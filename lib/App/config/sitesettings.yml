@@ -1,0 +1,4 @@
+environment: development
+memory: 512
+trace: 0
+mail-enabled: 0

@@ -1,0 +1,90 @@
+connections:
+  scym:
+    driver: pdo_mysql
+    user: scymorg
+    password: woolman
+    dbname: scymorg
+  scym_drupal:
+    driver: pdo_mysql
+    user: scymorg
+    password: woolman
+    dbname: scymorg
+  scym_model:
+    driver: pdo_mysql
+    user: scymorg
+    password: woolman
+    dbname: scymmodel
+  fma_model:
+    driver: pdo_mysql
+    user: austinqu_website
+    password: Georgefox1652
+    dbname: fmamodel
+  fma_production :
+    host: austinquakers.org
+    driver: pdo_mysql
+    user: austinqu_website
+    password: Georgefox1652
+    dbname: austinqu_fma
+  scym_production :
+    host: scym.org
+    driver: pdo_mysql
+    user: scymorg
+    password: woolman
+    dbname: scymorg
+  scym_temp :
+    driver: pdo_mysql
+    user: scymorg
+    password: woolman
+    dbname: scymtemp
+smtp:
+  server: localhost
+  username: mailsender
+  password: p@ssw0rd
+services:
+  argObject:
+    class: Tops\test\TDiTestClass
+  testObject:
+    class: Tops\test\TDiTestClass2
+    arguments: [@argObject]
+trace:
+  console: 1
+  logging: 1
+  log: trace
+  debugjs: 1
+  traces:
+    default: 1
+    trace1: 1
+    trace2: 1
+logging:
+  default: debug
+  logs:
+    - name: errors
+      handlers:
+        - type: testlog
+          level: error
+        - type: email
+          level: critical
+          sender:  Tops Admin <admin@2quakers.net>
+          recipient: Support <support@2quakers.net>
+    - name: debug
+      handlers:
+        - type: testlog
+          level: debug
+          bubble: 0
+    - name: trace
+      handlers:
+        - type: testlog
+          level: debug
+          bubble: 0
+exceptions:
+  logging: 1
+  policies:
+    default:
+      log: errors
+      rethrow: 0
+      level: error
+    critical:
+      log:  errors
+      rethrow: 1
+      level: critical
+

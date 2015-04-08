@@ -1,0 +1,14 @@
+namespaces:
+    root: App
+    services: services
+databases:
+    type:
+      application: scym
+      drupal: scym_drupal
+      model: fma_model
+      scym: scym_temp
+      fma: fma_production
+    models:
+      scym: App/src/db/scym
+      scym_drupal: Tops/src/drupal/db
+      fma: App/src/db/fma
