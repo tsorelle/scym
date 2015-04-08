@@ -5,8 +5,9 @@
  * Date: 12/31/2014
  * Time: 7:56 AM
  */
-require_once __DIR__ . '/../../core/vendor/autoload.php';
-include (__DIR__."/../Tops/start/init.php");
+// require_once __DIR__ . '/../../core/vendor/autoload.php';
+//include (__DIR__."/../Tops/start/init.php");
+include (__DIR__."/../Tops/start/autoload.php");
 \Tops\sys\TClassPath::Add('scym','App/src');
 
 use Tops\sys\TConfig;
