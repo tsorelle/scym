@@ -1,0 +1,1 @@
+This is a Drupal 7 web site project for South Central Yearly Meeting
