@@ -1,0 +1,25 @@
+<component name="libraryTable">
+  <library name="Generated files" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/assets/js/Tops.Peanut/Debugging.js" />
+        <item url="file://$PROJECT_DIR$/assets/js/Tops.App/MailboxesViewModel.js" />
+        <item url="file://$PROJECT_DIR$/assets/js/Tops.Peanut/Peanut.js" />
+        <item url="file://$PROJECT_DIR$/assets/js/Tops.App/TemplateViewModel.js" />
+        <item url="file://$PROJECT_DIR$/assets/js/Tops.App/App.js" />
+        <item url="file://$PROJECT_DIR$/assets/js/Tops.App/HelloWorldViewModel.js" />
+        <item url="file://$PROJECT_DIR$/assets/js/Tops.App/TestPageViewModel.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/assets/js/Tops.Peanut/Debugging.js" />
+      <root url="file://$PROJECT_DIR$/assets/js/Tops.App/MailboxesViewModel.js" />
+      <root url="file://$PROJECT_DIR$/assets/js/Tops.Peanut/Peanut.js" />
+      <root url="file://$PROJECT_DIR$/assets/js/Tops.App/TemplateViewModel.js" />
+      <root url="file://$PROJECT_DIR$/assets/js/Tops.App/App.js" />
+      <root url="file://$PROJECT_DIR$/assets/js/Tops.App/HelloWorldViewModel.js" />
+      <root url="file://$PROJECT_DIR$/assets/js/Tops.App/TestPageViewModel.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>

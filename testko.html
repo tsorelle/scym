@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title></title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
+
+    <script src="assets/js/Tops.Peanut/Peanut.js"></script>
+    <script src="assets/js/Tops.App/App.js"></script>
+    <script src="assets/js/Tops.App/TestPageViewModel.js"></script>
+
+</head>
+<body>
+
+<div class="container">
+
+<messages-component></messages-component>
+<div>
+<input data-bind="value: messageText" />
+<button data-bind="click: onAddMessageClick">Add info message</button>
+    <button data-bind="click: onAddErrorMessageClick">Add error message</button>
+    <button data-bind="click: onAddWarningMessageClick">Add warning message</button>
+</div>
+<div>
+    <button data-bind="click: onShowWaiter">Show Progress Waiter</button><br>
+    <button data-bind="click: onShowSpinWaiter">Show Spin Waiter</button><br>
+</div>
+
+<div>
+    <h1>Test form</h1>
+    <form>
+        <div class="form-group">
+            <label for="inputId">Id</label>
+            <input data-bind="value: itemId" type="text" class="form-control" id="inputId" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+            <label for="inputName">Name</label>
+            <input data-bind="value: itemName" type="text" class="form-control" id="inputName" placeholder="Enter item name">
+        </div>
+        <button data-bind="click: onGetItem" class="btn btn-primary">Get</button><br/>
+        <button data-bind="click: onPostItem" class="btn btn-primary">Post</button><br/>
+    </form>
+
+</div> <!-- end form -->
+</div> <!-- end container -->
+</body>
+<script>
+    var root = '/';
+    // var root = '/Tops.core';
+    ViewModel.init(root, function() {
+       ko.applyBindings(ViewModel);
+    });
+</script>
+</html>
