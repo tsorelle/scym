@@ -159,10 +159,10 @@ module Tops {
 
         // Drupal 8
         // See modules/tops/tops.routing.yml and modules/tops/src/controller/TopsController.php
-        // serviceUrl: string = "tops/service";
+        serviceUrl: string = "tops/service";
 
         // Drupal 6/7 or PHP
-        serviceUrl: string = "topsService.php";
+        // serviceUrl: string = "topsService.php";
 
 
         public getHtmlTemplate(name: string, successFunction: (htmlSource: string) => void) {

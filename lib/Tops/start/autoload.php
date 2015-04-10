@@ -9,9 +9,13 @@
  * Time: 6:05 PM
  */
 // Composer generated autoloader in Drupal core directory
-$drupalAutoloader = require_once __DIR__ . '/../../../core/vendor/autoload.php';
 
+/**
+ * @var  \Composer\Autoload\ClassLoader
+ */
 $libPath = realpath(__DIR__."/../..");
+$drupalModulePath = realpath($libPath."/../sites/all/modules");
+$drupalAutoloader = require_once __DIR__ . '/../../../core/vendor/autoload.php';
 
 // swiftfmailer autoload
 require_once $libPath.'/vendor/swiftmailer/lib/swift_required.php';
@@ -28,12 +32,13 @@ require_once($libPath . "/Tops/src/sys/TClassPath.php");
 \Tops\sys\TClassPath::Add('\Symfony\Component','vendor/Symfony/Component');
 \Tops\sys\TClassPath::Add('\Monolog','vendor/monolog/monolog/src/Monolog');
 
-// for Drupal 7 only:
+// for Drupal 7 only.  This is for forward compatibility with Drupal 8
 require_once($libPath."/Drupal/src/Drupal.php");
 \Tops\sys\TClassPath::Add('\Drupal','Drupal/src');
-
+// emulates Drupal 8 module class autoloading
+\Tops\sys\TClassPath::AddExternal('\Drupal\tops',$drupalModulePath,'tops/src');
 
 unset($libPath);
-
+unset($drupalModulePath);
 return $drupalAutoloader;
 

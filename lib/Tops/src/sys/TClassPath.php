@@ -104,6 +104,14 @@ class TClassPath
         self::$instance->addNamespace('Tops','Tops/src');
     }
 
+    public static function AddExternal($prefix, $basePath, $subPath = NULL) {
+        if ($subPath === NULL) {
+            $subPath = $prefix;
+        }
+        self::$instance->addNamespace($prefix,$subPath,false,$basePath);
+
+    }
+
     public static function Add($prefix, $subPath = NULL) {
         if ($subPath === NULL) {
             $subPath = $prefix;
@@ -140,13 +148,20 @@ class TClassPath
      * than last.
      * @return void
      */
-    public function addNamespace($prefix, $subPath, $prepend = false)
+    public function addNamespace($prefix, $subPath, $prepend = false, $basePath = null)
     {
         // normalize namespace prefix
         $prefix = trim($prefix, '\\') . '\\';
 
+        if (empty($basePath)) {
+            $basePath = $this->libPath;
+        }
+        else {
+            $basePath = $this->normalizePath($basePath,true);
+        }
+
         // normalize the base directory with a trailing separator
-        $base_dir = $this->appendPath($this->libPath,$subPath, true);
+        $base_dir = $this->appendPath($basePath,$subPath, true);
 
         // initialize the namespace prefix array
         if (isset($this->prefixes[$prefix]) === false) {

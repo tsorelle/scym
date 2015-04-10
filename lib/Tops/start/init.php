@@ -31,6 +31,7 @@ require_once(__DIR__.'/../../App/start/init.php');
 // Use with Drupal 7 for D8 emulation
 \Tops\sys\TObjectContainer::Register('path.alias_manager','Drupal\Core\Path\AliasManager');
 \Tops\sys\TObjectContainer::Register('current_user','\Tops\drupal\TDrupalAccountProxy');
+\Tops\sys\TObjectContainer::Register('tops-controller','\Drupal\tops\Controller\TopsController');
 
 // \Tops\sys\TTracer::setJsDebug(true);
 

@@ -10,7 +10,7 @@
 include (__DIR__."/../Tops/start/autoload.php");
 \Tops\sys\TClassPath::Add('scym','App/src');
 
-use Tops\sys\TConfig;
 
-\Tops\test\TSmokeTest::Test();
-\scym\db\TDBSmokeTest::Test();
+if (class_exists('Drupal\tops\Controller\TopsController')) {
+    print "\nOk\n";
+}
