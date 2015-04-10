@@ -1,6 +1,0 @@
-services:
-  argObject:
-    class: Tops\test\TDiTestClass
-  testObject:
-    class: Tops\test\TDiTestClass2
-    arguments: [@argObject]

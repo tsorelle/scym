@@ -28,6 +28,10 @@ require_once(__DIR__.'/../../App/start/init.php');
 \Tops\sys\TObjectContainer::Register('mailboxManager','\App\test\TestMailboxManager');
 \Tops\sys\TObjectContainer::Register('postoffice','\Tops\sys\TPostOffice','mailer,mailboxManager');
 
+// Use with Drupal 7 for D8 emulation
+\Tops\sys\TObjectContainer::Register('path.alias_manager','Drupal\Core\Path\AliasManager');
+\Tops\sys\TObjectContainer::Register('current_user','\Tops\drupal\TDrupalAccountProxy');
+
 // \Tops\sys\TTracer::setJsDebug(true);
 
 

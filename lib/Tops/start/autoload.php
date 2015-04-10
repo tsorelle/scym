@@ -28,6 +28,10 @@ require_once($libPath . "/Tops/src/sys/TClassPath.php");
 \Tops\sys\TClassPath::Add('\Symfony\Component','vendor/Symfony/Component');
 \Tops\sys\TClassPath::Add('\Monolog','vendor/monolog/monolog/src/Monolog');
 
+// for Drupal 7 only:
+require_once($libPath."/Drupal/src/Drupal.php");
+\Tops\sys\TClassPath::Add('\Drupal','Drupal/src');
+
 
 unset($libPath);
 
