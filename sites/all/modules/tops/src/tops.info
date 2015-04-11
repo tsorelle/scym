@@ -1,5 +1,0 @@
-; $Id$
-name = "TOPS Extension"
-description = "Supports KnockoutJS View Models and PEANUT Services."
-core = 7.x
-php = 5.4
