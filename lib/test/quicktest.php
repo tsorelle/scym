@@ -21,7 +21,7 @@
 require_once __DIR__."/TTestLoader.php";
 
 print "starting\n";
-
+/*
 // autoload tops, drupal core and tops module
 $loader = require __DIR__.'/../Tops/start/autoload.php';
 Tops\test\TTestLoader::Create($loader,"tops");
@@ -29,12 +29,18 @@ Tops\test\TTestLoader::Create($loader,"tops");
 use Tops\sys\TSession;
 TSession::Initialize();
 $t = TSession::GetSecurityToken();
+*/
+$path = false; // 'foo/bar/readme';
+$ext = pathinfo($path, PATHINFO_EXTENSION);
+print "\n$ext\n";
+if  (!empty($ext))
+// (!TSession::AuthenitcateSecurityToken($t))
+{
 
-if (!TSession::AuthenitcateSecurityToken($t)) {
-    print "Failed!/n";
+    print "Failed!\n";
 
 }
-else print "ok/n";
+else print "ok\n";
 /*
 for ($i=0; $i<20; $i++) {
     print TSession::createToken()."\n";

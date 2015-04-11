@@ -6,7 +6,7 @@
  * Time: 3:56 PM
  */
 
-namespace Tops\drupal;
+namespace Drupal\tops\Identity;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;

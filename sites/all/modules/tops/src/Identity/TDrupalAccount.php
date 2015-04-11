@@ -8,7 +8,7 @@
  * Wrapper for Drupal 7 user object implementing Drupal 8 AccountInterface
  */
 
-namespace Tops\drupal;
+namespace Drupal\tops\Identity;
 
 use Drupal;
 use Drupal\Core\Session\AccountInterface;

@@ -10,11 +10,12 @@
 namespace Drupal\tops;
 
 use Drupal\Core\Session\AccountInterface;
+use Drupal\tops\Mvvm\TViewModel;
 use \Tops\sys\TObjectContainer;
 use \Drupal\tops\Controller\TopsController;
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpFoundation\JsonResponse;
-
+use Tops\sys\TSession;
 
 
 class TopsModule {
@@ -39,6 +40,9 @@ class TopsModule {
     public static function Initialize() {
         if (!self::$initialized) {
             self::$initialized = true;
+            $req = Request::createFromGlobals();
+            TViewModel::Initialize($req);
+            TSession::Initialize();
         }
     }
 

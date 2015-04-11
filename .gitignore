@@ -2,8 +2,8 @@
 sites/*/settings*.php
 
 # Ignore paths that contain user-generated content.
-sites/*/files
-sites/*/private
+# sites/*/files
+# sites/*/private
 
 #exclude all modules except tops
 /modules
@@ -40,10 +40,8 @@ authorize.php
 CHANGELOG.txt
 index - test.php
 sites/all/themes/bootstrap
-sites/all/themes/README.txt
 sites/default
 sites/example.sites.php
-sites/README.txt
 lib/vendor
 lib/tools/model/*
 

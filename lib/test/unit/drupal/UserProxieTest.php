@@ -17,7 +17,7 @@ class UserProxieTest extends PHPUnit_Framework_TestCase {
         $GLOBALS['user'] = $fakeUser;
 
         \Tops\sys\TObjectContainer::Clear();
-        \Tops\sys\TObjectContainer::Register('current_user','\Tops\drupal\TDrupalAccountProxy');
+        \Tops\sys\TObjectContainer::Register('current_user','\Drupal\tops\Identity\TDrupalAccountProxy');
 
     }
 
