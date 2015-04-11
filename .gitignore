@@ -11,7 +11,6 @@ misc
 private
 profiles
 scripts
-themes
 INSTALL.txt
 index.php
 LICENSE.txt
@@ -50,14 +49,11 @@ sites/all/modules/devel
 sites/all/modules/ckeditor
 sites/all/themes/bootstrap
 sites/all/themes/README.txt
-sites/all/themes/zen
 sites/default
 sites/example.sites.php
 sites/README.txt
 lib/vendor
 lib/tools/model/*
-
-!sites/all/modules/tops/*
 
 #drupal core modules
 modules/aggregator
