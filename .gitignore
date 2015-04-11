@@ -12,7 +12,6 @@ modules
 private
 profiles
 scripts
-sites
 themes
 INSTALL.txt
 index.php

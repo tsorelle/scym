@@ -22,7 +22,7 @@ class TestGetServiceCommand extends TServiceCommand {
             $this->addInfoMessage("Found item");
             $item = new \stdClass();
             $item->name = "TestItem";
-            $item->id = 3;
+            $item->id = $id;
             $this->setReturnValue($item);
         }
         else {

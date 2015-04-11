@@ -193,7 +193,7 @@ module Tops {
             }
             var serviceRequest = { "serviceCode" : serviceName, "topsSecurityToken": _peanut.securityToken,  "request" : parameters};
 
-            var serviceUrl =  _peanut.clientApp.serviceUrl; // Drupal 8: tops/service, Drupal 6/7 or PHP: 'topsService.php';
+            var serviceUrl =  _peanut.clientApp.serviceUrl; // Drupal 8/7: tops/service, Drupal 6 or PHP: 'topsService.php';
 
             var result =
                 jQuery.ajax({
