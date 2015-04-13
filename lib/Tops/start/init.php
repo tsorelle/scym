@@ -24,7 +24,7 @@ require_once(__DIR__.'/../../App/start/init.php');
 \Tops\sys\TObjectContainer::Register('tracer','\Tops\sys\TTracer','configManager,traceLogger');
 \Tops\sys\TObjectContainer::Register('exceptionHandler','\Tops\sys\TExceptionHandler','errorLogger,configManager');
 \Tops\sys\TObjectContainer::Register('serviceFactory','\Tops\services\TServiceFactory','configManager');
-\Tops\sys\TObjectContainer::Register('serviceHost','\Tops\services\TServiceHost','serviceFactory,user,exceptionHandler');
+\Tops\sys\TObjectContainer::Register('serviceHost','\Tops\services\TServiceHost','serviceFactory,tops.user,exceptionHandler');
 \Tops\sys\TObjectContainer::Register('mailboxManager','\App\test\TestMailboxManager');
 \Tops\sys\TObjectContainer::Register('postoffice','\Tops\sys\TPostOffice','mailer,mailboxManager');
 
