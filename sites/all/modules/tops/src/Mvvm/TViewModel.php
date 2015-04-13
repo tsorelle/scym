@@ -23,7 +23,7 @@ class TViewModel
         }
         return false;
     }
-
+    
     /**
      *
      * Extracts an alias from the request returns it if it is valid for a view model
@@ -52,11 +52,11 @@ class TViewModel
             }
 
             $name = $pathParts[1];
-
+            $lowerName = strtolower($name); // for case insensitive compare
             // exclude Drupal and Tops root directories and standard Drupal root functions
-            if ($name == 'config' || $name == 'admin' || $name == 'user' ||
-                $name == 'sites' || $name == 'misc' || $name == 'assets' || $name == 'lib' || $name == 'core' ||
-                    $name == 'modules' || $name == 'themes'
+            if ($lowerName == 'config' || $lowerName == 'admin' || $lowerName == 'user' ||
+                $lowerName == 'sites' || $lowerName == 'misc' || $lowerName == 'assets' || $lowerName == 'lib' || $lowerName == 'core' ||
+                    $lowerName == 'modules' || $lowerName == 'themes' || $lowerName == 'tops'
             ) {
                 return null;
             }
@@ -155,6 +155,8 @@ class TViewModel
         if ($vmPath)
         {
             return
+
+
                //  '<script src="'.$vmPath.'"'."></script>\n".
                 // "<script>\n".
                 "   ViewModel.init('/');\n".

@@ -46,6 +46,80 @@ class TopsModule {
         }
     }
 
+    public static function PreprocessHtml(&$variables) {
+        $vmPath = TViewModel::getVmPath();
+        $hasVm = (!empty($vmPath));
+        $variables['peanut_viewmodel'] = $hasVm;
+        $variables['peanut_viewmodel_src'] = $vmPath;
+        // $variables['tops_js_debug'] =  \Tops\sys\TTracer::JsDebuggingOn();
+
+        if ($hasVm) {
+            $initJs =  "ViewModel.init('//', function() {  ko.applyBindings(ViewModel); });";
+
+            drupal_add_library('tops','peanut.app');
+            drupal_add_js($vmPath,array('group'=>'JS_THEME', 'scope'=>'footer', 'weight',2));
+            drupal_add_js($initJs,array('group'=>'JS_THEME','type'=>'inline', 'scope'=>'footer', 'weight',3));
+        }
+    }
+
+    public static function addPeanutScripts() {
+
+        $vmPath = TViewModel::getVmPath();
+        $hasVm = (!empty($vmPath));
+        if ($hasVm) {
+            $initJs =  "ViewModel.init('//', function() {  ko.applyBindings(ViewModel); });";
+
+            drupal_add_library('tops','peanut.app');
+            drupal_add_js($vmPath,array('group'=>'JS_THEME', 'scope'=>'footer'));
+            drupal_add_js($initJs,array('group'=>'JS_THEME','type'=>'inline', 'scope'=>'footer'));
+
+        }
+    }
+
+
+
+    public static function GetLibraries() {
+
+        $libraries['knockoutjs'] = array(
+            'title' => 'Knockout JS',
+            'website' => 'http://cdnjs.cloudflare.com',
+            'version' => '3.3.0',
+            'js' => array(
+                'http://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js' => array('type'=>'external', 'group' => JS_LIBRARY),  'weight' => 1),
+        );
+
+        $libraries['peanut'] = array(
+            'title' => 'Peanut Service Library',
+            'version' => '1.0',
+            'js' => array(
+                'assets/js/Tops.Peanut/Peanut.js' => array('group' => JS_LIBRARY, 'weight' => 2),
+            ),
+            'dependencies' => array(
+                array('system', 'jquery'),
+                array('tops','knockoutjs'),
+                // we also need bootstrap but will rely on bootstrap module for that
+            ),
+        );
+
+        $libraries['peanut.app'] = array(
+            'title' => 'Peanut Application',
+            'version' => '1.0',
+            'js' => array(
+                'assets/js/Tops.App/App.js' => array('group' => JS_LIBRARY, 'weight' => 3),
+            ),
+            'dependencies' => array(
+                array('system', 'jquery'),
+                array('tops','knockoutjs'),
+                array('tops','peanut')
+                // we also need bootstrap but will rely on bootstrap module for that
+            )
+        );
+
+
+        return $libraries;
+
+    }
+
         /**
      *
      * Set TopsController fake for unit test

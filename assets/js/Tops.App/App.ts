@@ -153,7 +153,7 @@ module Tops {
         }
 
         static current: Application;
-        applicationPath: string = "/";
+        applicationPath: string = "";
         peanut: Tops.Peanut;
         viewModel: any;
 
@@ -168,7 +168,8 @@ module Tops {
         public getHtmlTemplate(name: string, successFunction: (htmlSource: string) => void) {
             var parts = name.split('-');
             var fileName = parts[0] + parts[1].charAt(0).toUpperCase() + parts[1].substring(1);
-            var htmlSource = this.applicationPath + 'assets/templates/' + fileName + '.html';
+            var htmlSource = // this.applicationPath +
+                'assets/templates/' + fileName + '.html';
             jQuery.get(htmlSource, successFunction);
         }
 
@@ -196,7 +197,8 @@ module Tops {
         public initialize(applicationPath: string, successFunction?: () => void) {
             var me = this;
             me.setApplicationPath(applicationPath);
-            me.serviceUrl = this.applicationPath + this.serviceUrl;
+            me.serviceUrl = // this.applicationPath +
+                this.serviceUrl;
 
             messageManager.instance = new messageManager();
             me.registerComponent('messages-component', messageManager.instance, function () {
