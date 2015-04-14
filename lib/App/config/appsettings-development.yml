@@ -53,8 +53,8 @@ trace:
   debugjs: 1
   traces:
     default: 1
-    trace1: 1
-    trace2: 1
+    trace1: 0
+    trace2: 0
 logging:
   default: debug
   logs:

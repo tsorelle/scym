@@ -32,9 +32,13 @@ class TTracer
     private $traceCount = -1;
     private $sessionId;
 
-    public function isEnabled()
-    {
-        return $this->traceMode != self::TRACE_MODE_OFF;
+
+
+    public static function isEnabled() {
+        if (self::$tracer) {
+            return self::$tracer->traceMode != self::TRACE_MODE_OFF;
+        }
+        return false;
     }
 
     public function __construct(IConfigManager $configManager, ILogger $traceLogger = null)
@@ -68,6 +72,7 @@ class TTracer
             if (empty($this->traces)) {
                 array_push($this->traces,'default');
             }
+
         }
 
     }
@@ -132,7 +137,7 @@ class TTracer
 
     public static function Trace($message, $file = '', $line = 0)
     {
-        if (self::$tracer->isEnabled()) {
+        if (self::isEnabled()) {
             if (!empty($file)) {
                 if (!empty($line))
                     $message .= "  on line $line";
@@ -181,22 +186,34 @@ class TTracer
         }
     }
 
+    public static function RenderTraceMessages()
+    {
+        $messageText = self::Render();
+        $styles = 'background-color: white; border: 1px solid black; color: black; padding: 3px';
+        $markup = ($messageText) ? "<div id='tops.trace' style='$styles'>".$messageText.'</div>' :  '';
+        if ($markup) {
+            return array('#markup' => $markup);
+        }
+        return '';
+    }
+
+
     public static function GetMessages()
     {
-        if (self::$tracer->isEnabled())
+        if (self::isEnabled())
             return self::$tracer->getTraceMessages();
         return array();
     }  //  getTraceMessages
 
     public static function EchoOn()
     {
-        if (self::$tracer->isEnabled())
+        if (self::isEnabled())
             self::$tracer->setEchoOn();
     }  //  self::EchoOn
 
     public static function EchoOff()
     {
-        if (self::$tracer->isEnabled())
+        if (self::isEnabled())
             self::$tracer->setEchoOff();
     }  //  self::EchoOff
 

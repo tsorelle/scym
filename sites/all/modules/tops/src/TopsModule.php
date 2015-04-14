@@ -16,6 +16,7 @@ use \Drupal\tops\Controller\TopsController;
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpFoundation\JsonResponse;
 use Tops\sys\TSession;
+use Tops\sys\TTracer;
 
 
 class TopsModule {
@@ -25,6 +26,13 @@ class TopsModule {
      */
     private static $topsController = null;
     private static $initialized = false;
+
+
+    public static function TracerOn($username = 'admin', $traceId='default') {
+        if (\Drupal::currentUser()->getUsername() == $username) {
+            TTracer::On($traceId);
+        }
+    }
 
     /**
      * @return TopsController|mixed
@@ -38,12 +46,15 @@ class TopsModule {
     }
 
     public static function Initialize() {
+       //  TTracer::Trace('Start TopsModule::Initialize');
+
         if (!self::$initialized) {
             self::$initialized = true;
             $req = Request::createFromGlobals();
             TViewModel::Initialize($req);
             TSession::Initialize();
         }
+        // TTracer::Trace('End TopsModule::Initialize');
     }
 
     public static function PreprocessHtml(&$variables) {
@@ -61,7 +72,7 @@ class TopsModule {
             drupal_add_js($initJs,array('group'=>'JS_THEME','type'=>'inline', 'scope'=>'footer', 'weight',3));
         }
     }
-
+/*
     public static function addPeanutScripts() {
 
         $vmPath = TViewModel::getVmPath();
@@ -75,11 +86,10 @@ class TopsModule {
 
         }
     }
-
+*/
 
 
     public static function GetLibraries() {
-
         $libraries['knockoutjs'] = array(
             'title' => 'Knockout JS',
             'website' => 'http://cdnjs.cloudflare.com',
@@ -114,7 +124,6 @@ class TopsModule {
                 // we also need bootstrap but will rely on bootstrap module for that
             )
         );
-
 
         return $libraries;
 
@@ -175,14 +184,6 @@ class TopsModule {
      */
     public static function UpdateUser(AccountInterface $drupalAccount)
     {
-
-    }
-
-    public static function test($serviceCode,$parameter) {
-        $controller = self::GetTopsController();
-        $response = $controller->test2($serviceCode,$parameter);
-        $response->send();
-        exit;
 
     }
 

@@ -34,6 +34,8 @@ require_once(__DIR__.'/../../App/start/init.php');
 \Tops\sys\TObjectContainer::Register('tops-controller','\Drupal\tops\Controller\TopsController');
 
 // \Tops\sys\TTracer::setJsDebug(true);
+// \Tops\sys\TTracer::On();
+// \Drupal\tops\TopsModule::TracerOn();
 
 
 

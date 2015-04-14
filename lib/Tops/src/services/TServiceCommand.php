@@ -9,6 +9,7 @@
 namespace Tops\services;
 use Tops\sys\IUser;
 use Tops\sys\TSession;
+use Tops\sys\TTracer;
 use Tops\sys\TUser;
 
 /**
@@ -102,6 +103,12 @@ abstract class TServiceCommand {
         else {
             $this->addErrorMessage("Sorry, your session has expired or is not valid. Please return to home page.");
         }
+
+        $traceMessages = TTracer::GetMessages();
+        foreach($traceMessages as $message) {
+            $this->addInfoMessage("Trace: $message");
+        }
+
         return $this->context->GetResponse();
     }
 }

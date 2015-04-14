@@ -166,3 +166,4 @@
 <footer class="footer container">
   <?php print render($page['footer']); ?>
 </footer>
+<?php print render($trace_messages) ?>
