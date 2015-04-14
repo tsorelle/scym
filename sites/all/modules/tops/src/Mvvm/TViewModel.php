@@ -65,7 +65,7 @@ class TViewModel
 
             // if 'node' get arguments
             if ($name == 'node') {
-                if (!is_numeric($pathParts[2])) {
+                if ($count < 3 || !is_numeric($pathParts[2])) {
                     return null;
                 }
                 if ($count > 3) {

@@ -8,7 +8,7 @@
 use Drupal\tops\Mvvm\TViewModel;
 
 /**
- * Overrides theme_status-Messages
+ * Overrides theme_status_messages
  *
  * Inserts a KnockoutJS component element for ViewModel pages
  *
@@ -17,21 +17,11 @@ use Drupal\tops\Mvvm\TViewModel;
  */
 function topsy_status_messages($variables) {
     $vmPath = TViewModel::getVmPath();
-    if (empty($vmPath)) {
-        return;
+    $result = bootstrap_status_messages($variables);
+    if (!empty($vmPath)) {
+        $result = "$result\n<messages-component></messages-component>";
     }
-
-    $display = $variables['display'];
-    $output = '<messages-component></messages-component>';
-/*
- * // would we ever need to display both drupal messages and Peanut service messags?
- *
-    $messages = drupal_get_messages($display);
-    if (sizeof($messages) > 0) {
-        $existingContent = $variables['messages'];
-    }
-*/
-    return $output;
+    return $result;
 }
 
 
