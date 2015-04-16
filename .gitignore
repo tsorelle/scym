@@ -43,7 +43,7 @@ sites/all/themes/bootstrap
 sites/default
 sites/example.sites.php
 lib/vendor
-lib/tools/model/*
+lib/tools
 
 
 sites/all/themes/scymtheme/less/bootstrap
