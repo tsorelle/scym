@@ -45,3 +45,12 @@ sites/example.sites.php
 lib/vendor
 lib/tools/model/*
 
+
+sites/all/themes/scymtheme/less/bootstrap
+sites/all/themes/scymtheme/assets/fonts/glyphicons-halflings-regular.eot
+sites/all/themes/scymtheme/assets/fonts/glyphicons-halflings-regular.woff
+sites/all/themes/scymtheme/assets/fonts/glyphicons-halflings-regular.svg
+sites/all/themes/scymtheme/assets/fonts/glyphicons-halflings-regular.ttf
+sites/all/themes/scymtheme/assets/js/npm.js
+sites/all/themes/scymtheme/assets/js/bootstrap.min.js
+sites/all/themes/scymtheme/assets/js/bootstrap.js

@@ -68,8 +68,8 @@ class TopsModule {
             $initJs =  "ViewModel.init('//', function() {  ko.applyBindings(ViewModel); });";
 
             drupal_add_library('tops','peanut.app');
-            drupal_add_js($vmPath,array('group'=>'JS_THEME', 'scope'=>'footer', 'weight',2));
-            drupal_add_js($initJs,array('group'=>'JS_THEME','type'=>'inline', 'scope'=>'footer', 'weight',3));
+            drupal_add_js($vmPath,array('group'=>'JS_THEME', 'scope'=>'footer'));
+            drupal_add_js($initJs,array('group'=>'JS_THEME','type'=>'inline', 'scope'=>'footer'));
         }
     }
 /*
@@ -95,14 +95,14 @@ class TopsModule {
             'website' => 'http://cdnjs.cloudflare.com',
             'version' => '3.3.0',
             'js' => array(
-                'http://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js' => array('type'=>'external', 'group' => JS_LIBRARY),  'weight' => 1),
+                'http://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js' => array('type'=>'external', 'group' => JS_LIBRARY),  'weight' => '1'),
         );
 
         $libraries['peanut'] = array(
             'title' => 'Peanut Service Library',
             'version' => '1.0',
             'js' => array(
-                'assets/js/Tops.Peanut/Peanut.js' => array('group' => JS_LIBRARY, 'weight' => 2),
+                'assets/js/Tops.Peanut/Peanut.js' => array('group' => JS_LIBRARY, 'weight' => '2'),
             ),
             'dependencies' => array(
                 array('system', 'jquery'),
@@ -115,7 +115,7 @@ class TopsModule {
             'title' => 'Peanut Application',
             'version' => '1.0',
             'js' => array(
-                'assets/js/Tops.App/App.js' => array('group' => JS_LIBRARY, 'weight' => 3),
+                'assets/js/Tops.App/App.js' => array('group' => JS_LIBRARY, 'weight' => '3'),
             ),
             'dependencies' => array(
                 array('system', 'jquery'),
