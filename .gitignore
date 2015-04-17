@@ -25,7 +25,6 @@ MAINTAINERS.txt
 COPYRIGHT.txt
 cron.php
 genpwd.php
-README.txt
 install.php
 update.php
 INSTALL.sqlite.txt
@@ -43,8 +42,8 @@ sites/all/themes/bootstrap
 sites/default
 sites/example.sites.php
 lib/vendor
-lib/tools
-
+lib/tools/*.cmd
+lib/tools/environment.php
 
 sites/all/themes/scymtheme/less/bootstrap
 sites/all/themes/scymtheme/assets/fonts/glyphicons-halflings-regular.eot
