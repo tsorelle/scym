@@ -14,8 +14,13 @@ All other modifications are specific to scym.org.
 
 The style sheet, assets/css/scym-theme.min.css, is generated from the LESS files in the less directory.
 LESS compilation and minimization is done in the development environment. LESS compiler generates less\style.css
-as source for scym-theme.min.css. We use  'YUI Compressor' (http://yui.github.io/yuicompressor/) to perform this task.
+as source for scym-theme.min.css. Then use lib/tools/build.php to perform the mimimization and update.
+A Java installation is required (http://www.java.com)
 
 If the version of bootstrap needs to be updated, see setup instructions in less\README.txt.
+
+The stylesheet, assets/css/scym-more.css, is intended for temporary style changes as needed. These change should
+eventually be moved to less/content.less for recompilation into the minified css file.
+
 
 
