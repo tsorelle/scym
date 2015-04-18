@@ -7,11 +7,13 @@
  any contributed module.
  
  Top level directories
+ 
     * lib - library files for the tops framework
     * assets - publically accessibe resources for SCYM and tops.
     * core - vendor libraries from the Drupal 8 distribution used by the tops framework.
 
  Themes and modules  under sites/all
+ 
     * modules/tops - tops framework api for drupal
     * themes/scym - scym custom theme
     * themes/topsy - example custom theme for tops - not required for deployment
