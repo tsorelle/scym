@@ -1,5 +1,9 @@
+Topsy Example Theme
+===================
+
 This theme is based on the bootstrap theme starter kit in its simplest configuration
-with a couple of minor changes to support the Tops Module.
+with a couple of minor changes to support the Tops Module.  It is intended as an example for other tops based
+theme installation
 
 The changes for Tops are
 1) In template.php,
