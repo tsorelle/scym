@@ -11,7 +11,7 @@ use Drupal\tops\Mvvm\TViewModel;
  * @param $variables
  * @return string|void
  */
-function topsy_status_messages($variables) {
+function scymtheme_status_messages($variables) {
     $vmPath = TViewModel::getVmPath();
     $result = bootstrap_status_messages($variables);
     if (!empty($vmPath)) {
