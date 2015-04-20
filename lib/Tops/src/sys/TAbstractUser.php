@@ -21,6 +21,12 @@ abstract class TAbstractUser implements IUser
 
     protected $isCurrentUser = false;
 
+    /**
+     * @var array
+     */
+    protected   $profile = null;
+
+
 
     /**
      * @param $id
@@ -66,6 +72,7 @@ abstract class TAbstractUser implements IUser
      */
     public abstract function isAuthenticated();
 
+    protected abstract function loadProfile();
 
     /**
      * @internal param $first
@@ -189,6 +196,30 @@ abstract class TAbstractUser implements IUser
     {
         $this->isCurrentUser = true;
     }
+
+    public function getProfileValue($key) {
+        if (!isset($this->profile)) {
+            $this->loadProfile();
+        }
+        if (array_key_exists($this->profile,$key)) {
+            return $this->profile[$key];
+        }
+    }
+
+    public function setProfileValue($key,$value) {
+        if (!isset($this->profile)) {
+            $this->loadProfile();
+        }
+        if (array_key_exists($this->profile,$key)) {
+            $this->profile[$key] = $value;
+            $this->updateProfile($key);
+        }
+    }
+
+    public function updateProfile($key=null) {
+        // override in sub-class as needed
+    }
+
 
 
 }

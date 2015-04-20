@@ -15,6 +15,10 @@ use Tops\sys;
 use Drupal;
 use Tops\sys\TAbstractUser;
 
+/**
+ * Class TDrupalUser
+ * @package Drupal\tops\Identity
+ */
 class TDrupalUser extends TAbstractUser  {
 
     function __construct(AccountInterface $user = null) {
@@ -27,6 +31,7 @@ class TDrupalUser extends TAbstractUser  {
      * @var AccountInterface
      */
     private   $drupalUser;
+
 
 
     protected function loadDrupalUser(AccountInterface $account = null)
@@ -45,18 +50,17 @@ class TDrupalUser extends TAbstractUser  {
         $currentUser = TDrupalAccount::GetCurrent();
 
         if ($account == null) {
-            $account = $currentUser;
             $this->drupalUser = $account;
             $this->isCurrentUser = true;
         } else {
             $this->isCurrentUser = $account->id() == $currentUser->id();
         }
 
-        if (!$account->isAuthenticated()) {
+        if ($account->isAuthenticated()) {
             $this->email = $account->getEmail();
             $this->userName = $account->getUsername();
             $this->id = $account->id();
-            $this->loadDrupalProfile($account);
+            // $this->loadDrupalProfile($account);
         }
     }
 
@@ -64,24 +68,31 @@ class TDrupalUser extends TAbstractUser  {
      * @param AccountInterface $user
      *
      * Assign firstName, lastName, middleName and pictureFile
+     *
+     * This version for Drupal 7 - might work with 8, we'll see...
      */
-    protected function loadDrupalProfile(AccountInterface $account) {
+    protected function loadProfile() {
+        $this->profile = array();
+        $drupalUser =   user_load($this->getId());
+        if ($drupalUser != null) {
+            $vars = get_object_vars($drupalUser);
+            $keys = array_keys($vars);
+            foreach($keys as $key) {
+                if (substr( $key, 0, 6 ) === "field_") {
+                    $item = $vars[$key];
+                    $hasValue = isset($item['und'][0]['value']);
+                    if ($hasValue)
+                    {
+                        $value = $item['und'][0]['value'];
+                        $fieldName = substr($key,6);
+                        $this->profile[$fieldName] = $value;
+                    }
 
-        // todo:implement this for drupal 7 and 8
-
-        /* profile_load_profile not available after drupal 6
-        may be better to just delegate profile storage to the custom database, would save the synchronization
-        need to see how to find the user picture anyway
-
-
-        $field_definitions = \Drupal::entityManager()->getFieldDefinitions('user', 'user');
-        if (isset($field_definitions['user_picture'])) {
-
-
+                }
+            }
         }
-        */
-
     }
+
 
     /**
      * @param $id
@@ -172,4 +183,6 @@ class TDrupalUser extends TAbstractUser  {
         }
         return false;
     }
+
+
 }

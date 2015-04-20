@@ -27,6 +27,10 @@ class TDrupalAccount implements AccountInterface  {
      */
     private static $current;
 
+    protected function getProfileFieldValue($fieldName) {
+        //todo: finish this
+    }
+
     /**
      * @return AccountInterface
      */

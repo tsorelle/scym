@@ -90,12 +90,14 @@ class TopsModule {
 
 
     public static function GetLibraries() {
+
         $libraries['knockoutjs'] = array(
             'title' => 'Knockout JS',
             'website' => 'http://cdnjs.cloudflare.com',
             'version' => '3.3.0',
             'js' => array(
-                'http://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js' => array('type'=>'external', 'group' => JS_LIBRARY),  'weight' => '1'),
+                'http://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js' => array('type'=>'external', 'group' => JS_LIBRARY,  'weight' => '1')
+            ),
         );
 
         $libraries['peanut'] = array(

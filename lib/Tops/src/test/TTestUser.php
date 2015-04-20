@@ -219,4 +219,9 @@ class TTestUser extends TAbstractUser {
     {
         return $this->userName != 'guest';
     }
+
+    protected function loadProfile()
+    {
+        $this->profile = array();
+    }
 }

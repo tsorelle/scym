@@ -20,7 +20,7 @@ class TUser {
      */
     public static function getCurrent() {
         if (!isset(self::$currentUser)) {
-            self::$currentUser = TObjectContainer::Get('user');
+            self::$currentUser = TObjectContainer::Get('tops.user');
             self::$currentUser->loadCurrentUser();
         }
         return self::$currentUser;

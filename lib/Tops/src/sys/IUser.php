@@ -89,4 +89,11 @@ interface IUser
      * @return bool
      */
     public function isCurrent();
+
+
+    public function getProfileValue($key);
+
+    public function setProfileValue($key,$value);
+
+    public function updateProfile($key=null);
 }
