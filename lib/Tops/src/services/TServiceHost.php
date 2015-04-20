@@ -87,12 +87,6 @@ class TServiceHost {
      */
     public static function ExecuteRequest(Request $request = null, $serviceCode = null, $serviceRequest = null)
     {
-
-        $user = TUser::getCurrent();
-        if (empty($user)) {
-            throw new Exception('cant get current user');
-        }
-
         $instance = self::getInstance();
         try {
             return $instance->_executeRequest($request, $serviceCode, $serviceRequest);
