@@ -69,4 +69,5 @@ class TMemoryConfigManager extends TConfigSection implements IConfigManager {
         $result = $this->Value("environment");
         return empty($result) ? 'development' : $result;
     }
+
 }

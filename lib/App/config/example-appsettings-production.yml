@@ -1,13 +1,14 @@
-scym:
-  driver: pdo_mysql
-  user: scymorg
-  password: xxxxxx
-  dbname: scymorg
-scym_drupal:
-  driver: pdo_mysql
-  user: scymorg
-  password: xxxxx
-  dbname: scymorg
+connections:
+  scym:
+    driver: pdo_mysql
+    user: austinqu_scym
+    password: W00lm@n
+    dbname: austinqu_scym
+  scym_drupal:
+    driver: pdo_mysql
+    user: austinqu_scym
+    password: W00lm@n
+    dbname: austinqu_scymdpl
 smtp:
   server: localhost
 services:

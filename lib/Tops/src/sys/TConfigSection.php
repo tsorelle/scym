@@ -145,4 +145,15 @@ class TConfigSection implements IConfiguration
 
         return !empty($value);
     }
+
+
+    public function AddSection($sectionName, IConfiguration $section)
+    {
+
+        /** @var TConfigSection $config */
+        $config = $section;  // upcast $section
+
+        $this->configData[$sectionName] = $config->configData;
+
+    }
 }

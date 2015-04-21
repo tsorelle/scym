@@ -29,4 +29,8 @@ interface IConfiguration {
      * @return IConfiguration
      */
     public function GetSection($sectionPath);
+
+    public function AddSection($sectionName, IConfiguration $section);
+
+   // public function GetSectionAsArray($sectionPath);
 }
