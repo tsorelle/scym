@@ -5,9 +5,11 @@
  * Date: 1/2/2015
  * Time: 7:03 AM
  */
-$outputPath= realpath(__DIR__ . '/model');
-require_once __DIR__ . '/../../core/vendor/autoload.php';
+$dbType = 'application';
+$outputPath= realpath(__DIR__ . '/'. $dbType.'-'.'model');
+require_once(__DIR__.'/../Tops/start/autoload.php');
 include (__DIR__."/../Tops/start/init.php");
+
 \Tops\sys\TClassPath::Add('\Doctrine\ORM','vendor\doctrine\orm\lib\Doctrine\ORM');
 \Tops\sys\TClassPath::Add('\Doctrine\DBAL','vendor\doctrine\dbal\lib\Doctrine\DBAL');
 \Tops\sys\TClassPath::Add('\scym','App/src');
@@ -30,8 +32,7 @@ $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver($outputPath))
 $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache);
 $config->setProxyDir(__DIR__ . '/Proxies');
 $config->setProxyNamespace('Proxies');
-
-$em = \Tops\db\TEntityManagers::Get('model');
+$em = \Tops\db\TEntityManagers::Get($dbType);
 
 // custom datatypes (not mapped for reverse engineering)
 $em->getConnection()->getDatabasePlatform()->registerDoctrineTypeMapping('set', 'string');

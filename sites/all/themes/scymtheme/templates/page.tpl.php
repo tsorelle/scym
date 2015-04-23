@@ -82,7 +82,12 @@
       </a>
       <?php endif; ?>
 
-      <?php if (!empty($site_name)): ?>
+
+      <?php
+        if (!empty($siteshortname)) {
+            $site_name = $siteshortname;
+        }
+        if (!empty($site_name)): ?>
       <a class="name navbar-brand" href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>"><?php print $site_name; ?></a>
       <?php endif; ?>
 

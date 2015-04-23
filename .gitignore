@@ -57,3 +57,5 @@ sites/all/themes/scymtheme/assets/fonts/glyphicons-halflings-regular.ttf
 sites/all/themes/scymtheme/assets/js/npm.js
 sites/all/themes/scymtheme/assets/js/bootstrap.min.js
 sites/all/themes/scymtheme/assets/js/bootstrap.js
+
+lib/tools/scym-model

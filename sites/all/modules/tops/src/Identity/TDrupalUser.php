@@ -21,10 +21,17 @@ use Tops\sys\TAbstractUser;
  */
 class TDrupalUser extends TAbstractUser  {
 
+
+    protected function test() {
+        return 'drupal';
+    }
+
+
     function __construct(AccountInterface $user = null) {
         if (isset($user)) {
             $this->loadDrupalUser($user);
         }
+        $result = $this->test();
     }
 
     /**
@@ -36,6 +43,7 @@ class TDrupalUser extends TAbstractUser  {
 
     protected function loadDrupalUser(AccountInterface $account = null)
     {
+        $test = $this->test();
         $this->drupalUser = $account;
         if (empty($account)) {
             return;
@@ -64,6 +72,7 @@ class TDrupalUser extends TAbstractUser  {
             $this->id = $account->id();
             // $this->loadDrupalProfile($account);
         }
+
     }
 
     /**

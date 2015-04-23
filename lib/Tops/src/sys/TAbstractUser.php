@@ -11,14 +11,10 @@ namespace Tops\sys;
 
 abstract class TAbstractUser implements IUser
 {
-    protected $id = 0;
-    protected $firstName = '';
-    protected $lastName = '';
-    protected $middleName = '';
-    protected $userName = '';
-    protected $fullName = '';
-    protected $email = '';
 
+
+    protected $id = 0;
+    protected $userName = '';
     protected $isCurrentUser = false;
 
     /**
@@ -26,7 +22,7 @@ abstract class TAbstractUser implements IUser
      */
     protected   $profile = null;
 
-
+    protected abstract function test();
 
     /**
      * @param $id
@@ -75,21 +71,6 @@ abstract class TAbstractUser implements IUser
     protected abstract function loadProfile();
 
     /**
-     * @internal param $first
-     * @internal param string $last
-     * @internal param string $middle
-     */
-    public function concatFullName()
-    {
-        $this->fullName = $this->firstName;
-        if (!empty($this->middleName))
-            $this->fullName .= ' ' . $this->middleName;
-        if (!empty($this->lastName))
-            $this->fullName .= ' ' . $this->lastName;
-
-    }  //  concatFullName
-
-    /**
      * @return int
      */
     public function getId()
@@ -102,7 +83,7 @@ abstract class TAbstractUser implements IUser
      */
     public function getFirstName()
     {
-        return $this->firstName;
+        return $this->getProfileValue('firstName');
     }  //  getFirstName
 
     /**
@@ -110,7 +91,8 @@ abstract class TAbstractUser implements IUser
      */
     public function getLastName()
     {
-        return $this->lastName;
+        return $this->getProfileValue('lastName');
+
     }  //  getLastName
 
     /**
@@ -127,28 +109,19 @@ abstract class TAbstractUser implements IUser
      */
     public function getFullName($defaultToUsername = true)
     {
-        if (!empty($this->fullName))
-            return $this->fullName;
-
-        $result = '';
-        if (!empty($this->firstName)) {
-            $result = $this->firstName;
-        }
-        if (!empty($this->middleName)) {
-            if (!empty($result))
-                $result .= ' ';
-            $result .= $this->middleName;
-        }
-        if (!empty($this->lastName)) {
-            if (!empty($result))
-                $result .= ' ';
-            $result .= $this->lastName;
+        if ($this->userName == 'admin') {
+            return "The administrator";
         }
 
-        if (empty($result) && $defaultToUsername)
-            return $this->userName;
+        $name = $this->getProfileValue('fullName');
 
-        return $result;
+        if (empty($name)) {
+            if ($defaultToUsername) {
+                return $this->userName;
+            }
+            return '';
+        }
+        return $name;
     }  //  getfullName
 
     /**
@@ -157,34 +130,14 @@ abstract class TAbstractUser implements IUser
      */
     public function getUserShortName($defaultToUsername = true)
     {
-        // temporary fake
-        if ($this->userName == 'admin') {
-            return "The Administrator";
-        }
-        if ($this->userName == 'tsorelle') {
-            return "Terry SoRelle";
-        }
 
 
-        $result = '';
-        if (!empty($this->firstName)) {
-            $result = $this->firstName; //  substr($this->firstName,0,1).'.';
+        $name = $this->getProfileValue('shortName');
+        if (empty($name)) {
+            return $this->getFullName($defaultToUsername);
         }
-        if (!empty($this->middleName)) {
-            if (!empty($result))
-                $result .= ' ';
-            $result .= substr($this->middleName, 0, 1) . '.';
-        }
-        if (!empty($this->lastName)) {
-            if (!empty($result))
-                $result .= ' ';
-            $result .= $this->lastName;
-        }
+        return $name;
 
-        if (empty($result) && $defaultToUsername)
-            $result = $this->userName;
-
-        return $result;
     }  //  getfullName
 
 
@@ -193,7 +146,7 @@ abstract class TAbstractUser implements IUser
      */
     public function getEmail()
     {
-        return $this->email;
+        return $this->getProfileValue('email');
     }  //  getEmail
 
     public function isCurrent()
@@ -210,7 +163,7 @@ abstract class TAbstractUser implements IUser
         if (!isset($this->profile)) {
             $this->loadProfile();
         }
-        if (array_key_exists($this->profile,$key)) {
+        if (array_key_exists($key,$this->profile)) {
             return $this->profile[$key];
         }
     }
@@ -219,8 +172,9 @@ abstract class TAbstractUser implements IUser
         if (!isset($this->profile)) {
             $this->loadProfile();
         }
-        if (array_key_exists($this->profile,$key)) {
-            $this->profile[$key] = $value;
+        $isUpdate = array_key_exists($key,$this->profile) ;
+        $this->profile[$key] = $value;
+        if ($isUpdate) {
             $this->updateProfile($key);
         }
     }
