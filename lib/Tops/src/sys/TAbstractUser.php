@@ -157,6 +157,15 @@ abstract class TAbstractUser implements IUser
      */
     public function getUserShortName($defaultToUsername = true)
     {
+        // temporary fake
+        if ($this->userName == 'admin') {
+            return "The Administrator";
+        }
+        if ($this->userName == 'tsorelle') {
+            return "Terry SoRelle";
+        }
+
+
         $result = '';
         if (!empty($this->firstName)) {
             $result = $this->firstName; //  substr($this->firstName,0,1).'.';

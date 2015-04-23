@@ -37,7 +37,9 @@ class TDrupalUser extends TAbstractUser  {
     protected function loadDrupalUser(AccountInterface $account = null)
     {
         $this->drupalUser = $account;
-
+        if (empty($account)) {
+            return;
+        }
 
         // todo: this may not work in Drupal 8
         if ($_SERVER['SCRIPT_NAME'] === '/cron.php') {
@@ -104,6 +106,7 @@ class TDrupalUser extends TAbstractUser  {
         // $drupalAccount = \Drupal\user\Entity\User::load($id);
         // for Drupal 7
         $drupalAccount = TDrupalAccount::GetById($id);
+
         $this->loadDrupalUser($drupalAccount);
     }
 

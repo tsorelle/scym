@@ -36,10 +36,31 @@ class TUser {
     public static function setCurrent($userName)
     {
         if (!(isset(self::$currentUser) && self::$currentUser->getUserName() == $userName)) {
-            self::$currentUser = TObjectContainer::Get('user');
+            self::$currentUser = self::Create();
             self::$currentUser->loadByUserName($userName);
         }
         return self::$currentUser;
+    }
+
+    public static function getByUserName($userName) {
+
+        $result = self::Create();
+        $result->loadByUserName($userName);
+        return $result;
+    }
+
+    public static function getById($uid) {
+        $result = self::Create();
+        $result->loadById($uid);
+        return $result;
+    }
+
+    /**
+     * @return IUser
+     */
+    public static function Create() {
+        $result = TObjectContainer::Get('tops.user');
+        return $result;
     }
 
 

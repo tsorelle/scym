@@ -8,6 +8,7 @@
 //## Gray and brand colors for use across Bootstrap.
 
 @gray-base:              #000;
+@off-black:              lighten(@gray-base, 8.0%); // custom
 @gray-darker:            lighten(@gray-base, 13.5%); // #222
 @gray-dark:              lighten(@gray-base, 20%);   // #333
 @gray:                   lighten(@gray-base, 33.5%); // #555
@@ -28,7 +29,7 @@
 //** Background color for `<body>`.
 @body-bg:               #fff;
 //** Global text color on `<body>`.
-@text-color:            @gray-dark;
+@text-color:           @off-black; // @gray-base; //@gray-dark;
 
 //** Global textual link color.
 @link-color:            @brand-primary;
@@ -68,7 +69,7 @@
 @headings-font-family:    inherit;
 @headings-font-weight:    500;
 @headings-line-height:    1.1;
-@headings-color:          inherit;
+@headings-color:          firebrick; // inherit;
 
 
 //== Iconography
@@ -373,7 +374,7 @@
 @navbar-default-link-disabled-bg:          transparent;
 
 // Navbar brand label
-@navbar-default-brand-color:               @navbar-default-link-color;
+@navbar-default-brand-color:               @headings-color;// @navbar-default-link-color;
 @navbar-default-brand-hover-color:         darken(@navbar-default-brand-color, 10%);
 @navbar-default-brand-hover-bg:            transparent;
 
@@ -482,7 +483,7 @@
 @jumbotron-padding:              30px;
 @jumbotron-color:                inherit;
 @jumbotron-bg:                   @gray-lighter;
-@jumbotron-heading-color:        inherit;
+@jumbotron-heading-color:        @headings-color; // inherit;
 @jumbotron-font-size:            ceil((@font-size-base * 1.5));
 
 
@@ -704,7 +705,8 @@
 
 //** Border color for elements within panels
 @panel-inner-border:          #ddd;
-@panel-footer-bg:             #f5f5f5;
+@panel-footer-bg:             rgba(222, 242, 242, 0.98);   //#f5f5f5;
+
 
 @panel-default-text:          @gray-dark;
 @panel-default-border:        #ddd;
@@ -859,3 +861,7 @@
 @dl-horizontal-offset:        @component-offset-horizontal;
 //** Horizontal line color.
 @hr-border:                   @gray-lighter;
+
+
+// custom
+@scym-image-path:          "../images/";
