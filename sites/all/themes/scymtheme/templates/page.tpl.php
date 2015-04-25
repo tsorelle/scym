@@ -113,6 +113,13 @@
             <?php print render($page['navigation']); ?>
           <?php endif; ?>
         </nav>
+
+          <!-- end nav region -->
+          <?php if (!empty($page['end_nav_bar'])): ?>
+               <?php print render($page['end_nav_bar']); ?>
+          <?php endif; ?>
+
+
       </div>
     <?php endif; ?>
   </div>
@@ -171,4 +178,11 @@
 <footer class="footer container">
   <?php print render($page['footer']); ?>
 </footer>
-<?php print render($trace_messages) ?>
+<!-- print render($trace_messages) -->
+<?php
+echo '<p>';
+echo \Tops\sys\TTracer::isEnabled() ? 'Tracer enabled' : 'Tracer not enabled';
+echo '</p>';
+$messages = \Tops\sys\TTracer::RenderTraceMessages();
+print render($messages);
+?>

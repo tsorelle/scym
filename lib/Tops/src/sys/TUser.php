@@ -8,6 +8,7 @@
 
 namespace Tops\sys;
 
+use Tops\sys\IUserFactory;
 
 class TUser {
     /**
@@ -20,7 +21,7 @@ class TUser {
      */
     public static function getCurrent() {
         if (!isset(self::$currentUser)) {
-            self::$currentUser = TObjectContainer::Get('tops.user');
+            self::$currentUser = self::Create();
             self::$currentUser->loadCurrentUser();
         }
         return self::$currentUser;
@@ -55,12 +56,30 @@ class TUser {
         return $result;
     }
 
+    private static $userFactory;
+    public static function setUserFactory(IUserFactory $factory)
+    {
+        // set factory for testing routines
+        self::$userFactory = $factory;
+    }
+
+    /**
+     * @return IUserFactory
+     */
+    private static function getUserFactory() {
+        if (!isset(self::$userFactory)) {
+            self::$userFactory = TObjectContainer::Get('tops.userfactory');
+        }
+        return self::$userFactory;
+    }
+
     /**
      * @return IUser
      */
     public static function Create() {
-        $result = TObjectContainer::Get('tops.user');
-        return $result;
+
+        return self::getUserFactory()->createUser();
+
     }
 
 

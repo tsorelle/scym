@@ -19,10 +19,10 @@ class MailboxServiceTest extends PHPUnit_Framework_TestCase {
         \App\test\TestMailboxManager::setTestData();
 
         \Tops\sys\TObjectContainer::Clear();
-        \Tops\sys\TObjectContainer::Register('user','\Tops\test\TTestUser');
+        \Tops\sys\TObjectContainer::Register('userFactory','\Tops\test\TTestUserFactory');
         \Tops\sys\TObjectContainer::Register('configManager','\Tops\sys\TYmlConfigManager');
         \Tops\sys\TObjectContainer::Register('serviceFactory','\Tops\services\TServiceFactory','configManager');
-        \Tops\sys\TObjectContainer::Register('serviceHost','\Tops\services\TServiceHost','serviceFactory,user');
+        \Tops\sys\TObjectContainer::Register('serviceHost','\Tops\services\TServiceHost','serviceFactory,userFactory');
         \Tops\sys\TObjectContainer::Register('mailer','\Tops\sys\TNullMailer');
         \Tops\sys\TObjectContainer::Register('mailboxManager','\App\test\TestMailboxManager');
         \Tops\sys\TObjectContainer::Register('postoffice','\Tops\sys\TPostOffice','mailer,mailboxManager');

@@ -20,22 +20,20 @@ connections:
     password: Georgefox1652
     dbname: fmamodel
   fma_production :
-    host: austinquakers.org
     driver: pdo_mysql
     user: austinqu_website
     password: Georgefox1652
     dbname: austinqu_fma
   scym_production :
-    host: scym.org
     driver: pdo_mysql
-    user: scymorg
-    password: woolman
-    dbname: scymorg
+    user: austinqu_scym
+    password: W00lm@n
+    dbname: austinqu_scym
   scym_temp :
     driver: pdo_mysql
-    user: scymorg
-    password: woolman
-    dbname: scymtemp
+    user: austinqu_scym
+    password: W00lm@n
+    dbname: austinqu_scym
 smtp:
   server: localhost
   username: mailsender

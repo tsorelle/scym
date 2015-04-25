@@ -14,6 +14,7 @@ use Tops\sys\TObjectContainer;
 use Tops\sys\TPath;
 use Tops\sys\IConfigManager;
 use Tops\sys\IConfiguration;
+use Tops\sys\TTracer;
 
 class TEntityManagers {
     private static $managers;
@@ -31,6 +32,8 @@ class TEntityManagers {
             /** @var IConfigManager $configManager */
             $configManager = TObjectContainer::Get('configManager');
             self::$environment = $configManager->getEnvironment();
+            TTracer::Trace("Environment is ".self::$environment);
+
             $settings = $configManager->get('appsettings','databases');
             $connections = $configManager->get('appsettings-'.self::$environment,'connections');
             $settings->AddSection('connections',$connections);

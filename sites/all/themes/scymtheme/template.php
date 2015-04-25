@@ -1,6 +1,7 @@
 <?php
 
 use Drupal\tops\Mvvm\TViewModel;
+use Tops\sys\TTracer;
 
 
 /**
@@ -26,6 +27,7 @@ function scymtheme_status_messages($variables) {
  * @see comment.tpl.php
  */
 function scymtheme_preprocess_comment(&$variables) {
+
     $comment = $variables['elements']['#comment'];
     $node = $variables['elements']['#node'];
     $variables['comment']   = $comment;
@@ -51,20 +53,27 @@ function scymtheme_preprocess_comment(&$variables) {
     $uri['options'] += array('attributes' => array('class' => array('permalink'), 'rel' => 'bookmark'));
 
     // $variables['title']     = l($comment->subject, $uri['path'], $uri['options']);
-
+\Tops\sys\TTracer::Trace("Comment uid = $comment->uid");
     if (!isset($comment->uid)) {
         $authorName = 'Some user';
     }
     else {
         $authorId = $comment->uid;
         $authorObject = \Tops\sys\TUser::getById($authorId);
+        \Tops\sys\TTracer::ShowArray($authorObject);
         $authorName = $authorObject->getUserShortName();
         $userName = $authorObject->getUserName();
+
+        \Tops\sys\TTracer::Trace("Author user name is '$userName' or '$authorName'");
 
         if (empty($authorName) || $authorName == $userName) {
             $authorName = "User ".$userName;
         }
+        // $authorObject->setProfileValue('username',$userName);
     }
+
+
+
 
     $variables['author-name'] = $authorName;
 
@@ -165,6 +174,59 @@ function scymtheme_preprocess_page(&$variables) {
     else {
         $variables['navbar_classes_array'][] = 'navbar-default';
     }
+}
+
+/**
+ * Register custom login form
+ * see scymtheme/user-login-form.tpl.php
+ *
+ * @return array of template redirects
+ */
+function scymtheme_theme() {
+
+    return array(
+        'user_login_block' => array(
+            'template' => 'templates/user-login-form',
+            'render element' => 'form'
+        )
+    );
+}
+
+/**
+ * Identify dropdown menu blocks as implemented in scymtheme/block.tplphp
+ *
+ * @param $data
+ * @param $block
+ */
+function scymtheme_preprocess_block(&$data, $block) {
+    if ($data['block_html_id'] == 'block-user-login') {
+        $data['dropdown_id'] = 'login-div';
+    }
+
+}
+
+/**
+ * Style user login block, remove subject
+ *
+ * @param $data
+ * @param $block
+ */
+function scymtheme_block_view_user_login_alter(&$data, $block) {
+    $data['subject'] = null;
+    $content['#attributes']['class'][] = 'dropdown-menu';
+}
+
+
+/**
+ * Style login button on user login form
+ *
+ * @param $form
+ * @param $form_state
+ * @param $form_id
+ */
+function scymtheme_form_user_login_block_alter(&$form, &$form_state, $form_id) {
+    $form['actions']['submit']['#value'] = 'Sign in';
+    $form['actions']['submit']['#attributes']['class'][] = 'btn-success';
 }
 
 

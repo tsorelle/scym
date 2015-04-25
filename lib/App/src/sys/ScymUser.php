@@ -11,6 +11,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\tops\Identity\TDrupalUser;
 use Tops\db\TEntityManagers;
 use App\db\scym\ScymPerson;
+use Tops\sys\TTracer;
 
 class ScymUser extends TDrupalUser
 {
@@ -30,20 +31,39 @@ class ScymUser extends TDrupalUser
      */
     protected function loadProfile()
     {
+       //  \Tops\sys\TTracer::On();
+        /*
         if (array_key_exists($this->userName,self::$profileCache)) {
             $this->profile = self::$profileCache[$this->userName];
         }
+        */
+        TTracer::Trace("Load profile for $this->userName");
+        
+        
         parent::loadProfile();
         $person = $this->getPersonEntity();
         if ($person) {
-            $this->setProfileValue('firstName',$person->getFirstname());
-            $this->setProfileValue('lastName',$person->getLastname());
-            $this->setProfileValue('middleName',$person->getMiddlename());
-            $this->setProfileValue('email',$person->getEmail());
-            $this->setProfileValue('fullName',$person->getFullName());
-            $this->setProfileValue('shortName',$person->getShortName());
+            $this->profile['firstName'] = $person->getFirstname();
+            $this->profile['lastName'] = $person->getLastname();
+            $this->profile['middleName'] = $person->getMiddlename();
+            $this->profile['email'] = $person->getEmail();
+            $this->profile['fullName'] = $person->getFullName();
+            $this->profile['shortName'] = $person->getShortName();
+            TTracer::Trace("Found ".$person->getUsername());
         }
+        else {
+            TTracer::Trace("user $this->userName not found.");
+        }
+
         self::$profileCache[$this->userName] = $this->profile;
+
+        // $profileUser = $this->getProfileValue('username');
+
+        //if ($profileUser != $this->userName && !empty($profileUser) ) {
+        //    TTracer::Trace("Dirty profile!");
+        // }
+
+
     }
 
     /**
@@ -51,9 +71,11 @@ class ScymUser extends TDrupalUser
      */
     public function getPersonEntity()
     {
-        $name = $this->getUserName();
+        $name = $this->userName;
+        // $name = $this->getUserName();
+        TTracer::Trace("getPersonEntity for name= '$name'" );
         if ($name == 'admin') {
-            $name = 'tsorelle';
+            return null;
         }
 
         $em = TEntityManagers::Get();

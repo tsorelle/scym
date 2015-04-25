@@ -66,11 +66,11 @@ class TDrupalUser extends TAbstractUser  {
             $this->isCurrentUser = $account->id() == $currentUser->id();
         }
 
-        if ($account->isAuthenticated()) {
+
+        if ($account) {
             $this->email = $account->getEmail();
             $this->userName = $account->getUsername();
             $this->id = $account->id();
-            // $this->loadDrupalProfile($account);
         }
 
     }

@@ -224,4 +224,9 @@ class TTestUser extends TAbstractUser {
     {
         $this->profile = array();
     }
+
+    protected function test()
+    {
+        // TODO: Implement test() method.
+    }
 }

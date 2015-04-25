@@ -1,4 +1,6 @@
 <?php
+
+
 /**
  * Created by PhpStorm.
  * User: Terry
@@ -6,6 +8,7 @@
  * Time: 4:49 PM
  */
 use Tops\sys\TObjectContainer;
+
 
 
 class DiContainerTest extends PHPUnit_Framework_TestCase {
@@ -20,6 +23,18 @@ class DiContainerTest extends PHPUnit_Framework_TestCase {
         $actual = TObjectContainer::Get('testObject');
         $this->assertNotNull($actual,'No object instantiated');
         $this->assertInstanceOf('Tops\test\TDiTestClass',$actual);
+
+        /*
+        $unexpected = 'test';
+        $actual->setValue('test');
+
+        $actual = TObjectContainer::Get('testObject');
+
+        $test = $actual->getValue();
+
+
+        $this->assertNotEquals($unexpected,$test);
+        */
     }
 
     function testLoggerConstruction() {

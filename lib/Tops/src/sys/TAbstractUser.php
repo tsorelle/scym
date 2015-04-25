@@ -131,7 +131,7 @@ abstract class TAbstractUser implements IUser
     public function getUserShortName($defaultToUsername = true)
     {
 
-
+        TTracer::Trace("Get short name for $this->userName");
         $name = $this->getProfileValue('shortName');
         if (empty($name)) {
             return $this->getFullName($defaultToUsername);
@@ -160,13 +160,19 @@ abstract class TAbstractUser implements IUser
     }
 
     public function getProfileValue($key) {
+        TTracer::Trace("getProfileValue($key) for $this->userName");
         if (!isset($this->profile)) {
             $this->loadProfile();
         }
+
         if (array_key_exists($key,$this->profile)) {
+            TTracer::Trace("getProfileValue($key) key exists for $this->userName");
             return $this->profile[$key];
         }
+        return '';
     }
+
+
 
     public function setProfileValue($key,$value) {
         if (!isset($this->profile)) {
