@@ -202,7 +202,6 @@ function scymtheme_preprocess_block(&$data, $block) {
     if ($data['block_html_id'] == 'block-user-login') {
         $data['dropdown_id'] = 'login-div';
     }
-
 }
 
 /**
@@ -225,7 +224,7 @@ function _scymtheme_getArrayValue($a,$key)
 }
 
 /**
- * Style login button on user login form
+ * Style login button and convert labels to placeholders on user login form
  *
  * @param $form
  * @param $form_state
@@ -241,7 +240,6 @@ function scymtheme_form_user_login_block_alter(&$form, &$form_state, $form_id) {
             $type = _scymtheme_getArrayValue($element,'#type');
             if ($type == 'textfield' || $type == 'password')
             {
-            //    TTracer::Trace('field');
                 $title = _scymtheme_getArrayValue($element,'#title');
                 if (!empty($title)) {
                     $form[$fieldName]['#title'] = null;
@@ -250,19 +248,4 @@ function scymtheme_form_user_login_block_alter(&$form, &$form_state, $form_id) {
             }
         }
     }
-
-/*
-    $form['name']['#title']=null;
-    $form['name']['#attributes']['placeholder']='Name';
-    $form['pass']['#title']=null;
-    $form['pass']['#attributes']['placeholder']='Password';
-    */
 }
-
-/*
-function scymtheme_form_element(&$variables) {
-    TTracer::Trace('form_element');
-}
-*/
-
-
