@@ -17,6 +17,17 @@
  *    require_once __DIR__.'/../Tops/start/drupalAutoload.php';
  */
 
+$x = array(1);
+
+if ($x[1]) {
+    print 'ok'; //
+}
+else print 'foo';
+
+print done.
+    exit;
+
+
 
 require_once __DIR__."/TTestLoader.php";
 

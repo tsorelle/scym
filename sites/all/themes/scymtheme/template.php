@@ -53,7 +53,7 @@ function scymtheme_preprocess_comment(&$variables) {
     $uri['options'] += array('attributes' => array('class' => array('permalink'), 'rel' => 'bookmark'));
 
     // $variables['title']     = l($comment->subject, $uri['path'], $uri['options']);
-\Tops\sys\TTracer::Trace("Comment uid = $comment->uid");
+    // \Tops\sys\TTracer::Trace("Comment uid = $comment->uid");
     if (!isset($comment->uid)) {
         $authorName = 'Some user';
     }
@@ -216,6 +216,13 @@ function scymtheme_block_view_user_login_alter(&$data, $block) {
     $content['#attributes']['class'][] = 'dropdown-menu';
 }
 
+function _scymtheme_getArrayValue($a,$key)
+{
+    if (is_array($a) && array_key_exists($key,$a)) {
+        return $a[$key];
+    }
+    return null;
+}
 
 /**
  * Style login button on user login form
@@ -227,6 +234,35 @@ function scymtheme_block_view_user_login_alter(&$data, $block) {
 function scymtheme_form_user_login_block_alter(&$form, &$form_state, $form_id) {
     $form['actions']['submit']['#value'] = 'Sign in';
     $form['actions']['submit']['#attributes']['class'][] = 'btn-success';
+    $fieldNames = array_keys($form);
+    foreach( $fieldNames as $fieldName) {
+        if (substr($fieldName, 0, 1) != '#') {
+            $element = $form[$fieldName];
+            $type = _scymtheme_getArrayValue($element,'#type');
+            if ($type == 'textfield' || $type == 'password')
+            {
+            //    TTracer::Trace('field');
+                $title = _scymtheme_getArrayValue($element,'#title');
+                if (!empty($title)) {
+                    $form[$fieldName]['#title'] = null;
+                    $form[$fieldName]['#attributes']['placeholder'] = $title;
+                }
+            }
+        }
+    }
+
+/*
+    $form['name']['#title']=null;
+    $form['name']['#attributes']['placeholder']='Name';
+    $form['pass']['#title']=null;
+    $form['pass']['#attributes']['placeholder']='Password';
+    */
 }
+
+/*
+function scymtheme_form_element(&$variables) {
+    TTracer::Trace('form_element');
+}
+*/
 
 
