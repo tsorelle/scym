@@ -162,6 +162,11 @@ abstract class TAbstractUser implements IUser
     public function getProfileValue($key) {
         TTracer::Trace("getProfileValue($key) for $this->userName");
         if (!isset($this->profile)) {
+            $userName = $this->getUserName();
+            if (empty($userName)) {
+                return null;
+            }
+
             $this->loadProfile();
         }
 

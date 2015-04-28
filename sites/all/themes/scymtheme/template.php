@@ -2,6 +2,7 @@
 
 use Drupal\tops\Mvvm\TViewModel;
 use Tops\sys\TTracer;
+use Tops\sys\TUser;
 
 
 /**
@@ -201,6 +202,27 @@ function scymtheme_theme() {
 function scymtheme_preprocess_block(&$data, $block) {
     if ($data['block_html_id'] == 'block-user-login') {
         $data['dropdown_id'] = 'login-div';
+    }
+}
+
+/**
+ * Setup displayname property in user variable
+ *
+ * @param $variables
+ * @param $hook
+ */
+function scymtheme_preprocess(&$variables, $hook)
+{
+    $user = $variables['user'];
+    if (!isset($user->displayname)) {
+        if ($user->uid) {
+            $currentUser = TUser::getCurrent();
+            $name = $currentUser->getUserShortName();
+        }
+        else {
+            $name = 'Guest';
+        }
+        $variables['user']->displayname = $name;
     }
 }
 

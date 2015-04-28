@@ -90,6 +90,10 @@ class TDrupalAccount implements AccountInterface  {
         return $this->drupalAccount->uid;
     }
 
+    public function hasIdentity() {
+        return (isset($this->drupalAccount) && $this->drupalAccount->uid > 0 );
+    }
+
     /**
      * Returns a list of roles.
      *
@@ -171,7 +175,8 @@ class TDrupalAccount implements AccountInterface  {
      */
     public function isAnonymous()
     {
-        return (!$this->isAuthenticated());
+        return (!$this->hasIdentity());
+        // return (!$this->isAuthenticated());
     }
 
     /**
@@ -189,7 +194,7 @@ class TDrupalAccount implements AccountInterface  {
      */
     public function getPreferredLangcode($fallback_to_default = TRUE)
     {
-        $result = $this->drupalAccount->language;
+        $result = $this->hasIdentity() ? $this->drupalAccount->language : null;
         return ($result) ? $result : 'en-us';
     }
 
@@ -231,7 +236,7 @@ class TDrupalAccount implements AccountInterface  {
      */
     public function getUsername()
     {
-        return $this->drupalAccount->name;
+        return $this->hasIdentity() ? $this->drupalAccount->name : '';
     }
 
     /**
@@ -242,7 +247,7 @@ class TDrupalAccount implements AccountInterface  {
      */
     public function getEmail()
     {
-        return $this->drupalAccount->mail;
+        return $this->hasIdentity() ?  $this->drupalAccount->mail : '';
     }
 
     /**
@@ -266,7 +271,7 @@ class TDrupalAccount implements AccountInterface  {
      */
     public function getLastAccessedTime()
     {
-        return $this->drupalAccount->timestamp;
+        return $this->hasIdentity() ? $this->drupalAccount->timestamp : null;
     }
 
 
