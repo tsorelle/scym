@@ -88,17 +88,65 @@ abstract class TServiceCommand {
 
 
     /**
+     * Check service request for insecure content, to prevent cross site scripting attacks.
+     * The method can be overriden in sub-classes in order to either disable or extend
+     * the security checking.
+     *
+     * The default functionality checks only for specific tags. It may be necessary to perform
+     * more rigorous case specific checking in the sub-class.
+     *
+     * Returns true if no potentially unsave content is found.
+     *
+     * @param $request  mixed
+     * @return bool
+     */
+    protected function secureContent($request)
+    {
+        if (empty($request)) {
+            return true;
+        }
+
+        if (is_object($request)) {
+            $content = json_encode($request);
+        }
+        else {
+            $content = $request;
+            if (is_numeric(trim($content))) {
+                return true;
+            }
+        }
+
+        // disallow any html tags that might contain script injection
+        if (strstr($content,'<')) {
+            $tags = array('script', 'object', 'img', 'a','button', 'p', 'span', 'div', 'form', 'section', 'input','ul','ol','select','text','style');
+            foreach ($tags as $tag) {
+                $pattern = '/(' . $tag . '|<*\s' . $tag . ')(>|\s)/i';
+                if (preg_match($pattern, $content)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
+    /**
      * @param $request
      * @return TServiceResponse
      */
     public function execute($request, $securityToken = null) {
         $this->context = new TServiceContext();
         if (TSession::AuthenitcateSecurityToken($securityToken)) {
-            $this->request = $request;
-            if ($this->isAuthorized())
-                $this->run();
-            else
-                $this->addErrorMessage("Sorry, you are not authorized to use this service.");
+            if ($this->secureContent($request)) {
+                $this->request = $request;
+                if ($this->isAuthorized())
+                    $this->run();
+                else
+                    $this->addErrorMessage("Sorry, you are not authorized to use this service.");
+            }
+            else {
+                $this->addErrorMessage("Your request contains potentially insecure content. HTML tags are not allowed.");
+            }
         }
         else {
             $this->addErrorMessage("Sorry, your session has expired or is not valid. Please return to home page.");
