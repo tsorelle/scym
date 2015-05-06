@@ -48,6 +48,7 @@ sites/example.sites.php
 lib/vendor
 lib/tools/*.cmd
 lib/tools/environment.php
+lib/test/quicktest.php
 
 sites/all/themes/scymtheme/less/bootstrap
 sites/all/themes/scymtheme/assets/fonts/glyphicons-halflings-regular.eot
