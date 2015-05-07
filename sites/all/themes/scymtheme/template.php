@@ -213,16 +213,18 @@ function scymtheme_preprocess_block(&$data, $block) {
  */
 function scymtheme_preprocess(&$variables, $hook)
 {
-    $user = $variables['user'];
-    if (!isset($user->displayname)) {
-        if ($user->uid) {
-            $currentUser = TUser::getCurrent();
-            $name = $currentUser->getUserShortName();
+    if (array_key_exists('user',$variables)) {
+        $user = $variables['user'];
+        if (!isset($user->displayname)) {
+            if ($user->uid) {
+                $currentUser = TUser::getCurrent();
+                $name = $currentUser->getUserShortName();
+            }
+            else {
+                $name = 'Guest';
+            }
+            $variables['user']->displayname = $name;
         }
-        else {
-            $name = 'Guest';
-        }
-        $variables['user']->displayname = $name;
     }
 }
 
