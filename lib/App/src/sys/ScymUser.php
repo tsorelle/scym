@@ -9,18 +9,19 @@
 namespace App\sys;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\tops\Identity\TDrupalUser;
+use Tops\cache\TSessionCache;
 use Tops\db\TEntityManagers;
 use App\db\scym\ScymPerson;
 use Tops\sys\TTracer;
 
 class ScymUser extends TDrupalUser
 {
-    private static $profileCache = array();
 
     protected function test()
     {
         return 'scym';
     }
+
 
     /**
      * @param AccountInterface $user
@@ -32,6 +33,7 @@ class ScymUser extends TDrupalUser
     protected function loadProfile()
     {
        //  \Tops\sys\TTracer::On();
+
         /*
         if (array_key_exists($this->userName,self::$profileCache)) {
             $this->profile = self::$profileCache[$this->userName];
@@ -54,14 +56,6 @@ class ScymUser extends TDrupalUser
         else {
             TTracer::Trace("user $this->userName not found.");
         }
-
-        self::$profileCache[$this->userName] = $this->profile;
-
-        // $profileUser = $this->getProfileValue('username');
-
-        //if ($profileUser != $this->userName && !empty($profileUser) ) {
-        //    TTracer::Trace("Dirty profile!");
-        // }
 
 
     }

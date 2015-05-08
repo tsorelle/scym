@@ -11,6 +11,8 @@ namespace Drupal\tops\Identity;
 
 
 use Drupal\Core\Session\AccountInterface;
+use Tops\cache\ITopsCache;
+use Tops\cache\TSessionCache;
 use Tops\sys;
 use Drupal;
 use Tops\sys\TAbstractUser;
@@ -76,6 +78,37 @@ class TDrupalUser extends TAbstractUser  {
     }
 
     /**
+     * @var ITopsCache
+     */
+    private static $profileCache;
+
+    /**
+     * @return ITopsCache
+     */
+    public static function getProfileCache()
+    {
+        if (!isset(self::$profileCache)) {
+            self::$profileCache = new TSessionCache();
+        }
+        // self::$profileCache->FlushCachedItems();
+        return self::$profileCache;
+    }
+
+    private function getCachedProfile() {
+        $cache = self::getProfileCache();
+        $result = $cache->Get('users.'.$this->userName);
+        return $result;
+    }
+
+    private function cacheProfile() {
+        $cache = self::getProfileCache();
+        $result = $cache->Set('users.'.$this->userName,$this->profile,20);
+        return $result;
+    }
+
+
+
+    /**
      * @param AccountInterface $user
      *
      * Assign firstName, lastName, middleName and pictureFile
@@ -83,24 +116,27 @@ class TDrupalUser extends TAbstractUser  {
      * This version for Drupal 7 - might work with 8, we'll see...
      */
     protected function loadProfile() {
-        $this->profile = array();
-        $drupalUser =   user_load($this->getId());
-        if ($drupalUser != null) {
-            $vars = get_object_vars($drupalUser);
-            $keys = array_keys($vars);
-            foreach($keys as $key) {
-                if (substr( $key, 0, 6 ) === "field_") {
-                    $item = $vars[$key];
-                    $hasValue = isset($item['und'][0]['value']);
-                    if ($hasValue)
-                    {
-                        $value = $item['und'][0]['value'];
-                        $fieldName = substr($key,6);
-                        $this->profile[$fieldName] = $value;
-                    }
+        $this->profile = $this->getCachedProfile();
+        if (empty($this->profile)) {
+            $this->profile = array();
+            $drupalUser = user_load($this->getId());
+            if ($drupalUser != null) {
+                $vars = get_object_vars($drupalUser);
+                $keys = array_keys($vars);
+                foreach ($keys as $key) {
+                    if (substr($key, 0, 6) === "field_") {
+                        $item = $vars[$key];
+                        $hasValue = isset($item['und'][0]['value']);
+                        if ($hasValue) {
+                            $value = $item['und'][0]['value'];
+                            $fieldName = substr($key, 6);
+                            $this->profile[$fieldName] = $value;
+                        }
 
+                    }
                 }
             }
+            $this->cacheProfile();
         }
     }
 
