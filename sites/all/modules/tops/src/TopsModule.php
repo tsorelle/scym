@@ -17,6 +17,7 @@ use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpFoundation\JsonResponse;
 use Tops\sys\TSession;
 use Tops\sys\TTracer;
+use Tops\cache\TSessionCache;
 
 
 class TopsModule {
@@ -26,12 +27,92 @@ class TopsModule {
      */
     private static $topsController = null;
     private static $initialized = false;
+    private static $privateContentTermId;
 
+    /**
+     * @var TSessionCache
+     */
+    private static $sessionCache;
+
+    /**
+     * @return TSessionCache
+     */
+    private static function getSessionCache()
+    {
+        if (!isset(self::$sessionCache)) {
+            self::$sessionCache = new TSessionCache();
+        }
+        return self::$sessionCache;
+
+    }
+
+    private static function getPrivateContentTermId()
+    {
+        $cache = self::getSessionCache();
+        $tid = $cache->Get('termid.privatecontent');
+        if ($tid === null) {
+            $terms = taxonomy_get_term_by_name('Private', "content_access");
+            if (!empty($terms)) {
+                // taxonomy_get_term_by_name returns an associative array keyed by termid.
+                // warning, this may be deprecated in Drupal 8
+                $tid = array_keys($terms)[0];
+
+                // $cache->Set("termid.privatecontent",$tid,120);
+            }
+        }
+
+        return $tid;
+    }
 
     public static function TracerOn($username = 'admin', $traceId='default') {
         if (\Drupal::currentUser()->getUsername() == $username) {
             TTracer::On($traceId);
         }
+    }
+
+    private static function userAuthenticated()
+    {
+        $user = \Drupal::currentUser();
+        if ($user) {
+            return $user->isAuthenticated();
+        }
+        return false;
+    }
+
+    private static function userAnonymous()
+    {
+        $user = \Drupal::currentUser();
+        if ($user) {
+            return $user->isAnonymous();
+        }
+        return false;
+    }
+    public static function hasTaxonomyTerm($node,$taxonomyFieldName,$termName)
+    {
+        $terms = field_view_field('node', $node, $taxonomyFieldName);
+        if (isset($terms['#items'])) {
+            foreach ($terms['#items'] as $item) {
+                if (isset($item['taxonomy_term'])) {
+                    $term = $item['taxonomy_term'];
+                    if (($term->name == $termName)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    public static function checkContentAccess($node) {
+
+       if (self::userAnonymous() && $node !== null && isset($node->type)) {
+           $accessFieldName = 'field_' . $node->type . '_access';
+           if (property_exists($node,$accessFieldName)) {
+               if (self::hasTaxonomyTerm($node, $accessFieldName, 'Private')) {
+                   drupal_set_message(t('You must sign in to view this content.'), 'error');
+                   drupal_goto('/');
+               }
+           }
+       }
     }
 
     /**

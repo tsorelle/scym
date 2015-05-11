@@ -113,3 +113,13 @@ function tops_permission()
 }
 
 
+/**
+ * Implements hook_node_view().
+ */
+function tops_node_view($node, $view_mode, $langcode)
+{
+    if ($view_mode == 'full') {
+        \Drupal\Tops\TopsModule::checkContentAccess($node);
+    }
+
+}
