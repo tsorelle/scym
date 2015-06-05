@@ -98,7 +98,7 @@ abstract class TDbMailboxManager implements IMailboxManager {
     public function getMailboxes($filter = null)
     {
         $repository = $this->getRepository();
-        $repository->findAll();
+        return $repository->findAll();
     }
 
     /**

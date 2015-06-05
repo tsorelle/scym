@@ -125,19 +125,32 @@ class TDrupalUser extends TAbstractUser  {
                 $keys = array_keys($vars);
                 foreach ($keys as $key) {
                     if (substr($key, 0, 6) === "field_") {
-                        $item = $vars[$key];
-                        $hasValue = isset($item['und'][0]['value']);
-                        if ($hasValue) {
-                            $value = $item['und'][0]['value'];
+                        $value = $this->getSingleFieldValue($drupalUser,$key);
+                        if ($value !== false) {
                             $fieldName = substr($key, 6);
                             $this->profile[$fieldName] = $value;
                         }
-
                     }
                 }
             }
             $this->cacheProfile();
         }
+    }
+
+    private function getSingleFieldValue($account,$fieldName,$safeValue=true) {
+        $items = field_get_items('user',$account,$fieldName);
+        if (!empty($items)) {
+            $valueIndex = $safeValue ? 'safe_value' : 'value';
+            $hasValue = isset($items[0][$valueIndex]);
+            if ($safeValue && !$hasValue) {
+                $valueIndex = 'value';
+                $hasValue = isset($items[0][$valueIndex]);
+            }
+            if ($hasValue) {
+                return $items[0][$valueIndex];
+            }
+        }
+        return false;
     }
 
 

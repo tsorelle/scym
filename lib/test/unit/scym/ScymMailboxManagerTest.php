@@ -9,6 +9,10 @@
 class ScymMailboxManagerTest extends PHPUnit_Framework_TestCase {
 
     public function testScymMailbox() {
+        \Tops\sys\TObjectContainer::Clear();
+        \Tops\sys\TObjectContainer::Register('configManager','\Tops\sys\TYmlConfigManager');
+
+
         $mgr = new \App\db\TScymMailboxManager();
         $box = $mgr->addMailbox("TEST","Test box","test@mailboxes.org","Test Mail box");
         $this->assertNotNull($box);

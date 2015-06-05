@@ -1,0 +1,30 @@
+<div class="container">
+
+    <div>
+        <input data-bind="value: messageText" />
+        <button data-bind="click: onAddMessageClick">Add info message</button>
+        <button data-bind="click: onAddErrorMessageClick">Add error message</button>
+        <button data-bind="click: onAddWarningMessageClick">Add warning message</button>
+    </div>
+    <div>
+        <button data-bind="click: onShowWaiter">Show Progress Waiter</button><br>
+        <button data-bind="click: onShowSpinWaiter">Show Spin Waiter</button><br>
+    </div>
+
+    <div>
+        <h1>Test form</h1>
+        <form>
+            <div class="form-group">
+                <label for="inputId">Id</label>
+                <input data-bind="value: itemId" type="text" class="form-control" id="inputId" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label for="inputName">Name</label>
+                <input data-bind="value: itemName" type="text" class="form-control" id="inputName" placeholder="Enter item name">
+            </div>
+            <button data-bind="click: onGetItem" class="btn btn-primary">Get</button><br/>
+            <button data-bind="click: onPostItem" class="btn btn-primary">Post</button><br/>
+        </form>
+
+    </div> <!-- end form -->
+</div> <!-- end container -->

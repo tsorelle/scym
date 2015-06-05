@@ -51,7 +51,7 @@ class TObjectContainer {
      * Retrieve instance from the container.
      */
     public static function Get($key) {
-        return self::$container->get($key);
+        return self::GetContainer()->get($key);
     }
 
     /**

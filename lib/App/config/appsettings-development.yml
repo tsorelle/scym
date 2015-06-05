@@ -85,4 +85,6 @@ exceptions:
       log:  errors
       rethrow: 1
       level: critical
+security:
+  xsstokens : 0
 

@@ -123,6 +123,33 @@ function scymtheme_preprocess_comment(&$variables) {
     }
 }
 
+function _scymtheme_swapSubmittedName($submitted,$uid) {
+    if (empty($submitted)) {
+        return $submitted;
+    }
+    $authorObject = \Tops\sys\TUser::getById($uid);
+    $fullName = $authorObject->getUserShortName();
+    $userName = $authorObject->getUserName();
+    if ($userName == 'admin' && empty($fullName)) {
+        $fullName = 'The administrator';
+    }
+    if ($userName == $fullName) {
+        return $submitted;
+    }
+
+    $endTag = (strstr($submitted,'<span')) ? '</span' : '</a';
+    return str_replace($userName.$endTag,$fullName.$endTag,$submitted);
+}
+
+function scymtheme_preprocess_node(&$variables) {
+    if (isset($variables['submitted']) && isset($variables['node'])) {
+        $authorId = $variables['node']->uid;
+        $variables['submitted'] = _scymtheme_swapSubmittedName($variables['submitted'],$variables['node']->uid);
+    }
+
+}
+
+
 /**
  * Implements hook_preprocess_page().
  *
@@ -273,3 +300,4 @@ function scymtheme_form_user_login_block_alter(&$form, &$form_state, $form_id) {
         }
     }
 }
+

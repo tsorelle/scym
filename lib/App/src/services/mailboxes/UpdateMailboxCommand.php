@@ -65,34 +65,42 @@ class UpdateMailboxCommand extends TServiceCommand {
 
         $mgr = TPostOffice::GetMailboxManager();
         $id = empty($dto->id) ? 0 : $dto->id;
-        if ($id === 0) {
-            $box = $mgr->findByCode($dto->code);
-            if ($box === null) {
-                $box = $mgr->addMailbox($dto->code, $dto->name, $dto->email, $dto->description);
-                $mgr->saveChanges();
-            }
-            else {
-                $this->updateBox($dto, $mgr, $box);
-            }
-        }
-        else {
-            $box = $mgr->find($id);
-            if ($box === null) {
-                $this->addErrorMessage("Cannot find mail box for id #$id");
-                return;
-            }
-            if ($box->getMailboxCode() != $dto->code) {
-                $existing = $mgr->findByCode($dto->code);
-                if ($existing !== null && $existing->getMailboxId() != $id) {
-                    $this->addErrorMessage("Duplicate record found for mailbox code $dto->code");
-                    return;
+        $state = $dto->state;
+        $box = $mgr->findByCode($dto->code);
+        $id = $box == null ? 0 : $box->getMailboxId();
+
+        switch($state) {
+            case 0 :  // no change
+                break;
+            case 1: // insert
+                if (empty($id)) {
+                    $box = $mgr->addMailbox($dto->code, $dto->name, $dto->email, $dto->description);
+                    $this->addInfoMessage("Created mailbox " . $box->getMailboxCode());
                 }
-            }
-            $this->updateBox($dto,$mgr,$box);
+                else {
+                    $this->addErrorMessage("Duplicate record found for mailbox code $dto->code");
+                }
+                break;
+            case 2: // update
+                if (empty($id) ) {
+                    $this->addWarningMessage('Mailbox was not found in database.');
+                }
+                else {
+                    $this->updateBox($dto, $mgr, $box);
+                    $this->addInfoMessage("Updated mailbox " . $box->getMailboxCode());
+                }
+                break;
+            case 3: // delete
+                if (empty($id)) {
+                    $this->addWarningMessage('Mailbox was not found in database.');
+                }
+                else {
+                    $mgr->drop($id);
+                    $this->addInfoMessage("Deleted mailbox " . $dto->code);
+                }
+                break;
         }
-
-        $this->addInfoMessage("Updated mailbox " . $box->getMailboxCode());
-        $this->setReturnValue($box);
+        $list = MailboxServices::getList($this, $mgr);
+        $this->setReturnValue($list);
     }
-
 }

@@ -8,6 +8,8 @@
 namespace Tops\services;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use \Symfony\Component\HttpFoundation\Request;
+use Tops\sys\IConfiguration;
+use Tops\sys\IConfigManager;
 use Tops\sys\IExceptionHandler;
 use Tops\sys\IUserFactory;
 use Tops\sys\TObjectContainer;
@@ -100,6 +102,36 @@ class TServiceHost {
 
     }
 
+    /**
+     * @var IConfiguration
+     */
+    private static $tokensEnabled;
+
+    /**
+     * @return IConfiguration
+     */
+    private static function tokensAreEnabled() {
+        if (!isset(self::$tokensEnabled)) {
+            /** @var IConfigManager $configManager */
+            $configManager = TObjectContainer::Get('configManager');
+            $securityConfig = $configManager->getLocal('appsettings','security');
+            self::$tokensEnabled = $securityConfig->IsTrue('xsstokens',true);
+        }
+        return self::$tokensEnabled;
+    }
+
+
+
+    private function getSecurityToken(Request $request) {
+        if ($request != null && self::tokensAreEnabled()) {
+            $securityToken = $request->get('topsSecurityToken');
+            if (!$securityToken) {
+                return 'invalid';
+            }
+        }
+        return '';
+    }
+
     private function _executeRequest(Request $request = null, $serviceCode = null, $serviceRequest = null)
     {
 
@@ -124,7 +156,6 @@ class TServiceHost {
         }
 
         $requestMethod = $request->getMethod();
-
         if ($requestMethod == 'POST') {
             if ($serviceRequest != null) {
                 $input = json_decode($serviceRequest);
@@ -138,15 +169,9 @@ class TServiceHost {
                 throw new \Exception('Unsupported request method: ' . $request->getMethod());
             }
         }
-
-        $securityToken = $request->get('topsSecurityToken');
-        if (!$securityToken) {
-            $securityToken = 'invalid';
-        }
-
+        $securityToken = $this->getSecurityToken($request);
         return $this->_execute($serviceCode, $input, $securityToken);
     }
-
 
     /**
      * @param $serviceCode

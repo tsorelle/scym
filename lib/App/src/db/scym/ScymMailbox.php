@@ -1,6 +1,6 @@
 <?php
 
-namespace App\db;
+namespace App\db\scym;
 
 use Doctrine\ORM\Mapping as ORM;
 use Tops\sys\IMailbox;
