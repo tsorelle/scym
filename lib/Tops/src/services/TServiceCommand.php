@@ -28,11 +28,17 @@ abstract class TServiceCommand {
      * @var array
      */
     private $authorizations = array();
+    private $errorCount = 0;
 
     abstract protected function run();
 
+    protected function hasErrors() {
+        return ($this->errorCount > 0);
+    }
+
     protected function addErrorMessage($text) {
         $this->context->AddErrorMessage($text);
+        $this->errorCount++;
     }
 
     public function addInfoMessage($text) {

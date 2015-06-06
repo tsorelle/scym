@@ -97,8 +97,10 @@ $vmcontent = __DIR__."/lib/test/vmtest/$testpage.html";
 </footer>
 
 <!-- initialize and bind viewmodel -->
-<script src="/assets/js/Tops.App/<?php print $testpage?>ViewModel.js?noae8u"></script>
-<script>ViewModel.init('//', function() {  ko.applyBindings(ViewModel); });</script>
+<script src="/assets/js/Tops.App/<?php print $testpage?>ViewModel.js"></script>
+<script>ViewModel.init('//', function() {
+        ko.applyBindings(ViewModel);
+    });</script>
 
 
 <!-- bootstrap template startup -->

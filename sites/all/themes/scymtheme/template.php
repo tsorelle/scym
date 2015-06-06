@@ -301,3 +301,22 @@ function scymtheme_form_user_login_block_alter(&$form, &$form_state, $form_id) {
     }
 }
 
+function scymtheme_bootstrap_search_form_wrapper($variables) {
+    $output = '<div class="input-group">';
+    $output .= $variables['element']['#children'];
+    $output .= '<span class="input-group-btn">';
+    $output .= '<button type="submit" class="btn btn-default">';
+    // We can be sure that the font icons exist in CDN.
+    if (theme_get_setting('bootstrap_cdn')) {
+        $output .= _bootstrap_icon('search');
+    }
+    else {
+        // use locally installed icons
+        $output .= '<span class="glyphicon glyphicon-search" aria-hidden="true"></span>';
+    }
+
+    $output .= '</button>';
+    $output .= '</span>';
+    $output .= '</div>';
+    return $output;
+}

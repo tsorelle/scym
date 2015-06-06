@@ -1,6 +1,8 @@
 // replace all occurances of 'VmName' with the name of your model
 
 /// <reference path='../typings/knockout/knockout.d.ts' />
+/// <reference path='../typings/underscore/underscore.d.ts' />
+/// <reference path='../typings/bootstrap/bootstrap.d.ts' />
 /// <reference path="./App.ts" />
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />

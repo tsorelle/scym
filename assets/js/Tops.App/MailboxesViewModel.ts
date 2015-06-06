@@ -7,16 +7,9 @@
 /// <reference path="./App.ts" />
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />
+/// <reference path='mailboxes.d.ts' />
 module Tops {
 
-    export class mailBox {
-        id: string = '';
-        name: string = '';
-        description: string = '';
-        code: string = '';
-        email: string = '';
-        state: number = 0;
-    }
     export class MailboxesViewModel implements IMainViewModel {
         static instance: Tops.MailboxesViewModel;
         private application: Tops.Application;
@@ -152,12 +145,7 @@ module Tops {
             me.showForm();
         }
 
-        validateEmail(email: string) {
-            if (!email || email.trim() == '') {
-                return false;
-            }
-            return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email);
-        }
+
 
         clearValidation() {
             var me = this;
@@ -194,7 +182,7 @@ module Tops {
             }
             */
 
-            var emailOk = me.validateEmail(box.email);
+            var emailOk = me.peanut.validateEmail(box.email);
             me.mailboxEmailHasError(!emailOk);
             if (!emailOk) {
                 valid = false;

@@ -230,91 +230,30 @@ module Tops {
             var _peanut = this;
             return _peanut.executeRPC("POST", serviceName, parameters, successFunction, errorFunction);
         }
-        /*
 
-            // peanut controller requires parameter as a string.
-            if (!parameters)
-                parameters = "";
-            else  {
-                parameters = JSON.stringify(parameters);
-            }
-            var serviceRequest = { "serviceCode" : serviceName, "request" : parameters};
-            var serviceUrl =  _peanut.clientApp.serviceUrl; // 'topsService.php';
-
-
-            var result =
-                jQuery.ajax({
-                    type: "POST",
-                    data: serviceRequest,
-                    dataType: "json",
-                    cache: false,
-                    url: serviceUrl
-                })
-                    .done(
-                    function(serviceResponse) {
-                        _peanut.showServiceMessages(serviceResponse);
-                        if (successFunction) {
-                            successFunction(serviceResponse);
-                        }
-                    }
-                )
-                    .fail(
-                    function(jqXHR, textStatus ) {
-                        var errorMessage = _peanut.showExceptionMessage(jqXHR);
-                        if (errorFunction)
-                            errorFunction(errorMessage);
-                    });
-
-
-            return result;
-        }
-        */
-
+        // GET is no longer supported. This method is for backward compatibility but is identical to execute service
         getFromService(serviceName: string, parameters: any = "",
                        successFunction?: (serviceResponse: IServiceResponse) => void,
                        errorFunction?: (errorMessage: string) => void) : JQueryPromise<any> {
             var _peanut = this;
             return _peanut.executeRPC("POST", serviceName, parameters, successFunction, errorFunction);
         }
+
         /*
-            var _peanut = this;
+         * Utility routines
+         */
 
-            if (!parameters)
-                parameters = "";
-
-            var serviceRequest = { "serviceCode" : serviceName, "request" : parameters};
-            var serviceUrl =  _peanut.clientApp.serviceUrl; // 'topsService.php';
-            // var serviceRequest = { "serviceCode" : serviceName, "request" : parameters};
-            // var serviceUrl =  _peanut.clientApp.serviceUrl; // 'topsService.php';
-
-            var result =
-                jQuery.ajax({
-                    type: "GET",
-                    data: serviceRequest,
-                    dataType: "json",
-                    cache: false,
-                    url: serviceUrl
-                })
-                    .done(
-                    function(serviceResponse) {
-                        _peanut.showServiceMessages(serviceResponse);
-                        if (successFunction) {
-                            successFunction(serviceResponse);
-                        }
-                    }
-                )
-                    .fail(
-                    function(jqXHR, textStatus ) {
-                        var errorMessage = _peanut.showExceptionMessage(jqXHR);
-
-                        if (errorFunction)
-                            errorFunction(errorMessage);
-                    });
-
-            return result;
+        getRequestParam(name){
+            if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+                return decodeURIComponent(name[1]);
         }
-        */
 
+        validateEmail(email: string) {
+            if (!email || email.trim() == '') {
+                return false;
+            }
+            return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email);
+        }
 
     }
 }

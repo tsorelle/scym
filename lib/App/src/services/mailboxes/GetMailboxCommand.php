@@ -10,6 +10,7 @@ namespace App\services\mailboxes;
 use Tops\services;
 use Tops\services\TServiceCommand;
 use Tops\sys\TPostOffice;
+use Tops\sys\TUser;
 
 
 class GetMailboxCommand extends TServiceCommand {
@@ -23,17 +24,34 @@ class GetMailboxCommand extends TServiceCommand {
 
         $mgr = TPostOffice::GetMailboxManager();
         if (is_numeric($id)) {
-            $result = $mgr->find($id);
+            $box = $mgr->find($id);
         }
         else {
-            $result = $mgr->findByCode($id);
+            $box = $mgr->findByCode($id);
         }
 
-        if ($result === null) {
+        if ($box === null) {
             $this->addErrorMessage("Cannot find mailbox for id '$id'.");
         }
         else {
-            $this->setReturnValue($result);
+            $dto = new \stdClass();
+            $mailbox = new \stdClass();
+            $mailbox->name = $box->getName();
+            $mailbox->description = $box->getDescription();
+            $mailbox->email = $box->getEmail();
+            $mailbox->code = $box->getMailboxCode();
+            $mailbox->id = $box->getMailboxId();
+            $mailbox->state = 0;
+            $dto->box = $mailbox;
+
+            $user = TUser::getCurrent();
+
+            $dto->fromAddress = $user->getEmail();
+            if (empty($dto->fromAddress)) {
+                $dto->fromName = empty($dto->fromAddress) ? '' : $user->getFullName();
+            }
+
+            $this->setReturnValue($dto);
         }
     }
 }
