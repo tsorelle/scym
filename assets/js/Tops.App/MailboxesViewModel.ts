@@ -7,7 +7,6 @@
 /// <reference path="./App.ts" />
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />
-/// <reference path='mailboxes.d.ts' />
 module Tops {
 
     export class MailboxesViewModel implements IMainViewModel {

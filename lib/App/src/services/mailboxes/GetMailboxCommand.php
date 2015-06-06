@@ -47,7 +47,7 @@ class GetMailboxCommand extends TServiceCommand {
             $user = TUser::getCurrent();
 
             $dto->fromAddress = $user->getEmail();
-            if (empty($dto->fromAddress)) {
+            if (!empty($dto->fromAddress)) {
                 $dto->fromName = empty($dto->fromAddress) ? '' : $user->getFullName();
             }
 

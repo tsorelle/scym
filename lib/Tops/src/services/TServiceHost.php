@@ -6,6 +6,7 @@
  * Time: 6:42 AM
  */
 namespace Tops\services;
+use MyProject\Proxies\__CG__\stdClass;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use \Symfony\Component\HttpFoundation\Request;
 use Tops\sys\IConfiguration;
@@ -61,20 +62,21 @@ class TServiceHost {
     /**
      * @return TServiceResponse
      */
-    private function getFailureResponse() {
+    private function getFailureResponse($debugInfo = null) {
         if (!isset($this->failureResponse)) {
-            $this->failureResponse = new TServiceResponse();
+            $this->failureResponse = new TServiceErrorResponse();
             $this->failureResponse->Result = ResultType::ServiceFailure;
             $message = new TServiceMessage();
             $message->MessageType = MessageType::Error;
             $message->Text = 'Service failed. If the problem persists contact the site administrator.';
             $this->failureResponse->Messages = array($message);
-
+            $this->failureResponse->debugInfo = $debugInfo;
         }
         return $this->failureResponse;
     }
 
     private function handleException($ex) {
+        // throw $ex;
         if (empty($this->exceptionHandler)) {
             return true;
         }
@@ -97,7 +99,13 @@ class TServiceHost {
             if ($rethrow) {
                 throw $ex;
             }
-            return $instance->getFailureResponse();
+
+            $debugInfo = new \stdClass();
+            $debugInfo->message = $ex->getMessage();
+            $debugInfo->location = $ex->getFile().": Line ".$ex->getLine();
+            $debugInfo->trace = $ex->getTraceAsString();
+
+            return $instance->getFailureResponse($debugInfo);
         }
 
     }

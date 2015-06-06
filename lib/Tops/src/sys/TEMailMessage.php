@@ -282,7 +282,7 @@ class TEMailMessage {
     public function setRecipient($recipients, $name=null)
     {
         $this->recipientList = Array();
-        if (is_string($recipients)) {
+        if (is_string($recipients) && empty($name)) {
             $recipients = explode(';',$recipients);
         }
 

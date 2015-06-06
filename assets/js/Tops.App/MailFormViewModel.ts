@@ -9,7 +9,6 @@
 /// <reference path="./App.ts" />
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />
-/// <reference path='mailboxes.d.ts' />
 module Tops {
     export class mailMessage {
         toName : string;
@@ -93,7 +92,7 @@ module Tops {
                         me.mailboxName(response.box.name);
                         me.mailboxEmail(response.box.email);
                         me.fromAddress(response.fromAddress);
-                        me.fromName(response.fromAddress);
+                        me.fromName(response.fromName);
                         me.userIsAnonymous(response.fromAddress.trim() == '');
                         me.headerMessage("Send a message to: " + response.box.name);
                         me.formVisible(true);

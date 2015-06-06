@@ -5,6 +5,14 @@
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path="../typings/bootstrap/bootstrap.d.ts" />
 module Tops {
+    export class mailBox {
+        id:string;
+        name:string;
+        description:string;
+        code:string ;
+        email:string;
+        state:number;
+    }
 
     export class waitMessage {
         private static waitDialog : any = null;

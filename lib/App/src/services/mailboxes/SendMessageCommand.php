@@ -33,16 +33,16 @@ class SendMessageCommand extends TServiceCommand {
             $this->addErrorMessage('An e-mail address for the recipient is required');
         }
         else {
-            $name =  empty($toName) ? null : trim($toName);
-            $message->setRecipient($toAddress,$name);
+            $toName =  empty($toName) ? null : trim($toName);
+            $message->setRecipient($toAddress,$toName);
         }
 
         if (empty($fromAddress)) {
             $this->addErrorMessage('Your e-mail address is required');
         }
         else {
-            $name =  empty($fromName) ? null : trim($fromName);
-            $message->setFromAddress($fromAddress,$name);
+            $fromName =  empty($fromName) ? null : trim($fromName);
+            $message->setFromAddress($fromAddress,$fromName);
         }
 
         if (empty($subject)) {
