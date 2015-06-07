@@ -12,7 +12,7 @@
 module Tops {
     export class mailMessage {
         toName : string;
-        toAddress : string;
+        mailboxCode: string;
         fromName : string;
         fromAddress : string;
         subject : string;
@@ -20,7 +20,8 @@ module Tops {
     }
 
     export class getMailboxResponse {
-        box: mailBox;
+        mailboxCode: string;
+        mailboxName: string;
         fromName: string;
         fromAddress: string;
     }
@@ -30,11 +31,11 @@ module Tops {
         private application: Tops.IPeanutClient;
         private peanut: Tops.Peanut;
 
+        private mailboxCode = '';
+
+
         // Observables
         headerMessage = ko.observable('');
-        mailboxCode = ko.observable('');
-        mailboxName = ko.observable('');
-        mailboxEmail = ko.observable('');
         fromAddress = ko.observable('');
         fromName = ko.observable('');
         messageSubject = ko.observable('');
@@ -83,23 +84,20 @@ module Tops {
             var me = this;
             var mailboxCode = me.peanut.getRequestParam('box');
             mailboxCode = mailboxCode ? mailboxCode : 'scym';
-            // me.testMessage("TESTING: " + mailboxId);
             me.application.showWaiter('Loading mailbox. Please wait...');
             me.peanut.getFromService( 'mailboxes.GetMailbox',mailboxCode, function (serviceResponse: Tops.IServiceResponse) {
                     if (serviceResponse.Result == Tops.Peanut.serviceResultSuccess) {
                         var response = <getMailboxResponse>serviceResponse.Value;
-                        me.mailboxCode(mailboxCode);
-                        me.mailboxName(response.box.name);
-                        me.mailboxEmail(response.box.email);
+                        me.mailboxCode = mailboxCode;
                         me.fromAddress(response.fromAddress);
                         me.fromName(response.fromName);
                         me.userIsAnonymous(response.fromAddress.trim() == '');
-                        me.headerMessage("Send a message to: " + response.box.name);
+                        me.headerMessage("Send a message to: " + response.mailboxName);
                         me.formVisible(true);
                     }
                     else {
                         me.formVisible(false);
-                        me.headerMessage('No mailbox found for ' + mailboxCode);
+                        me.headerMessage('No mailbox found for ' + me.mailboxCode);
                     }
                 }
             ).always(function() {
@@ -114,8 +112,7 @@ module Tops {
         createMessage() {
             var me = this;
             var message = new mailMessage();
-            message.toName = me.mailboxName();
-            message.toAddress = me.mailboxEmail();
+            message.mailboxCode = me.mailboxCode;
             message.subject = me.messageSubject();
             message.body = me.messageBody();
             message.fromAddress = me.fromAddress();

@@ -35,22 +35,11 @@ class GetMailboxCommand extends TServiceCommand {
         }
         else {
             $dto = new \stdClass();
-            $mailbox = new \stdClass();
-            $mailbox->name = $box->getName();
-            $mailbox->description = $box->getDescription();
-            $mailbox->email = $box->getEmail();
-            $mailbox->code = $box->getMailboxCode();
-            $mailbox->id = $box->getMailboxId();
-            $mailbox->state = 0;
-            $dto->box = $mailbox;
-
+            $dto->mailboxCode = $box->getMailboxCode();
+            $dto->mailboxName = $box->getName();
             $user = TUser::getCurrent();
-
             $dto->fromAddress = $user->getEmail();
-            if (!empty($dto->fromAddress)) {
-                $dto->fromName = empty($dto->fromAddress) ? '' : $user->getFullName();
-            }
-
+            $dto->fromName = empty($dto->fromAddress) ? '' : $user->getFullName();
             $this->setReturnValue($dto);
         }
     }

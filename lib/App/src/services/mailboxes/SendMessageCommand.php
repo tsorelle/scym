@@ -21,16 +21,31 @@ class SendMessageCommand extends TServiceCommand {
             return null;
         }
 
-        $toName =  isset($dto->toName) ? trim($dto->toName) : '';
-        $toAddress =  isset($dto->toAddress) ? trim($dto->toAddress) : '';
+        $mailboxCode =  isset($dto->mailboxCode) ? trim($dto->mailboxCode) : '';
+        if (empty($mailboxCode)) {
+            $this->addErrorMessage("Application error: expected mailbox code.");
+            return null;
+        }
+
         $fromName =  isset($dto->fromName) ? trim($dto->fromName) : '';
         $fromAddress =  isset($dto->fromAddress) ? trim($dto->fromAddress) : '';
         $subject =  isset($dto->subject) ? trim($dto->subject) : '';
         $body =  isset($dto->body) ? trim($dto->body) : '';
 
+
+        $mgr = TPostOffice::GetMailboxManager();
+        $box = $mgr->findByCode($mailboxCode);
+        if ($box === null) {
+            $this->addErrorMessage("Application error: Cannot find mailbox for '$mailboxCode'");
+        }
+
+
+        $toName =  $box->getName();
+        $toAddress =  $box->getEmail();
+
         $message = new TEMailMessage();
         if (empty($toAddress)) {
-            $this->addErrorMessage('An e-mail address for the recipient is required');
+            $this->addErrorMessage("Application error: Invalid mailbox $mailboxCode");
         }
         else {
             $toName =  empty($toName) ? null : trim($toName);
@@ -72,7 +87,12 @@ class SendMessageCommand extends TServiceCommand {
 
         $errors = $message->getValidationErrors();
         foreach($errors as $email => $error) {
-            $this->addErrorMessage("The address '$email' is invalid: $error");
+            if (stristr($email,$toAddress)) {
+                $this->addErrorMessage("Application error: Invalid address in mailbox '$mailboxCode''");
+            }
+            else {
+                $this->addErrorMessage("The address '$email' is invalid: $error");
+            }
         }
         return $message;
     }
