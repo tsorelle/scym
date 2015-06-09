@@ -180,9 +180,11 @@
 </footer>
 <!-- print render($trace_messages) -->
 <?php
+/*
 echo '<p>';
 echo \Tops\sys\TTracer::isEnabled() ? 'Tracer enabled' : 'Tracer not enabled';
 echo '</p>';
+*/
 $messages = \Tops\sys\TTracer::RenderTraceMessages();
 print render($messages);
 ?>
