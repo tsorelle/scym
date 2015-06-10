@@ -230,6 +230,9 @@ function scymtheme_preprocess_block(&$data, $block) {
     if ($data['block_html_id'] == 'block-user-login') {
         $data['dropdown_id'] = 'login-div';
     }
+    else if ($data['block_html_id'] == 'block-search-form') {
+       $data['dropdown_id'] = 'search-div';
+    }
 }
 
 /**

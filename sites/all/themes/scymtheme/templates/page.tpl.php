@@ -106,13 +106,26 @@
           <?php if (!empty($primary_nav)): ?>
             <?php print render($primary_nav); ?>
           <?php endif; ?>
-          <?php if (!empty($secondary_nav)): ?>
-            <?php print render($secondary_nav); ?>
-          <?php endif; ?>
+
+
           <?php if (!empty($page['navigation'])): ?>
             <?php print render($page['navigation']); ?>
           <?php endif; ?>
         </nav>
+
+          <?php if ($logged_in): ?>
+              <ul class="nav navbar-nav navbar-right">
+                  <li class="dropdown" style="">
+                      <!-- section id="block-search-form" class="block block-search contextual-links-region clearfix" -->
+                      <a href="#" title="Logout or My Account" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                          <span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+                      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                          <li role="presentation"><a role="menuitem" tabindex="-1" href="/user/logout">Log out</a></li>
+                          <li role="presentation"><a role="menuitem" tabindex="-1" href="/user">My user profile</a></li>
+                      </ul>
+                  </li>
+              </ul>
+          <?php endif; ?>
 
           <!-- end nav region -->
           <?php if (!empty($page['end_nav_bar'])): ?>
@@ -175,7 +188,7 @@
 
   </div>
 </div>
-<footer class="footer container">
+<footer class="footer container panel-footer">
   <?php print render($page['footer']); ?>
 </footer>
 <!-- print render($trace_messages) -->

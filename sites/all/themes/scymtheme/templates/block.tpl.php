@@ -54,10 +54,16 @@
 <?php if (empty($dropdown_id)): ?>
     <section id="<?php print $block_html_id; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
 <?php else: ?>
-    <!-- block for login form -->
     <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown" style="padding-right: 10px">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Sign in <span class="caret"></span></a>
+        <li class="dropdown">
+            <?php if ($dropdown_id == 'login-div'): ?>
+                <!-- block for login form -->
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Sign in <span class="caret"></span></a>
+            <?php elseif ($dropdown_id == 'search-div'): ?>
+                <!-- block for search form -->
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Search the site."><span class="glyphicon glyphicon-search"></span></a>
+            <?php endif;?>
+
             <div class="dropdown-menu" id="<?php print $dropdown_id;?>">
 <?php endif;?>
 
