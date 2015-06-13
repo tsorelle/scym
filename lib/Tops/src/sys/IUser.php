@@ -96,4 +96,6 @@ interface IUser
     public function setProfileValue($key,$value);
 
     public function updateProfile($key=null);
+
+    public function getContentTypes();
 }

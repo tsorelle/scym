@@ -194,6 +194,10 @@ abstract class TAbstractUser implements IUser
         // override in sub-class as needed
     }
 
+    public function getContentTypes() {
+        // overide in subclass as needed
+        return array();
+    }
 
 
 }

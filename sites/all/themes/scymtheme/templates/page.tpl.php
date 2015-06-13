@@ -115,6 +115,11 @@
 
           <?php if ($logged_in): ?>
               <ul class="nav navbar-nav navbar-right">
+                  <?php if(!empty($userContentMenu)) : ?>
+                      <?php print render($userContentMenu); ?>
+                  <?php endif; ?>
+
+
                   <li class="dropdown" style="">
                       <!-- section id="block-search-form" class="block block-search contextual-links-region clearfix" -->
                       <a href="#" title="Logout or My Account" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -124,7 +129,9 @@
                           <li role="presentation"><a role="menuitem" tabindex="-1" href="/user">My user profile</a></li>
                       </ul>
                   </li>
+
               </ul>
+
           <?php endif; ?>
 
           <!-- end nav region -->
@@ -140,21 +147,32 @@
 
 <div class="main-container container">
 
-  <header role="banner" id="page-header">
-    <?php if (!empty($site_slogan)): ?>
-      <p class="lead"><?php print $site_slogan; ?></p>
-    <?php endif; ?>
+    <?php if ($is_front): ?>
+    <div class="row">
+        <div class="jumbotron" id="site-header" >
+            <h1>South Central Yearly Meeting</h1>
+            <p class="header-title">Religious Society of Friends</p>
+            <p class="header-title">Texas, Oklahoma, Arkansas, Louisiana, Missouri </p>
+        </div>
+    </div>
 
-    <?php print render($page['header']); ?>
-  </header> <!-- /#page-header -->
+    <?php endif; ?>
+    <header role="banner" id="page-header">
+
+        <!-- ?php if (!empty($site_slogan)): ? -->
+        <!-- p class="lead"><?php print $site_slogan; ?></p -->
+        <!-- ?php endif; ? -->
+        <?php print render($page['header']); ?>
+    </header> <!-- /#page-header -->
 
   <div class="row">
 
-    <?php if (!empty($page['sidebar_first'])): ?>
+    <?php if ((!$is_front) && !empty($page['sidebar_first'])): ?>
       <aside class="col-sm-3" role="complementary">
         <?php print render($page['sidebar_first']); ?>
       </aside>  <!-- /#sidebar-first -->
     <?php endif; ?>
+
 
     <section<?php print $content_column_class; ?>>
       <?php if (!empty($page['highlighted'])): ?>
@@ -181,7 +199,8 @@
     </section>
 
     <?php if (!empty($page['sidebar_second'])): ?>
-      <aside class="col-sm-3" role="complementary">
+      <!-- aside class="col-sm-3" role="complementary" -->
+      <aside class="<?php print ($is_front ?'col-sm-4' :'col-sm-3');?>" role="complementary">
         <?php print render($page['sidebar_second']); ?>
       </aside>  <!-- /#sidebar-second -->
     <?php endif; ?>

@@ -150,6 +150,49 @@ function scymtheme_preprocess_node(&$variables) {
 }
 
 
+function _scymtheme_typeToLi($type)
+{
+    $first = substr($type->type,0,1);
+
+    $article = ($first == 'a' || $first == 'i' || $first == 'o' || $first == 'u') ? 'an ' : 'a ';
+
+
+    return '<li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/'.
+    $type->type . '" title="' . strip_tags($type->description) . '" >Create '.$article. $type->name . '</a></li> ';
+}
+
+function _scym_buildContentTypeMenu($userContentTypes) {
+
+    $typeList = '';
+    if (array_key_exists('page',$userContentTypes)) {
+        $type = $userContentTypes['page'];
+        $typeList .= _scymtheme_typeToLi($type);
+    }
+    if (array_key_exists('article',$userContentTypes)) {
+        $type = $userContentTypes['article'];
+        $typeList .= _scymtheme_typeToLi($type);
+    }
+    foreach ($userContentTypes as $key => $type) {
+        if ($key != 'page' && $key != 'article') {
+            $typeList .= _scymtheme_typeToLi($type);
+        }
+    }
+
+    $typeList .= '<li role="presentation"><a role="menuitem" tabindex="-1" href="/admin/content" title="Manage all content">Manage content</a></li> ';
+
+    return
+        // array('user-content-menu' =>
+            array(
+            '#prefix' => '<li class="dropdown" > '.
+                '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Create Content"> '.
+                '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a> '.
+                '<ul class="dropdown-menu" role="menu" aria-labelledby="editMenu1">',
+            '#markup' => $typeList,
+            '#suffix' => '</ul></li>',
+        // )
+    );
+}
+
 /**
  * Implements hook_preprocess_page().
  *
@@ -159,12 +202,23 @@ function scymtheme_preprocess_page(&$variables) {
 
     $variables['siteshortname'] = 'SCYM';
 
+    $variables['userContentMenu'] = false;
+
+    if ($variables['logged_in']) {
+        $currentUser = TUser::getCurrent();
+        $userContentTypes = $currentUser->getContentTypes();
+        if (!empty($userContentTypes)) {
+            $variables['userContentMenu'] = _scym_buildContentTypeMenu($userContentTypes);
+        }
+    }
+
     // Add information about the number of sidebars.
     if (!empty($variables['page']['sidebar_first']) && !empty($variables['page']['sidebar_second'])) {
         $variables['content_column_class'] = ' class="col-sm-6"';
     }
     elseif (!empty($variables['page']['sidebar_first']) || !empty($variables['page']['sidebar_second'])) {
-        $variables['content_column_class'] = ' class="col-sm-9"';
+        $variables['content_column_class'] =
+            $variables['is_front'] ? ' class="col-sm-8"' : ' class="col-sm-9"';
     }
     else {
         $variables['content_column_class'] = ' class="col-sm-12"';

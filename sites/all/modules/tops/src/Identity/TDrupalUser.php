@@ -106,6 +106,24 @@ class TDrupalUser extends TAbstractUser  {
         return $result;
     }
 
+    public function getContentTypes() {
+        $result = $this->getProfileValue('user-content-types');
+        if (!$result) {
+            $types = node_type_get_types();
+            $result = array();
+            foreach($types as $type) {
+                if (!$type->disabled) {
+                    $permission =  $type->type == 'book' ? 'create new books' : 'create '.$type->type." content";
+                    if ($this->isAuthorized($permission)) {
+                        $result[$type->type] = $type;
+                    }
+                }
+            }
+            $this->setProfileValue('user-content-type',$result);
+        }
+        return $result;
+    }
+
 
 
     /**
