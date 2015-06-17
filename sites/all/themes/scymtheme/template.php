@@ -158,7 +158,11 @@ function _scymtheme_typeToLi($type)
 
 
     return '<li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/'.
-    $type->type . '" title="' . strip_tags($type->description) . '" >Create '.$article. $type->name . '</a></li> ';
+    str_replace('_','-',$type->type) . '" title="' . strip_tags($type->description) . '" >Create '.$article. $type->name . '</a></li> ';
+}
+
+function _scymtheme_menu_li($href,$title,$text) {
+    return sprintf('<li role="presentation"><a role="menuitem" tabindex="-1" href="%s" title="%s" >%s</a></li> ',$href,$title,$text);
 }
 
 function _scym_buildContentTypeMenu($userContentTypes) {
@@ -193,6 +197,29 @@ function _scym_buildContentTypeMenu($userContentTypes) {
     );
 }
 
+function _scym_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
+    $items = '';
+    $isAdmin = $currentUser->isMemberOf('administrator');
+    $isModerator = $currentUser->isMemberOf('moderator');
+    if ($isAdmin || $isModerator) {
+        $items .= _scymtheme_menu_li('\Mailboxes','Manage Mailboxes','Mailboxes');
+        $items .= _scymtheme_menu_li('\RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');
+    }
+    if (empty($items)) {
+        return false;
+    }
+    return
+        array(
+            '#prefix' => '<li class="dropdown" > '.
+                '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Tools"> '.
+                '<span class="glyphicon  glyphicon-cog" aria-hidden="true"></span></a> '.
+                '<ul class="dropdown-menu" role="menu" aria-labelledby="editMenu1">',
+            '#markup' => $items,
+            '#suffix' => '</ul></li>',
+        );
+
+}
+
 /**
  * Implements hook_preprocess_page().
  *
@@ -203,6 +230,7 @@ function scymtheme_preprocess_page(&$variables) {
     $variables['siteshortname'] = 'SCYM';
 
     $variables['userContentMenu'] = false;
+    $variables['adminToolsMenu'] = false;
 
     if ($variables['logged_in']) {
         $currentUser = TUser::getCurrent();
@@ -210,6 +238,8 @@ function scymtheme_preprocess_page(&$variables) {
         if (!empty($userContentTypes)) {
             $variables['userContentMenu'] = _scym_buildContentTypeMenu($userContentTypes);
         }
+        $variables['adminToolsMenu'] = _scym_buildAdminToolsMenu($currentUser);
+
     }
 
     // Add information about the number of sidebars.

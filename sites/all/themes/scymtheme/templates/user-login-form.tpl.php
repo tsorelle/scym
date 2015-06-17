@@ -6,6 +6,7 @@
 ?>
     <?php
         print '<!-- login form here -->';
+        hide($form['links']);
     ?>
     <div class="form-group">
         <!-- input id="edit-name" type="text" placeholder="User name" name="name" class="form-control" -->
@@ -15,8 +16,10 @@
         <!-- input id="edit-pass" type="password" name="pass" placeholder="Password" class="form-control" -->
         <?php print drupal_render($form['pass']);?>
     </div>
+
     <div id="login-form-links">
-        <?php print drupal_render($form['links']); ?>
+        <a href="/user/password" title="Request new password via e-mail.">Request new password . . .</a><br/>
+        <p><a href="/user/register" title="Request a new user account.">Request an account . . .</a></p>
     </div>
 
     <?php print drupal_render_children($form); ?>

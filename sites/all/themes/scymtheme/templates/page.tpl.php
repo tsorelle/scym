@@ -119,6 +119,9 @@
                       <?php print render($userContentMenu); ?>
                   <?php endif; ?>
 
+                  <?php if(!empty($adminToolsMenu)) : ?>
+                      <?php print render($adminToolsMenu); ?>
+                  <?php endif; ?>
 
                   <li class="dropdown" style="">
                       <!-- section id="block-search-form" class="block block-search contextual-links-region clearfix" -->
