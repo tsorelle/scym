@@ -1,0 +1,5 @@
+; $Id$
+name = "SCYM Module"
+description = "Provides features for SCYM Website"
+core = 7.x
+php = 5.4

@@ -153,19 +153,21 @@ function scymtheme_preprocess_node(&$variables) {
 function _scymtheme_typeToLi($type)
 {
     $first = substr($type->type,0,1);
-
     $article = ($first == 'a' || $first == 'i' || $first == 'o' || $first == 'u') ? 'an ' : 'a ';
 
+    $href = '/node/add/'.str_replace('_','-',$type->type);
+    $title = strip_tags($type->description);
+    $text = 'Create '.$article. $type->name;
 
-    return '<li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/'.
-    str_replace('_','-',$type->type) . '" title="' . strip_tags($type->description) . '" >Create '.$article. $type->name . '</a></li> ';
+    return _scymtheme_menuLi($href,$title,$text);
 }
 
-function _scymtheme_menu_li($href,$title,$text) {
-    return sprintf('<li role="presentation"><a role="menuitem" tabindex="-1" href="%s" title="%s" >%s</a></li> ',$href,$title,$text);
+function _scymtheme_menuLi($href,$title,$text) {
+    return sprintf('<li role="presentation"><a role="menuitem" tabindex="-1" href="%s" title="%s" >%s</a></li> ',
+        $href,$title,$text);
 }
 
-function _scym_buildContentTypeMenu($userContentTypes) {
+function _scymtheme_buildContentTypeMenu($userContentTypes) {
 
     $typeList = '';
     if (array_key_exists('page',$userContentTypes)) {
@@ -182,33 +184,33 @@ function _scym_buildContentTypeMenu($userContentTypes) {
         }
     }
 
-    $typeList .= '<li role="presentation"><a role="menuitem" tabindex="-1" href="/admin/content" title="Manage all content">Manage content</a></li> ';
+    $typeList .= _scymtheme_menuLi('/admin/content','Manage all content','Manage Content');
 
     return
-        // array('user-content-menu' =>
-            array(
+        array(
             '#prefix' => '<li class="dropdown" > '.
                 '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Create Content"> '.
                 '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a> '.
                 '<ul class="dropdown-menu" role="menu" aria-labelledby="editMenu1">',
             '#markup' => $typeList,
             '#suffix' => '</ul></li>',
-        // )
     );
 }
 
-function _scym_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
+function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     $items = '';
-    $isAdmin = $currentUser->isMemberOf('administrator');
-    $isModerator = $currentUser->isMemberOf('moderator');
-    if ($isAdmin || $isModerator) {
-        $items .= _scymtheme_menu_li('\Mailboxes','Manage Mailboxes','Mailboxes');
-        $items .= _scymtheme_menu_li('\RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');
+    $mailboxManager = $currentUser->isAuthorized('manage mailboxes');
+    $isRegistrar = $currentUser->isAuthorized('administer registrations');
+
+    if ($mailboxManager) {
+        $items .= _scymtheme_menuLi('\Mailboxes','Manage Mailboxes','Mailboxes');
     }
-    if (empty($items)) {
-        return false;
+
+    if ($isRegistrar) {
+        $items .= _scymtheme_menuLi('\RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');
     }
-    return
+
+    return (empty($items)) ? false :
         array(
             '#prefix' => '<li class="dropdown" > '.
                 '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Tools"> '.
@@ -217,7 +219,6 @@ function _scym_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
             '#markup' => $items,
             '#suffix' => '</ul></li>',
         );
-
 }
 
 /**
@@ -236,9 +237,9 @@ function scymtheme_preprocess_page(&$variables) {
         $currentUser = TUser::getCurrent();
         $userContentTypes = $currentUser->getContentTypes();
         if (!empty($userContentTypes)) {
-            $variables['userContentMenu'] = _scym_buildContentTypeMenu($userContentTypes);
+            $variables['userContentMenu'] = _scymtheme_buildContentTypeMenu($userContentTypes);
         }
-        $variables['adminToolsMenu'] = _scym_buildAdminToolsMenu($currentUser);
+        $variables['adminToolsMenu'] = _scymtheme_buildAdminToolsMenu($currentUser);
 
     }
 

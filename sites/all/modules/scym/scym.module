@@ -1,0 +1,26 @@
+<?php
+/**
+ *  Module for additional SCYM functions
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function scym_permission()
+{
+    return array(
+        'manage mailboxes' => array(
+            'title' => 'Manage Mailboxes',
+            'description' => 'Create and update mailboxes.'
+        ),
+        'administer registrations' => array(
+            'title' => 'Administer Yearly Meeting Registations',
+            'description' => 'Use all features of administration program.'
+        ),
+        'administer directory' => array(
+            'title' => 'Administer Member Directory',
+            'description' => 'Add and update persons and addresses in the directory.'
+        ),
+    );
+
+}
