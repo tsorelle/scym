@@ -7,11 +7,12 @@ sites/*/settings*.php
 # sites/*/files
 # sites/*/private
 
-#exclude all modules except tops
+#exclude all modules except tops and scym
 /modules
 !/sites/all/modules/
 /sites/all/modules/*
 !/sites/all/modules/tops
+!/sites/all/modules/scym
 
 /core
 !lib/test/**/*
