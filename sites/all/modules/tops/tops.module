@@ -10,7 +10,7 @@
 use Drupal\tops\Identity\TDrupalAccount;
 use Symfony\Component\HttpFoundation\Request;
 
-$drupalAutoloader = require_once(__DIR__.'/../../../../lib/Tops/start/autoload.php');
+require_once(__DIR__.'/../../../../lib/Tops/start/autoload.php');
 require_once(__DIR__.'/../../../../lib/Tops/start/init.php');
 
 /**

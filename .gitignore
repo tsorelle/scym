@@ -1,63 +1,6 @@
-# ignore phpstorm local settings
-.idea
 # Ignore configuration files that may contain sensitive information.
 sites/*/settings*.php
 
 # Ignore paths that contain user-generated content.
-# sites/*/files
-# sites/*/private
-
-#exclude all modules except tops and scym
-/modules
-!/sites/all/modules/
-/sites/all/modules/*
-!/sites/all/modules/tops
-!/sites/all/modules/scym
-
-/core
-!lib/test/**/*
-
-includes
-misc
-private
-profiles
-scripts
-INSTALL.txt
-index.php
-LICENSE.txt
-xmlrpc.php
-MAINTAINERS.txt
-COPYRIGHT.txt
-cron.php
-genpwd.php
-install.php
-update.php
-INSTALL.sqlite.txt
-INSTALL.pgsql.txt
-.htaccess
-INSTALL.mysql.txt
-robots.txt
-UPGRADE.txt
-composer.json
-web.config
-authorize.php
-CHANGELOG.txt
-index - test.php
-sites/all/themes/bootstrap
-sites/default
-sites/example.sites.php
-lib/vendor
-lib/tools/*.cmd
-lib/tools/environment.php
-lib/test/quicktest.php
-
-sites/all/themes/scymtheme/less/bootstrap
-sites/all/themes/scymtheme/assets/fonts/glyphicons-halflings-regular.eot
-sites/all/themes/scymtheme/assets/fonts/glyphicons-halflings-regular.woff
-sites/all/themes/scymtheme/assets/fonts/glyphicons-halflings-regular.svg
-sites/all/themes/scymtheme/assets/fonts/glyphicons-halflings-regular.ttf
-sites/all/themes/scymtheme/assets/js/npm.js
-sites/all/themes/scymtheme/assets/js/bootstrap.min.js
-sites/all/themes/scymtheme/assets/js/bootstrap.js
-
-lib/tools/scym-model
+sites/*/files
+sites/*/private

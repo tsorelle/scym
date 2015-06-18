@@ -21,6 +21,11 @@ function scym_permission()
             'title' => 'Administer Member Directory',
             'description' => 'Add and update persons and addresses in the directory.'
         ),
+
+        'manage web site tasks' => array(
+            'title' => 'Manage Web Site Tasks',
+            'description' => 'Add and update tasks.'
+        ),
     );
 
 }

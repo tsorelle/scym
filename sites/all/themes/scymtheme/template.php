@@ -167,7 +167,12 @@ function _scymtheme_menuLi($href,$title,$text) {
         $href,$title,$text);
 }
 
-function _scymtheme_buildContentTypeMenu($userContentTypes) {
+function _scymtheme_buildContentTypeMenu(\Tops\sys\IUser $currentUser) {
+
+    $userContentTypes = $currentUser->getContentTypes();
+    if (empty($userContentTypes)) {
+        return false;
+    }
 
     $typeList = '';
     if (array_key_exists('page',$userContentTypes)) {
@@ -201,11 +206,14 @@ function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     $items = '';
     $mailboxManager = $currentUser->isAuthorized('manage mailboxes');
     $isRegistrar = $currentUser->isAuthorized('administer registrations');
+    $manageTasks = $currentUser->isAuthorized('manage web site tasks');
 
+    if ($manageTasks) {
+        $items .= _scymtheme_menuLi('\tasks','Manage Web Site','Task List');
+    }
     if ($mailboxManager) {
         $items .= _scymtheme_menuLi('\Mailboxes','Manage Mailboxes','Mailboxes');
     }
-
     if ($isRegistrar) {
         $items .= _scymtheme_menuLi('\RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');
     }
@@ -235,11 +243,8 @@ function scymtheme_preprocess_page(&$variables) {
 
     if ($variables['logged_in']) {
         $currentUser = TUser::getCurrent();
-        $userContentTypes = $currentUser->getContentTypes();
-        if (!empty($userContentTypes)) {
-            $variables['userContentMenu'] = _scymtheme_buildContentTypeMenu($userContentTypes);
-        }
-        $variables['adminToolsMenu'] = _scymtheme_buildAdminToolsMenu($currentUser);
+        $variables['userContentMenu'] = _scymtheme_buildContentTypeMenu($currentUser);
+        $variables['adminToolsMenu']  = _scymtheme_buildAdminToolsMenu($currentUser);
 
     }
 
