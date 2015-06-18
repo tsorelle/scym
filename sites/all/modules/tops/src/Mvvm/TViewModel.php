@@ -10,6 +10,7 @@ namespace Drupal\tops\Mvvm;
 use Drupal;
 use Symfony\Component\HttpFoundation\Request;
 use Tops\sys\TPath;
+use Tops\sys\TPostOffice;
 
 class TViewModel
 {
@@ -125,19 +126,36 @@ class TViewModel
         return null;
     }
 
+    private static $viewModelFiles;
+    private static function getViewModelFiles() {
+        if (!isset(self::$viewModelFiles)) {
+            self::$viewModelFiles = array();
+            $vmDirectory = '/assets/js/Tops.App';
+            $vmRootPath = \Tops\sys\TPath::FromRoot($vmDirectory);
+            $files = scandir($vmRootPath);
+            foreach($files as $fileName) {
+                if (strstr($fileName,'ViewModel.js')) {
+                    $parts = explode('ViewModel.js',$fileName);
+                    if (sizeof($parts == 2) && empty($parts[1])) {
+                        $vmName = $parts[0];
+                        self::$viewModelFiles[strtolower($vmName)] = $vmDirectory.'/' . $fileName;
+                    }
+                }
+            }
+        }
+        return self::$viewModelFiles;
+    }
+
     public static function Initialize(Request $request) {
         $name = self::getNameFromRequest($request);
         if ($name)
         {
-            $vmPath = $vmPath = "assets/js/Tops.App/$name".'ViewModel.js';
-            $vmLocation = TPath::FromRoot($vmPath);
-            if (!empty($vmLocation)) {
-                self::$vmPaths[$name] = $vmPath;
-                self::$vmname = $name;
-                return true;
-            }
-            else if (array_key_exists($name,self::$vmPaths)) {
-                unset(self::$vmPaths[$name]);
+            $vmFiles = self::getViewModelFiles();
+            $key = strtolower($name);
+            if (array_key_exists($key,$vmFiles)) {
+                $vmPath = $vmFiles[$key];
+                self::$vmPaths[$key] = $vmPath;
+                self::$vmname = $key;
             }
         }
         return false;
