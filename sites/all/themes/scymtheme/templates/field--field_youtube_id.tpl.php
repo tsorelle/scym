@@ -50,12 +50,9 @@
 <?php
     $id = $item['#markup'];
     print empty($id) ? '' :
-       '<div class="video-display"><iframe width="425" height="349" src="http://www.youtube.com/embed/'.$id.'?rel=0&modestbranding=1" frameborder="0" allowfullscreen></iframe>'.
+       '<div class="video-display">'.
+       '<iframe width="560" height="315" src="https://www.youtube.com/embed/'.$id.'?rel=0&modestbranding=1"  frameborder="0" allowfullscreen></iframe>'.
        '</div>';
-
-//        '<div class="video-display"><iframe width="425" height="349" src="http://www.youtube.com/embed/'.$id.'?rel=0&showinfo=0&amp;modestbranding=1" frameborder="0" allowfullscreen></iframe>'.
-        // <iframe width="560" height="315" src="https://www.youtube.com/embed/teHQ4jz8e2I" frameborder="0" allowfullscreen></iframe>
-        //        '<div class="video-display"><iframe width="425" height="349" src="http://www.youtube.com/embed/'.$id.'?rel=0" frameborder="0" allowfullscreen></iframe>'.
 
         ?>
     <?php endforeach; ?>
