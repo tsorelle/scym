@@ -43,6 +43,8 @@ class ScymUser extends TDrupalUser
         
         
         parent::loadProfile();
+        // Associations with directory not currently used
+        /*
         $person = $this->getPersonEntity();
         if ($person) {
             $this->profile['firstName'] = $person->getFirstname();
@@ -56,6 +58,7 @@ class ScymUser extends TDrupalUser
         else {
             TTracer::Trace("user $this->userName not found.");
         }
+        */
 
 
     }

@@ -146,6 +146,9 @@ class TDrupalUser extends TAbstractUser  {
                         $value = $this->getSingleFieldValue($drupalUser,$key);
                         if ($value !== false) {
                             $fieldName = substr($key, 6);
+                            if ($fieldName == 'full_name') {
+                                $fieldName = 'fullName'; // as expected by TAbstract user
+                            }
                             $this->profile[$fieldName] = $value;
                         }
                     }
