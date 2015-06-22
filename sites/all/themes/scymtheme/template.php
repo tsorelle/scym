@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Loader order: Tops and scym modules must be loaded first.
+ * See scym.module notes.
+ */
+
+
 use Drupal\tops\Mvvm\TViewModel;
 use Tops\sys\TTracer;
 use Tops\sys\TUser;

@@ -7,6 +7,9 @@
  * and scym module must be loaded before ckeditor (see scym_file_download($uri)
  * to ensure this load order run this query:
  *
+ * UPDATE system SET weight= -4 WHERE NAME='tops' AND TYPE='module';
+ * UPDATE system SET weight= -3 NAME='scym' AND TYPE='module';
+ * UPDATE system SET weight= -2 NAME='scymtheme' AND TYPE = 'theme';
  *
  */
 
