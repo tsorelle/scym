@@ -32,35 +32,28 @@ class ScymUser extends TDrupalUser
      */
     protected function loadProfile()
     {
-       //  \Tops\sys\TTracer::On();
-
-        /*
-        if (array_key_exists($this->userName,self::$profileCache)) {
-            $this->profile = self::$profileCache[$this->userName];
-        }
-        */
         TTracer::Trace("Load profile for $this->userName");
-        
-        
         parent::loadProfile();
-        // Associations with directory not currently used
+
+        // May have future integration with SCYM Directory. Not currently used
         /*
+
         $person = $this->getPersonEntity();
         if ($person) {
             $this->profile['firstName'] = $person->getFirstname();
             $this->profile['lastName'] = $person->getLastname();
             $this->profile['middleName'] = $person->getMiddlename();
             $this->profile['email'] = $person->getEmail();
-            $this->profile['fullName'] = $person->getFullName();
-            $this->profile['shortName'] = $person->getShortName();
+            if (!isset($this->profile['fullName'])) {
+                $this->profile['fullName'] = $person->getFullName();
+                $this->profile['shortName'] = $person->getShortName();
+            }
             TTracer::Trace("Found ".$person->getUsername());
         }
         else {
             TTracer::Trace("user $this->userName not found.");
         }
         */
-
-
     }
 
     /**
