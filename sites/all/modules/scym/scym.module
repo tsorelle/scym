@@ -1,6 +1,13 @@
 <?php
 /**
  *  Module for additional SCYM functions
+ *
+ * Load order:
+ * Tops module most be loaded first
+ * and scym module must be loaded before ckeditor (see scym_file_download($uri)
+ * to ensure this load order run this query:
+ *
+ *
  */
 
 /**
@@ -29,3 +36,21 @@ function scym_permission()
     );
 
 }
+
+/**
+ * Implements hook_file_download().
+ *
+ * The purpose of this function is to correct a problem with the ckeditor module.
+ * When the module is installed it may disable protections for private file downloads.
+ * For this to work, Tops must be loaded before ckeditor. See header notes.
+ *
+ */
+function scym_file_download($uri)
+{
+    if (substr($uri,0,8) == 'private:') {
+        $currentUser = Drupal::currentUser();
+        return $currentUser->isAnonymous() ? -1 : null;
+    }
+    return null;
+}
+
