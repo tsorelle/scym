@@ -62,8 +62,18 @@ class MailboxServiceTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(\Tops\services\ResultType::Success, $response->Result);
         $this->assertNotNull($response->Value);
         $box = $response->Value;
-        $this->assertEquals('Terry SoRelle',$box->getName());
+        $this->assertNotNull($box);
+        $this->assertEquals('Terry SoRelle',$box->mailboxName);
 
+    }
+
+    private function getBoxFromList($list, $code) {
+        foreach($list as $box) {
+            if ($box->code == $code) {
+                return $box;
+            }
+        }
+        return null;
     }
 
     public function testCreateBox() {
@@ -72,6 +82,7 @@ class MailboxServiceTest extends PHPUnit_Framework_TestCase {
         $svcRequest->code = 'TESTCODE';
         $svcRequest->name = "Test box";
         $svcRequest->email = 'e@mail.com';
+        $svcRequest->state = 1;
 
         $request = new Request();
         $request->setMethod('POST');
@@ -83,13 +94,12 @@ class MailboxServiceTest extends PHPUnit_Framework_TestCase {
         $this->assertNotNull($response);
         $this->assertEquals(\Tops\services\ResultType::Success, $response->Result);
         $this->assertNotNull($response->Value);
-        $box = $response->Value;
-        $this->assertEquals('Test box',$box->getName());
+        $box =  $this->getBoxFromList($response->Value,'TESTCODE');
 
         $request = new Request();
         $request->setMethod('GET');
         $request->request->set('serviceCode','mailboxes\GetMailbox');
-        $request->request->set( 'request', $box->getMailboxId());
+        $request->request->set( 'request', $box->code);
 
         $response = \Tops\services\TServiceHost::ExecuteRequest($request);
 
@@ -97,7 +107,7 @@ class MailboxServiceTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(\Tops\services\ResultType::Success, $response->Result);
         $this->assertNotNull($response->Value);
         $box = $response->Value;
-        $this->assertEquals('Test box',$box->getName());
+        $this->assertEquals('Test box',$box->mailboxName);
 
 
 

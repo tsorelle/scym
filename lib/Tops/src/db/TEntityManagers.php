@@ -18,30 +18,7 @@ use Tops\sys\TTracer;
 
 class TEntityManagers {
     private static $managers;
-    private static $environment;
-    /**
-     * @var IConfiguration
-     */
-    private static $configuration;
 
-    /**
-     * @return IConfiguration
-     */
-    private static function getConfiguration() {
-        if (!isset(self::$configuration)) {
-            /** @var IConfigManager $configManager */
-            $configManager = TObjectContainer::Get('configManager');
-            self::$environment = $configManager->getEnvironment();
-            TTracer::Trace("Environment is ".self::$environment);
-
-            $settings = $configManager->get('appsettings','databases');
-            $connections = $configManager->get('appsettings-'.self::$environment,'connections');
-            $settings->AddSection('connections',$connections);
-
-            self::$configuration = $settings;
-        }
-        return self::$configuration;
-    }
 
     /**
      * Get a Doctrine entity manager based on name of database type.
@@ -67,13 +44,6 @@ class TEntityManagers {
         if (isset(self::$managers))
             return;
         self::$managers = Array();
-        /*
-        $env = (new TConfig("tops"))->Value("environment");
-        if ($env == null) {
-            throw new \Exception("No tops.yml environment setting found.");
-        }
-        self::$environment = $env;
-        */
     }
 
 
@@ -87,12 +57,13 @@ class TEntityManagers {
     private static function createManager($typeKey,$isDevMode=null) {
         // $config = new TConfig("databases");
 
-        $config = self::getConfiguration();
+        // $config = self::getConfiguration();
+        $config = TDbConfiguration::GetConfiguration();
         $databaseId = $config->Value("type/$typeKey");
         if ($isDevMode === null) {
-            $isDevMode = self::$environment === 'development';
-        }
 
+            $isDevMode = TDbConfiguration::GetEnvironment()  === 'development';
+        }
         $entityPath = $config->Value("models/$databaseId");
         $metaConfigPath = TPath::FromLib($entityPath);
         $connectionParams = $config->Value("connections/$databaseId");
@@ -100,16 +71,6 @@ class TEntityManagers {
         $entityManager = EntityManager::create($connectionParams,$metaConfig);
         self::$managers[$typeKey] = $entityManager;
         return $entityManager;
-    }
-
-    public static function ReadDbConfig($typeKey="application",$isDevMode=null) {
-        $config = self::getConfiguration();
-        $databaseId = $config->Value("type/$typeKey");
-        if ($isDevMode === null) {
-            $isDevMode = self::$environment == "development";
-        }
-        $connectionParams =  $config->GetSection("connections/$databaseId");
-        return $connectionParams;
     }
 
 }

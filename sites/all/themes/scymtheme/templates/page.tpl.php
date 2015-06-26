@@ -154,9 +154,9 @@
     <div class="row">
         <div class="jumbotron" id="site-header" >
             <h1>South Central Yearly Meeting</h1>
-            <p class="header-title">Religious Society of Friends</p>
-            <p class="header-title">Texas, Oklahoma, Arkansas, Louisiana, Missouri </p>
+
         </div>
+        <div id="header-sub-title">Religious Society of Friends: Arkansas, Louisiana, Missouri, Oklahoma, Texas  </div>
     </div>
 
     <?php endif; ?>
