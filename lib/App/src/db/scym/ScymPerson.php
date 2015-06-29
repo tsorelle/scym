@@ -2,6 +2,7 @@
 
 namespace App\db\scym;
 
+use App\db\DateStampedEntity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -14,9 +15,9 @@ use Doctrine\ORM\Mapping\Table;
  * Persons
  *
  * @Table(name="persons", indexes={@Index(name="PersonNames", columns={"lastName", "firstName"})})
- * @Entity
+ * @Entity @HasLifecycleCallbacks
  */
-class ScymPerson
+class ScymPerson extends DateStampedEntity
 {
     /**
      * @var integer
@@ -26,6 +27,21 @@ class ScymPerson
      * @GeneratedValue(strategy="IDENTITY")
      */
     private $personid;
+
+    /**
+     * @var \DateTime
+     *
+     * @Column(name="dateAdded", type="datetime", nullable=true)
+     */
+    private $dateadded;
+
+    /**
+     * @var \DateTime
+     *
+     * @Column(name="dateUpdated", type="datetime", nullable=true)
+     */
+    private $dateupdated;
+
 
     /**
      * @var string
@@ -65,9 +81,9 @@ class ScymPerson
     /**
      * @var string
      *
-     * @Column(name="workPhone", type="string", length=25, nullable=true)
+     * @Column(name="phone2", type="string", length=25, nullable=true)
      */
-    private $workphone;
+    private $phone2;
 
     /**
      * @var string
@@ -76,19 +92,28 @@ class ScymPerson
      */
     private $email;
 
-    /**
-     * @var integer
-     *
-     * @Column(name="membershipStatus", type="integer", nullable=true)
-     */
-    private $membershipstatus = '1';
 
     /**
-     * @var integer
+     * @var \DateTime
      *
-     * @Column(name="birthYear", type="integer", nullable=true)
+     * @Column(name="dateOfBirth", type="date", nullable=true)
      */
-    private $birthyear = '0';
+    private $dateOfBirth;
+
+    /**
+     * @var string
+     *
+     * @Column(name="addedBy", type="string", length=100, nullable=true)
+     */
+    private $addedby;
+
+    /**
+     * @var string
+     *
+     * @Column(name="updatedBy", type="string", length=100, nullable=true)
+     */
+    private $updatedby;
+
 
     /**
      * @var string
@@ -100,30 +125,9 @@ class ScymPerson
     /**
      * @var string
      *
-     * @Column(name="password", type="string", length=30, nullable=true)
-     */
-    private $password;
-
-    /**
-     * @var string
-     *
      * @Column(name="notes", type="string", length=200, nullable=true)
      */
     private $notes;
-
-    /**
-     * @var \DateTime
-     *
-     * @Column(name="dateAdded", type="date", nullable=true)
-     */
-    private $dateadded;
-
-    /**
-     * @var \DateTime
-     *
-     * @Column(name="dateUpdated", type="date", nullable=true)
-     */
-    private $dateupdated;
 
     /**
      * @var boolean
@@ -156,16 +160,9 @@ class ScymPerson
     /**
      * @var integer
      *
-     * @Column(name="ymStatusCode", type="integer", nullable=true)
+     * @Column(name="membershipTypeId", type="integer", nullable=true)
      */
-    private $ymstatuscode;
-
-    /**
-     * @var \DateTime
-     *
-     * @Column(name="dateOfBirth", type="date", nullable=true)
-     */
-    private $dateofbirth;
+    private $membershipTypeId;
 
 
 
@@ -173,7 +170,7 @@ class ScymPerson
     /**
      * Get personid
      *
-     * @return integer 
+     * @return integer
      */
     public function getPersonid()
     {
@@ -196,7 +193,7 @@ class ScymPerson
     /**
      * Get firstname
      *
-     * @return string 
+     * @return string
      */
     public function getFirstname()
     {
@@ -219,7 +216,7 @@ class ScymPerson
     /**
      * Get lastname
      *
-     * @return string 
+     * @return string
      */
     public function getLastname()
     {
@@ -242,7 +239,7 @@ class ScymPerson
     /**
      * Get middlename
      *
-     * @return string 
+     * @return string
      */
     public function getMiddlename()
     {
@@ -265,7 +262,7 @@ class ScymPerson
     /**
      * Get addressid
      *
-     * @return integer 
+     * @return integer
      */
     public function getAddressid()
     {
@@ -288,7 +285,7 @@ class ScymPerson
     /**
      * Get phone
      *
-     * @return string 
+     * @return string
      */
     public function getPhone()
     {
@@ -296,26 +293,26 @@ class ScymPerson
     }
 
     /**
-     * Set workphone
+     * Set phone2
      *
-     * @param string $workphone
+     * @param string $phone2
      * @return ScymPerson
      */
-    public function setWorkphone($workphone)
+    public function setPhone2($phone2)
     {
-        $this->workphone = $workphone;
+        $this->phone2 = $phone2;
 
         return $this;
     }
 
     /**
-     * Get workphone
+     * Get phone2
      *
-     * @return string 
+     * @return string
      */
-    public function getWorkphone()
+    public function getPhone2()
     {
-        return $this->workphone;
+        return $this->phone2;
     }
 
     /**
@@ -334,7 +331,7 @@ class ScymPerson
     /**
      * Get email
      *
-     * @return string 
+     * @return string
      */
     public function getEmail()
     {
@@ -342,50 +339,74 @@ class ScymPerson
     }
 
     /**
-     * Set membershipstatus
+     * Set dateOfBirth
      *
-     * @param integer $membershipstatus
+     * @param \DateTime $dateOfBirth
      * @return ScymPerson
      */
-    public function setMembershipstatus($membershipstatus)
+    public function setDateOfBirth($dateOfBirth)
     {
-        $this->membershipstatus = $membershipstatus;
+        $this->dateOfBirth = $dateOfBirth;
 
         return $this;
     }
 
     /**
-     * Get membershipstatus
+     * Get dateOfBirth
      *
-     * @return integer 
+     * @return \DateTime
      */
-    public function getMembershipstatus()
+    public function getDateOfBirth()
     {
-        return $this->membershipstatus;
+        return $this->dateOfBirth;
     }
 
     /**
-     * Set birthyear
+     * Set addedby
      *
-     * @param integer $birthyear
-     * @return ScymPerson
+     * @param string $addedby
+     * @return Persons
      */
-    public function setBirthyear($birthyear)
+    public function setAddedBy($addedby)
     {
-        $this->birthyear = $birthyear;
+        $this->addedby = $addedby;
 
         return $this;
     }
 
     /**
-     * Get birthyear
+     * Get addedby
      *
-     * @return integer 
+     * @return string
      */
-    public function getBirthyear()
+    public function getAddedBy()
     {
-        return $this->birthyear;
+        return $this->addedby;
     }
+
+    /**
+     * Set updatedby
+     *
+     * @param string $updatedby
+     * @return ScymPerson
+     */
+    public function setUpdatedBy($updatedby)
+    {
+        $this->updatedby = $updatedby;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedby
+     *
+     * @return string
+     */
+    public function getUpdatedBy()
+    {
+        return $this->updatedby;
+    }
+
 
     /**
      * Set username
@@ -403,34 +424,11 @@ class ScymPerson
     /**
      * Get username
      *
-     * @return string 
+     * @return string
      */
     public function getUsername()
     {
         return $this->username;
-    }
-
-    /**
-     * Set password
-     *
-     * @param string $password
-     * @return ScymPerson
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    /**
-     * Get password
-     *
-     * @return string 
-     */
-    public function getPassword()
-    {
-        return $this->password;
     }
 
     /**
@@ -449,57 +447,11 @@ class ScymPerson
     /**
      * Get notes
      *
-     * @return string 
+     * @return string
      */
     public function getNotes()
     {
         return $this->notes;
-    }
-
-    /**
-     * Set dateadded
-     *
-     * @param \DateTime $dateadded
-     * @return ScymPerson
-     */
-    public function setDateadded($dateadded)
-    {
-        $this->dateadded = $dateadded;
-
-        return $this;
-    }
-
-    /**
-     * Get dateadded
-     *
-     * @return \DateTime 
-     */
-    public function getDateadded()
-    {
-        return $this->dateadded;
-    }
-
-    /**
-     * Set dateupdated
-     *
-     * @param \DateTime $dateupdated
-     * @return ScymPerson
-     */
-    public function setDateupdated($dateupdated)
-    {
-        $this->dateupdated = $dateupdated;
-
-        return $this;
-    }
-
-    /**
-     * Get dateupdated
-     *
-     * @return \DateTime 
-     */
-    public function getDateupdated()
-    {
-        return $this->dateupdated;
     }
 
     /**
@@ -518,7 +470,7 @@ class ScymPerson
     /**
      * Get junior
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getJunior()
     {
@@ -541,7 +493,7 @@ class ScymPerson
     /**
      * Get active
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getActive()
     {
@@ -564,7 +516,7 @@ class ScymPerson
     /**
      * Get sortkey
      *
-     * @return string 
+     * @return string
      */
     public function getSortkey()
     {
@@ -587,7 +539,7 @@ class ScymPerson
     /**
      * Get affiliationcode
      *
-     * @return string 
+     * @return string
      */
     public function getAffiliationcode()
     {
@@ -595,49 +547,26 @@ class ScymPerson
     }
 
     /**
-     * Set ymstatuscode
+     * Set membershipTypeId
      *
-     * @param integer $ymstatuscode
+     * @param integer $membershipTypeId
      * @return ScymPerson
      */
-    public function setYmstatuscode($ymstatuscode)
+    public function setMembershipTypeId($membershipTypeId)
     {
-        $this->ymstatuscode = $ymstatuscode;
+        $this->membershipTypeId = $membershipTypeId;
 
         return $this;
     }
 
     /**
-     * Get ymstatuscode
+     * Get membershipTypeId
      *
-     * @return integer 
+     * @return integer
      */
-    public function getYmstatuscode()
+    public function getMembershipTypeId()
     {
-        return $this->ymstatuscode;
-    }
-
-    /**
-     * Set dateofbirth
-     *
-     * @param \DateTime $dateofbirth
-     * @return ScymPerson
-     */
-    public function setDateofbirth($dateofbirth)
-    {
-        $this->dateofbirth = $dateofbirth;
-
-        return $this;
-    }
-
-    /**
-     * Get dateofbirth
-     *
-     * @return \DateTime
-     */
-    public function getDateofbirth()
-    {
-        return $this->dateofbirth;
+        return $this->membershipTypeId;
     }
 
     private function appendName($name, $next) {
@@ -670,5 +599,66 @@ class ScymPerson
         }
         return $name;
     }
+
+    /**
+     * Set dateadded
+     *
+     * @param \DateTime $dateadded
+     * @return ScymPerson
+     */
+    public function setDateAdded($dateadded)
+    {
+        $this->dateadded = $dateadded;
+
+        return $this;
+    }
+
+    /**
+     * Get dateadded
+     *
+     * @return \DateTime
+     */
+    public function getDateAdded()
+    {
+        return $this->dateadded;
+    }
+
+    /**
+     * Set dateupdated
+     *
+     * @param \DateTime $dateupdated
+     * @return ScymPerson
+     */
+    public function setDateUpdated($dateupdated)
+    {
+        $this->dateupdated = $dateupdated;
+
+        return $this;
+    }
+
+    /**
+     * Get dateupdated
+     *
+     * @return \DateTime
+     */
+    public function getDateUpdated()
+    {
+        return $this->dateupdated;
+    }
+
+    /** @PrePersist */
+    public function doOnPrePersist()
+    {
+        $this->setDateStamp();
+    }
+
+    /** @PreUpdate */
+    public function doOnPreUpdate()
+    {
+        $this->setUpdateStamp();
+    }
+
+
+
 
 }

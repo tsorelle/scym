@@ -9,6 +9,7 @@
 namespace Tops\sys;
 
 use Tops\sys\IUserFactory;
+use Tops\sys\TNullUserFactory;
 
 class TUser {
     /**
@@ -68,7 +69,12 @@ class TUser {
      */
     private static function getUserFactory() {
         if (!isset(self::$userFactory)) {
-            self::$userFactory = TObjectContainer::Get('tops.userfactory');
+            if (TObjectContainer::HasDefinition('tops.userfactory')) {
+                self::$userFactory = TObjectContainer::Get('tops.userfactory');
+            }
+            else {
+                self::$userFactory = new TNullUserFactory();
+            }
         }
         return self::$userFactory;
     }
