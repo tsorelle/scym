@@ -4,15 +4,45 @@ namespace App\db\scym;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Column;
+use App\db\DateStampedEntity;
 
 /**
  * Addresses
  *
  * @Table(name="addresses")
- * @Entity
+ * @Entity @HasLifecycleCallbacks
  */
-class ScymAddress
+class ScymAddress extends DateStampedEntity
 {
+    /**
+     * @OneToMany(targetEntity="ScymPerson", mappedBy="address",fetch="EAGER")
+     */
+    protected $persons;
+
+    /**
+     * Add person
+     *
+     * @param ScymPerson $person
+     * @return ScymAddress
+     */
+    public function addPerson(ScymPerson $person) {
+        $this->persons[] = $person;
+        $person->setAddress($this);
+        return $this;
+    }
+
+    public function removePerson(ScymPerson $person) {
+        $this->persons->removeElement($person);
+    }
+
+    public function __construct() {
+        $this->persons = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    public function getPersons()  {
+        return $this->persons;
+    }
+
     /**
      * @var integer
      *
@@ -20,160 +50,106 @@ class ScymAddress
      * @Id
      * @GeneratedValue(strategy="IDENTITY")
      */
-    private $addressid;
+    protected $addressid;
+
 
     /**
      * @var integer
      *
      * @Column(name="addressType", type="integer", nullable=true)
      */
-    private $addresstype = '1';
+    protected $addresstype = '1';
 
     /**
      * @var string
      *
      * @Column(name="addressName", type="string", length=50, nullable=true)
      */
-    private $addressname;
+    protected $addressname;
 
     /**
      * @var string
      *
      * @Column(name="address1", type="string", length=50, nullable=true)
      */
-    private $address1;
+    protected $address1;
 
     /**
      * @var string
      *
      * @Column(name="address2", type="string", length=50, nullable=true)
      */
-    private $address2;
+    protected $address2;
 
     /**
      * @var string
      *
      * @Column(name="city", type="string", length=40, nullable=true)
      */
-    private $city;
+    protected $city;
 
     /**
      * @var string
      *
      * @Column(name="state", type="string", length=2, nullable=true)
      */
-    private $state;
+    protected $state;
 
     /**
      * @var string
      *
      * @Column(name="postalCode", type="string", length=20, nullable=true)
      */
-    private $postalcode;
+    protected $postalcode;
 
     /**
      * @var string
      *
      * @Column(name="country", type="string", length=25, nullable=true)
      */
-    private $country;
+    protected $country;
 
     /**
      * @var string
      *
      * @Column(name="phone", type="string", length=25, nullable=true)
      */
-    private $phone;
+    protected $phone;
 
-    /**
-     * @var string
-     *
-     * @Column(name="email", type="string", length=20, nullable=true)
-     */
-    private $email;
 
     /**
      * @var string
      *
      * @Column(name="notes", type="string", length=200, nullable=true)
      */
-    private $notes;
+    protected $notes;
 
-    /**
-     * @var \DateTime
-     *
-     * @Column(name="dateAdded", type="date", nullable=true)
-     */
-    private $dateadded;
-
-    /**
-     * @var \DateTime
-     *
-     * @Column(name="dateUpdated", type="date", nullable=true)
-     */
-    private $dateupdated;
-
-    /**
-     * @var string
-     *
-     * @Column(name="listContact", type="string", length=30, nullable=true)
-     */
-    private $listcontact;
 
     /**
      * @var boolean
      *
      * @Column(name="newsletter", type="boolean", nullable=true)
      */
-    private $newsletter;
-
-    /**
-     * @var boolean
-     *
-     * @Column(name="printlabel", type="boolean", nullable=true)
-     */
-    private $printlabel;
+    protected $newsletter;
 
     /**
      * @var boolean
      *
      * @Column(name="active", type="boolean", nullable=true)
      */
-    private $active = '1';
+    protected $active = '1';
 
     /**
      * @var string
      *
      * @Column(name="sortkey", type="string", length=80, nullable=true)
      */
-    private $sortkey;
-
-    /**
-     * @var integer
-     *
-     * @Column(name="datasource", type="integer", nullable=true)
-     */
-    private $datasource = '0';
-
-    /**
-     * @var integer
-     *
-     * @Column(name="scymEntityId", type="integer", nullable=true)
-     */
-    private $scymentityid;
-
-    /**
-     * @var boolean
-     *
-     * @Column(name="gender", type="boolean", nullable=true)
-     */
-    private $gender;
-
+    protected $sortkey;
 
     /**
      * Get addressid
      *
-     * @return integer 
+     * @return integer
      */
     public function getAddressid()
     {
@@ -388,29 +364,6 @@ class ScymAddress
     }
 
     /**
-     * Set email
-     *
-     * @param string $email
-     * @return ScymAddress
-     */
-    public function setEmail($email)
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    /**
-     * Get email
-     *
-     * @return string 
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
      * Set notes
      *
      * @param string $notes
@@ -434,75 +387,6 @@ class ScymAddress
     }
 
     /**
-     * Set dateadded
-     *
-     * @param \DateTime $dateadded
-     * @return ScymAddress
-     */
-    public function setDateadded($dateadded)
-    {
-        $this->dateadded = $dateadded;
-
-        return $this;
-    }
-
-    /**
-     * Get dateadded
-     *
-     * @return \DateTime 
-     */
-    public function getDateadded()
-    {
-        return $this->dateadded;
-    }
-
-    /**
-     * Set dateupdated
-     *
-     * @param \DateTime $dateupdated
-     * @return ScymAddress
-     */
-    public function setDateupdated($dateupdated)
-    {
-        $this->dateupdated = $dateupdated;
-
-        return $this;
-    }
-
-    /**
-     * Get dateupdated
-     *
-     * @return \DateTime 
-     */
-    public function getDateupdated()
-    {
-        return $this->dateupdated;
-    }
-
-    /**
-     * Set listcontact
-     *
-     * @param string $listcontact
-     * @return ScymAddress
-     */
-    public function setListcontact($listcontact)
-    {
-        $this->listcontact = $listcontact;
-
-        return $this;
-    }
-
-    /**
-     * Get listcontact
-     *
-     * @return string 
-     */
-    public function getListcontact()
-    {
-        return $this->listcontact;
-    }
-
-    /**
      * Set newsletter
      *
      * @param boolean $newsletter
@@ -523,29 +407,6 @@ class ScymAddress
     public function getNewsletter()
     {
         return $this->newsletter;
-    }
-
-    /**
-     * Set printlabel
-     *
-     * @param boolean $printlabel
-     * @return ScymAddress
-     */
-    public function setPrintlabel($printlabel)
-    {
-        $this->printlabel = $printlabel;
-
-        return $this;
-    }
-
-    /**
-     * Get printlabel
-     *
-     * @return boolean 
-     */
-    public function getPrintlabel()
-    {
-        return $this->printlabel;
     }
 
     /**
@@ -594,72 +455,5 @@ class ScymAddress
         return $this->sortkey;
     }
 
-    /**
-     * Set datasource
-     *
-     * @param integer $datasource
-     * @return ScymAddress
-     */
-    public function setDatasource($datasource)
-    {
-        $this->datasource = $datasource;
 
-        return $this;
-    }
-
-    /**
-     * Get datasource
-     *
-     * @return integer 
-     */
-    public function getDatasource()
-    {
-        return $this->datasource;
-    }
-
-    /**
-     * Set scymentityid
-     *
-     * @param integer $scymentityid
-     * @return ScymAddress
-     */
-    public function setScymentityid($scymentityid)
-    {
-        $this->scymentityid = $scymentityid;
-
-        return $this;
-    }
-
-    /**
-     * Get scymentityid
-     *
-     * @return integer 
-     */
-    public function getScymentityid()
-    {
-        return $this->scymentityid;
-    }
-
-    /**
-     * Set gender
-     *
-     * @param boolean $gender
-     * @return ScymAddress
-     */
-    public function setGender($gender)
-    {
-        $this->gender = $gender;
-
-        return $this;
-    }
-
-    /**
-     * Get gender
-     *
-     * @return boolean 
-     */
-    public function getGender()
-    {
-        return $this->gender;
-    }
 }

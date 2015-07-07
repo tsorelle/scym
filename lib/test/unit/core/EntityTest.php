@@ -10,6 +10,38 @@ use Tops\db\TEntityManagers;
 // use App\db\ScymPerson;
 
 class EntityTest extends PHPUnit_Framework_TestCase {
+
+    /**
+     * @param \Doctrine\ORM\EntityManager $em
+     * @return null|\App\db\scym\ScymPerson
+     */
+    private function findTestPerson(\Doctrine\ORM\EntityManager $em) {
+        $repository = $em->getRepository('App\db\scym\ScymPerson');
+        return $repository->findOneBy(array('lastname' => 'SoRelle', 'firstname' => 'Terry'));
+    }
+
+    public function testLoadAddress() {
+        $this->assertTrue(class_exists('App\db\scym\ScymAddress',true),'Person class not found.');
+        // $this->assertTrue(class_exists('\Doctrine\ORM\EntityManager',true),'EntityManager class not found.');
+
+        \Tops\sys\TObjectContainer::Clear();
+        \Tops\sys\TObjectContainer::Register('configManager','\Tops\sys\TYmlConfigManager');
+
+        $em = TEntityManagers::Get();
+        $repository = $em->getRepository('App\db\scym\ScymAddress');
+
+        $address = $repository->find(117);
+
+        $this->assertNotNull($address,'Address not loaded.');
+
+        $this->assertNotNull($address);
+        $persons = $address->getPersons();
+        foreach ($persons as $p) {
+            $name = $p->getFirstName();
+        }
+
+    }
+
     public function testLoadEntity() {
         $this->assertTrue(class_exists('App\db\scym\ScymPerson',true),'Person class not found.');
         // $this->assertTrue(class_exists('\Doctrine\ORM\EntityManager',true),'EntityManager class not found.');
@@ -18,12 +50,26 @@ class EntityTest extends PHPUnit_Framework_TestCase {
         \Tops\sys\TObjectContainer::Register('configManager','\Tops\sys\TYmlConfigManager');
 
         $em = TEntityManagers::Get();
+
         $repository = $em->getRepository('App\db\scym\ScymPerson');
-        $person = $repository->findOneBy(array('lastname' => 'SoRelle', 'firstname' => 'Terry'));
+
+        $person = $repository->find(180);
+        //findOneBy(array('lastname' => 'SoRelle', 'firstname' => 'Terry'));
+        // $person = $this->findTestPerson($em);
+
+
         $this->assertNotNull($person,'Person 180 not loaded.');
 
         $this->assertEquals('Terry',$person->getFirstName());
         $this->assertEquals('SoRelle',$person->getLastName());
+        $id = $person->getAddressId();
+        $address = $person->getAddress();
+
+        $this->assertNotNull($address);
+        $persons = $address->getPersons();
+        foreach ($persons as $p) {
+            print $p->getFirstName();
+        }
 
     }
 
@@ -41,6 +87,7 @@ class EntityTest extends PHPUnit_Framework_TestCase {
          * @var \App\db\scym\ScymPerson
          */
         $person = $repository->findOneBy(array('lastname' => 'SoRelle', 'firstname' => 'Terry'));
+        // $person = $repository->find(180);
 
         $this->assertNotNull($person,'Person 180 not loaded.');
 

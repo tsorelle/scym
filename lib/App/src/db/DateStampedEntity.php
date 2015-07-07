@@ -7,69 +7,73 @@
  */
 
 namespace App\db;
+//abstract 
 
-abstract class DateStampedEntity {
+/**
+ * @MappedSuperclass
+ */
+class DateStampedEntity {
 
-    private $username;
-    private function getUserName() {
-        if (!isset($this->username)) {
-            $this->username = '';
+    /**
+     * @var \DateTime
+     *
+     * @Column(name="dateAdded", type="datetime", nullable=true)
+     */
+    protected $dateadded;
+
+    /**
+     * @var \DateTime
+     *
+     * @Column(name="dateUpdated", type="datetime", nullable=true)
+     */
+    protected $dateupdated;
+
+    /**
+     * @var string
+     *
+     * @Column(name="addedBy", type="string", length=100, nullable=true)
+     */
+    protected $addedby;
+
+    /**
+     * @var string
+     *
+     * @Column(name="updatedBy", type="string", length=100, nullable=true)
+     */
+    protected $updatedby;
+
+    private $currentUserName;
+    protected function getCurrentUserName() {
+        if (!isset($this->currentUserName)) {
+            $this->currentUserName = '';
             $user = \Tops\sys\TUser::getCurrent();
             if ($user != null) {
-                $this->username = $user->getUserName();
+                $this->currentUserName = $user->getUserName();
             }
 
-            if (empty($this->username)) {
+            if (empty($this->currentUserName)) {
                 $this->username = 'unknown';
             }
         }
-        return $this->username;
+        return $this->currentUserName;
     }
+
+
 
     public function setDateStamp($initial = true) {
         $now = new \DateTime();
-        $username = $this->getUserName();
+        $username = $this->getCurrentUserName();
         if ($initial) {
-            $this->setDateAdded($now);
-            $this->setAddedBy($username);
+            $this->dateadded = $now;
+            $this->addedby = $username ;
         }
-        $this->setDateUpdated($now);
-        $this->setUpdatedBy($username);
+        $this->dateupdated = $now;
+        $this->updatedby = $username;
     }
 
     public function setUpdateStamp() {
         $this->setDateStamp(false);
     }
-
-    /**
-     * Set dateadded
-     *
-     * @param \DateTime $dateadded
-     * @return DateStampedEntity
-     */
-    public abstract function setDateAdded($dateadded);
-
-    /**
-     * Get dateadded
-     *
-     * @return \DateTime
-     */
-    public abstract function getDateAdded();
-
-    /**
-     * Set dateupdated
-     *
-     * @param \DateTime $dateupdated
-     * @return DateStampedEntity
-     */
-    public abstract function setDateUpdated($dateupdated);
-
-    /**
-     * Get dateupdated
-     *
-     * @return \DateTime
-     */
-    public abstract function getDateUpdated();
 
 
     /**
@@ -78,32 +82,117 @@ abstract class DateStampedEntity {
      * @param string $addedby
      * @return DateStampedEntity
      */
-    public abstract function setAddedBy($addedby);
+    public function setAddedBy($addedby)
+    {
+        $this->addedby = $addedby;
+
+        return $this;
+    }
 
     /**
      * Get addedby
      *
      * @return string
      */
-    public abstract function getAddedBy();
+    public function getAddedBy()
+    {
+        return $this->addedby;
+    }
 
     /**
-     * Set updatedBy
+     * Set dateadded
+     *
+     * @param \DateTime $dateadded
+     * @return DateStampedEntity
+     */
+    public function setDateAdded($dateadded)
+    {
+        $this->dateadded = $dateadded;
+
+        return $this;
+    }
+
+    /**
+     * Get dateadded
+     *
+     * @return \DateTime
+     */
+    public function getDateAdded()
+    {
+        return $this->dateadded;
+    }
+
+    /**
+     * Set dateupdated
+     *
+     * @param \DateTime $dateupdated
+     * @return DateStampedEntity
+     */
+    public function setDateUpdated($dateupdated)
+    {
+        $this->dateupdated = $dateupdated;
+
+        return $this;
+    }
+
+    /**
+     * Get dateupdated
+     *
+     * @return \DateTime
+     */
+    public function getDateUpdated()
+    {
+        return $this->dateupdated;
+    }
+    /**
+     * Set updatedby
      *
      * @param string $updatedby
      * @return DateStampedEntity
      */
-    public abstract function setUpdatedBy($updatedby);
+    public function setUpdatedBy($updatedby)
+    {
+        $this->updatedby = $updatedby;
+
+        return $this;
+    }
 
     /**
      * Get updatedby
      *
      * @return string
      */
-    public abstract function getUpdatedBy();
+    public function getUpdatedBy()
+    {
+        return $this->updatedby;
+    }
+
+
+    /**
+     * Set username
+     *
+     * @param string $username
+     * @return DateStampedEntity
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+
+        return $this;
+    }
 
 
 
+    /** @PrePersist */
+    public function doOnPrePersist()
+    {
+        $this->setDateStamp();
+    }
 
+    /** @PreUpdate */
+    public function doOnPreUpdate()
+    {
+        $this->setUpdateStamp();
+    }
 
 }

@@ -28,20 +28,6 @@ class ScymPerson extends DateStampedEntity
      */
     private $personid;
 
-    /**
-     * @var \DateTime
-     *
-     * @Column(name="dateAdded", type="datetime", nullable=true)
-     */
-    private $dateadded;
-
-    /**
-     * @var \DateTime
-     *
-     * @Column(name="dateUpdated", type="datetime", nullable=true)
-     */
-    private $dateupdated;
-
 
     /**
      * @var string
@@ -65,11 +51,24 @@ class ScymPerson extends DateStampedEntity
     private $middlename;
 
     /**
-     * @var integer
+     * @var string
      *
-     * @Column(name="addressID", type="integer", nullable=true)
+     * @Column(name="username", type="string", length=30, nullable=true)
      */
-    private $addressid;
+    protected $username;
+
+    /**
+     * @var ScymAddress
+     *
+     * @ManyToOne(targetEntity="ScymAddress",inversedBy="persons")
+     * @JoinColumn(name="addressID", referencedColumnName="addressID")
+     */
+    protected $address;
+
+    public function getAddressId()
+    {
+        return $this->address->getAddressid();
+    }
 
     /**
      * @var string
@@ -92,6 +91,12 @@ class ScymPerson extends DateStampedEntity
      */
     private $email;
 
+    /**
+     * @var boolean
+     *
+     * @Column(name="newsletter", type="boolean", nullable=false)
+     */
+    private $newsletter = '0';
 
     /**
      * @var \DateTime
@@ -100,27 +105,6 @@ class ScymPerson extends DateStampedEntity
      */
     private $dateOfBirth;
 
-    /**
-     * @var string
-     *
-     * @Column(name="addedBy", type="string", length=100, nullable=true)
-     */
-    private $addedby;
-
-    /**
-     * @var string
-     *
-     * @Column(name="updatedBy", type="string", length=100, nullable=true)
-     */
-    private $updatedby;
-
-
-    /**
-     * @var string
-     *
-     * @Column(name="username", type="string", length=30, nullable=true)
-     */
-    private $username;
 
     /**
      * @var string
@@ -157,13 +141,20 @@ class ScymPerson extends DateStampedEntity
      */
     private $affiliationcode;
 
+
+    /**
+     * @var string
+     *
+     * @Column(name="otherAffiliation", type="string", length=100, nullable=true)
+     */
+    private $otheraffiliation;
+
     /**
      * @var integer
      *
-     * @Column(name="membershipTypeId", type="integer", nullable=true)
+     * @Column(name="directoryListingTypeId", type="integer", nullable=false)
      */
-    private $membershipTypeId;
-
+    private $directorylistingtypeid = '1';
 
 
 
@@ -247,27 +238,103 @@ class ScymPerson extends DateStampedEntity
     }
 
     /**
-     * Set addressid
+     * Set username
      *
-     * @param integer $addressid
+     * @param string $username
      * @return ScymPerson
      */
-    public function setAddressid($addressid)
+    public function setUsername($username)
     {
-        $this->addressid = $addressid;
+        $this->username = $username;
 
         return $this;
     }
 
     /**
-     * Get addressid
+     * Get username
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+
+
+    /**
+     * Set address
+     *
+     * @param ScymAddress $address
+     * @return ScymPerson
+     */
+    public function setAddress(ScymAddress $address = null)
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * Get address
+     *
+     * @return ScymAddress
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
+    /**
+     * Set otheraffiliation
+     *
+     * @param string $otheraffiliation
+     * @return ScymPerson
+     */
+    public function setOtherAffiliation($otheraffiliation)
+    {
+        $this->otheraffiliation = $otheraffiliation;
+
+        return $this;
+    }
+
+    /**
+     * Get otheraffiliation
+     *
+     * @return string
+     */
+    public function getOtherAffiliation()
+    {
+        return $this->otheraffiliation;
+    }
+
+
+    /**
+     * Set directorylistingtypeid
+     *
+     * @param integer $directorylistingtypeid
+     * @return Persons
+     */
+    public function setDirectoryListingTypeId($directorylistingtypeid)
+    {
+        $this->directorylistingtypeid = $directorylistingtypeid;
+
+        return $this;
+    }
+
+    /**
+     * Get directorylistingtypeid
      *
      * @return integer
      */
-    public function getAddressid()
+    public function getDirectoryListingTypeId()
     {
-        return $this->addressid;
+        return $this->directorylistingtypeid;
     }
+
+
+
+
 
     /**
      * Set phone
@@ -339,6 +406,31 @@ class ScymPerson extends DateStampedEntity
     }
 
     /**
+     * Set newsletter
+     *
+     * @param boolean $newsletter
+     * @return Persons
+     */
+    public function setNewsletter($newsletter)
+    {
+        $this->newsletter = $newsletter;
+
+        return $this;
+    }
+
+    /**
+     * Get newsletter
+     *
+     * @return boolean
+     */
+    public function getNewsletter()
+    {
+        return $this->newsletter;
+    }
+
+
+
+    /**
      * Set dateOfBirth
      *
      * @param \DateTime $dateOfBirth
@@ -359,76 +451,6 @@ class ScymPerson extends DateStampedEntity
     public function getDateOfBirth()
     {
         return $this->dateOfBirth;
-    }
-
-    /**
-     * Set addedby
-     *
-     * @param string $addedby
-     * @return Persons
-     */
-    public function setAddedBy($addedby)
-    {
-        $this->addedby = $addedby;
-
-        return $this;
-    }
-
-    /**
-     * Get addedby
-     *
-     * @return string
-     */
-    public function getAddedBy()
-    {
-        return $this->addedby;
-    }
-
-    /**
-     * Set updatedby
-     *
-     * @param string $updatedby
-     * @return ScymPerson
-     */
-    public function setUpdatedBy($updatedby)
-    {
-        $this->updatedby = $updatedby;
-
-        return $this;
-    }
-
-    /**
-     * Get updatedby
-     *
-     * @return string
-     */
-    public function getUpdatedBy()
-    {
-        return $this->updatedby;
-    }
-
-
-    /**
-     * Set username
-     *
-     * @param string $username
-     * @return ScymPerson
-     */
-    public function setUsername($username)
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
-    /**
-     * Get username
-     *
-     * @return string
-     */
-    public function getUsername()
-    {
-        return $this->username;
     }
 
     /**
@@ -546,28 +568,6 @@ class ScymPerson extends DateStampedEntity
         return $this->affiliationcode;
     }
 
-    /**
-     * Set membershipTypeId
-     *
-     * @param integer $membershipTypeId
-     * @return ScymPerson
-     */
-    public function setMembershipTypeId($membershipTypeId)
-    {
-        $this->membershipTypeId = $membershipTypeId;
-
-        return $this;
-    }
-
-    /**
-     * Get membershipTypeId
-     *
-     * @return integer
-     */
-    public function getMembershipTypeId()
-    {
-        return $this->membershipTypeId;
-    }
 
     private function appendName($name, $next) {
         if (empty($name)) {
@@ -585,7 +585,7 @@ class ScymPerson extends DateStampedEntity
     public function getShortName() {
         $name = $this->appendName($this->firstname,$this->lastname);
         if (empty($name)) {
-            return $this->username;
+            return $this->getUserName();
         }
         return $name;
 
@@ -600,63 +600,6 @@ class ScymPerson extends DateStampedEntity
         return $name;
     }
 
-    /**
-     * Set dateadded
-     *
-     * @param \DateTime $dateadded
-     * @return ScymPerson
-     */
-    public function setDateAdded($dateadded)
-    {
-        $this->dateadded = $dateadded;
-
-        return $this;
-    }
-
-    /**
-     * Get dateadded
-     *
-     * @return \DateTime
-     */
-    public function getDateAdded()
-    {
-        return $this->dateadded;
-    }
-
-    /**
-     * Set dateupdated
-     *
-     * @param \DateTime $dateupdated
-     * @return ScymPerson
-     */
-    public function setDateUpdated($dateupdated)
-    {
-        $this->dateupdated = $dateupdated;
-
-        return $this;
-    }
-
-    /**
-     * Get dateupdated
-     *
-     * @return \DateTime
-     */
-    public function getDateUpdated()
-    {
-        return $this->dateupdated;
-    }
-
-    /** @PrePersist */
-    public function doOnPrePersist()
-    {
-        $this->setDateStamp();
-    }
-
-    /** @PreUpdate */
-    public function doOnPreUpdate()
-    {
-        $this->setUpdateStamp();
-    }
 
 
 
