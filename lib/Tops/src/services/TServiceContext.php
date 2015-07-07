@@ -8,7 +8,7 @@
  */
 
 namespace Tops\services;
-
+use Tops\sys\IMessageContainer;
 
 /**
  * Class TServiceContext
@@ -17,7 +17,7 @@ namespace Tops\services;
  *
  * @package Tops\services
  */
-class TServiceContext {
+class TServiceContext implements IMessageContainer {
     /**
      * @var TServiceResponse
      */
@@ -50,6 +50,10 @@ class TServiceContext {
         $this->AddMessage(MessageType::Error,$text);
         if ($this->response->Result < ResultType::Errors)
             $this->response->Result = ResultType::Errors;
+    }
+
+    public function GetResult() {
+        return $this->response->Result;
     }
 
     public function AddServiceFatalErrorMessage($text) {

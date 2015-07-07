@@ -32,6 +32,12 @@ function scym_permission()
             'description' => 'Add and update persons and addresses in the directory.'
         ),
 
+        'register documents' => array(
+            'title' => 'Register Document',
+            'description' => 'Register uploaded document.'
+        ),
+
+
         'manage web site tasks' => array(
             'title' => 'Manage Web Site Tasks',
             'description' => 'Add and update tasks.'

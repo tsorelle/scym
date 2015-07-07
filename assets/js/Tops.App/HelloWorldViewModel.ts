@@ -15,6 +15,7 @@ module Tops {
 
         // Constructor
         constructor() {
+
             var me = this;
             Tops.HelloWorldViewModel.instance = me;
             me.application = new Tops.Application(me);

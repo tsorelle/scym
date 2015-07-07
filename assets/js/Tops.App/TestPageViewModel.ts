@@ -8,6 +8,7 @@
 // Module
 module Tops {
 
+//hello
 
     // view model
     export class TestPageViewModel implements IMainViewModel {

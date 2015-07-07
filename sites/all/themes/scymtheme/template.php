@@ -213,16 +213,20 @@ function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     $mailboxManager = $currentUser->isAuthorized('manage mailboxes');
     $isRegistrar = $currentUser->isAuthorized('administer registrations');
     $manageTasks = $currentUser->isAuthorized('manage web site tasks');
-
+    $registerDocuments = $currentUser->isAuthorized('register documents');
     if ($manageTasks) {
         $items .= _scymtheme_menuLi('\tasks','Manage Web Site','Task List');
     }
     if ($mailboxManager) {
         $items .= _scymtheme_menuLi('\Mailboxes','Manage Mailboxes','Mailboxes');
     }
+    if ($registerDocuments) {
+        $items .= _scymtheme_menuLi('\RegisterDocument','Register Uploaded Document','Register Document');
+    }
     if ($isRegistrar) {
         $items .= _scymtheme_menuLi('\RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');
     }
+
 
     return (empty($items)) ? false :
         array(

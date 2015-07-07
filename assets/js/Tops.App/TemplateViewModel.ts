@@ -13,7 +13,7 @@ module Tops {
         private application: Tops.IPeanutClient;
         private peanut: Tops.Peanut;
 
-
+private update = true;
         // Constructor
         constructor() {
             var me = this;
@@ -21,6 +21,9 @@ module Tops {
             me.application = new Tops.Application(me);
             me.peanut = me.application.peanut;
         }
+
+        private foo = false;
+
 
         /**
          * @param applicationPath - root path of application or location of service script

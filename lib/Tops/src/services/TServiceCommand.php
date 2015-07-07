@@ -11,6 +11,7 @@ use Tops\sys\IUser;
 use Tops\sys\TSession;
 use Tops\sys\TTracer;
 use Tops\sys\TUser;
+use Tops\sys\IMessageContainer;
 
 /**
  * Class TServiceCommand
@@ -21,7 +22,6 @@ abstract class TServiceCommand {
      * @var TServiceContext
      */
     private  $context;
-    
     private  $request;
 
     /**
@@ -56,6 +56,15 @@ abstract class TServiceCommand {
     public function getRequest() {
 
         return $this->request;
+    }
+
+
+    /**
+     * @return IMessageContainer
+     */
+    protected function  getMessages()
+    {
+        return $this->context;
     }
 
     /**
