@@ -10,7 +10,6 @@ namespace App\sys;
 use Tops\db\TQueryManager;
 use Tops\sys\IMessageContainer;
 use Tops\sys\TPath;
-use App\api\DocumentDescriptionDTO;
 
 class ScymDocumentImporter {
     /**
@@ -291,15 +290,15 @@ class ScymDocumentImporter {
         $fileInfo->docStatus = empty($doc->docStatus) ? 'Informal' : $doc->docStatus;
 
         if (!empty($doc->ymYear)) {
-            $fileInfo->ymYear = $doc->ymyear;
+            $fileInfo->ymYear = $doc->ymYear;
         }
 
         if (!empty($doc->committee)) {
             $fileInfo->committee = $doc->committee;
         }
 
-        if (!empty($doc->sessiontype)) {
-            $fileInfo->sessionType = $doc->sessiontype;
+        if (!empty($doc->sessionType)) {
+            $fileInfo->sessionType = $doc->sessionType;
         }
 
         // create node
