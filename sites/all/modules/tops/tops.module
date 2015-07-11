@@ -9,6 +9,7 @@
 
 use Drupal\tops\Identity\TDrupalAccount;
 use Symfony\Component\HttpFoundation\Request;
+use Tops\sys\TPath;
 
 require_once(__DIR__.'/../../../../lib/Tops/start/autoload.php');
 require_once(__DIR__.'/../../../../lib/Tops/start/init.php');
@@ -33,6 +34,24 @@ function tops_service_execute($serviceCode='',$parameter='') {
    \Drupal\tops\TopsModule::ExecuteService($serviceCode, $parameter);
 }
 
+function tops_script_execute($scriptName) {
+    error_reporting(E_ALL);
+    print "<h1>Script: $scriptName</h1>";
+    $tops_script_startTime = time();
+    print "<pre>\n";
+    print'Started: '.date('m/d/Y h:i:s a', $tops_script_startTime)."\n\n";
+
+    try {
+        include(TPath::FromLib('App/scripts/'.$scriptName.'.php'));
+    }
+    catch(\Exception $ex) {
+        print $ex->getMessage();
+    }
+
+    $tops_script_endTime = time();
+    print "\n\nDone: ".date('m/d/Y h:i:s a', $tops_script_endTime)."\n</pre>";
+    exit;
+}
 
 /**
  * Implementation of hook_help()

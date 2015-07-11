@@ -268,6 +268,14 @@ class TopsModule {
             'type' => MENU_CALLBACK,
         );
 
+        $items['tops/script'] = array(
+            'page callback' => 'tops_script_execute',
+            'access arguments' => array('execute tops script'), // 'access content'),
+            'type' => MENU_CALLBACK,
+        );
+
+
+
         return $items;
 
     }
@@ -285,6 +293,11 @@ class TopsModule {
           'execute service command' => array(
               'title' => 'Execute TOPS service',
               'description' => 'Post AJAX request to execute a service command.'
+          ),
+
+          'execute tops script' => array(
+                'title' => 'Execute TOPS script',
+                'description' => 'Execute a maintenance script.'
           ),
         );
     }
