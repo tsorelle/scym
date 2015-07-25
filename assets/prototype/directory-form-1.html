@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>South Central Yearly Meeting</title>
+
+    <!-- Bootstrap -->
+    <!-- css/bootstrap.min -->
+    <!-- link href="themes/scym/assets/css/style.css" rel="stylesheet" -->
+    <link href="sites/all/themes/scymtheme/assets/css/scym-theme.min.css" rel="stylesheet">
+    <link href="sites/all/themes/scymtheme/assets/css/scym-more.css" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="http://local.scym.org/misc/jquery.once.js?v=1.2"></script>
+    <script src="http://local.scym.org/misc/drupal.js?nr9wnb"></script>
+    <script src="http://local.scym.org/sites/all/modules/jquery_update/replace/ui/external/jquery.cookie.js?v=67fb34f6a866c40d0570"></script>
+    <script src="http://local.scym.org/sites/all/modules/escape_admin/js/escapeAdmin.modernizer.js?v=7.38"></script>
+    <script src="http://local.scym.org/sites/all/modules/escape_admin/js/escapeAdmin.js?v=7.38"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
+    <script src="http://local.scym.org/assets/js/Tops.Peanut/Peanut.js?v=1.0"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script src="http://local.scym.org/assets/js/Tops.App/App.js?v=1.0"></script>
+    <script src="http://local.scym.org/modules/toolbar/toolbar.js?nr9wnb"></script>
+    <script src="http://local.scym.org/sites/all/themes/scymtheme/assets/js/bootstrap.min.js?nr9wnb"></script>
+
+
+
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
+
+    <script src="assets/js/Tops.Peanut/Peanut.js?v=1.0"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script src="assets/js/Tops.App/App.js?v=1.0"></script>
+
+
+    <style>
+        .view-model-container {
+            padding-bottom: 10px;
+            padding-left: 0px;
+        }
+        #found-header { padding-bottom: 10px;  }
+    </style>
+
+<!-- link type="text/css" href="assets/css/scym.css" rel="stylesheet" -->
+<style>
+    .element-invisible { display: none; }
+</style>
+</head>
+
+<body class="html not-front logged-in no-sidebars page-node page-node- page-node-4 node-type-page toolbar toolbar-drawer" >
+
+<header id="navbar" role="banner" class="navbar container navbar-default">
+    <div class="container">
+
+        <div class="navbar-header">
+
+
+            <a class="name navbar-brand" href="/" title="Home">SCYM</a>
+
+            <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <nav role="navigation">
+                <ul class="menu nav navbar-nav"><li class="first leaf"><a href="/about/scym" title="About SCYM, Friends, Committees and Sessions">About</a></li>
+                    <li class="leaf"><a href="/meetings" title="SCYM Meetings and Worship Groups">Meetings</a></li>
+                    <li class="leaf"><a href="/members" title="SCYM Member Directory">Members</a></li>
+                    <li class="last leaf"><a href="/resources" title="Calendar, links, documents and other resources.">Resources</a></li>
+                </ul>
+
+            </nav>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown" > <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Create Content"> <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a> <ul class="dropdown-menu" role="menu" aria-labelledby="editMenu1"><li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/page" title="Use basic pages for your static content, such as an 'About us' page." >Create a Basic page</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/article" title="Use articles for time-sensitive content like news, press releases or blog posts." >Create an Article</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/forum" title="A forum topic starts a new discussion thread within a forum." >Create a Forum topic</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/book" title="Books have a built-in hierarchical navigation. Use for handbooks or tutorials." >Create a Book page</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/documents" title="Document for the SCYM library" >Create a Document</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/errorpage403" title="For administrator use only. Page used to display access denied error." >Create a Error Page 403</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/help-page" title="A page for the help system" >Create a Help Page</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/video-page" title="A page with embedded YouTube video" >Create a Video Page</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/webform" title="Create a new form or questionnaire accessible to users. Submission results and statistics are recorded and accessible to privileged users." >Create a Webform</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="/node/add/web-site-task" title="A request, feature or bug report." >Create a Web Site Task</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="/admin/content" title="Manage all content" >Manage Content</a></li> </ul></li>
+                <li class="dropdown" > <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Tools"> <span class="glyphicon  glyphicon-cog" aria-hidden="true"></span></a> <ul class="dropdown-menu" role="menu" aria-labelledby="editMenu1"><li role="presentation"><a role="menuitem" tabindex="-1" href="\tasks" title="Manage Web Site" >Task List</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="\Mailboxes" title="Manage Mailboxes" >Mailboxes</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="\RegistrationAdmin" title="Manage Yearly Meeting Registrations" >Manage Registrations</a></li> </ul></li>
+                <li class="dropdown" style="">
+                    <a href="#" title="Logout or My Account" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/user/logout">Log out</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/user">My user profile</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+
+
+            <!-- end nav region -->
+            <div class="region region-end-nav-bar">
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <!-- block for search form -->
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Search the site."><span class="glyphicon glyphicon-search"></span></a>
+
+                        <div class="dropdown-menu" id="search-div">
+
+
+                            <form class="form-search content-search" action="/Mailboxes" method="post" id="search-block-form" accept-charset="UTF-8"><div><div>
+                                <div class="input-group"><input title="Enter the terms you wish to search for." placeholder="Search" class="form-control form-text form-search" type="search" id="edit-search-block-form--2" name="search_block_form" value="" size="15" maxlength="128" /><span class="input-group-btn"><button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button></span></div><button class="element-invisible btn btn-primary form-submit" id="edit-submit" name="op" value="Search" type="submit">Search</button>
+                                <input type="hidden" name="form_build_id" value="form-pBZxKZqR_gBCEdEnt_hHT-t_ZIYfTKIPLKxcyFZQtiw" />
+                                <input type="hidden" name="form_token" value="HcKXZF0lS_UhJq80Fy_cwHflF5myzv3Eonwop9CQ-Z4" />
+                                <input type="hidden" name="form_id" value="search_block_form" />
+                            </div>
+                            </div></form>
+                        </div></li></ul> <!-- /.block -->
+            </div>
+
+
+        </div>
+    </div>
+
+
+</header>
+
+<div class="main-container container">
+
+    <header role="banner" id="page-header">
+
+        <!-- ?php if (!empty($site_slogan)): ? -->
+        <!-- p class="lead"></p -->
+        <!-- ?php endif; ? -->
+    </header> <!-- /#page-header -->
+
+    <div class="row">
+        <section class="col-sm-12">
+            <a id="main-content"></a>
+            <h1 class="page-header">SCYM Directory</h1>
+            <div class="region region-content">
+
+            <section id="block-system-main" class="block block-system clearfix">
+                <div id="node-4" class="node node-page clearfix" about="/Mailboxes" typeof="foaf:Document">
+                    <span property="dc:title" content="Mailboxes" class="rdf-meta element-hidden"></span>
+                    <span property="sioc:num_replies" content="0" datatype="xsd:integer" class="rdf-meta element-hidden"></span>
+
+                    <div class="content">
+                        <div class="field field-name-body field-type-text-with-summary field-label-hidden">
+                            <div class="field-items">
+                                <div class="field-item even" property="content:encoded">
+
+                                    <!-- ******************  START FORM ****************************************************************************  -->
+                                    <div id="scym-directory" class="container view-model-container">
+                                        <div class="row" id="search-form">
+                                            <div class="col-md-12">
+                                                <form>
+                                                    <div class="row">
+                                                        <div class="col-md-8">
+                                                            <div class="form-group">
+                                                                <input type="text" class="form-control" placeholder="Search" data-bind="value: familiesList.searchValue">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <button class="btn btn-default" data-bind="click:findFamiliesByPersonName" >Persons <span class="glyphicon glyphicon-search"></span> </button>
+                                                            <button class="btn btn-default" data-bind="click:findFamiliesByAddressName">Addresses <span class="glyphicon glyphicon-search"></span></button>
+                                                            <div class="btn-group" data-bind="visible:userCanEdit">
+                                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    New <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu">
+                                                                    <li><a href="#" data-bind="click:newPerson">Person</a></li>
+                                                                    <li><a href="#" data-bind="click:newAddress">Address</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        <div id="found-panel" class="found well" data-bind="visible:familiesList.selectionCount">
+                                            <div id="found-header" class="row">
+                                                <div class="col-md-2">
+                                                    Found: <span data-bind="text: familiesList.selectionCount"></span> <span data-bind="text: searchType"></span>.
+                                                </div>
+                                                <div class="col-md-2" style="padding-right: 3px" data-bind="visible:familiesList.hasPrevious">
+                                                    <a href="#"  data-bind="click:familiesList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+                                                </div>
+                                                <div class="col-md-2" style="padding-right: 3px" data-bind="visible:familiesList.hasMore">
+                                                    <a href="#" data-bind="click:familiesList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+                                                </div>
+                                                <div class="col-md-6"></div>
+                                            </div> <!-- end found header -->
+
+                                            <div class="row" id="found-list">
+                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[1]">
+                                                    <div>
+                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[2]">
+                                                    <div>
+                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[3]">
+                                                    <div>
+                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[4]">
+                                                    <div>
+                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[5]">
+                                                    <div>
+                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[6]">
+                                                    <div>
+                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                                                    </div>
+                                                </div>
+
+                                            </div> <!-- end found list -->
+                                        </div> <!-- end found panel -->
+
+                                        <div id="family-panel"  class="row" data-bind="visible:family.visible">
+                                            <form>
+                                                <!-- person panels -->
+                                                <div id="person-panel"  class="col-md-6">
+                                                    <div id="person-view-panel" data-bind="visible:personForm.viewState() == 'view'">
+                                                        <fieldset id="person-view-fields">
+                                                        <legend data-bind="text:personFormHeader"></legend>
+                                                            <div id="person-view-buttons" data-bind="visible:userCanEdit">
+                                                                <button class="btn btn-default" data-bind="click:editPerson">Edit</button>
+                                                                <button class="btn btn-default" data-bind="click:movePerson">
+                                                                    <span data-bind="visible:family.hasAddress">Move</span>
+                                                                    <span data-bind="visible:!family.hasAddress()">Get Address</span>
+                                                                </button>
+                                                            </div>
+                                                            <em>Name:</em> <span ></span><br>
+                                                        </fieldset>
+                                                    </div>
+                                                    <div id="person-edit-panel" data-bind="visible:personForm.viewState() == 'edit'">
+                                                        <fieldset id="person-form" >
+                                                            <div id="person-edit-buttons">
+                                                                <button class="btn btn-primary" data-bind="click:savePerson">Save</button>
+                                                                <button class="btn btn-default" data-bind="click:cancelPersonEdit">Cancel</button>
+                                                            </div>
+                                                            <legend data-bind="text:personFormHeader"></legend>
+                                                            <div class="form-group">
+                                                                <label for="firstName">First name</label>
+                                                                <input class="form-control" id="firstName" data-bind="value:personForm.firstName"/>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="middleName">Middle name</label>
+                                                                <input class="form-control" id="middleName" data-bind="value:personForm.middleName"/>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="lastName">Last name</label>
+                                                                <input class="form-control" id="lastName" data-bind="value:personForm.lastName"/>
+                                                            </div>
+                                                        </fieldset>
+
+                                                    </div>
+                                                    <div id="person-search-panel"  data-bind="visible:personForm.viewState() == 'search'">
+                                                        <fieldset id="person-search-fields">
+                                                            <legend>Find Person</legend>
+                                                            <div class="row">
+                                                                <div class="col-md-8">
+                                                                    <div class="form-group">
+                                                                        <input type="text" class="form-control" placeholder="Search" data-bind="value: personForm.searchValue">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <button class="btn btn-default" data-bind="click:findPersons" title="Search"><span class="glyphicon glyphicon-search"></span> </button>
+                                                                    <button class="btn btn-default" data-bind="click:createPersonForAddress" title="Create new person for address."><span class="glyphicon glyphicon-plus"></span></button>
+                                                                    <button class="btn btn-default" data-bind="click:cancelPersonSearch" title="Cancel"><span class="glyphicon glyphicon-remove"></span></button>
+                                                                </div>
+                                                            </div>
+                                                            <div id="findPersonResults"  class="row found well" data-bind="visible:personsList.selectionCount">
+                                                                <div id="persons-found-header" class="row">
+                                                                    <div class="col-md-12">
+                                                                        Found: <span data-bind="text: personsList.selectionCount"></span> persons.
+                                                                    </div>
+
+                                                                </div>
+                                                                <div id="persons-found-nav" class="row">
+                                                                    <div class="col-md-6" style="padding-right: 3px" data-bind="visible:personsList.hasPrevious">
+                                                                        <a href="#"  data-bind="click:personsList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+                                                                    </div>
+                                                                    <div class="col-md-6" style="padding-right: 3px" data-bind="visible:personsList.hasMore">
+                                                                        <a href="#" data-bind="click:personsList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+                                                                    </div>
+                                                                </div> <!-- end found header -->
+
+                                                                <div class="row" id="persons-found-list">
+                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[1]">
+                                                                        <div>
+                                                                            <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[2]">
+                                                                        <div>
+                                                                            <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[3]">
+                                                                        <div>
+                                                                            <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div> <!-- end found list -->
+
+                                                            </div>
+
+
+
+
+
+                                                        </fieldset>
+                                                    </div>
+                                                    <div id="person-empty-panel"  data-bind="visible:personForm.viewState() == 'empty'">
+                                                        <p>No person</p>
+                                                    </div>
+                                                </div> <!-- end person panel -->
+
+                                                <!-- address panels -->
+                                                <div id="address-panel"  class="col-md-6">
+                                                    <div id="address-view-panel" data-bind="visible:addressForm.viewState() == 'view'">
+                                                        <fieldset id="address-view-fields">
+                                                            <legend>Address</legend>
+                                                            <div id="address-view-buttons">
+                                                                <button class="btn btn-default" data-bind="click:editAddress,visible:userCanEdit">Edit</button>
+                                                                <button class="btn btn-default" data-bind="click:findPersonForAddress, visible:family.personCount()<2 && userCanEdit()">Add person</button>
+                                                                <div id="address-persons-list" class="btn-group" data-bind="visible:family.personCount()>1">
+                                                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        Persons <span class="caret"></span>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu" data-bind="foreach:addressPersonsList">
+                                                                        <li><a href="#" data-bind="click:$parent.selectPerson"><span data-bind="text: Name"></span></a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <em>Name:</em> <span ></span><br>
+                                                        </fieldset>
+                                                    </div>
+                                                    <div id="address-edit-panel" data-bind="visible:addressForm.viewState() == 'edit'">
+                                                        <fieldset id="address-form" >
+                                                            <legend >Address</legend>
+                                                        </fieldset>
+
+                                                        <div id="address-edit-buttons">
+                                                            <button class="btn btn-primary" data-bind="click:saveAddress">Save</button>
+                                                            <button class="btn btn-default" data-bind="click:cancelAddressEdit">Cancel</button>
+                                                        </div>
+                                                    </div>
+                                                    <div id="address-search-panel"  data-bind="visible:addressForm.viewState() == 'search'">
+                                                        <fieldset id="address-search-fields">
+                                                            <legend>Find Address</legend>
+                                                            <div class="row">
+                                                                <div class="col-md-8">
+                                                                    <div class="form-group">
+                                                                        <input type="text" class="form-control" placeholder="Search" data-bind="value: addressForm.searchValue">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <button class="btn btn-default" data-bind="click:findAddresses" title="Search"><span class="glyphicon glyphicon-search"></span> </button>
+                                                                    <button class="btn btn-default" data-bind="click:createAddressForPerson" title="Create new address for person."><span class="glyphicon glyphicon-plus"></span></button>
+                                                                    <button class="btn btn-default" data-bind="click:cancelAddressSearch" title="Cancel"><span class="glyphicon glyphicon-remove"></span></button>
+                                                                </div>
+                                                            </div>
+                                                            <div id="findAddressResults"  class="row found well" data-bind="visible:addressesList.selectionCount">
+                                                                <div id="address-found-header" class="row">
+                                                                    <div class="col-md-12">
+                                                                        Found: <span data-bind="text: addressesList.selectionCount"></span> addresses.
+                                                                    </div>
+                                                                </div>
+                                                                <div id="address-found-nav" class="row">
+                                                                    <div class="col-md-6" style="padding-right: 3px" data-bind="visible:addressesList.hasPrevious">
+                                                                        <a href="#"  data-bind="click:addressesList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+                                                                    </div>
+                                                                    <div class="col-md-6" style="padding-right: 3px" data-bind="visible:addressesList.hasMore">
+                                                                        <a href="#" data-bind="click:addressesList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+                                                                    </div>
+                                                                </div> <!-- end found header -->
+
+                                                                <div class="row" id="addresses-found-list">
+                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: addressesList.selectionList[1]">
+                                                                        <div>
+                                                                            <a href="#" data-bind="click:$parent.assignAddressToPerson"><span data-bind="text: Name"></span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: addressesList.selectionList[2]">
+                                                                        <div>
+                                                                            <a href="#" data-bind="click:$parent.assignAddressToPerson"><span data-bind="text: Name"></span></a>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: addressesList.selectionList[3]">
+                                                                        <div>
+                                                                            <a href="#" data-bind="click:$parent.assignAddressToPerson"><span data-bind="text: Name"></span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div> <!-- end found list -->
+
+                                                            </div>
+
+                                                        </fieldset>
+                                                    </div>
+                                                    <div id="address-empty-panel"  data-bind="visible:addressForm.viewState() == 'empty'">
+                                                        <p>No address</p>
+                                                    </div>
+                                                </div> <!-- end address panel -->
+                                            </form>
+                                        </div> <!-- end family panel -->
+                                    </div> <!-- end form content div -->
+                                    <!-- ******************  END FORM ****************************************************************************  -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            </div> <!-- content div -->
+        </section>
+    </div>
+</div>
+
+<footer class="footer container panel-footer">
+    <div class="region region-footer">
+
+        <section id="block-block-1" class="block block-block clearfix">
+
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
+                    <h3>Persons</h3>
+                    <ul>
+                        <li><a href="/MailForm">Inquiries</a> </li>
+                        <li><a href="/MailForm?box=clerk">Clerk</a> </li>
+                        <li><a href="/MailForm?box=support">Web Support</a> </li>
+                    </ul>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
+                    <h3>Information</h3>
+                    <ul>
+                        <li><a href="/about/friends">About Quakers</a> </li>
+                        <li><a href="/about/scym">About SCYM</a> </li>
+                    </ul>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
+                    <h3>Features</h3>
+                    <ul>
+                        <li><a href="/resources/documents">Documents</a> </li>
+                        <li><a href="/members/download" title="Directory download (requires sign in)">Downloads</a> </li>
+                        <li><a href="/about/sessions/annual/registration" title="Register for Yearly Meeting Sessions">Register</a> </li>
+                    </ul>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
+                    <h3>Listings</h3>
+                    <ul>
+                        <li><a href="/meetings/local" title="Monthly Meetings and Worship Groups">Local Meetings</a> </li>
+                        <li><a href="/meetings/quarterly">Quarterly Meetings</a> </li>
+                        <li><a href="/members/directory" title="Member directory (requires sign in)">Member Directory</a> </li>
+                    </ul>
+                </div>
+            </div>
+
+        </section> <!-- /.block -->
+    </div>
+</footer>
+    <script src="assets/js/Tops.App/ScymDirectoryViewModel.js?nr9wnb"></script>
+    <script>ViewModel.init('design/', function() {  ko.applyBindings(ViewModel); });</script>
+
+</body>
+</html>
