@@ -260,7 +260,7 @@ module Tops {
          * @returns {scymPerson} (person deleted)
          */
         public removePerson(id : string) {
-            //todo: call this when delete is implementd
+            //todo: call this when delete is implemented
             var me = this;
             var person = _.find(me.persons, function(person: scymPerson){
                 return person.id == id;
@@ -299,12 +299,18 @@ module Tops {
             }
         }
 
+        /**
+         * reset search observables
+         */
         public reset() {
             var me = this;
             me.searchValue('');
             me.selectionCount(0);
         }
 
+        /**
+         *  Assign result list
+         */
         public setList(list : Tops.INameValuePair[]) {
             var me = this;
             me.itemList = list;
@@ -317,6 +323,9 @@ module Tops {
             me.parseColumns();
         }
 
+        /**
+         * handle next-page click
+         */
         public nextPage = ()=> {
             var me = this;
             if (me.currentPage < me.lastPage) {
@@ -328,6 +337,9 @@ module Tops {
             me.parseColumns();
         };
 
+        /**
+         * handle previous-page click
+         */
         public previousPage = ()=> {
             var me = this;
             if (me.currentPage > 1) {
@@ -338,6 +350,9 @@ module Tops {
             me.parseColumns();
         };
 
+        /**
+         * arrange list in observable columns
+         */
         private parseColumns() {
             var me = this;
             var columns = [];
@@ -366,29 +381,45 @@ module Tops {
         }
     }
 
+    /**
+     * base class for person panel and address panel
+     */
     export class editPanel {
 
         public searchList = new searchListObservable(2,10);
         public viewState = ko.observable('');
 
-
+        /**
+         * set view state 'edit'
+         */
         public edit(){
             var me = this;
             me.viewState('edit');
         }
+        /**
+         * set view state 'closed'
+         */
         public close() {
             var me = this;
             me.viewState('closed');
         }
-
+        /**
+         * set view state 'search'
+         */
         public search() {
             var me = this;
             me.viewState('search');
         }
+        /**
+         * set view state 'empty'
+         */
         public empty() {
             var me = this;
             me.viewState('empty');
         }
+        /**
+         * set view state 'view'
+         */
         public view() {
             var me = this;
             me.viewState('view');
@@ -396,8 +427,14 @@ module Tops {
 
     }
 
+    /**
+     * observable container for person panel
+     */
     export class personObservable extends editPanel{
 
+        /**
+         * reset fields
+         */
         public clear() {
             var me=this;
             me.firstName('');
@@ -419,6 +456,9 @@ module Tops {
             me.directorylistingtypeid= ko.observable(1);
         }
 
+        /**
+         * set fields from person DTO
+         */
         public assign = (person: scymPerson) => {
             var me=this;
             me.firstName(person.firstName);
@@ -459,6 +499,9 @@ module Tops {
         public otheraffiliation = ko.observable('');
         public directorylistingtypeid= ko.observable(1);
 
+        /**
+         * format full name from parts
+         */
         public static makeFullName(first: string, middle: string, last:string) {
             var result = first.trim();
             if (middle) {
@@ -470,6 +513,9 @@ module Tops {
             return result;
         }
 
+        /**
+         * return full name based on component name values
+         */
         public fullName = () => {
             var me = this;
             var first = this.firstName();
@@ -481,6 +527,9 @@ module Tops {
 
     }
 
+    /**
+     * observable container for address panel
+     */
     export class addressObservable extends editPanel {
         public id = '';
         public addressName = ko.observable('');
@@ -498,6 +547,9 @@ module Tops {
         public active  = ko.observable(1);
         public sortkey= ko.observable('');
 
+        /**
+         * reset fields
+         */
         public clear() {
             var me = this;
             me.id = '';
@@ -517,6 +569,9 @@ module Tops {
             me.sortkey('');
         }
 
+        /**
+         * Set fields from address DTO
+         */
         public assign = (address : scymAddress) => {
             var me = this;
             me.addressName(address.addressname);
@@ -537,6 +592,9 @@ module Tops {
         };
     }
 
+    /**
+     * View Model class for directory application
+     */
     export class ScymDirectoryViewModel implements IMainViewModel {
         static instance: Tops.ScymDirectoryViewModel;
         private application: Tops.IPeanutClient;
@@ -614,9 +672,12 @@ module Tops {
             var me = this;
             me.family.visible(false);
             me.familiesList.searchValue('');
-            var list = me.makeFakePersons();
 
-            me.familiesList.setList(list);
+            // todo: get search result from service
+            var list = me.makeFakePersons();
+            var response = new fakeServiceResponse(list);
+            me.handleFindFamiliesResponse(response);
+
             me.searchType('Persons');
         }
 
@@ -627,10 +688,21 @@ module Tops {
             var me = this;
             me.family.visible(false);
             me.familiesList.searchValue('');
-            var list = me.makeFakeAddresses();
-            me.familiesList.setList(list);
             me.searchType('Addresses');
+
+            //todo: get family search from service
+            var list = me.makeFakeAddresses();
+            var response = new fakeServiceResponse(list);
+            me.handleFindFamiliesResponse(response);
         }
+
+        private handleFindFamiliesResponse = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var list = <INameValuePair[]>serviceResponse.Value;
+                me.familiesList.setList(list);
+            }
+        };
 
         /**
          * on click of add person button in address form
@@ -647,8 +719,8 @@ module Tops {
          */
         public createPersonForAddress() {
             var me = this;
+            me.personForm.clear();
             me.personForm.edit();
-
         }
 
         /**
@@ -661,7 +733,7 @@ module Tops {
         }
 
         /**
-         * of click of search button, person panel search view
+         * on click of search button, person panel search view
          */
         public findPersons() {
             var me = this;
@@ -813,27 +885,31 @@ module Tops {
          * On click item link in found panel
          * @param item
          */
-         public displayFamily = (item : INameValuePair) => {
-             var me = this;
-             me.family.visible(false);
-             me.familiesList.reset();
-             me.personForm.clear();
-             me.personForm.close();
-             me.addressForm.clear();
-             me.addressForm.close();
-             me.addressPersonsList([]);
+        public displayFamily = (item : INameValuePair) => {
+            var me = this;
+            me.family.visible(false);
+            me.familiesList.reset();
+            me.personForm.clear();
+            me.personForm.close();
+            me.addressForm.clear();
+            me.addressForm.close();
+            me.addressPersonsList([]);
 
-             // todo: get family data from service
-             var family = me.makeFakeFamily(item.Name);
-             var response = new fakeServiceResponse(family);
+            // todo: get family data from service
+            var family = me.makeFakeFamily(item.Name);
+            var response = new fakeServiceResponse(family);
 
-             me.setupFamily(response);
-         };
+            me.setupFamily(response);
+        };
 
+
+        /**
+         * on select person in persons button dropdown on address panel
+         * @param item
+         */
         public selectPerson = (item : INameValuePair) => {
             var me = this;
             if (item.Value == 'new') {
-                // me.personForm.clear();
                 me.personForm.search();
             }
             else {
@@ -854,11 +930,17 @@ module Tops {
 
         };
 
+        /**
+         * on click of edit button in person panel view mode
+         */
         public editPerson() {
             var me = this;
             me.personForm.edit();
         }
 
+        /**
+         * on click of move button in person panel view mode
+         */
         public movePerson() {
             var me = this;
             me.addressesList.reset();
@@ -866,6 +948,9 @@ module Tops {
             me.addressForm.search();
         }
 
+        /**
+         * On click of edit button on address panel view mode
+         */
         public editAddress() {
             var me = this;
             me.addressForm.edit();
@@ -881,6 +966,9 @@ module Tops {
             me.personForm.view();
         }
 
+        /**
+         * on save button click on person panel in edit mode
+         */
         public savePerson() {
             var me = this;
             // todo: implement data persistance for person
@@ -888,7 +976,7 @@ module Tops {
         }
 
         /**
-         * handle save click on address form
+         * handle save click on address form in edit mode
          */
         public saveAddress() {
             var me = this;
@@ -907,6 +995,7 @@ module Tops {
             me.family.visible(true);
             me.personForm.edit();
             me.addressForm.empty();
+            // todo: handle new person persistence
         };
 
         public newAddress() {
@@ -918,6 +1007,7 @@ module Tops {
             me.family.visible(true);
             me.addressForm.edit();
             me.personForm.empty();
+            // todo: handle address persistence
         }
 
 
