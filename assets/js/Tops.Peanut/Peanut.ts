@@ -10,6 +10,24 @@ module Tops {
         public Name: string;
         public Value: string;
     }
+
+    /**
+     * Use for testing. Normally IServiceResponse is returned from a service
+     */
+    export class fakeServiceResponse implements IServiceResponse {
+        constructor(returnValue: any) {
+            var me=this;
+            me.Value = returnValue;
+            me.Data = returnValue;
+        }
+
+        Messages: IServiceMessage[] = [];
+        Result: number = 0;
+        Value: any;
+        Data: any;
+    }
+
+
     export class Peanut {
 
         public static debugging() {
