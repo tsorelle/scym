@@ -146,8 +146,9 @@ class TopsModule {
         // $variables['tops_js_debug'] =  \Tops\sys\TTracer::JsDebuggingOn();
 
         if ($hasVm) {
+            // $initJs =  "ViewModel.init('//', function() {  ko.applyBindings(ViewModel); }); jQuery(function() {jQuery( '.datepicker' ).datepicker();}); ";
             $initJs =  "ViewModel.init('//', function() {  ko.applyBindings(ViewModel); });";
-
+            drupal_add_library('system', 'ui.datepicker');
             drupal_add_library('tops','peanut.app');
             drupal_add_js($vmPath,array('group'=>'JS_THEME', 'scope'=>'footer'));
             drupal_add_js($initJs,array('group'=>'JS_THEME','type'=>'inline', 'scope'=>'footer'));

@@ -7,6 +7,9 @@
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />
 
+// reference to jqueryui required if date popups are used.
+/// <reference path='../typings/jqueryui/jqueryui.d.ts' />
+
 module Tops {
     export class VmNameViewModel implements IMainViewModel {
         static instance: Tops.VmNameViewModel;
@@ -39,6 +42,13 @@ private update = true;
         init(applicationPath: string, successFunction?: () => void) {
             var me = this;
             // setup messaging and other application initializations
+            // initialize date popus if used
+            /*
+             jQuery(function() {
+             jQuery( ".datepicker" ).datepicker();
+             });
+             */
+
             me.application.initialize(applicationPath,
                 function() {
                     // do view model initializations here.

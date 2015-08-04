@@ -105,6 +105,20 @@ class ScymPerson extends DateStampedEntity
      */
     private $dateOfBirth;
 
+    /**
+     * @var boolean
+     *
+     * @Column(name="deceased", type="boolean", nullable=false)
+     */
+    private $deceased = '0';
+
+    /**
+     * @var string
+     *
+     * @Column(name="organization", type="string", length=100, nullable=true)
+     */
+    private $organization;
+
 
     /**
      * @var string
@@ -452,6 +466,53 @@ class ScymPerson extends DateStampedEntity
     {
         return $this->dateOfBirth;
     }
+
+    /**
+     * Set deceased
+     *
+     * @param boolean $deceased
+     * @return ScymPerson
+     */
+    public function setDeceased($deceased)
+    {
+        $this->deceased = $deceased;
+
+        return $this;
+    }
+
+    /**
+     * Get deceased
+     *
+     * @return boolean
+     */
+    public function getDeceased()
+    {
+        return $this->deceased;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param string $organization
+     * @return ScymPerson
+     */
+    public function setOrganization($organization)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return string
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
 
     /**
      * Set notes

@@ -21,14 +21,12 @@ require.config({
         }
     }
 });
-
 // load AMD module main.ts (compiled to main.js)
 // and include shims $, _, Backbone
 require(['main'], function (main, $, _, Backbone) {
     var app = main.AppMain();
     app.run();
 });
-
 var recOne = require.config({ baseUrl: 'js' });
 recOne(['core'], function (core) {
 });
