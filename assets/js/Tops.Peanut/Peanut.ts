@@ -11,6 +11,20 @@ module Tops {
         public Value: string;
     }
 
+    export class Dates {
+        public static getCurrentDateString() {
+            var d = new Date();
+            return d.toDateString;
+        }
+
+        public static formatDateString(s : string) {
+            if (!s) {
+                return '';
+            }
+            var d = new Date(s);
+            return d.toDateString();
+        }
+    }
     /**
      * Use for testing. Normally IServiceResponse is returned from a service
      */
@@ -266,7 +280,7 @@ module Tops {
                 return decodeURIComponent(name[1]);
         }
 
-        validateEmail(email: string) {
+        public static ValidateEmail(email: string) {
             if (!email || email.trim() == '') {
                 return false;
             }

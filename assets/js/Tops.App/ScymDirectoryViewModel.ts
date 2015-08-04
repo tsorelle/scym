@@ -44,8 +44,6 @@ module Tops {
         public otheraffiliation : string = '';
         public directorylistingtypeid: number=1;
         public lastUpdate : string = '';
-        //todo: use deceased?
-        public deceased: number = 0;
         public organization: string = '';
 
         public id : string = ''; // client side id
@@ -57,7 +55,6 @@ module Tops {
      */
     export class scymAddress {
         public addressId : any = null; // database entity id
-        public addresstype: number = 1;
         public addressname = '';
         public address1 = '';
         public address2 = '';
@@ -67,7 +64,6 @@ module Tops {
         public country = '';
         public phone = '';
         public notes = '';
-        public newsletter  = '';
         public active : number = 1;
         public sortkey = '';
         public lastUpdate : string = '';
@@ -213,8 +209,6 @@ module Tops {
             me.persons.push(person);
             me.personCount(me.persons.length);
         }
-
-
 
         /**
          * Return selected person object
@@ -395,7 +389,7 @@ module Tops {
 
         public searchList = new searchListObservable(2,10);
         public viewState = ko.observable('');
-        public validationMessage = ko.observable('');
+        public hasErrors = ko.observable(false);
         /**
          * set view state 'edit'
          */
@@ -457,7 +451,6 @@ module Tops {
         public otheraffiliation = ko.observable('');
         public directorylistingtypeid= ko.observable(1);
         public lastUpdate = ko.observable('');
-        public deceased = ko.observable(0);
         public organization = ko.observable('');
 
         public selectedAffiliation : KnockoutObservable<INameValuePair> = ko.observable(null);
@@ -469,6 +462,10 @@ module Tops {
         public hasAffiliation : KnockoutComputed<boolean>;
         public emailLink : KnockoutComputed<string>;
         // public directoryListing: KnockoutComputed<string>;
+
+        public firstNameError = ko.observable('');
+        public lastNameError = ko.observable('');
+        public emailError = ko.observable('');
 
         constructor() {
             super();
@@ -564,13 +561,15 @@ module Tops {
             me.lastUpdate('');
             me.personId('');
             me.organization('');
-            me.deceased(0);
             me.selectedAffiliation(null);
         }
 
         public clearValidations() {
             var me = this;
-            me.validationMessage('');
+            me.firstNameError('');
+            me.lastNameError('');
+            me.emailError('');
+            me.hasErrors(false);
         }
 
         /**
@@ -598,7 +597,6 @@ module Tops {
             me.directorylistingtypeid(person.directorylistingtypeid);
             me.lastUpdate(person.lastUpdate);
             me.personId(person.personId);
-            me.deceased(person.deceased);
             me.organization(person.organization);
             var affiliationItem = me.getAffiliationItem();
             me.selectedAffiliation(affiliationItem);
@@ -636,18 +634,34 @@ module Tops {
             person.phone2 = me.phone2();
             person.sortkey = me.sortkey();
             person.username = me.username();
-            person.deceased = me.deceased();
             person.organization = me.organization();
         };
 
         public validate = ():boolean => {
             var me = this;
-            var name = me.fullName();
-            if (!name) {
-                me.validationMessage('A name is required');
-                return false;
+            me.clearValidations();
+            var valid = true;
+            var value = me.firstName();
+            if (!value) {
+                me.firstNameError(": Please enter the first name");
+                valid = false;
             }
-            return true;
+            value = me.lastName();
+            if (!value) {
+                me.lastNameError(": Please enter the last name");
+                valid = false;
+            }
+            value = me.email();
+            if (value) {
+                var emailOk = Peanut.ValidateEmail(value);
+                if (!emailOk) {
+                    me.emailError(': Please enter a valid email address.');
+                    valid = false;
+                }
+            }
+
+            me.hasErrors(!valid);
+            return valid;
         };
 
         /**
@@ -683,7 +697,7 @@ module Tops {
      */
     export class addressObservable extends editPanel {
         public id = '';
-        public addresstype = ko.observable(1);
+        public addressId : KnockoutObservable<any> =  ko.observable();
         public addressname= ko.observable('');
         public address1= ko.observable('');
         public address2= ko.observable('');
@@ -693,10 +707,42 @@ module Tops {
         public country= ko.observable('');
         public phone= ko.observable('');
         public notes= ko.observable('');
-        public newsletter = ko.observable('');
         public active  = ko.observable(1);
         public sortkey= ko.observable('');
         public lastUpdate = ko.observable('');
+        public cityLocation : KnockoutComputed<string>;
+
+        public addressNameError = ko.observable('');
+
+        constructor() {
+            super();
+            var me = this;
+            me.cityLocation = ko.computed(me.computeCityLocation);
+        }
+
+        computeCityLocation = ()  => {
+            var me = this;
+            var city = me.city();
+            var state = me.state();
+            var zip = me.postalcode();
+
+            var result = city ? city : '';
+
+            if (result) {
+                if (state) {
+                    result = result + ', ';
+                }
+            }
+            if (state) {
+                result = result + state;
+            }
+
+            if (zip) {
+                result = result + ' ' + zip;
+            }
+
+            return result;
+        };
 
         /**
          * reset fields
@@ -705,7 +751,6 @@ module Tops {
             var me = this;
             me.clearValidations();
             me.id = '';
-            me.addresstype(1);
             me.addressname('');
             me.address1('');
             me.address2('');
@@ -715,23 +760,39 @@ module Tops {
             me.country('');
             me.phone('');
             me.notes('');
-            me.newsletter('');
             me.active (1);
             me.sortkey('');
             me.lastUpdate('');
+            me.addressId(null);
         }
 
-        public clearValidations() {
+        private clearValidations() {
             var me = this;
-            me.validationMessage('');
+            me.hasErrors(false);
+            me.addressNameError('');
         }
+
+        public validate = ():boolean => {
+            var me = this;
+            me.clearValidations();
+            var valid = true;
+            var value = me.addressname();
+            if (!value) {
+                me.addressNameError(": Please enter a name for the address");
+                me.hasErrors(true);
+                return false;
+            }
+
+            return true;
+        };
+
+
         /**
          * Set fields from address DTO
          */
         public assign = (address : scymAddress) => {
             var me = this;
             me.clearValidations();
-            me.addresstype(address.addresstype);
             me.addressname(address.addressname);
             me.address1(address.address1);
             me.address2(address.address2);
@@ -741,17 +802,16 @@ module Tops {
             me.country(address.country);
             me.phone(address.phone);
             me.notes(address.notes);
-            me.newsletter(address.newsletter);
             me.active (address.active);
             me.sortkey(address.sortkey);
             me.lastUpdate(address.lastUpdate);
+            me.addressId(address.addressId);
         };
 
         public updateScymAddress(address: scymAddress) {
             var me = this;
             address.address1 = me.address1();
             address.address2 = me.address2();
-            address.addresstype = me.addresstype();
             address.addressname = me.addressname();
             address.city = me.city();
             address.state = me.state();
@@ -759,7 +819,6 @@ module Tops {
             address.country = me.country();
             address.phone = me.phone();
             address.notes = me.notes();
-            address.newsletter = me.newsletter();
             address.active = me.active();
             address.sortkey = me.sortkey();
         }
@@ -1206,11 +1265,16 @@ module Tops {
 
         public cancelAddressEdit() {
             var me = this;
+            // rollback changes
+            me.addressForm.assign(me.family.address);
             me.addressForm.view();
         }
 
         public cancelPersonEdit() {
             var me = this;
+            // rollback changes to form
+            var selected = me.family.getSelected();
+            me.personForm.assign(selected);
             me.personForm.view();
         }
 
@@ -1278,16 +1342,17 @@ module Tops {
          */
         public saveAddress() {
             var me = this;
-
-            if (me.family.address == null) {
-                me.family.address = new scymAddress();
-                me.family.address.editState = editState.created;
+            if (me.addressForm.validate()) {
+                if (me.family.address == null) {
+                    me.family.address = new scymAddress();
+                    me.family.address.editState = editState.created;
+                }
+                else {
+                    me.family.address.editState = editState.updated;
+                }
+                me.addressForm.updateScymAddress(me.family.address);
+                me.saveChanges();
             }
-            else {
-                me.family.address.editState = editState.updated;
-            }
-            me.addressForm.updateScymAddress(me.family.address);
-            me.saveChanges();
         }
 
 
@@ -1396,7 +1461,6 @@ module Tops {
             terry.directorylistingtypeid = 2;
             terry.newsletter = 1;
             terry.junior = 0;
-            terry.deceased = 0;
             terry.notes = 'Some notes for terry.';
 
             var liz = new scymPerson();
