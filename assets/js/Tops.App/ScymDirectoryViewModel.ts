@@ -44,6 +44,7 @@ module Tops {
         public otheraffiliation : string = '';
         public directorylistingtypeid: number=1;
         public lastUpdate : string = '';
+        //todo: use deceased?
         public deceased: number = 0;
         public organization: string = '';
 
