@@ -39,6 +39,9 @@ class ScymAddress extends DateStampedEntity
         $this->persons = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
     public function getPersons()  {
         return $this->persons;
     }
@@ -453,6 +456,32 @@ class ScymAddress extends DateStampedEntity
     public function getSortkey()
     {
         return $this->sortkey;
+    }
+
+    /**
+     * @return \stdClass
+     */
+    public function getDataTransferObject() {
+        $result = new \stdClass();
+
+        $result->addressId = $this->addressid;
+        $result->addressname = $this->addressname;
+        $result->address1 = $this->address1;
+        $result->address2 = $this->address2;
+        $result->city = $this->city;
+        $result->state = $this->state;
+        $result->postalcode = $this->postalcode;
+        $result->country = $this->country;
+        $result->phone = $this->phone;
+        $result->notes = $this->notes;
+        $result->active  = $this->active;
+        $result->sortkey = $this->sortkey;
+        $result->lastUpdate = $this->lastUpdateAsString();
+        $result->id = $this->addressid; // client side id
+        $result->editState = 0; // unchanged
+
+        return $result;
+
     }
 
 

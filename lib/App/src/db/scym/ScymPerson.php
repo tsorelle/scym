@@ -67,7 +67,7 @@ class ScymPerson extends DateStampedEntity
 
     public function getAddressId()
     {
-        return $this->address->getAddressid();
+        return $this->address ? $this->address->getAddressid() : null;
     }
 
     /**
@@ -632,7 +632,34 @@ class ScymPerson extends DateStampedEntity
     }
 
 
+    public function getDataTransferObject() {
+        $result = new \stdClass();
 
+        $result->personId = $this->personid;
+        $result->firstName= $this->firstname;
+        $result->middleName= $this->middlename;
+        $result->lastName= $this->lastname;
+        $result->username = $this->username;
+        $result->addressId = $this->getAddressId();
+        $result->phone = $this->phone;
+        $result->phone2= $this->phone2;
+        $result->email = $this->email;
+        $result->newsletter = $this->newsletter;
+        $result->dateOfBirth = $this->formatDtoDate($this->dateOfBirth);
+        $result->notes = $this->notes;
+        $result->junior = $this->junior;
+        $result->active = $this->active;
+        $result->sortkey = $this->sortkey;
+        $result->affiliationcode = $this->affiliationcode;
+        $result->otheraffiliation = $this->otheraffiliation;
+        $result->directorylistingtypeid = $this->directorylistingtypeid;
+        $result->organization = $this->organization;
+        $result->sortkey = $this->sortkey;
+        $result->lastUpdate = $this->lastUpdateAsString();
+        $result->id = $this->personid; // client side id
+        $result->editState = 0; // unchanged
 
+        return $result;
+    }
 
 }

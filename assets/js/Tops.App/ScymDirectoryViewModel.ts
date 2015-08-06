@@ -81,7 +81,7 @@ module Tops {
 
     }
 
-    export interface IDirectoryInitializationResponse {
+    export interface IInitDirectoryResponse {
         canEdit : boolean;
         directoryListingTypes : INameValuePair[];
         affiliationCodes : INameValuePair[];
@@ -845,6 +845,7 @@ module Tops {
         addressesList =  new searchListObservable(3,6);
         addressPersonsList = ko.observableArray<INameValuePair>();
         userCanEdit = ko.observable(true);
+        userIsAuthorized = ko.observable(false);
 
         // Constructor
         constructor() {
@@ -887,55 +888,30 @@ module Tops {
 
         getInitializations(doneFunction?: () => void) {
             var me = this;
-
-            var fakeData =  {
-                canEdit: true,
-                directoryListingTypes : [
-                    {Name: 'None', Value: 0},
-                    {Name: 'List in Directory', Value: 1},
-                    {Name: 'Lookup only', Value: 2}
-                ],
-                affiliationCodes : [
-                    {Name: '(No SCYM affiliation)', Value: 'NONE'},
-                    {Name: 'Friends Meeting of Austin', Value: 'AU TX'},
-                    {Name: 'Baton Rouge Friends Meeting', Value: 'BA LA'},
-                    {Name: 'Friends Meeting of San Antonio', Value: 'SA TX'},
-                ]
-            };
-
-            var serviceResponse  = new fakeServiceResponse(fakeData);
-            me.handleInitializationResponse(serviceResponse);
-            me.application.hideWaiter();
-            if (doneFunction) {
-                doneFunction();
-            }
-
-            jQuery('#scym-directory').show();
-
-            // TODO: peanut initialization service.
-            /*
-            me.peanut.getFromService( 'mailboxes.GetMailboxList',null, me.handleInitializationResponse)
-            .always(function() {
+            me.application.hideServiceMessages();
+            me.peanut.executeService('directory.InitDirectoryApp','', me.handleInitializationResponse)
+                .always(function() {
                     me.application.hideWaiter();
                     if (doneFunction) {
                         doneFunction();
+                        jQuery('#scym-directory').show();
                     }
                 });
-             */
-        }
+      }
 
-        handleInitializationResponse(serviceResponse: IServiceResponse) {
+        handleInitializationResponse = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Tops.Peanut.serviceResultSuccess) {
-                var response = <IDirectoryInitializationResponse>serviceResponse.Value;
+                var response = <IInitDirectoryResponse>serviceResponse.Value;
                 me.userCanEdit(response.canEdit);
                 me.personForm.affiliations(response.affiliationCodes);
                 me.personForm.directoryListingTypes(response.directoryListingTypes);
+                me.userIsAuthorized(true);
             }
             else {
                 me.userCanEdit(false);
             }
-        }
+        };
 
         // ******** Computed observable functions
 
@@ -956,15 +932,7 @@ module Tops {
          */
         public findFamiliesByPersonName() {
             var me = this;
-            me.family.visible(false);
-            me.familiesList.searchValue('');
-
-            // todo: get search result from service
-            var list = me.makeFakePersons();
-            var response = new fakeServiceResponse(list);
-            me.handleFindFamiliesResponse(response);
-
-            me.searchType('Persons');
+            me.findFamilies('Persons');
         }
 
         /**
@@ -972,14 +940,23 @@ module Tops {
          */
         public findFamiliesByAddressName() {
             var me = this;
-            me.family.visible(false);
-            me.familiesList.searchValue('');
-            me.searchType('Addresses');
+            me.findFamilies('Addresses');
+        }
 
-            //todo: get family search from service
-            var list = me.makeFakeAddresses();
-            var response = new fakeServiceResponse(list);
-            me.handleFindFamiliesResponse(response);
+        private findFamilies(searchType: string) {
+            var me = this;
+            me.searchType(searchType);
+            me.family.visible(false);
+            var request = new KeyValueDTO();
+            request.Name = searchType;
+            request.Value = me.familiesList.searchValue();
+
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Searching...');
+            me.peanut.executeService('directory.DirectorySearch',request, me.handleFindFamiliesResponse)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
         }
 
         private handleFindFamiliesResponse = (serviceResponse: IServiceResponse) => {
@@ -987,6 +964,7 @@ module Tops {
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var list = <INameValuePair[]>serviceResponse.Value;
                 me.familiesList.setList(list);
+                me.familiesList.searchValue('');
             }
         };
 
@@ -1202,11 +1180,17 @@ module Tops {
              me.addressForm.close();
              me.addressPersonsList([]);
 
-             // todo: get family data from service
-             var family = me.makeFakeFamily(item.Name);
-             var response = new fakeServiceResponse(family);
+            var request = new KeyValueDTO();
+            request.Name = me.searchType();
+            request.Value = item.Value;
 
-             me.setupFamily(response);
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Locating family...');
+            me.peanut.executeService('directory.GetFamily',request,me.setupFamily)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+
          };
 
 

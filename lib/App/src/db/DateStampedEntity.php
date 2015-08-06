@@ -195,4 +195,18 @@ class DateStampedEntity {
         $this->setUpdateStamp();
     }
 
+
+    protected function formatDtoDate($dateValue,$format='F j, Y')
+    {
+        if (!empty($dateValue)) {
+           return $dateValue->format($format);
+        }
+        return '';
+    }
+
+    protected function lastUpdateAsString($format='F j, Y')
+    {
+        return $this->formatDtoDate($this->dateupdated,$format);
+    }
+
 }
