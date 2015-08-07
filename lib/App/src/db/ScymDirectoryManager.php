@@ -171,4 +171,41 @@ class ScymDirectoryManager
         $em->flush();
     }
 
+    public function deleteEntity($entity) {
+        $em = $this->getEntityManager();
+        $em->remove($entity);
+        $em->flush();
+    }
+
+    public function addPersonToAddress(ScymPerson $person, $addressId) {
+        $address = $this->getAddressById($addressId);
+        if ($address) {
+            $person->setAddress($address);
+            $this->updateEntity($person);
+            // must call refresh to update the 1:m side of the relationship in memory.
+            $this->entityManager->refresh($address);
+        }
+        return $address;
+    }
+
+    public function removePersonAddress(ScymPerson $person) {
+        $address = null;
+        if ($person) {
+            $address = $person->getAddress();
+            if ($address) {
+                $person->setAddress(null);
+                $this->updateEntity($person);
+                // must call refresh to update the 1:m side of the relationship in memory.
+                $this->entityManager->refresh($address);
+            }
+        }
+        return $address;
+    }
+
+    public function saveChanges() {
+        if ($this->entityManager != null) {
+            $this->entityManager->flush();
+            $this->entityManager = null;
+        }
+    }
 }

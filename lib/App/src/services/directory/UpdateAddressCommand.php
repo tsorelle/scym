@@ -26,7 +26,7 @@ class UpdateAddressCommand extends TServiceCommand
         
         $id = $request->addressId;
         $address = null;
-        if (empty($id)) {
+        if ($request->editState == 1) { // editState.created
             $address = new Scymaddress();
         }
         else {

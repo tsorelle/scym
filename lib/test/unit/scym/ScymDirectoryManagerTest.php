@@ -1,4 +1,5 @@
 <?php
+use App\db\scym\ScymPerson;
 use App\db\ScymDirectoryManager;
 
 /**
@@ -180,6 +181,109 @@ class ScymDirectoryManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected,$address->getSortkey());
         $address->setSortkey($sortkey);
         $manager->updateEntity($address);
+    }
+
+    public function testInsertAddress() {
+        $testAddressId = 117;
+        $manager = $this->getDirectoryManager();
+        $address = $manager->getAddressById($testAddressId);
+        $this->assertNotNull($address);
+        $dto = $address->getDataTransferObject();
+        $dto->addressname = 'Delete this address';
+        $newaddress = new \App\db\scym\ScymAddress();
+        $newaddress->updateFromDataTransferObject($dto);
+        $manager->updateEntity($newaddress);
+        $id = $newaddress->getAddressid();
+        $this->assertNotEmpty($id);
+        $address = $manager->getAddressById($id);
+        $this->assertNotNull($address);
+        $this->assertEquals($dto->addressname,$address->getAddressname());
+        $manager->deleteEntity($address);
+        $address = $manager->getaddressById($id);
+        $this->assertNull($address);
+    }
+
+
+    public function testInsertPerson() {
+        $testPersonId = 180;
+        $manager = $this->getDirectoryManager();
+        $person = $manager->getPersonById($testPersonId);
+        $this->assertNotNull($person);
+        $dto = $person->getDataTransferObject();
+        $dto->firstName = 'Delete';
+        $dto->lastName = 'Me';
+        $newPerson = new \App\db\scym\ScymPerson();
+        $newPerson->updateFromDataTransferObject($dto);
+        $manager->updateEntity($newPerson);
+        $id = $newPerson->getPersonid();
+        $this->assertNotEmpty($id);
+        $person = $manager->getPersonById($id);
+        $this->assertNotNull($person);
+        $this->assertEquals($dto->firstName,$person->getFirstname());
+        $this->assertEquals($dto->lastName,$person->getLastname());
+        $manager->deleteEntity($person);
+        $person = $manager->getPersonById($id);
+        $this->assertNull($person);
+    }
+
+    public function testAddPersonToAddress() {
+        $testAddressId = 117;
+        $manager = $this->getDirectoryManager();
+
+        $testPerson = new ScymPerson();
+        $testPerson->setFirstname('Delete');
+        $testPerson->setLastname('Me');
+        $manager->updateEntity($testPerson);
+
+        $testId = $testPerson->getPersonid();
+        $this->assertNotNull($testId);
+        $address = $manager->addPersonToAddress($testPerson,$testAddressId);
+        $this->assertNotNull($address);
+        $persons = $address->getPersons();
+        $personCount = $persons->count();
+        $found = false;
+        foreach ($persons as $person) {
+            if ($person->getPersonid() == $testId) {
+                $found = true;
+                break;
+            }
+        }
+        $manager->deleteEntity($testPerson);
+        $this->assertEquals(3,$personCount);
+        $this->assertTrue($found);
+    }
+
+    public function testRemovePersonFromAddress() {
+        $testAddressId = 117;
+        $manager = $this->getDirectoryManager();
+
+        // add a test person
+        $testPerson = new ScymPerson();
+        $testPerson->setFirstname('Delete');
+        $testPerson->setLastname('Me');
+        $manager->updateEntity($testPerson);
+        $testId = $testPerson->getPersonid();
+        $this->assertNotNull($testId);
+        $address = $manager->addPersonToAddress($testPerson,$testAddressId);
+        $this->assertNotNull($address);
+        $persons = $address->getPersons();
+        $personCount1 = $persons->count();
+
+        $address = $manager->removePersonAddress($testPerson);
+
+        $persons = $address->getPersons();
+        $personCount2 = $persons->count();
+        $removedPersons = $personCount1 - $personCount2 ;
+        $found = false;
+        foreach ($persons as $person) {
+            if ($person->getPersonid() == $testId) {
+                $found = true;
+                break;
+            }
+        }
+        $manager->deleteEntity($testPerson);
+        $this->assertEquals(1,$removedPersons);
+        $this->assertFalse($found);
     }
 
 

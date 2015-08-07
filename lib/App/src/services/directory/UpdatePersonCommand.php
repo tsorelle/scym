@@ -32,7 +32,7 @@ class UpdatePersonCommand extends TServiceCommand
         $manager = new ScymDirectoryManager();
         $id = $request->personId;
         $person = null;
-        if (empty($id)) {
+        if ($request->editState == 1) { // editState.created
             $person = new ScymPerson();
         }
         else {
@@ -41,9 +41,7 @@ class UpdatePersonCommand extends TServiceCommand
                 $this->addErrorMessage('Person not found for id ' . $request->Value);
                 return;
             }
-
         }
-
 
         $valid = $person->updateFromDataTransferObject($request);
         if (!$valid) {
