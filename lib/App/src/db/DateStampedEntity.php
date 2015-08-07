@@ -204,6 +204,7 @@ class DateStampedEntity {
         return '';
     }
 
+
     protected function lastUpdateAsString($format='F j, Y')
     {
         return $this->formatDtoDate($this->dateupdated,$format);

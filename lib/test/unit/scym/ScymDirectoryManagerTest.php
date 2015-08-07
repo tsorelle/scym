@@ -143,4 +143,44 @@ class ScymDirectoryManagerTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testUpdatePerson() {
+        $testPersonId = 180;
+        $manager = $this->getDirectoryManager();
+        $person = $manager->getPersonById($testPersonId);
+        $this->assertNotNull($person);
+        $email = $person->getEmail();
+        $dto = $person->getDataTransferObject();
+        $expected = 'e@mail.com';
+        $changeDate = $person->getDateUpdated();
+        $dto->email = $expected;
+        $valid = $person->updateFromDataTransferObject($dto);
+        $this->assertTrue($valid,'Invalid date');
+        $manager->updateEntity($person);
+        $this->assertNotEquals($changeDate,$person->getDateUpdated());
+        $person = $manager->getPersonById($testPersonId);
+        $this->assertEquals($expected,$person->getEmail());
+        $person->setEmail($email);
+        $manager->updateEntity($person);
+    }
+
+    public function testUpdateAddress() {
+        $testAddressId = 117;
+        $manager = $this->getDirectoryManager();
+        $address = $manager->getAddressById($testAddressId);
+        $this->assertNotNull($address);
+        $dto = $address->getDataTransferObject();
+        $expected = 'testvalue';
+        $changeDate = $address->getDateUpdated();
+        $sortkey = $address->getSortkey();
+        $dto->sortkey = $expected;
+        $address->updateFromDataTransferObject($dto);
+        $manager->updateEntity($address);
+        $this->assertNotEquals($changeDate,$address->getDateUpdated());
+        $address = $manager->getAddressById($testAddressId);
+        $this->assertEquals($expected,$address->getSortkey());
+        $address->setSortkey($sortkey);
+        $manager->updateEntity($address);
+    }
+
+
 }

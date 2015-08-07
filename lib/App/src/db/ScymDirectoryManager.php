@@ -20,7 +20,7 @@ class ScymDirectoryManager
 {
 
     /**
-     * @return \Doctrine\ORM\EntityManager
+     * @var \Doctrine\ORM\EntityManager
      */
     private $entityManager;
     private $repositories = array();
@@ -163,6 +163,12 @@ class ScymDirectoryManager
     public function getAddressById($id) {
         $addresses = $this->getAddressesRepository();
         return $addresses->find($id);
+    }
+
+    public function updateEntity($entity) {
+        $em = $this->getEntityManager();
+        $em->persist($entity);
+        $em->flush();
     }
 
 }

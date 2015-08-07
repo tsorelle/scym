@@ -632,6 +632,42 @@ class ScymPerson extends DateStampedEntity
     }
 
 
+    private function assignDob($dateString) {
+        try {
+            $dateValue = empty($dateString) ? null : new \DateTime($dateString);
+            $this->dateOfBirth = $dateValue;
+        }
+        catch(\Exception $ex) {
+            return false;
+        }
+        return true;
+    }
+
+    public function updateFromDataTransferObject($dto) {
+        $valid = $this->assignDob($dto->dateOfBirth);
+        if (!$valid) {
+            return false;
+        }
+        $this->firstname= $dto->firstName;
+        $this->middlename= $dto->middleName;
+        $this->lastname= $dto->lastName;
+        $this->username= $dto->username;
+        $this->phone= $dto->phone;
+        $this->phone2= $dto->phone2;
+        $this->email= $dto->email;
+        $this->newsletter= $dto->newsletter;
+        $this->notes= $dto->notes;
+        $this->junior= $dto->junior;
+        $this->active= $dto->active;
+        $this->sortkey= $dto->sortkey;
+        $this->affiliationcode= $dto->affiliationcode;
+        $this->otheraffiliation= $dto->otheraffiliation;
+        $this->directorylistingtypeid= $dto->directorylistingtypeid;
+        $this->organization= $dto->organization;
+        $this->sortkey= $dto->sortkey;
+        return true;
+    }
+
     public function getDataTransferObject() {
         $result = new \stdClass();
 

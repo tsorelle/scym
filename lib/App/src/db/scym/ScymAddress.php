@@ -481,7 +481,22 @@ class ScymAddress extends DateStampedEntity
         $result->editState = 0; // unchanged
 
         return $result;
-
+    }
+    
+    public function updateFromDataTransferObject(\stdClass $dto)
+    {
+        $this->addressid = $dto->addressId;
+        $this->addressname = $dto->addressname;
+        $this->address1 = $dto->address1;
+        $this->address2 = $dto->address2;
+        $this->city = $dto->city;
+        $this->state = $dto->state;
+        $this->postalcode = $dto->postalcode;
+        $this->country = $dto->country;
+        $this->phone = $dto->phone;
+        $this->notes = $dto->notes;
+        $this->active = $dto->active;
+        $this->sortkey = $dto->sortkey;
     }
 
 
