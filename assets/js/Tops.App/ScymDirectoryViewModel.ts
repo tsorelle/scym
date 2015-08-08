@@ -46,7 +46,6 @@ module Tops {
         public lastUpdate : string = '';
         public organization: string = '';
 
-        public id : string = ''; // client side id
         public editState : number = editState.created;
     }
 
@@ -72,6 +71,21 @@ module Tops {
         public editState: number = editState.created;
     }
 
+    export class addressPersonServiceRequest {
+        personId: any;
+        addressId: any;
+    }
+
+    export class newPersonForAddressRequest {
+        person: scymPerson;
+        addressId: any;
+    }
+
+    export class newAddressForPersonRequest {
+        personId: any;
+        address: scymAddress;
+    }
+
     /**
      * Related persons and address DTO as returned by service
      */
@@ -94,7 +108,7 @@ module Tops {
     class clientFamily {
         public address : scymAddress;
         public persons: scymPerson[] = [];
-        public selectedPersonId : string = '';
+        public selectedPersonId : any = null;
         private newId : number = 0;
         public changeCount:number = 0;
 
@@ -108,7 +122,7 @@ module Tops {
          * @param family
          * @returns {scymPerson} first person in list
          */
-        public setFamily(family: scymFamily){
+        public setFamily(family: scymFamily, selectedPersonId: any = 0){
             var me = this;
             me.setAddress(family.address);
             var selected = me.setPersons(family.persons);
@@ -129,10 +143,26 @@ module Tops {
         /**
          * Set null address
          */
-        public clearAddress() {
+        public clearAddress(selectedPersonId : any = 0) {
             var me = this;
             me.address = null;
             me.hasAddress(false);
+            var person = null;
+            if (selectedPersonId) {
+                person = me.selectPerson(selectedPersonId);
+            }
+            else {
+                person = me.getSelected();
+            }
+
+            me.persons = [];
+
+            if (person == null) {
+                me.visible(false);
+            }
+            else {
+                me.persons.push(person);
+            }
         }
 
         /**
@@ -156,7 +186,7 @@ module Tops {
             var active = me.getActivePersons();
             var firstPerson = _.first(active);
             if (firstPerson) {
-                me.selectedPersonId = firstPerson.id;
+                me.selectedPersonId = firstPerson.personId;
             }
             return <scymPerson>firstPerson;
         }
@@ -168,46 +198,50 @@ module Tops {
          * @param persons
          * @returns {scymPerson}
          */
-        public setPersons(persons: scymPerson[]) : scymPerson {
+        public setPersons(persons: scymPerson[], selectedPersonId: any = 0) : scymPerson {
             var me = this;
-            me.selectedPersonId = '';
             me.personCount(0);
 
-            var firstPerson : scymPerson = null;
+            var selectedPerson : scymPerson = null;
+
             if (persons) {
                 _.each(persons,function(person: scymPerson){
-                    person.id = person.personId.toString();
                     person.editState = editState.unchanged;
                 });
+
                 me.persons = persons;
-                firstPerson = me.selectFirstPerson();
+                if (selectedPersonId) {
+                    selectedPerson = me.getPersonById(selectedPersonId);
+                }
+
+                if (!selectedPerson) {
+                    selectedPerson = me.selectFirstPerson();
+                }
             }
             else {
                 me.persons = [];
             }
 
             me.personCount(persons.length);
-            return firstPerson;
+            me.selectedPersonId = selectedPerson ? selectedPerson.personId : null;
+            return selectedPerson;
         }
 
-        /**
-         * Add new person to list from person observable
-         * @param person
-         */
-        public addPerson = (newPerson : scymPerson) => {
+        public addPersonToList(person: scymPerson, selected: boolean = true) {
             var me = this;
-            newPerson.editState = editState.created;
-            newPerson.personId = 0;
-            me.newId = me.newId + 1;
-            newPerson.id = 'new:' + me.newId.toString();
-            me.persons.push(newPerson);
-            me.personCount(me.persons.length);
-        };
-
-        public addPersonToList(person: scymPerson) {
-            var me = this;
-            me.persons.push(person);
-            me.personCount(me.persons.length);
+            var i = _.findIndex(me.persons, function(thePerson: scymPerson) {
+                return thePerson.personId == person.personId;
+            },me);
+            if (i < 1) {
+                me.persons[i] = person;
+            }
+            else {
+                me.persons.push(person);
+                me.personCount(me.persons.length);
+            }
+            if (selected) {
+                me.selectedPersonId = person.personId;
+            }
         }
 
         /**
@@ -218,16 +252,19 @@ module Tops {
             var me = this;
 
             var selected = _.find(me.persons,function(person) {
-                return me.selectedPersonId == person.id;
+                return me.selectedPersonId == person.personId;
             },me);
             return <scymPerson>selected;
         }
 
-        public getPersonById(id : string) : scymPerson {
+        public getPersonById(id : any) : scymPerson {
             var me = this;
+            if (!id) {
+                return null;
+            }
 
             var result = _.find(me.persons,function(person) {
-                return id == person.id;
+                return id == person.personId;
             },me);
             return <scymPerson>result;
 
@@ -238,37 +275,56 @@ module Tops {
          * @param id
          * @returns {scymPerson}
          */
-        public selectPerson(id : string) : scymPerson {
+        public selectPerson(id : any) : scymPerson {
             var me = this;
             var selected = null;
             if (id) {
                 selected = _.find(me.persons,function(person) {
-                    return person.id == id;
+                    return person.personId == id;
                 },me);
                 if (selected) {
                     me.selectedPersonId = id;
                 }
             }
             else {
-                me.selectedPersonId = '';
+                me.selectedPersonId = null;
             }
             return <scymPerson>selected;
         }
+
 
         /**
          * Set deleted flag on person for id
          * @param id
          * @returns {scymPerson} (person deleted)
          */
-        public removePerson(id : string) {
-            //todo: call this when delete is implemented
+        public removePerson(personId : string) {
             var me = this;
+
             var person = _.find(me.persons, function(person: scymPerson){
-                return person.id == id;
+                return person.personId == personId;
             });
-            person.editState = editState.deleted;
-            me.selectFirstPerson();
+
+            // remove from array
+            var currentPersons = me.persons;
+            me.persons =  _.reject(currentPersons, function(person: scymPerson){
+                return person.personId === personId;
+            });
+
+            if (me.persons.length == 0 && me.address == null) {
+                me.selectedPersonId = 0;
+                me.visible(false);
+            }
+            else {
+                me.selectFirstPerson();
+            }
+
             return <scymPerson>person;
+        }
+
+        public isLoaded = () => {
+            var me = this;
+            return (me.address != null || me.persons.length > 0);
         }
 
     }
@@ -289,6 +345,7 @@ module Tops {
         currentPage : number = 1;
         lastPage : number;
         itemList: INameValuePair[];
+        foundCount = ko.observable(0);
 
         public constructor(columnCount : number, maxInColumn: number ) {
             var me = this;
@@ -300,6 +357,7 @@ module Tops {
             }
         }
 
+
         /**
          * reset search observables
          */
@@ -307,6 +365,7 @@ module Tops {
             var me = this;
             me.searchValue('');
             me.selectionCount(0);
+            me.foundCount(0);
         }
 
         /**
@@ -316,6 +375,12 @@ module Tops {
             var me = this;
             me.itemList = list;
             var itemCount = list.length;
+            if (itemCount == 1 && list[0].Value === null) {
+                me.foundCount(itemCount - 1);
+            }
+            else {
+                me.foundCount(itemCount);
+            }
             me.selectionCount(itemCount);
             me.currentPage = 1;
             me.lastPage = Math.ceil(itemCount / me.itemsPerPage);
@@ -382,6 +447,12 @@ module Tops {
         }
     }
 
+    export class saveOperations {
+        static update = 'update';
+        static insert = 'insert';
+        static reassign = 'reassign';
+    }
+
     /**
      * base class for person panel and address panel
      */
@@ -390,12 +461,16 @@ module Tops {
         public searchList = new searchListObservable(2,10);
         public viewState = ko.observable('');
         public hasErrors = ko.observable(false);
+        public isAssigned = false;
+        public relationId : any = null;
+
         /**
          * set view state 'edit'
          */
-        public edit(){
+        public edit(relationId: any = null){
             var me = this;
             me.viewState('edit');
+            me.relationId = relationId;
         }
         /**
          * set view state 'closed'
@@ -423,7 +498,12 @@ module Tops {
          */
         public view() {
             var me = this;
-            me.viewState('view');
+            if (me.isAssigned) {
+                me.viewState('view');
+            }
+            else {
+                me.viewState('empty');
+            }
         }
     }
 
@@ -431,8 +511,6 @@ module Tops {
      * observable container for person panel
      */
     export class personObservable extends editPanel{
-
-        public id = '';
         public personId = ko.observable('');
         public firstName = ko.observable('');
         public middleName = ko.observable('');
@@ -506,7 +584,7 @@ module Tops {
             if (!id) {
                 id = 0;
             }
-            var key = id.toString()
+            var key = id.toString();
 
             var result = _.find(lookup,function(item : INameValuePair) {
                 return item.Value == key;
@@ -540,11 +618,11 @@ module Tops {
          */
         public clear() {
             var me=this;
+            me.isAssigned = false;
             me.clearValidations();
             me.firstName('');
             me.middleName('');
             me.lastName('');
-            me.id = '';
             me.username('');
             me.phone('');
             me.phone2('');
@@ -577,11 +655,15 @@ module Tops {
          */
         public assign = (person: scymPerson) => {
             var me=this;
+            if (!person) {
+                me.clear();
+                return;
+            }
+            me.isAssigned = true;
             me.clearValidations();
             me.firstName(person.firstName);
             me.middleName(person.middleName);
             me.lastName(person.lastName);
-            me.id = person.id;
             me.username(person.username);
             me.phone(person.phone);
             me.phone2(person.phone2);
@@ -621,6 +703,7 @@ module Tops {
             }
             person.directorylistingtypeid = me.directorylistingtypeid();
 
+            person.personId = me.personId();
             person.dateOfBirth = me.dateOfBirth();
             person.email = me.email();
             person.firstName = me.firstName();
@@ -686,7 +769,7 @@ module Tops {
             var first = this.firstName();
             var middle = this.middleName();
             var last = this.lastName();
-            return personObservable.makeFullName(first,last,middle);
+            return personObservable.makeFullName(first,middle,last);
         }
 
 
@@ -696,7 +779,6 @@ module Tops {
      * observable container for address panel
      */
     export class addressObservable extends editPanel {
-        public id = '';
         public addressId : KnockoutObservable<any> =  ko.observable();
         public addressname= ko.observable('');
         public address1= ko.observable('');
@@ -719,6 +801,14 @@ module Tops {
             var me = this;
             me.cityLocation = ko.computed(me.computeCityLocation);
         }
+
+        public search() {
+            var me = this;
+
+            me.viewState('search');
+        }
+
+
 
         computeCityLocation = ()  => {
             var me = this;
@@ -749,8 +839,8 @@ module Tops {
          */
         public clear() {
             var me = this;
+            me.isAssigned = false;
             me.clearValidations();
-            me.id = '';
             me.addressname('');
             me.address1('');
             me.address2('');
@@ -792,6 +882,7 @@ module Tops {
          */
         public assign = (address : scymAddress) => {
             var me = this;
+            me.isAssigned = true;
             me.clearValidations();
             me.addressname(address.addressname);
             me.address1(address.address1);
@@ -834,18 +925,22 @@ module Tops {
 
         public family = new clientFamily();
 
+        private insertAssociation = 'none';
+        private personUpdateOperation = 'update';
+
         //  *********** Observables ****************/
         searchValue = ko.observable('');
         searchType = ko.observable('');
         personForm = new personObservable();
         addressForm = new addressObservable();
         personFormHeader : KnockoutComputed<string>; // initialization in constructor
-        familiesList = new searchListObservable(6,3);
+        familiesList = new searchListObservable(6,2);
         personsList =  new searchListObservable(3,6);
         addressesList =  new searchListObservable(3,6);
         addressPersonsList = ko.observableArray<INameValuePair>();
         userCanEdit = ko.observable(true);
         userIsAuthorized = ko.observable(false);
+
 
         // Constructor
         constructor() {
@@ -889,15 +984,15 @@ module Tops {
         getInitializations(doneFunction?: () => void) {
             var me = this;
             me.application.hideServiceMessages();
-            me.peanut.executeService('directory.InitDirectoryApp','', me.handleInitializationResponse)
-                .always(function() {
+            me.peanut.executeService('directory.InitDirectoryApp', '', me.handleInitializationResponse)
+                .always(function () {
                     me.application.hideWaiter();
                     if (doneFunction) {
                         doneFunction();
                         jQuery('#scym-directory').show();
                     }
                 });
-      }
+        }
 
         handleInitializationResponse = (serviceResponse: IServiceResponse) => {
             var me = this;
@@ -984,7 +1079,8 @@ module Tops {
         public createPersonForAddress() {
             var me = this;
             me.personForm.clear();
-            me.personForm.edit();
+            var addressId = me.family.address ? me.family.address.addressId : null;
+            me.personForm.edit(addressId);
         }
 
         /**
@@ -1001,20 +1097,24 @@ module Tops {
          */
         public findPersons() {
             var me = this;
-            me.personsList.searchValue('');
 
-            // todo: get persons list from service
-            var list = me.makeFakePersons();
-            var response = new fakeServiceResponse(list);
+            var request = new KeyValueDTO();
+            request.Name = 'Persons';
+            request.Value = me.personsList.searchValue();
 
-            me.showPersonSearchResults(response);
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Searching...');
+            me.peanut.executeService('directory.DirectorySearch',request, me.showPersonSearchResults)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
         }
 
         /**
          * service response handler for findPersons
          * @param serviceResponse
          */
-        public showPersonSearchResults(serviceResponse: IServiceResponse) {
+        public showPersonSearchResults = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var list = <INameValuePair[]>serviceResponse.Value;
@@ -1027,26 +1127,55 @@ module Tops {
          */
         public findAddresses() {
             var me = this;
+            var request = new KeyValueDTO();
+            request.Name = 'Addresses';
+            request.Value = me.addressesList.searchValue();
 
-            // todo: get address list from service
-            var list = me.makeFakeAddresses();
-            var response = new fakeServiceResponse(list);
-            me.showAddressSearchResults(response);
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Searching...');
+            me.peanut.executeService('directory.DirectorySearch',request, me.showAddressSearchResults)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+        }
 
+        private clearAddressSearchList() {
+            var me = this;
+            var removeItem = new KeyValueDTO();
+            removeItem.Name = '(No address)';
+            removeItem.Value = null;
+            var list = [];
+            if (me.family.address) {
+                var removeItem = new KeyValueDTO();
+                removeItem.Name = '(No address)';
+                removeItem.Value = null;
+                list.push(removeItem);
+            }
+            me.addressesList.setList(list);
         }
 
         /**
          * Service response handler for findAddresses
          * @param serviceResponse
          */
-        public showAddressSearchResults(serviceResponse: IServiceResponse) {
+        public showAddressSearchResults = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var list = <INameValuePair[]>serviceResponse.Value;
+                var list = [];
+                if (me.family.address) {
+                    var removeItem = new KeyValueDTO();
+                    removeItem.Name = '(No address)';
+                    removeItem.Value = null;
+                    list.push(removeItem);
+                    list = list.concat(<INameValuePair[]>serviceResponse.Value);
+                }
+                else {
+                   list = <INameValuePair[]>serviceResponse.Value;
+                }
+
                 me.addressesList.setList(list);
             }
         }
-
 
         /**
          * On click of person link in person form search view
@@ -1054,57 +1183,75 @@ module Tops {
          */
         public addPersonToAddress = (personItem : INameValuePair) => {
             var me = this;
-            me.personsList.reset();
+            if (me.family.address == null) {
+                return;
+            }
 
+            var request = new addressPersonServiceRequest();
+            request.addressId = me.family.address.addressId;
+            request.personId = personItem.Value;
 
-            // todo: handle person/address link up
-            var testPerson = new scymPerson();
-            testPerson.id = personItem.Value;
-            testPerson.firstName = 'Test';
-            testPerson.lastName = 'Person';
-            var serviceResponse = new fakeServiceResponse(testPerson);
-            // todo call getPerson service with handleGetPersonResponse
-            me.handleGetPersonResponse(serviceResponse);
-
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Updating...');
+            // todo: implement AddPersonToAddressCommand
+            me.peanut.executeService('directory.AddPersonToAddress',request, me.handleAddPersonToAddressResponse)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
 
         };
-        private handleGetPersonResponse(serviceResponse: IServiceResponse) {
+
+        private handleAddPersonToAddressResponse = (serviceResponse: IServiceResponse) => {
+            var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var person = <scymPerson>serviceResponse.Value;
-                person.id = person.personId.toString();
-                person.addressId = this.family.address ? this.family.address.addressId : null;
-                this.personForm.assign(person);
-                this.personForm.edit();
+                me.personsList.reset();
+                me.family.addPersonToList(person);
+                me.personForm.assign(person);
+                me.personForm.view();
             }
-        }
+        };
+
         /**
          * On click of address link in address form search view
          * @param addressItem
          */
         public assignAddressToPerson = (addressItem : INameValuePair) => {
             var me = this;
+            var request = new addressPersonServiceRequest();
+            request.addressId = addressItem.Value;
+            request.personId = me.family.selectedPersonId;
+
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Updating...');
+            // todo: implement ChangePersonAddressCommand
+            me.peanut.executeService('directory.ChangePersonAddress',request, me.handleChangePersonAddress)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+
             me.addressesList.reset();
-
-            // todo: handle address/person link up
-
-
-
-
-
             me.addressForm.view();
         };
 
-
+        private handleChangePersonAddress = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var currentPersonId = me.family.selectedPersonId;
+                var family = <scymFamily>serviceResponse.Value;
+                me.addressesList.reset();
+                var selected = me.family.setFamily(family,currentPersonId);
+                me.refreshFamilyForms(selected);
+            }
+        };
 
         /**
          * On click of create button in person form, search view
          */
         public createAddressForPerson() {
             var me = this;
-            // todo: handle new address creation
-
             me.addressesList.reset();
-            me.addressForm.edit();
+            me.addressForm.edit(me.family.selectedPersonId);
         }
 
         /**
@@ -1116,33 +1263,50 @@ module Tops {
             me.addressForm.view();
         }
 
-        private setupFamily = (serviceResponse: IServiceResponse)=> {
+
+        private handleFamilyResponse = (serviceResponse: IServiceResponse)=> {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var family = <scymFamily>serviceResponse.Value;
+                me.addressPersonsList([]);
+                var selected = me.family.setFamily(family);
+                me.refreshFamilyForms(selected);
+            }
+        };
+
+        private handleUpdateFamilyResponse = (serviceResponse: IServiceResponse)=> {
             var me = this;
             me.addressPersonsList([]);
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var family = <scymFamily>serviceResponse.Value;
-                var selected = me.family.setFamily(family);
-
-                if (selected) {
-                    me.personForm.assign(<scymPerson>selected);
-                    me.personForm.view();
-                }
-                else {
-                    me.personForm.empty();
-                }
-
-                if (family.address) {
-                    me.addressForm.assign(family.address);
-                    this.buildPersonSelectList(selected);
-                    me.addressForm.view();
-                } else {
-                    me.addressPersonsList([]);
-                    me.addressForm.empty();
-                }
-                me.buildPersonSelectList(selected);
-                me.family.visible(true);
+                var currentSelected = me.family.getSelected();
+                var personId = currentSelected ? currentSelected.personId : 0;
+                var selected = me.family.setFamily(family,personId);
+                me.refreshFamilyForms(selected);
             }
         };
+
+        private refreshFamilyForms(selected : scymPerson) {
+            var me = this;
+            if (selected) {
+                me.personForm.assign(<scymPerson>selected);
+                me.personForm.view();
+            }
+            else {
+                me.personForm.empty();
+            }
+
+            if (me.family.address) {
+                me.addressForm.assign(me.family.address);
+                me.buildPersonSelectList(selected);
+                me.addressForm.view();
+            } else {
+                me.addressPersonsList([]);
+                me.addressForm.empty();
+            }
+            me.buildPersonSelectList(selected);
+            me.family.visible(true);
+        }
 
         private buildPersonSelectList(selected) {
             var me = this;
@@ -1186,7 +1350,7 @@ module Tops {
 
             me.application.hideServiceMessages();
             me.application.showWaiter('Locating family...');
-            me.peanut.executeService('directory.GetFamily',request,me.setupFamily)
+            me.peanut.executeService('directory.GetFamily',request,me.handleFamilyResponse)
                 .always(function() {
                     me.application.hideWaiter();
                 });
@@ -1216,11 +1380,6 @@ module Tops {
             }
         };
 
-        public selectAddress = (item : INameValuePair) => {
-            var me = this;
-
-        };
-
         /**
          * on click of edit button in person panel view mode
          */
@@ -1235,7 +1394,7 @@ module Tops {
         public movePerson() {
             var me = this;
             me.addressesList.reset();
-
+            me.clearAddressSearchList();
             me.addressForm.search();
         }
 
@@ -1250,16 +1409,28 @@ module Tops {
         public cancelAddressEdit() {
             var me = this;
             // rollback changes
-            me.addressForm.assign(me.family.address);
-            me.addressForm.view();
+            if (me.family.isLoaded()) {
+                me.addressForm.assign(me.family.address);
+                me.addressForm.view();
+            }
+            else {
+                me.family.visible(false);
+                me.addressForm.clear();
+            }
         }
 
         public cancelPersonEdit() {
             var me = this;
             // rollback changes to form
-            var selected = me.family.getSelected();
-            me.personForm.assign(selected);
-            me.personForm.view();
+            if (me.family.isLoaded()) {
+                var selected = me.family.getSelected();
+                me.personForm.assign(selected);
+                me.personForm.view();
+            }
+            else {
+                me.family.visible(false);
+                me.personForm.clear();
+            }
         }
 
         /**
@@ -1267,81 +1438,114 @@ module Tops {
          */
         public savePerson(): void {
             var me = this;
-            var person = null;
             if (!me.personForm.validate()) {
                 return;
             }
 
-            if (!me.personForm.id) {
+            var person = null;
+            var updateMessage = 'Updating person...';
+            var personId = me.personForm.personId;
+
+            if (!personId) {
                 person = new scymPerson();
-                me.personForm.updateScymPerson(person);
-                me.family.addPerson(person);
+                person.editState = editState.created;
             }
             else {
-                person = me.family.getPersonById(me.personForm.id);
-                if (person == null){
-                    person = new scymPerson();
-                    person.address = me.family.address.addressId;
-                    me.personForm.updateScymPerson(person);
-                    me.family.addPersonToList(person);
-                    me.family.selectedPersonId = person.id;
-                }
-                else {
-                    me.personForm.updateScymPerson(person);
-                }
+                person = me.family.getPersonById(personId);
                 person.editState = editState.updated;
             }
-            me.saveChanges();
+            me.personForm.updateScymPerson(person);
+
+            if (person.editState == editState.created && me.personForm.relationId) {
+                var request = new newPersonForAddressRequest();
+                request.person = person;
+                request.addressId =  me.family.address ? me.family.address.addressId : null;
+                me.application.showWaiter("Adding new person to address ...");
+                // todo: implement NewPersonForAddressCommand
+                me.peanut.executeService('directory.NewPersonForAddressCommand',person, me.handleAddPersonToAddressResponse)
+                    .always(function() {
+                        me.application.hideWaiter();
+                    });
+            }
+            else {
+                var updateMessage = person.editState == editState.created ? 'Adding person ...' : 'Updating person...';
+                me.application.showWaiter(updateMessage);
+                me.peanut.executeService('directory.UpdatePerson',person, me.handleUpdatePersonResponse)
+                    .always(function() {
+                        me.application.hideWaiter();
+                    });
+            }
         }
 
-        private saveChanges() {
-            var me = this;
-
-            var changes = new scymFamily();
-            if (me.family.address.editState != editState.unchanged) {
-                changes.address = me.family.address;
-            }
-
-            var familyPersons = me.family.persons;
-            changes.persons = _.filter(me.family.persons, function(person: scymPerson) {
-                return person.editState != editState.unchanged;
-            },familyPersons);
-
-            if (changes.address != null || changes.persons.length > 0) {
-                // todo: implement data persistance for family, replace with service call 'changes' as parameter.
-                var response = new fakeServiceResponse(null);
-                me.handleUpdateResponse(response);
-            }
-        }
-        private handleUpdateResponse(serviceResponse: IServiceResponse) {
+         private handleUpdatePersonResponse = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var person = <scymPerson>serviceResponse.Value;
+                me.family.addPersonToList(person);
+                me.personForm.assign(person);
+                me.family.visible(true);
                 me.personForm.view();
                 me.addressForm.view();
             }
-        }
+        };
 
         /**
          * handle save click on address form in edit mode
          */
         public saveAddress() {
             var me = this;
-            if (me.addressForm.validate()) {
-                if (me.family.address == null) {
-                    me.family.address = new scymAddress();
-                    me.family.address.editState = editState.created;
-                }
-                else {
-                    me.family.address.editState = editState.updated;
-                }
-                me.addressForm.updateScymAddress(me.family.address);
-                me.saveChanges();
+
+            if (!me.addressForm.validate()) {
+                return;
+            }
+
+
+            var address = null;
+            var addressId = me.addressForm.addressId();
+
+            if (!addressId) {
+                address = new scymAddress();
+                address.editState = editState.created;
+            }
+            else {
+                address = me.family.address;
+                address.editState = editState.updated;
+            }
+            me.addressForm.updateScymAddress(address);
+
+            if (address.editState == editState.created && me.addressForm.relationId) {
+                var request = new newAddressForPersonRequest();
+                request.address = address;
+                request.personId = me.family.selectedPersonId;
+                me.application.showWaiter("Adding new address for person ...");
+                // todo: implement NewAddressForPersonCommand
+                me.peanut.executeService('directory.NewAddressForPersonCommand',address, me.handleChangePersonAddress)
+                    .always(function() {
+                        me.application.hideWaiter();
+                    });
+            }
+            else {
+                var updateMessage = address.editState == editState.created ? 'Adding address ...' : 'Updating address...';
+                me.application.showWaiter(updateMessage);
+                me.peanut.executeService('directory.Updateaddress',address, me.handleUpdateAddressResponse)
+                    .always(function() {
+                        me.application.hideWaiter();
+                    });
             }
         }
 
+        private handleUpdateAddressResponse = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                me.family.address = <scymAddress>serviceResponse.Value;
+                me.personForm.view();
+                me.addressForm.view();
+            }
+        };
+
 
         /**
-         *  On select new person
+         *  On select new person upper panel
          */
         public newPerson = () => {
             var me=this;
@@ -1350,10 +1554,10 @@ module Tops {
             me.family.visible(true);
             me.personForm.edit();
             me.addressForm.empty();
-            // todo: handle new person persistence
+
         };
 
-        public newAddress() {
+        public newAddress = () => {
             var me=this;
             me.familiesList.reset();
             me.personForm.clear();
@@ -1361,114 +1565,119 @@ module Tops {
             me.family.visible(true);
             me.addressForm.edit();
             me.personForm.empty();
-            // todo: handle address persistence
-        }
+        };
 
-        // ******* FAKES **********
-        private makeFakePersons() {
+        private createSelectedPersonRequest() {
             var me = this;
-            var list = [];
-            list.push(me.makeFakeListItem(1,"Terry SoRelle"));
-            list.push(me.makeFakeListItem(2,"Elizabeth Yeats"));
-            list.push(me.makeFakeListItem(3,"Bill Wilkinson"));
-            list.push(me.makeFakeListItem(4,"Shelly Angel"));
-            list.push(me.makeFakeListItem(5,"Terry SoRelle"));
-            list.push(me.makeFakeListItem(6,"Jonathan Polacheck"));
-            list.push(me.makeFakeListItem(7,"Bill Wilkinson"));
-            list.push(me.makeFakeListItem(8,"Terry SoRelle"));
-            list.push(me.makeFakeListItem(9,"Elizabeth Yeats"));
-            list.push(me.makeFakeListItem(10,"Bill Wilkinson"));
-            list.push(me.makeFakeListItem(11,"Shelly Angel"));
-            list.push(me.makeFakeListItem(12,"Jonathan Polacheck"));
-            list.push(me.makeFakeListItem(13,"Terry SoRelle"));
-            list.push(me.makeFakeListItem(14,"Elizabeth Yeats"));
-            list.push(me.makeFakeListItem(15,"Bill Wilkinson"));
-            list.push(me.makeFakeListItem(16,"Shelly Angel"));
-            list.push(me.makeFakeListItem(17,"Jonathan Polacheck"));
-            list.push(me.makeFakeListItem(18,"Walter Polacheck"));
-            list.push(me.makeFakeListItem(19,"Homer Polacheck"));
-            return list;
+            var request = new addressPersonServiceRequest();
+            request.personId = me.family.selectedPersonId;
+            request.addressId = me.family.address ?  me.family.address.addressId : 0;
+            return request;
         }
 
-        private makeFakeAddresses() {
+        public removeSelectedFromAddress() {
             var me = this;
-            var list = [];
-            list.push(me.makeFakeListItem(1,"Terry SoRelle and Liz Yeats"));
-            list.push(me.makeFakeListItem(4,"Bill and Denise Wilkinson"));
-            list.push(me.makeFakeListItem(6,"Shelly Angel"));
-            list.push(me.makeFakeListItem(7,"Jonathan Polacheck and Kirsten Dean Polacheck"));
-            list.push(me.makeFakeListItem(11,"Terry SoRelle and Liz Yeats"));
-            list.push(me.makeFakeListItem(14,"Bill and Denise Wilkinson"));
-            list.push(me.makeFakeListItem(16,"Shelly Angel"));
-            list.push(me.makeFakeListItem(17,"Jonathan Polacheck and Kirsten Dean Polacheck"));
-            list.push(me.makeFakeListItem(21,"Terry SoRelle and Liz Yeats"));
-            list.push(me.makeFakeListItem(24,"Bill and Denise Wilkinson"));
-            list.push(me.makeFakeListItem(26,"Shelly Angel"));
-            list.push(me.makeFakeListItem(27,"Jonathan Polacheck and Kirsten Dean Polacheck"));
-            list.push(me.makeFakeListItem(31,"Terry SoRelle and Liz Yeats"));
-            list.push(me.makeFakeListItem(34,"Bill and Denise Wilkinson"));
-            list.push(me.makeFakeListItem(36,"Shelly Angel"));
-            list.push(me.makeFakeListItem(37,"Jonathan Polacheck and Kirsten Dean Polacheck"));
-            list.push(me.makeFakeListItem(41,"Terry SoRelle and Liz Yeats"));
-            list.push(me.makeFakeListItem(44,"Bill and Denise Wilkinson"));
-            list.push(me.makeFakeListItem(46,"Shelly Angel"));
-            list.push(me.makeFakeListItem(47,"Jonathan Polacheck and Kirsten Dean Polacheck"));
-            return list;
-        }
-        private makeFakeListItem(id: number, text: string) {
-            var result = new Tops.KeyValueDTO();
-            result.Name = text;
-            result.Value = id.toString();
-            return result;
+            var request = me.createSelectedPersonRequest();
+            if (request.addressId < 1 || request.personId < 1) {
+                return;
+            }
+
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Removing person from address...');
+
+            // todo: implement RemovePersonFromAddressCommand
+            me.peanut.executeService('directory.RemovePersonFromAddress',request, me.handleRemovePersonResponse)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
         }
 
-        private makeFakeFamily(name: string) {
-            var family = new scymFamily();
-            family.address = new scymAddress();
-            //if (name == 'Terry SoRelle' || name == 'Liz Yeats' || name == 'Terry SoRelle and Liz Yeats') {
-            family.address.addressId = 1;
-            family.address = new scymAddress();
-            family.address.addressname = 'Terry SoRelle and Liz Yeats';
-            family.address.address1 = '904 E. Meadowmere';
-            family.address.city = 'Austin';
-            family.address.state = 'TX';
-            family.address.postalcode = '78758';
-            family.address.editState = editState.unchanged;
-
-            var terry = new scymPerson();
-            terry.personId = 1;
-            terry.firstName = 'Terry';
-            terry.lastName = 'SoRelle';
-            terry.email = 'tls@2quakers.net';
-            terry.editState = editState.unchanged;
-            terry.affiliationcode = 'AU TX';
-            terry.directorylistingtypeid = 2;
-            terry.newsletter = 1;
-            terry.junior = 0;
-            terry.notes = 'Some notes for terry.';
-
-            var liz = new scymPerson();
-            liz.personId = 2;
-            liz.firstName = 'Elizabeth';
-            liz.lastName = 'Yeats';
-            liz.email = 'liz.yeats@outlook.com';
-            liz.editState = editState.unchanged;
-            liz.affiliationcode = 'NONE';
-            liz.directorylistingtypeid = 1;
-            liz.newsletter = 0;
-            liz.junior = 1;
-            liz.organization = 'Friends General Conference';
-            liz.otheraffiliation = 'Friendship Meeting, Greensboro, NC';
-            liz.notes = 'Some notes here';
-
-            family.persons[0] = liz;
-            family.persons[1] = terry;
-
-            return family;
+        public deletePerson() {
+            var me = this;
+            me.showPersonDeleteConfirmForm();
         }
+
+        hidePersonDeleteConfirmForm() {
+            jQuery("#confirm-delete-person-modal").modal('hide');
+        }
+
+        showPersonDeleteConfirmForm() {
+            var me = this;
+            jQuery("#confirm-delete-person-modal").modal('show');
+        }
+
+
+        hideAddressDeleteConfirmForm() {
+            jQuery("#confirm-delete-address-modal").modal('hide');
+        }
+
+        showAddressDeleteConfirmForm() {
+            var me = this;
+            jQuery("#confirm-delete-address-modal").modal('show');
+        }
+
+
+        public executeDeletePerson() {
+            var me = this;
+            me.hidePersonDeleteConfirmForm();
+            var request = new addressPersonServiceRequest();
+            request.personId = me.family.selectedPersonId;
+            if (!request.personId) {
+                return;
+            }
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Delete person...');
+            // todo: implement DeletePersonCommand
+            me.peanut.executeService('directory.DeletePerson',request, me.handleRemovePersonResponse)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+        }
+
+        private handleRemovePersonResponse = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                me.family.removePerson(me.family.selectedPersonId);
+                me.personForm.view();
+                me.addressForm.view();
+            }
+        };
+
+        public deleteAddress() {
+            var me = this;
+            me.showAddressDeleteConfirmForm();
+        }
+
+        public executeDeleteAddress() {
+            var me = this;
+            me.hideAddressDeleteConfirmForm();
+            var addressId = me.family.address ? me.family.address.addressId : 0;
+            if (!addressId) {
+                return;
+            }
+
+            var request = addressId;
+
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Deleting address...');
+            // todo: implement DeleteAddressCommand
+            me.peanut.executeService('directory.DeleteAddress',request, me.handleClearAddressResponse)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+
+        }
+
+        private handleClearAddressResponse = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                me.family.clearAddress();
+                me.addressForm.empty();
+                me.personForm.view();
+            }
+        };
+
     }
-
-
 }
 
 Tops.ScymDirectoryViewModel.instance = new Tops.ScymDirectoryViewModel();

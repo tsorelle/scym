@@ -50,6 +50,6 @@ class UpdatePersonCommand extends TServiceCommand
 
         $manager->updateEntity($person);
         $result = $person->getDataTransferObject();
-        $this->setReturnValue($person);
+        $this->setReturnValue($result);
     }
 }

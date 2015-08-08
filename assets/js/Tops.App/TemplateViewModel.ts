@@ -16,7 +16,7 @@ module Tops {
         private application: Tops.IPeanutClient;
         private peanut: Tops.Peanut;
 
-private update = true;
+
         // Constructor
         constructor() {
             var me = this;
@@ -59,6 +59,29 @@ private update = true;
                 }
             );
         }
+
+        public serviceCallTemplate() {
+            // todo: delete serviceCallTemplate when not needed
+            var me = this;
+            var request = null; //
+
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Message here...');
+            me.peanut.executeService('directory.ServiceName',request, me.handleServiceResponseTemplate)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+        }
+
+        private handleServiceResponseTemplate = (serviceResponse: IServiceResponse) => {
+            // todo: delete handleServiceResponseTemplate when not needed
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+
+
+            }
+        };
+
     }
 }
 

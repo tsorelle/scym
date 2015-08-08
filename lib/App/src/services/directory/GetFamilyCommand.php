@@ -42,7 +42,7 @@ class GetFamilyCommand extends TServiceCommand
             if (empty($address)) {
                 $this->addErrorMessage('Address not found for id  '.$request->Value);
             }
-            $response = GetFamilyResponse::BuildResponseForAddress();
+            $response = GetFamilyResponse::BuildResponseForAddress($address);
         }
 
         $this->setReturnValue($response);
