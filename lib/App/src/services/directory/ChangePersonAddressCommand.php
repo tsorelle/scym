@@ -25,7 +25,23 @@ class ChangePersonAddressCommand extends TServiceCommand
 
     protected function run()
     {
-        $request = $this->getRequest();
         $manager = new ScymDirectoryManager();
+        $request = $this->getRequest();
+        $personId = $request->personId;
+        $addressId = $request->addressId;
+        $person = $manager->getPersonById($personId);
+        if ($person == null) {
+            $this->addErrorMessage('Person not found');
+        }
+        if (empty($addressId)) {
+            $manager->removePersonAddress($person);
+            $response = GetFamilyResponse::BuildResponseForPerson($person);
+        }
+        else {
+            $address = $manager->addPersonToAddress($person,$addressId);
+            $response = GetFamilyResponse::BuildResponseForAddress($address,$personId);
+        }
+
+        $this->setReturnValue($response);
     }
 }

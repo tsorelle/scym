@@ -14,7 +14,7 @@ use App\db\scym\ScymPerson;
 
 class GetFamilyResponse
 {
-    public static function BuildResponseForAddress(ScymAddress $address)
+    public static function BuildResponseForAddress(ScymAddress $address,$selectedPersonId = 0)
     {
         $result = new \stdClass();
         $result->persons = array();
@@ -22,26 +22,31 @@ class GetFamilyResponse
         $persons = $address->getPersons();
         if (!empty($persons)) {
             foreach($persons as $addrPerson) {
-                $dto = $addrPerson->getDataTransferObject();
-                array_push($result->persons, $dto);
+                if ($addrPerson->getActive()) {
+                    $dto = $addrPerson->getDataTransferObject();
+                    array_push($result->persons, $dto);
+                }
             }
         }
+        $result->selectedPersonId = $selectedPersonId;
         return $result;
     }
 
 
     public static function BuildResponseForPerson(ScymPerson $person)
     {
+
         if ($person != null) {
             $address = $person->getAddress();
             if ($address != null) {
-                return self::BuildResponseForAddress($address);
+                return self::BuildResponseForAddress($address,$person->getPersonid());
             }
         }
 
         $result = new \stdClass();
         $result->persons = array();
         $result->address = null;
+        $result->selectedPersonId = $person->getPersonid();
         $dto = $person->getDataTransferObject();
         array_push($result->persons, $dto);
         return $result;

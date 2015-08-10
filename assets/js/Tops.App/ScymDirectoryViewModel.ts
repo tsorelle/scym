@@ -92,7 +92,7 @@ module Tops {
     export class scymFamily {
         public address : scymAddress;
         public persons: scymPerson[] = [];
-
+        public selectedPersonId = 0;
     }
 
     export interface IInitDirectoryResponse {
@@ -122,10 +122,10 @@ module Tops {
          * @param family
          * @returns {scymPerson} first person in list
          */
-        public setFamily(family: scymFamily, selectedPersonId: any = 0){
+        public setFamily(family: scymFamily){
             var me = this;
             me.setAddress(family.address);
-            var selected = me.setPersons(family.persons);
+            var selected = me.setPersons(family.persons,family.selectedPersonId);
 
             return selected;
         }
@@ -188,6 +188,9 @@ module Tops {
             if (firstPerson) {
                 me.selectedPersonId = firstPerson.personId;
             }
+            else {
+                me.selectedPersonId = 0;
+            }
             return <scymPerson>firstPerson;
         }
 
@@ -232,7 +235,7 @@ module Tops {
             var i = _.findIndex(me.persons, function(thePerson: scymPerson) {
                 return thePerson.personId == person.personId;
             },me);
-            if (i < 1) {
+            if (i > 0) {
                 me.persons[i] = person;
             }
             else {
@@ -242,6 +245,7 @@ module Tops {
             if (selected) {
                 me.selectedPersonId = person.personId;
             }
+
         }
 
         /**
@@ -300,26 +304,15 @@ module Tops {
          */
         public removePerson(personId : string) {
             var me = this;
-
-            var person = _.find(me.persons, function(person: scymPerson){
-                return person.personId == personId;
-            });
-
             // remove from array
             var currentPersons = me.persons;
             me.persons =  _.reject(currentPersons, function(person: scymPerson){
-                return person.personId === personId;
+                return person.personId == personId;
             });
 
-            if (me.persons.length == 0 && me.address == null) {
-                me.selectedPersonId = 0;
-                me.visible(false);
-            }
-            else {
-                me.selectFirstPerson();
-            }
+            var selected = me.selectFirstPerson();
 
-            return <scymPerson>person;
+            return selected;
         }
 
         public isLoaded = () => {
@@ -1120,7 +1113,7 @@ module Tops {
                 var list = <INameValuePair[]>serviceResponse.Value;
                 me.personsList.setList(list);
             }
-        }
+        };
 
         /**
          * On click find address button
@@ -1175,7 +1168,7 @@ module Tops {
 
                 me.addressesList.setList(list);
             }
-        }
+        };
 
         /**
          * On click of person link in person form search view
@@ -1193,7 +1186,6 @@ module Tops {
 
             me.application.hideServiceMessages();
             me.application.showWaiter('Updating...');
-            // todo: implement AddPersonToAddressCommand
             me.peanut.executeService('directory.AddPersonToAddress',request, me.handleAddPersonToAddressResponse)
                 .always(function() {
                     me.application.hideWaiter();
@@ -1207,6 +1199,7 @@ module Tops {
                 var person = <scymPerson>serviceResponse.Value;
                 me.personsList.reset();
                 me.family.addPersonToList(person);
+                me.buildPersonSelectList(person);
                 me.personForm.assign(person);
                 me.personForm.view();
             }
@@ -1224,7 +1217,6 @@ module Tops {
 
             me.application.hideServiceMessages();
             me.application.showWaiter('Updating...');
-            // todo: implement ChangePersonAddressCommand
             me.peanut.executeService('directory.ChangePersonAddress',request, me.handleChangePersonAddress)
                 .always(function() {
                     me.application.hideWaiter();
@@ -1237,10 +1229,10 @@ module Tops {
         private handleChangePersonAddress = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var currentPersonId = me.family.selectedPersonId;
                 var family = <scymFamily>serviceResponse.Value;
+                var currentPersonId = family.selectedPersonId;
                 me.addressesList.reset();
-                var selected = me.family.setFamily(family,currentPersonId);
+                var selected = me.family.setFamily(family);
                 me.refreshFamilyForms(selected);
             }
         };
@@ -1279,9 +1271,9 @@ module Tops {
             me.addressPersonsList([]);
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var family = <scymFamily>serviceResponse.Value;
-                var currentSelected = me.family.getSelected();
-                var personId = currentSelected ? currentSelected.personId : 0;
-                var selected = me.family.setFamily(family,personId);
+                // var currentSelected = me.family.getSelected();
+                // var personId = currentSelected ? currentSelected.personId : 0;
+                var selected = me.family.setFamily(family);
                 me.refreshFamilyForms(selected);
             }
         };
@@ -1310,6 +1302,16 @@ module Tops {
 
         private buildPersonSelectList(selected) {
             var me = this;
+            me.family.persons.sort(function(x: scymPerson,y: scymPerson) {
+               if (x.personId === y.personId ) {
+                   return 0;
+               }
+                if (x.sortkey > y.sortkey) {
+                    return 1;
+                }
+                return -1;
+            });
+
             var personList = [];
             if (selected) {
                 _.each(me.family.persons, function (person:scymPerson) {
@@ -1385,7 +1387,12 @@ module Tops {
          */
         public editPerson() {
             var me = this;
-            me.personForm.edit();
+            // avoid accidental click as default button.
+            var addressFormState = me.addressForm.viewState();
+            var personFormState = me.personForm.viewState();
+            if ((addressFormState == 'view' || addressFormState == 'empty') && personFormState == 'view') {
+                me.personForm.edit();
+            }
         }
 
         /**
@@ -1403,7 +1410,14 @@ module Tops {
          */
         public editAddress() {
             var me = this;
-            me.addressForm.edit();
+            // avoid accidental click as default button.
+            // todo: better solution for accidental button clicks
+            var personFormState = me.personForm.viewState();
+            var addressFormState = me.addressForm.viewState();
+            if ((personFormState == 'view' || personFormState == 'empty') && addressFormState == 'view') {
+                me.addressForm.edit();
+            }
+
         }
 
         public cancelAddressEdit() {
@@ -1444,7 +1458,7 @@ module Tops {
 
             var person = null;
             var updateMessage = 'Updating person...';
-            var personId = me.personForm.personId;
+            var personId = me.personForm.personId();
 
             if (!personId) {
                 person = new scymPerson();
@@ -1461,8 +1475,7 @@ module Tops {
                 request.person = person;
                 request.addressId =  me.family.address ? me.family.address.addressId : null;
                 me.application.showWaiter("Adding new person to address ...");
-                // todo: implement NewPersonForAddressCommand
-                me.peanut.executeService('directory.NewPersonForAddressCommand',person, me.handleAddPersonToAddressResponse)
+                me.peanut.executeService('directory.NewPersonForAddress',request, me.handleAddPersonToAddressResponse)
                     .always(function() {
                         me.application.hideWaiter();
                     });
@@ -1518,8 +1531,7 @@ module Tops {
                 request.address = address;
                 request.personId = me.family.selectedPersonId;
                 me.application.showWaiter("Adding new address for person ...");
-                // todo: implement NewAddressForPersonCommand
-                me.peanut.executeService('directory.NewAddressForPersonCommand',address, me.handleChangePersonAddress)
+                me.peanut.executeService('directory.NewAddressForPerson',request, me.handleChangePersonAddress)
                     .always(function() {
                         me.application.hideWaiter();
                     });
@@ -1576,6 +1588,7 @@ module Tops {
         }
 
         public removeSelectedFromAddress() {
+            // todo: delete if not needed
             var me = this;
             var request = me.createSelectedPersonRequest();
             if (request.addressId < 1 || request.personId < 1) {
@@ -1585,7 +1598,6 @@ module Tops {
             me.application.hideServiceMessages();
             me.application.showWaiter('Removing person from address...');
 
-            // todo: implement RemovePersonFromAddressCommand
             me.peanut.executeService('directory.RemovePersonFromAddress',request, me.handleRemovePersonResponse)
                 .always(function() {
                     me.application.hideWaiter();
@@ -1620,14 +1632,11 @@ module Tops {
         public executeDeletePerson() {
             var me = this;
             me.hidePersonDeleteConfirmForm();
-            var request = new addressPersonServiceRequest();
-            request.personId = me.family.selectedPersonId;
-            if (!request.personId) {
-                return;
-            }
+
+            var request = me.family.selectedPersonId;
+
             me.application.hideServiceMessages();
             me.application.showWaiter('Delete person...');
-            // todo: implement DeletePersonCommand
             me.peanut.executeService('directory.DeletePerson',request, me.handleRemovePersonResponse)
                 .always(function() {
                     me.application.hideWaiter();
@@ -1635,11 +1644,18 @@ module Tops {
         }
 
         private handleRemovePersonResponse = (serviceResponse: IServiceResponse) => {
+            // TODO: ui issue, last person disappears if address deleted.
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                me.family.removePerson(me.family.selectedPersonId);
-                me.personForm.view();
-                me.addressForm.view();
+                var selected = me.family.removePerson(me.family.selectedPersonId);
+                me.buildPersonSelectList(selected);
+                if (selected) {
+                    me.personForm.assign(selected);
+                    me.personForm.view();
+                }
+                else {
+                    me.personForm.empty();
+                }
             }
         };
 
@@ -1660,7 +1676,6 @@ module Tops {
 
             me.application.hideServiceMessages();
             me.application.showWaiter('Deleting address...');
-            // todo: implement DeleteAddressCommand
             me.peanut.executeService('directory.DeleteAddress',request, me.handleClearAddressResponse)
                 .always(function() {
                     me.application.hideWaiter();

@@ -180,12 +180,16 @@ class ScymDirectoryManager
     public function addPersonToAddress(ScymPerson $person, $addressId) {
         $address = $this->getAddressById($addressId);
         if ($address) {
-            $person->setAddress($address);
-            $this->updateEntity($person);
-            // must call refresh to update the 1:m side of the relationship in memory.
-            $this->entityManager->refresh($address);
+            $this->joinPersonAndAddress($person,$address);
         }
         return $address;
+    }
+
+    public function joinPersonAndAddress(ScymPerson $person, ScymAddress $address) {
+        $person->setAddress($address);
+        $this->updateEntity($person);
+        // must call refresh to update the 1:m side of the relationship in memory.
+        $this->entityManager->refresh($address);
     }
 
     public function removePersonAddress(ScymPerson $person) {
@@ -199,8 +203,31 @@ class ScymDirectoryManager
                 $this->entityManager->refresh($address);
             }
         }
-        return $address;
     }
+
+    public function deactivatePerson($personId) {
+        $person = $this->getPersonById($personId);
+        $person->setActive(0);
+        $person->setAddress(null);
+        $this->updateEntity($person);
+    }
+
+    public function deactivateAddress($addressId) {
+        $em = $this->getEntityManager();
+        $address = $this->getAddressById($addressId);
+        if ($address != null) {
+            $people = $address->getPersons();
+            foreach ($people as $person ) {
+                $person->setAddress(null);
+                $em->persist($person);
+            }
+        }
+        $em->flush();
+        $this->entityManager->refresh($address);
+        $address->setActive(0);
+        $this->updateEntity($address);
+    }
+
 
     public function saveChanges() {
         if ($this->entityManager != null) {
