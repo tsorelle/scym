@@ -27,12 +27,12 @@ class TEntityManagers {
      * @return EntityManager
      * @throws \Exception
      */
-    public static function Get($key='application')
+    public static function Get($key='application',$isDevMode=null)
     {
         self::initialize();
         if (array_key_exists($key,self::$managers))
             return self::$managers[$key];
-        return self::createManager($key);
+        return self::createManager($key,$isDevMode);
     }
 
     /**
@@ -61,7 +61,7 @@ class TEntityManagers {
         $config = TDbConfiguration::GetConfiguration();
         $databaseId = $config->Value("type/$typeKey");
         // temporary workaround to force proxy generation on server
-        $isDevMode = true;
+        // $isDevMode = true;
 
         if ($isDevMode === null) {
 

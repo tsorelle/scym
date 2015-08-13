@@ -118,4 +118,55 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 
     }
 
+    public function testLoadMeetingEntity() {
+        $this->assertTrue(class_exists('App\db\scym\ScymMailbox',true),'Person class not found.');
+        // $this->assertTrue(class_exists('\Doctrine\ORM\EntityManager',true),'EntityManager class not found.');
+
+        \Tops\sys\TObjectContainer::Clear();
+        \Tops\sys\TObjectContainer::Register('configManager','\Tops\sys\TYmlConfigManager');
+
+        $em = TEntityManagers::Get();
+        $repository = $em->getRepository('App\db\scym\ScymMeeting');
+        $meeting = $repository->findOneBy(array('affiliationcode' => 'AU TX'));
+        $this->assertNotNull($meeting,'Meeting not loaded.');
+        $actual = $meeting->getMeetingName();
+        $expected = 'Friends Meeting of Austin';
+        $this->assertEquals($expected,$actual);
+
+        $quarterly = $meeting->getQuarterlyMeeting();
+        $this->assertNotNull($quarterly);
+        $expected = 'Cielo Grande';
+        $actual = $quarterly->getQuarterlyMeetingName();
+        $this->assertEquals($expected,$actual);
+
+    }
+
+    public function testLoadQuarterlyMeetingEntity() {
+        $this->assertTrue(class_exists('App\db\scym\ScymQuarterlyMeeting',true),'Quarterly meeting class not found.');
+        // $this->assertTrue(class_exists('\Doctrine\ORM\EntityManager',true),'EntityManager class not found.');
+
+        \Tops\sys\TObjectContainer::Clear();
+        \Tops\sys\TObjectContainer::Register('configManager','\Tops\sys\TYmlConfigManager');
+
+        $em = TEntityManagers::Get();
+        $repository = $em->getRepository('App\db\scym\ScymQuarterlyMeeting');
+        $meeting = $repository->findOneBy(array('quarterlymeetingname' => 'Cielo Grande'));
+        $this->assertNotNull($meeting,'Quarterly Meeting not loaded.');
+        $actual = $meeting->getQuarterlyMeetingId();
+        $expected = 1;
+        $this->assertEquals($expected,$actual);
+
+        $meetings = $meeting->getMeetings();
+        $this->assertNotEmpty($meetings);
+        $found = false;
+        foreach($meetings as $meeting) {
+            if ($meeting->getAffiliationcode() == 'AU TX') {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found);
+
+
+    }
 }

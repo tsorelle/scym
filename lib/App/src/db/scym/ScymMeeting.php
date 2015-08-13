@@ -2,15 +2,23 @@
 
 namespace App\db\scym;
 
+
+use App\db\DateStampedEntity;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\Index;
+use Doctrine\ORM\Mapping\Table;
+
 
 /**
  * ScymMeeting
  *
  * @Table(name="meetings", uniqueConstraints={@UniqueConstraint(name="affiliationCodeIndex", columns={"affiliationCode"})})
- * @Entity
+ * @Entity @HasLifecycleCallbacks
  */
-class ScymMeeting
+class ScymMeeting extends DateStampedEntity
 {
     /**
      * @var integer
@@ -20,13 +28,6 @@ class ScymMeeting
      * @GeneratedValue(strategy="IDENTITY")
      */
     private $meetingid;
-
-    /**
-     * @var integer
-     *
-     * @Column(name="quarterlyMeetingId", type="integer", nullable=true)
-     */
-    private $quarterlymeetingid;
 
     /**
      * @var string
@@ -106,81 +107,56 @@ class ScymMeeting
     private $longitude;
 
     /**
-     * @var \DateTime
-     *
-     * @Column(name="dateAdded", type="date", nullable=true)
-     */
-    private $dateadded;
-
-    /**
-     * @var \DateTime
-     *
-     * @Column(name="dateUpdated", type="date", nullable=true)
-     */
-    private $dateupdated;
-
-    /**
      * @var boolean
      *
      * @Column(name="active", type="boolean", nullable=true)
      */
     private $active = '1';
-
+    
     /**
-     * @var string
+     * @var ScymQuarterlyMeeting
      *
-     * @Column(name="addedBy", type="string", length=100, nullable=true)
+     * @ManyToOne(targetEntity="ScymQuarterlyMeeting",inversedBy="meetings")
+     *   @JoinColumn(name="quarterlyMeetingId", referencedColumnName="quarterlyMeetingId")
      */
-    private $addedby;
+    protected $quarterlymeeting;
 
-    /**
-     * @var string
-     *
-     * @Column(name="updatedBy", type="string", length=100, nullable=true)
-     */
-    private $updatedby;
-
-
-    /**
-     * Get meetingid
-     *
-     * @return integer 
-     */
-    public function getMeetingid()
+    public function getQuarterlyMeetingId()
     {
-        return $this->meetingid;
+        return $this->quarterlymeeting ? $this->quarterlymeeting->getQuarterlyMeetingId() : null;
     }
 
     /**
-     * Set quarterlymeetingid
+     * Set QuarterlyMeeting
      *
-     * @param integer $quarterlymeetingid
+     * @param ScymQuarterlyMeeting $QuarterlyMeeting
      * @return ScymMeeting
      */
-    public function setQuarterlymeetingid($quarterlymeetingid)
+    public function setQuarterlyMeeting(ScymQuarterlyMeeting $QuarterlyMeeting = null)
     {
-        $this->quarterlymeetingid = $quarterlymeetingid;
+        $this->quarterlymeeting = $QuarterlyMeeting;
 
         return $this;
     }
 
     /**
-     * Get quarterlymeetingid
+     * Get QuarterlyMeeting
      *
-     * @return integer 
+     * @return ScymQuarterlyMeeting
      */
-    public function getQuarterlymeetingid()
+    public function getQuarterlyMeeting()
     {
-        return $this->quarterlymeetingid;
+        return $this->quarterlymeeting;
     }
-
+    
+    
     /**
-     * Set meetingname
+     * Set meetingName
      *
      * @param string $meetingname
      * @return ScymMeeting
      */
-    public function setMeetingname($meetingname)
+    public function setMeetingName($meetingname)
     {
         $this->meetingname = $meetingname;
 
@@ -192,7 +168,7 @@ class ScymMeeting
      *
      * @return string 
      */
-    public function getMeetingname()
+    public function getMeetingName()
     {
         return $this->meetingname;
     }
@@ -426,53 +402,7 @@ class ScymMeeting
     {
         return $this->longitude;
     }
-
-    /**
-     * Set dateadded
-     *
-     * @param \DateTime $dateadded
-     * @return ScymMeeting
-     */
-    public function setDateadded($dateadded)
-    {
-        $this->dateadded = $dateadded;
-
-        return $this;
-    }
-
-    /**
-     * Get dateadded
-     *
-     * @return \DateTime 
-     */
-    public function getDateadded()
-    {
-        return $this->dateadded;
-    }
-
-    /**
-     * Set dateupdated
-     *
-     * @param \DateTime $dateupdated
-     * @return ScymMeeting
-     */
-    public function setDateupdated($dateupdated)
-    {
-        $this->dateupdated = $dateupdated;
-
-        return $this;
-    }
-
-    /**
-     * Get dateupdated
-     *
-     * @return \DateTime 
-     */
-    public function getDateupdated()
-    {
-        return $this->dateupdated;
-    }
-
+    
     /**
      * Set active
      *
@@ -496,49 +426,4 @@ class ScymMeeting
         return $this->active;
     }
 
-    /**
-     * Set addedby
-     *
-     * @param string $addedby
-     * @return ScymMeeting
-     */
-    public function setAddedby($addedby)
-    {
-        $this->addedby = $addedby;
-
-        return $this;
-    }
-
-    /**
-     * Get addedby
-     *
-     * @return string 
-     */
-    public function getAddedby()
-    {
-        return $this->addedby;
-    }
-
-    /**
-     * Set updatedby
-     *
-     * @param string $updatedby
-     * @return ScymMeeting
-     */
-    public function setUpdatedby($updatedby)
-    {
-        $this->updatedby = $updatedby;
-
-        return $this;
-    }
-
-    /**
-     * Get updatedby
-     *
-     * @return string 
-     */
-    public function getUpdatedby()
-    {
-        return $this->updatedby;
-    }
 }

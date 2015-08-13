@@ -1,7 +1,16 @@
-# Ignore configuration files that may contain sensitive information.
 sites/*/settings*.php
-
-# Ignore paths that contain user-generated content.
 sites/*/files
 sites/*/private
 notes/*
+assets/bootstrap/*
+core/*
+includes/*
+misc/*
+modules/*
+private/*
+profiles/*
+schema/*
+scripts/*
+themes/*
+lib/vendor/*
+lib/test/*
