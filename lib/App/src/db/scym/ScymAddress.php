@@ -474,6 +474,7 @@ class ScymAddress extends DateStampedEntity
         $result->country = $this->country;
         $result->phone = $this->phone;
         $result->notes = $this->notes;
+        $result->newsletter = $this->newsletter;
         $result->active  = $this->active;
         $result->sortkey = $this->sortkey;
         $result->lastUpdate = $this->lastUpdateAsString();
@@ -495,6 +496,7 @@ class ScymAddress extends DateStampedEntity
         $this->country = $dto->country;
         $this->phone = $dto->phone;
         $this->notes = $dto->notes;
+        $this->newsletter = $dto->newsletter;
         $this->active = $dto->active;
         $this->sortkey = $dto->sortkey;
     }

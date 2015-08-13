@@ -1,0 +1,8 @@
+members/directory,ScymDirectoryViewModel
+meetings/local,ScymMeetingsViewModel
+mailboxes,MailboxesViewModel
+mailform,MailFormViewModel
+datepickertest,DatePickerTestViewModel
+helloworld,HelloWorldViewModel
+registerdocument,RegisterDocumentViewModel
+testpage,TestPageViewModel

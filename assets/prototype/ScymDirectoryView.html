@@ -78,10 +78,10 @@
     </div> <!-- end found panel -->
 
     <div id="family-panel"  class="row" data-bind="visible:family.visible">
-        <form>
             <!-- person panels -->
             <div id="person-panel"  class="col-md-6">
                 <div id="person-view-panel" data-bind="visible:personForm.viewState() == 'view'">
+                    <form>
                     <fieldset id="person-view-fields">
                         <legend data-bind="text:personFormHeader"></legend>
                         <div id="person-view-buttons" data-bind="visible:userCanEdit() && (addressForm.viewState() == 'view' || addressForm.viewState() == 'empty')">
@@ -92,7 +92,6 @@
                             </button>
                             <button class="btn btn-default" data-bind="click:deletePerson">Delete</button>
                         </div>
-
                         <div data-bind="visible:personForm.hasAffiliation">
                             <strong>Meeting: </strong>
                             <span data-bind="text:personForm.affiliation"></span>
@@ -127,7 +126,7 @@
                             <span data-bind="text:personForm.phone2"></span>
                         </div>
                         <div>
-                            <strong>Send&nbsp;newsletter: </strong>
+                            <strong>Send&nbsp;newsletter (e-mail): </strong>
                             <span data-bind="visible:personForm.newsletter">Yes</span><span data-bind="visible:!personForm.newsletter()">No</span>
                         </div>
                         <div data-bind="visible:personForm.notes">
@@ -138,12 +137,13 @@
                             <strong>Last&nbsp;update: </strong>
                             <span data-bind="text:personForm.lastUpdate"></span>
                         </div>
-                        <div>
+                        <div data-bind="visible:userCanEdit">
                             <strong>Person Id: </strong>
                             <span data-bind="text:personForm.personId"></span>
                         </div>
 
                     </fieldset>
+                        </form>
                 </div>
                 <div id="person-edit-panel" data-bind="visible:personForm.viewState() == 'edit'">
                     <fieldset id="person-form" >
@@ -175,7 +175,7 @@
                         </div>
                         <div class="form-group" data-bind="visible:personForm.email">
                             <input id="newsletter-input" type="checkbox" data-bind="checked:personForm.newsletter"/>
-                            <label for="newsletter-input"  class="control-label">  Send newsletter</label>
+                            <label for="newsletter-input"  class="control-label">  Send newsletter (e-mail) </label>
                         </div>
                         <div class="form-group">
                             <label for="phone-input" class="control-label">Phone</label>
@@ -197,7 +197,7 @@
                         <div class="form-group">
                             <label for="affiliation-input" class="control-label">SCYM Meeting or Worship Group</label>
                             <select class="form-control" id="affiliation-input"
-                                    data-bind="options: personForm.affiliations,optionsText:'Name',value: personForm.selectedAffiliation"></select>
+                                    data-bind="options: personForm.affiliations,optionsText:'Name',value: personForm.selectedAffiliation,optionsCaption:'Select meeting...'"></select>
                         </div>
                         <div class="form-group">
                             <label for="otheraffiliation-input"  class="control-label">Meeting (outside of SCYM)</label>
@@ -228,6 +228,7 @@
 
                 </div>
                 <div id="person-search-panel"  data-bind="visible:personForm.viewState() == 'search'">
+                    <form>
                     <fieldset id="person-search-fields">
                         <legend>Find Person</legend>
                         <div class="row">
@@ -259,18 +260,12 @@
                             </div> <!-- end found header -->
 
                             <div class="row" id="persons-found-list">
-                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[1]">
+                                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" data-bind="foreach: personsList.selectionList[1]">
                                     <div class="link-list-item">
                                         <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
                                     </div>
                                 </div>
-                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[2]">
-                                    <div class="link-list-item">
-                                        <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
-                                    </div>
-
-                                </div>
-                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[3]">
+                                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" data-bind="foreach: personsList.selectionList[2]">
                                     <div class="link-list-item">
                                         <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
                                     </div>
@@ -279,6 +274,7 @@
 
                         </div>
                     </fieldset>
+                    </form>
                 </div>
                 <div id="person-empty-panel"  data-bind="visible:personForm.viewState() == 'empty'">
                     <p>No person</p>
@@ -288,20 +284,21 @@
             <!-- address panels -->
             <div id="address-panel"  class="col-md-6">
                 <div id="address-view-panel" data-bind="visible:addressForm.viewState() == 'view'">
+                    <form>
                     <fieldset id="address-view-fields">
                         <legend>Address</legend>
-                        <div id="address-view-buttons"  data-bind="visible:userCanEdit() && (personForm.viewState() == 'view' || personForm.viewState() == 'empty')">
-                            <button class="btn btn-default" data-bind="click:editAddress,visible:userCanEdit">Edit</button>
-                            <button class="btn btn-default" data-bind="click:findPersonForAddress, visible:family.personCount()<2 && userCanEdit()">Add person</button>
+                        <div id="address-view-buttons">
                             <div id="address-persons-list" class="btn-group" data-bind="visible:family.personCount()>1">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Persons <span class="caret"></span>
+                                    Residents <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu" data-bind="foreach:addressPersonsList">
                                     <li><a href="#" data-bind="click:$parent.selectPerson"><span data-bind="text: Name"></span></a></li>
                                 </ul>
                             </div>
-                            <button class="btn btn-default" data-bind="click:deleteAddress">Delete</button>
+                            <button class="btn btn-default" data-bind="click:editAddress,visible:userCanEdit() && (personForm.viewState() == 'view' || personForm.viewState() == 'empty')">Edit</button>
+                            <button class="btn btn-default" data-bind="click:findPersonForAddress, visible:family.personCount()<2 && (userCanEdit() && (personForm.viewState() == 'view' || personForm.viewState() == 'empty'))">Add person</button>
+                            <button class="btn btn-default" data-bind="click:deleteAddress, visible:userCanEdit">Delete</button>
                         </div>
                         <div id='streetaddress-view'>
                             <div>
@@ -327,6 +324,11 @@
                             <strong>Household phone: </strong>
                             <span data-bind="text:addressForm.phone"></span>
                         </div>
+                        <div>
+                            <strong>Send&nbsp;newsletter (postal): </strong>
+                            <span data-bind="visible:addressForm.newsletter">Yes</span><span data-bind="visible:!addressForm.newsletter()">No</span>
+                        </div>
+
                         <div data-bind="visible:addressForm.notes">
                             <strong>Notes:</strong><br>
                             <span data-bind="text:addressForm.notes">notes</span>
@@ -335,12 +337,13 @@
                             <strong>Last&nbsp;update: </strong>
                             <span data-bind="text:addressForm.lastUpdate"></span>
                         </div>
-                        <div>
+                        <div data-bind="visible:userCanEdit">
                             <strong>Address Id: </strong>
                             <span data-bind="text:addressForm.addressId"></span>
                         </div>
 
                     </fieldset>
+                    </form>
                 </div>
                 <div id="address-edit-panel" data-bind="visible:addressForm.viewState() == 'edit'">
                     <fieldset id="address-form" >
@@ -394,6 +397,11 @@
                         <input class="form-control" id="address-phone-input" data-bind="value:addressForm.phone"/>
                     </div>
                     <div class="form-group">
+                        <input id="address-newsletter-input" type="checkbox" data-bind="checked:addressForm.newsletter"/>
+                        <label for="address-newsletter-input"  class="control-label">  Send newsletter (postal)</label>
+                    </div>
+
+                    <div class="form-group">
                         <label for="address-sortkey-input" class="control-label">Sort key</label>
                         <input class="form-control" id="address-sortkey-input" data-bind="value:addressForm.sortkey"/>
                     </div>
@@ -403,6 +411,7 @@
                     </div>
                 </div>
                 <div id="address-search-panel"  data-bind="visible:addressForm.viewState() == 'search'">
+                    <form>
                     <fieldset id="address-search-fields">
                         <legend>Find Address</legend>
                         <div class="row">
@@ -447,18 +456,19 @@
                             </div> <!-- end found list -->
 
                         </div>
-                    </fieldset>
+                        </fieldset>
+                    </form>
                 </div>
                 <div id="address-empty-panel"  data-bind="visible:addressForm.viewState() == 'empty'">
                     <p>No address</p>
                 </div>
             </div> <!-- end address panel -->
-        </form>
     </div> <!-- end family panel -->
 
     <div class="modal" id="confirm-delete-person-modal">
         <div class="modal-dialog">
             <div class="modal-content">
+                <form>
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Delete person</h4>
@@ -470,6 +480,7 @@
                     <button type="button" class="btn btn-primary" data-bind="click: executeDeletePerson">Delete</button>
                     <button type="button" class="btn btn-default"  data-dismiss="modal">Cancel</button>
                 </div>
+                </form>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
@@ -477,6 +488,7 @@
     <div class="modal" id="confirm-delete-address-modal">
         <div class="modal-dialog">
             <div class="modal-content">
+                <form>
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Delete address</h4>
@@ -488,6 +500,7 @@
                     <button type="button" class="btn btn-primary" data-bind="click: executeDeleteAddress">Delete</button>
                     <button type="button" class="btn btn-default"  data-dismiss="modal">Cancel</button>
                 </div>
+                    </form>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->

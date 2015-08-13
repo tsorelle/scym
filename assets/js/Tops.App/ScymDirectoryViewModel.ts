@@ -63,6 +63,7 @@ module Tops {
         public country = '';
         public phone = '';
         public notes = '';
+        public newsletter : number = 1;
         public active : number = 1;
         public sortkey = '';
         public lastUpdate : string = '';
@@ -128,6 +129,15 @@ module Tops {
             var selected = me.setPersons(family.persons,family.selectedPersonId);
 
             return selected;
+        }
+        
+        public empty() {
+            var me = this;
+            me.address = null;
+            me.hasAddress(false);
+            me.persons = [];
+            me.personCount(0);
+            me.selectedPersonId = 0;
         }
 
         /**
@@ -785,6 +795,7 @@ module Tops {
         public active  = ko.observable(1);
         public sortkey= ko.observable('');
         public lastUpdate = ko.observable('');
+        public newsletter = ko.observable(0);
         public cityLocation : KnockoutComputed<string>;
 
         public addressNameError = ko.observable('');
@@ -844,6 +855,7 @@ module Tops {
             me.phone('');
             me.notes('');
             me.active (1);
+            me.newsletter(0);
             me.sortkey('');
             me.lastUpdate('');
             me.addressId(null);
@@ -890,6 +902,7 @@ module Tops {
             me.sortkey(address.sortkey);
             me.lastUpdate(address.lastUpdate);
             me.addressId(address.addressId);
+            me.newsletter(address.newsletter);
         };
 
         public updateScymAddress(address: scymAddress) {
@@ -905,6 +918,7 @@ module Tops {
             address.notes = me.notes();
             address.active = me.active();
             address.sortkey = me.sortkey();
+            address.newsletter = me.newsletter();
         }
     }
 
@@ -927,9 +941,9 @@ module Tops {
         personForm = new personObservable();
         addressForm = new addressObservable();
         personFormHeader : KnockoutComputed<string>; // initialization in constructor
-        familiesList = new searchListObservable(6,2);
-        personsList =  new searchListObservable(3,6);
-        addressesList =  new searchListObservable(3,6);
+        familiesList = new searchListObservable(6,10);
+        personsList =  new searchListObservable(2,12);
+        addressesList =  new searchListObservable(2,12);
         addressPersonsList = ko.observableArray<INameValuePair>();
         userCanEdit = ko.observable(true);
         userIsAuthorized = ko.observable(false);
@@ -1390,9 +1404,9 @@ module Tops {
             // avoid accidental click as default button.
             var addressFormState = me.addressForm.viewState();
             var personFormState = me.personForm.viewState();
-            if ((addressFormState == 'view' || addressFormState == 'empty') && personFormState == 'view') {
+            // if ((addressFormState == 'view' || addressFormState == 'empty') && personFormState == 'view') {
                 me.personForm.edit();
-            }
+            // }
         }
 
         /**
@@ -1410,14 +1424,7 @@ module Tops {
          */
         public editAddress() {
             var me = this;
-            // avoid accidental click as default button.
-            // todo: better solution for accidental button clicks
-            var personFormState = me.personForm.viewState();
-            var addressFormState = me.addressForm.viewState();
-            if ((personFormState == 'view' || personFormState == 'empty') && addressFormState == 'view') {
-                me.addressForm.edit();
-            }
-
+            me.addressForm.edit();
         }
 
         public cancelAddressEdit() {
@@ -1539,7 +1546,7 @@ module Tops {
             else {
                 var updateMessage = address.editState == editState.created ? 'Adding address ...' : 'Updating address...';
                 me.application.showWaiter(updateMessage);
-                me.peanut.executeService('directory.Updateaddress',address, me.handleUpdateAddressResponse)
+                me.peanut.executeService('directory.UpdateAddress',address, me.handleUpdateAddressResponse)
                     .always(function() {
                         me.application.hideWaiter();
                     });
@@ -1549,7 +1556,9 @@ module Tops {
         private handleUpdateAddressResponse = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                me.family.address = <scymAddress>serviceResponse.Value;
+                var address = <scymAddress>serviceResponse.Value;
+                var selected = me.family.setAddress(address);
+                me.addressForm.assign(address);
                 me.personForm.view();
                 me.addressForm.view();
             }
@@ -1563,10 +1572,11 @@ module Tops {
             var me=this;
             me.familiesList.reset();
             me.personForm.clear();
-            me.family.visible(true);
+            me.addressForm.clear();
+            me.family.empty();
             me.personForm.edit();
             me.addressForm.empty();
-
+            me.family.visible(true);
         };
 
         public newAddress = () => {
@@ -1574,9 +1584,10 @@ module Tops {
             me.familiesList.reset();
             me.personForm.clear();
             me.addressForm.clear();
-            me.family.visible(true);
+            me.family.empty();
             me.addressForm.edit();
             me.personForm.empty();
+            me.family.visible(true);
         };
 
         private createSelectedPersonRequest() {
@@ -1585,23 +1596,6 @@ module Tops {
             request.personId = me.family.selectedPersonId;
             request.addressId = me.family.address ?  me.family.address.addressId : 0;
             return request;
-        }
-
-        public removeSelectedFromAddress() {
-            // todo: delete if not needed
-            var me = this;
-            var request = me.createSelectedPersonRequest();
-            if (request.addressId < 1 || request.personId < 1) {
-                return;
-            }
-
-            me.application.hideServiceMessages();
-            me.application.showWaiter('Removing person from address...');
-
-            me.peanut.executeService('directory.RemovePersonFromAddress',request, me.handleRemovePersonResponse)
-                .always(function() {
-                    me.application.hideWaiter();
-                });
         }
 
         public deletePerson() {

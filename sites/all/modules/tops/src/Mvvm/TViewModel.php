@@ -14,7 +14,7 @@ use Tops\sys\TPostOffice;
 
 class TViewModel
 {
-    private static $vmPaths = array();
+    private static $vmPaths = null;
     private static $vmname = null;
 
     public static function isVmPage()
@@ -85,18 +85,21 @@ class TViewModel
 
             // get node alias
             if ($name == 'node') {
-                // $name = $name . '/' . $pathParts[2];
                 $aliasManager = self::getAliasManager();
                 if (!$aliasManager) {
                     return null;
                 }
-                $name = $aliasManager->getAliasByPath($path);
-                if (!strstr('/', $name)) {
+                $name = $aliasManager->getAliasByPath(null); // $path);
+                if (strstr('/node/', $name)) {
+                    // must have alias
+                    return null;
+                }
+                else {
                     return $name;
                 }
-                return null;
             }
-            return $name;
+
+            return  $count > 2 ? $pathParts[1].'/'.$pathParts[2] : $name;
         }
 
         return null;
@@ -126,35 +129,35 @@ class TViewModel
         return null;
     }
 
-    private static $viewModelFiles;
-    private static function getViewModelFiles() {
-        if (!isset(self::$viewModelFiles)) {
-            self::$viewModelFiles = array();
-            $vmDirectory = '/assets/js/Tops.App';
-            $vmRootPath = \Tops\sys\TPath::FromRoot($vmDirectory);
-            $files = scandir($vmRootPath);
-            foreach($files as $fileName) {
-                if (strstr($fileName,'ViewModel.js')) {
-                    $parts = explode('ViewModel.js',$fileName);
-                    if (sizeof($parts == 2) && empty($parts[1])) {
-                        $vmName = $parts[0];
-                        self::$viewModelFiles[strtolower($vmName)] = $vmDirectory.'/' . $fileName;
+    private static function getVMPathList() {
+        if (self::$vmPaths === null) {
+            self::$vmPaths = array();
+            $configpath = TPath::ConfigPath('viewmodels.csv');
+            $configFile = @fopen($configpath,'r');
+            if ($configFile) {
+                $vmDirectory = '/assets/js/Tops.App';
+                $vmRootPath = \Tops\sys\TPath::FromRoot($vmDirectory);
+                while(!feof($configFile)) {
+                    $parts =  explode(',',fgets($configFile));
+                    if (sizeof($parts) > 1) {
+                        $key = trim($parts[0]);
+                        $value = trim($parts[1]);
+                        self::$vmPaths[$key] = $vmDirectory.'/'.$value.'.js';
                     }
                 }
+                fclose($configFile);
             }
         }
-        return self::$viewModelFiles;
+        return self::$vmPaths;
     }
 
     public static function Initialize(Request $request) {
         $name = self::getNameFromRequest($request);
         if ($name)
         {
-            $vmFiles = self::getViewModelFiles();
             $key = strtolower($name);
-            if (array_key_exists($key,$vmFiles)) {
-                $vmPath = $vmFiles[$key];
-                self::$vmPaths[$key] = $vmPath;
+            $vmPaths = self::getVMPathList();
+            if (array_key_exists($key,$vmPaths)) {
                 self::$vmname = $key;
             }
         }
@@ -173,14 +176,8 @@ class TViewModel
         if ($vmPath)
         {
             return
-
-
-               //  '<script src="'.$vmPath.'"'."></script>\n".
-                // "<script>\n".
                 "   ViewModel.init('/');\n".
-                "   ko.applyBindings(ViewModel); // \n"
-                // ."</script>\n"
-                ;
+                "   ko.applyBindings(ViewModel); \n";
         }
         return '';
     }

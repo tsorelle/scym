@@ -109,7 +109,10 @@ class ScymDirectoryManager
     private function searchForPersons($searchString){
         $em = $this->getEntityManager();
         $sql = 'SELECT p FROM App\db\scym\ScymPerson p WHERE p.active=1 AND '.
-            '(p.firstname LIKE :name OR p.lastname LIKE :name OR p.middlename LIKE :name) ORDER BY p.lastname,p.firstname';
+            '(p.firstname LIKE :name OR p.lastname LIKE :name OR p.middlename LIKE :name '.
+            "OR CONCAT(p.firstname,' ',p.lastname) like :name ".
+            "OR CONCAT(p.firstname,' ',p.middlename,' ',p.lastname) like :name) ".
+            'ORDER BY p.lastname,p.firstname';
         $query = $em->createQuery($sql);
         $query->setParameter('name', '%'.$searchString.'%');
         $result = $query->getResult();
