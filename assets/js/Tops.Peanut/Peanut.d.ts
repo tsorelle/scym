@@ -46,4 +46,10 @@ declare module Tops {
         Value: string;
     }
 
+    export interface IListItem {
+        Text: string;
+        Value: any;
+        Description: string;
+    }
+
 }

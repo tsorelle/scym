@@ -79,14 +79,15 @@ module Tops {
         public hasErrors = ko.observable(false);
         public meetingNameError = ko.observable('');
         public affiliationCodeError = ko.observable('');
-        public emaiError = ko.observable('');
+        public emailError = ko.observable('');
         public areaError = ko.observable('');
 
         private clearErrors() {
             var me = this;
             me.meetingNameError('');
-            me.emaiError('');
+            me.emailError('');
             me.areaError('');
+            me.affiliationCodeError('');
             me.hasErrors(false);
         }
 
@@ -139,6 +140,56 @@ module Tops {
             me.clearErrors();
         }
 
+
+        public validate = (meetings : scymMeeting[]):boolean => {
+            var me = this;
+            me.clearErrors();
+            var valid = true;
+            var value = me.meetingName();
+            if (!value) {
+                me.meetingNameError(": Please enter the name of the meeting.");
+                valid = false;
+            }
+
+            value = me.area();
+            if (!value) {
+                me.areaError(": Please enter the city or area where the meeting is located.");
+                valid = false;
+            }
+
+            value = me.email();
+            if (value) {
+                var emailOk = Peanut.ValidateEmail(value);
+                if (!emailOk) {
+                    me.emailError(': Please enter a valid email address.');
+                    valid = false;
+                }
+            }
+
+            value = me.affiliationCode();
+            if (value) {
+                value = value.toLowerCase();
+                var meeting = _.find(meetings,function(m : scymMeeting){
+                    var code = m.affiliationCode;
+                    if (code) {
+                        return code.toLowerCase() == value;
+                    }
+                },me);
+                if (meeting && (meeting.meetingId != me.meetingId())) {
+                    me.affiliationCodeError('Affiliation codes must be unique. Another meeting uses this one.');
+                    valid = false;
+                }
+            }
+            else {
+                me.affiliationCodeError(': a four or five letter affiliation code is required.');
+                valid = false;
+            }
+
+            me.hasErrors(!valid);
+            return valid;
+        };
+
+
         public update(meeting: scymMeeting) {
             var me = this;
             meeting.affiliationCode = me.affiliationCode();
@@ -166,10 +217,6 @@ module Tops {
 
 
     export class MeetingsViewModel implements IMainViewModel {
-        // todo: implement filter functionality
-        // todo: implement add new meeting functionality
-        // todo: implement meeting form validation
-
         static instance: Tops.MeetingsViewModel;
         private application: Tops.IPeanutClient;
         private peanut: Tops.Peanut;
@@ -421,24 +468,26 @@ module Tops {
 
         updateMeeting = () => {
             var me = this;
-            var meeting = me.selectedMeeting;
-            me.meetingForm.update(meeting);
-            me.hideForm();
+            if (me.meetingForm.validate(me.meetings)) {
+                var meeting = me.selectedMeeting;
+                me.meetingForm.update(meeting);
+                me.hideForm();
 
-            me.application.hideServiceMessages();
-            me.application.showWaiter('Updating meeting...');
+                me.application.hideServiceMessages();
+                me.application.showWaiter('Updating meeting...');
 
-            var fakeResponse = new fakeServiceResponse(meeting);
-            me.handleMeetingUpdate(fakeResponse);
-            me.application.hideWaiter();
+                var fakeResponse = new fakeServiceResponse(meeting);
+                me.handleMeetingUpdate(fakeResponse);
+                me.application.hideWaiter();
 
-            /*
-            me.peanut.executeService('meetings.updateMeeting',meeting, me.handleMeetingUpdate)
-                .always(function() {
-                    me.application.hideWaiter();
-                });
-            */
-
+                // todo: implement service call to do update
+                /*
+                 me.peanut.executeService('meetings.updateMeeting',meeting, me.handleMeetingUpdate)
+                 .always(function() {
+                 me.application.hideWaiter();
+                 });
+                 */
+            }
 
         };
 
