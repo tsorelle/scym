@@ -129,7 +129,7 @@ module Tops {
                 valid = false;
             }
             else {
-                var fromAddressOk = me.peanut.validateEmail(message.fromAddress);
+                var fromAddressOk = Tops.Peanut.ValidateEmail(message.fromAddress);
                 if (!fromAddressOk) {
                     me.fromAddressError(': This e-mail address is not valid.');
                     valid = false;

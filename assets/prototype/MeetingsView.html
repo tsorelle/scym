@@ -1,0 +1,209 @@
+<!-- ******************  START FORM ****************************************************************************  -->
+<div id="meetings-application-container" style="display:none" class="container view-model-container">
+    <div id="buttons-panel">
+        <form>
+            <div class="row">
+                <div class="col-md-1">
+                    <strong>Filter:</strong>
+                </div>
+                <div class="col-md-4">
+                    by Quarterly Meeting: <select data-bind="options: quarterlies,
+                               optionsText: 'Text',
+                               value: quarterlyMeetingFilter,
+                               optionsCaption: '-- All --'"></select>
+                </div>
+                <div class="col-md-4">
+                    by State: <select data-bind="options: states,
+                               value: statesFilter,
+                               optionsCaption: '-- All --'"></select>
+                </div>
+                <div class="col-md-3">
+                    <div data-bind="visible:userCanEdit">
+                        <input id="active-filter" type="checkbox" data-bind="checked:activeFilter"/>
+                          Active&nbsp;only
+                    </div>
+                </div>
+            </div>
+            <div data-bind="visible:userCanEdit">
+                <a href="#" data-bind="click:createMeeting" title="Create a new meeting or worship group">Add a new&nbsp;Meeting</a>
+            </div>
+
+        </form>
+    </div>
+    <div id="meetings-panel">
+        <div class="row">
+            <div class="col-md-6" data-bind="foreach:meetingsColumn1" >
+                <h2 data-bind="text:meetingName"></h2>
+                <div class="meeting-info">
+                    <div data-bind="visible:active==0" >
+                        <strong>Inactive</strong>
+                        <a href="#" style="padding-left: 5px" data-bind="click: $parent.showMeetingForm" >
+                            More information . . .
+                        </a>
+                    </div>
+                    <div data-bind="visible:active"><strong>Worship location:</strong> <span data-bind="text:area"></span><span data-bind="visible:worshipLocation">, <span data-bind="text:worshipLocation"></span></span></div>
+                    <div data-bind="visible:active==1 && worshipTimes"><strong>Worship times: </strong><span data-bind="text:worshipTimes"></span></div>
+                    <div data-bind="visible:active">
+                        <a style="padding-right: 10px" href="#" data-bind="visible:url,attr: { href : url }">
+                            Web site
+                        </a>
+                        <a style="padding-right: 10px"  href="#" data-bind="visible:mailFormLink,attr: { href : mailFormLink }">
+                            E-mail
+                        </a>
+                        <a href="#" data-bind="click: $parent.showMeetingForm" >
+                            More . . .
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6" data-bind="foreach:meetingsColumn2" >
+                <h2 data-bind="text:meetingName"></h2>
+                <div><strong>Worship location:</strong> <span data-bind="text:area"></span><span data-bind="visible:worshipLocation">, <span data-bind="text:worshipLocation"></span></span></div>
+                <div data-bind="visible:worshipTimes"><strong>Worship times: </strong><span data-bind="text:worshipTimes"></span></div>
+                <div>
+                    <a style="padding-right: 10px" href="#" data-bind="visible:url,attr: { href : url }">
+                        Web site
+                    </a>
+                    <a style="padding-right: 10px"  href="#" data-bind="visible:mailFormLink,attr: { href : mailFormLink }">
+                        E-mail
+                    </a>
+                    <a href="#" data-bind="click: $parent.showMeetingForm" >
+                        More . . .
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="meeting-detail-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" data-bind="text: meetingForm.meetingName"></h4>
+                </div>
+                <div class="modal-body">
+                    <form data-bind="visible:meetingForm.viewState() == 'view'">
+                        <div class="meeting-info">
+                            <div data-bind="visible:meetingForm.quarterlyMeeting.Text">
+                                <strong>Quarterly Meeting:</strong>
+                                <span data-bind="text:meetingForm.quarterlyMeeting.Text"></span> </div>
+                            <div><strong>Worship location:</strong> <span data-bind="text:meetingForm.area"></span><span data-bind="visible:meetingForm.worshipLocation">,
+                                <span data-bind="text:meetingForm.worshipLocation"></span></span></div>
+                            <div data-bind="visible:meetingForm.worshipTimes"><strong>Worship times: </strong><span data-bind="text:meetingForm.worshipTimes"></span></div>
+                            <div data-bind="visible:meetingForm.url">
+                                <strong>Web site</strong>:
+                                <a style="padding-right: 10px" href="#" data-bind="attr: { href : meetingForm.url }">
+                                    <span data-bind="text:meetingForm.url"></span>
+                                </a>
+                            </div>
+                            <div data-bind="visible:meetingForm.mailFormLink">
+                                <strong>E-mail</strong>:
+                                <a style="padding-right: 10px"  href="#" data-bind="attr: { href : meetingForm.mailFormLink }">Show e-mail form</a>
+                            </div>
+                            <div data-bind="visible:meetingForm.detailText">
+                                <div><strong>More Details:</strong></div>
+                                <div data-bind="text:meetingForm.detailText"></div>
+                            </div>
+                            <div data-bind="visible:meetingForm.note() && userCanEdit()">
+                                <div><strong>Notes:</strong></div>
+                                <div data-bind="text:meetingForm.note"></div>
+                            </div>
+
+                        </div>
+                    </form>
+                    <form data-bind="visible:meetingForm.viewState() == 'edit'">
+                        <div class="alert alert-danger" role="alert" data-bind="visible:meetingForm.hasErrors">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            <span class="sr-only">Error:</span>
+                            Please correct errors before saving.
+                        </div>
+
+                        <div class="form-group">
+                            <input id="active-input" type="checkbox" data-bind="checked:meetingForm.active"/>
+                            <label for="active-input"  class="control-label">  Active? </label>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-8" data-bind="css:{'has-error': meetingForm.meetingNameError}" >
+                                <label for="meetingName" class="control-label">Meeting name:<span data-bind="text:meetingForm.meetingNameError"></span></label>
+                                <input class="form-control" id="meetingName" data-bind="value:meetingForm.meetingName"/>
+                            </div>
+                            <div class="form-group col-md-4" data-bind="css:{'has-error': meetingForm.affiliationCodeError}" >
+                                <label for="affiliationCode" class="control-label">Affiliation code:<span data-bind="text:meetingForm.affiliationCodeError"></span></label>
+                                <input class="form-control" id="affiliationCode" data-bind="value:meetingForm.affiliationCode"/>
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="form-group col-md-8" data-bind="css:{'has-error': meetingForm.areaError}" >
+                                <label for="area" class="control-label">City of worship location:<span data-bind="text:meetingForm.areaError"></span></label>
+                                <input class="form-control" id="area" data-bind="value:meetingForm.area"/>
+                            </div>
+                            <div class="form-group col-md-4" >
+                                <label for="state" class="control-label">State:</label>
+
+                                <select class="form-control" id="state" data-bind="value:meetingForm.state">
+                                    <option>Arkansas</option>
+                                    <option>Missouri</option>
+                                    <option>Oklahoma</option>
+                                    <option>Texas</option>
+                                    <option>Four-states area (TX,AR,OK,LA)</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="quarter" class="control-label">Quarterly meeting:</label>
+                            <select id="quarter" data-bind="options: quarterlies,
+                                               optionsText: 'Text',
+                                               value: meetingForm.quarterlyMeeting,
+                                               optionsCaption: 'No quarterly meeting'"></select>
+
+                        </div>
+                        <div class="form-group" >
+                            <label for="location" class="control-label">Worship location:</label>
+                            <input class="form-control" id="location" data-bind="value:meetingForm.worshipLocation"/>
+                        </div>
+                        <div class="form-group" >
+                            <label for="times" class="control-label">Worship times:</label>
+                            <input class="form-control" id="times" data-bind="value:meetingForm.worshipTimes"/>
+                        </div>
+
+                        <div class="form-group" data-bind="css:{'has-error': meetingForm.emailError}" >
+                            <label for="email" class="control-label">Enter an e-mail to update or create mailbox:<span data-bind="text:meetingForm.emailError"></span></label>
+                            <input class="form-control" id="email" data-bind="value:meetingForm.email"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="details-input" class="control-label">Details:</label>
+                            <textarea class="form-control" id="details-input" data-bind="value:meetingForm.detailText"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes-input" class="control-label">Notes: (for administrative view)</label>
+                            <textarea class="form-control" id="notes-input" data-bind="value:meetingForm.note"></textarea>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer"  data-bind="visible:!userCanEdit()">
+                    <a href="#" data-dismiss="modal">Close</a>
+                </div>
+                <div class="modal-footer" data-bind="visible:userCanEdit">
+                    <button type="button" class="btn btn-primary" data-bind="visible:meetingForm.viewState() == 'view',click: editMeeting">Edit</button>
+                    <button type="button" class="btn btn-default" data-bind="visible:meetingForm.viewState() == 'view'" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bind="visible:meetingForm.viewState() == 'edit',click: updateMeeting">Save changes</button>
+                    <button type="button" data-bind="visible:meetingForm.viewState() == 'edit',click:cancelEdit" class="btn btn-default" >
+                        Cancel
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+</div> <!-- end form content div -->
+<!-- ******************  END FORM ****************************************************************************  -->

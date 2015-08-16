@@ -11,15 +11,6 @@
 
 module Tops {
 
-    /**
-     * Constants for scym entities editState
-     */
-    export class editState {
-        public static unchanged : number = 0;
-        public static created : number = 1;
-        public static updated : number = 2;
-        public static deleted : number = 3;
-    }
 
     /**
      * Person DTO as returned from services
