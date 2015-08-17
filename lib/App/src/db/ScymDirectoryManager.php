@@ -10,44 +10,13 @@ namespace App\db;
 
 
 use App\db\scym\ScymAddress;
-use App\db\scym\ScymMeeting;
 use App\db\scym\ScymPerson;
 use Doctrine\ORM\EntityRepository;
-use Tops\db\TEntityManagers;
+use Tops\db\TDbServiceManager;
 use Tops\sys\TNameValuePair;
 
-class ScymDirectoryManager
+class ScymDirectoryManager extends TDbServiceManager
 {
-
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $entityManager;
-    private $repositories = array();
-
-    /**
-     * @return \Doctrine\ORM\EntityManager
-     */
-    private function getEntityManager() {
-        if (!(isset($this->entityManager))) {
-            $this->entityManager = TEntityManagers::Get();
-        }
-        return $this->entityManager;
-    }
-
-    /**
-     * @param $className
-     * @return EntityRepository
-     */
-    private function getRepository($className) {
-        if (!isset($this->repositories[$className])) {
-            $em = $this->getEntityManager();
-            $repository = $em->getRepository($className);
-            $this->repositories[$className] = $repository;
-        }
-        return $this->repositories[$className];
-    }
-
     /**
      * @return EntityRepository
      */
@@ -168,18 +137,6 @@ class ScymDirectoryManager
         return $addresses->find($id);
     }
 
-    public function updateEntity($entity) {
-        $em = $this->getEntityManager();
-        $em->persist($entity);
-        $em->flush();
-    }
-
-    public function deleteEntity($entity) {
-        $em = $this->getEntityManager();
-        $em->remove($entity);
-        $em->flush();
-    }
-
     public function addPersonToAddress(ScymPerson $person, $addressId) {
         $address = $this->getAddressById($addressId);
         if ($address) {
@@ -232,10 +189,4 @@ class ScymDirectoryManager
     }
 
 
-    public function saveChanges() {
-        if ($this->entityManager != null) {
-            $this->entityManager->flush();
-            $this->entityManager = null;
-        }
-    }
 }

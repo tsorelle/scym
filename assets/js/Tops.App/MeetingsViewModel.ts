@@ -27,9 +27,9 @@ module Tops {
         public active : number = 1;
         public updatedBy = '';
         public quarterlyMeetingId : any = null;
+        public quarterlyMeetingName = '';
 
         public mailFormLink = '';
-        public quarterlyMeeting: IListItem = null;
         public email = '';
         public editState : number = editState.created;
     }
@@ -67,8 +67,8 @@ module Tops {
         public longitude = ko.observable();
         public lastUpdate = ko.observable('');
         public updatedBy = ko.observable('');
-        public quarterlyMeetingName = ko.observable('');
-        public quarterlyMeetingId = ko.observable();
+        // public quarterlyMeetingName = ko.observable('');
+        // public quarterlyMeetingId = ko.observable();
         public viewState = ko.observable('view');
         public hasMailbox = ko.observable(false);
         public email = ko.observable('');
@@ -101,18 +101,18 @@ module Tops {
             me.state('');
             me.worshipLocation('');
             me.worshipTimes('');
-            me.quarterlyMeetingId(null);
+            me.quarterlyMeeting(null);
+            // me.quarterlyMeetingId(null);
+            // me.quarterlyMeetingName('');
             me.detailText('');
             me.note('');
             me.lastUpdate('');
             me.updatedBy('');
             me.url('');
             me.hasMailbox(false);
-            me.quarterlyMeetingName('');
             me.email('');
             me.latitude(null);
             me.longitude(null);
-            me.quarterlyMeeting(null);
             me.clearErrors();
         }
         
@@ -127,7 +127,6 @@ module Tops {
             me.longitude(meeting.longitude);
             me.meetingName(meeting.meetingName);
             me.note(meeting.note);
-            me.quarterlyMeetingId(meeting.quarterlyMeetingId);
             me.state(meeting.state);
             me.updatedBy(meeting.updatedBy);
             me.url(meeting.url);
@@ -135,8 +134,17 @@ module Tops {
             me.worshipTimes(meeting.worshipTimes);
             me.hasMailbox(meeting.mailFormLink ? true : false);
             me.active(meeting.active ? true : false);
-            me.quarterlyMeeting(meeting.quarterlyMeeting);
             me.email('');
+            if (meeting.quarterlyMeetingId) {
+                me.quarterlyMeeting(<IListItem>{
+                    Text: meeting.quarterlyMeetingName,
+                    Value: meeting.quarterlyMeetingId,
+                    Description: ''
+                });
+            }
+            else {
+                me.quarterlyMeeting(null);
+            }
             me.clearErrors();
         }
 
@@ -203,14 +211,9 @@ module Tops {
             meeting.url = me.url();
             meeting.worshipLocation = me.worshipLocation();
             meeting.worshipTimes = me.worshipTimes();
-            meeting.quarterlyMeeting = me.quarterlyMeeting();
             meeting.email = me.email();
-            if (meeting.quarterlyMeeting) {
-                meeting.quarterlyMeetingId = meeting.quarterlyMeeting.Value;
-            }
-            else {
-                meeting.quarterlyMeetingId = null;
-            }
+            var quarterly = me.quarterlyMeeting();
+            meeting.quarterlyMeetingId = (quarterly)? quarterly.Value : null;
             meeting.editState = me.meetingId() ? editState.updated : editState.created;
         }
     }
@@ -230,7 +233,6 @@ module Tops {
         quarterlies = ko.observableArray<IListItem>();
         states = ko.observableArray<string>();
         meetingForm = new meetingObservable();
-        meetingsDisplayRows = ko.observableArray<scymMeeting[]>();
         userCanEdit = ko.observable(false);
         quarterlyMeetingFilter = ko.observable<IListItem>();
         statesFilter = ko.observable<string>();
@@ -282,29 +284,38 @@ module Tops {
             var me = this;
             me.application.hideServiceMessages();
 
-            // todo: replace fake initialization with service call
-            // fake scaffolding
-            var fakeresponse = me.getFakeInitResponse();
-            me.handleInitializationResponse(fakeresponse);
-            me.application.hideWaiter();
-            if (doneFunction) {
-                doneFunction();
-                jQuery('#meetings-application-container').show();
-            }
-            // ** end fake stuff ***
-
-
-            /* // real stuff:
-            me.peanut.executeService('directory.InitMeetingsApp', '', me.handleInitializationResponse)
+            me.peanut.executeService('meetings.InitMeetingsApp', '', me.handleInitializationResponse)
                 .always(function () {
                     me.application.hideWaiter();
                     if (doneFunction) {
                         doneFunction();
-             jQuery('#meetings-application-container').show();
+                        jQuery('#meetings-application-container').show();
                     }
                 });
-            */
         }
+
+        handleInitializationResponse = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Tops.Peanut.serviceResultSuccess) {
+                var response = <IInitMeetingsResponse>serviceResponse.Value;
+                me.meetings = response.meetings;
+                me.quarterlies(response.quarterlies);
+                me.states(['Arkansas','Missouri','Louisiana','Oklahoma','Texas','Four-states area (TX,AR,OK,LA)']);
+                me.quarterlyMeetingFilter.subscribe(me.applyQuarterlyFilter);
+                me.statesFilter.subscribe(me.applyStatesFilter);
+                me.activeFilter.subscribe(me.applyActiveFilter);
+                me.userCanEdit(response.canEdit);
+                me.filterType = '';
+                me.filterValue = null;
+                me.filterOn = true;
+                me.showActiveOnly = true;
+                me.filterActiveOnly();
+            }
+            else {
+                // me.userCanEdit(false);
+            }
+        };
+
 
         applyStatesFilter = (state: string) => {
             var me = this;
@@ -355,6 +366,19 @@ module Tops {
 
         };
 
+        reapplyFilters()  {
+            var me = this;
+            if (me.filterType == 'quarterly') {
+                me.filterByQuarterly();
+            }
+            else if (me.filterType == 'state') {
+                me.filterByState();
+            }
+            else {
+                me.filterActiveOnly();
+            }
+        }
+
 
         filterByQuarterly() {
             var me = this;
@@ -386,27 +410,6 @@ module Tops {
             me.loadColumns(meetingList);
         }
 
-        handleInitializationResponse = (serviceResponse: IServiceResponse) => {
-            var me = this;
-            if (serviceResponse.Result == Tops.Peanut.serviceResultSuccess) {
-                var response = <IInitMeetingsResponse>serviceResponse.Value;
-                me.meetings = response.meetings;
-                me.quarterlies(response.quarterlies);
-                me.states(['Arkansas','Missouri','Louisiana','Oklahoma','Texas','Four-states area (TX,AR,OK,LA)']);
-                me.quarterlyMeetingFilter.subscribe(me.applyQuarterlyFilter);
-                me.statesFilter.subscribe(me.applyStatesFilter);
-                me.activeFilter.subscribe(me.applyActiveFilter);
-                me.userCanEdit(response.canEdit);
-                me.filterType = '';
-                me.filterValue = null;
-                me.filterOn = true;
-                me.showActiveOnly = true;
-                me.filterActiveOnly();
-            }
-            else {
-                // me.userCanEdit(false);
-            }
-        };
 
         private loadColumns(meetingsList : scymMeeting[]) {
             var me = this;
@@ -476,154 +479,37 @@ module Tops {
                 me.application.hideServiceMessages();
                 me.application.showWaiter('Updating meeting...');
 
-                var fakeResponse = new fakeServiceResponse(meeting);
-                me.handleMeetingUpdate(fakeResponse);
-                me.application.hideWaiter();
-
-                // todo: implement service call to do update
-                /*
-                 me.peanut.executeService('meetings.updateMeeting',meeting, me.handleMeetingUpdate)
-                 .always(function() {
-                 me.application.hideWaiter();
-                 });
-                 */
+                 me.peanut.executeService('meetings.UpdateMeeting',meeting, me.handleMeetingUpdate)
+                     .always(function() {
+                         me.application.hideWaiter();
+                     });
             }
-
         };
 
         private handleMeetingUpdate = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var meeting = <scymMeeting>serviceResponse.Value;
-                // todo: handle update response
+                var updated = <scymMeeting>serviceResponse.Value;
+                var currentIndex = _.findIndex(me.meetings, function(meeting : scymMeeting){
+                    return meeting.meetingId == updated.meetingId;
+                },me);
+                if (currentIndex) {
+                    me.meetings[currentIndex] = updated;
+                }
+                else {
+                    me.meetings.push(updated);
+                }
+                me.reapplyFilters();
             }
         };
-
-
 
         hideForm() {
             jQuery("#meeting-detail-modal").modal('hide');
         }
 
         showForm() {
-            var me = this;
-            // me.clearValidation();
             jQuery("#meeting-detail-modal").modal('show');
         }
-
-        hideConfirmForm() {
-            jQuery("#confirm-delete-modal").modal('hide');
-        }
-
-        showConfirmForm() {
-            var me = this;
-            jQuery("#confirm-delete-modal").modal('show');
-        }
-
-
-        // Temporary for testing
-        public serviceCallTemplate() {
-            // todo: delete serviceCallTemplate when not needed
-            var me = this;
-            var request = null; //
-
-            me.application.hideServiceMessages();
-            me.application.showWaiter('Message here...');
-            me.peanut.executeService('directory.ServiceName',request, me.handleServiceResponseTemplate)
-                .always(function() {
-                    me.application.hideWaiter();
-                });
-        }
-
-        private handleServiceResponseTemplate = (serviceResponse: IServiceResponse) => {
-            // todo: delete handleServiceResponseTemplate when not needed
-            var me = this;
-            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-
-
-            }
-        };
-
-        private getFakeInitResponse() {
-            var me = this;
-            var response = {
-                canEdit: true,
-                quarterlies: [
-                    {
-                        Text: 'Cielo Grande',
-                        Value: 1,
-                        Description: ''
-                    },
-                    {
-                        Text: 'Bayou',
-                        Value: 2,
-                        Description: ''
-                    },
-                    {
-                        Text: 'Arkansas-Oklahoma',
-                        Value: 3,
-                        Description: ''
-                    }
-                ],
-                meetings: []
-            };
-
-            response.meetings.push(me.createFakeMeeting( 1,'Alpine Friends Worship Group','AL TX',null,'Alpine','Texas','http://www.quakerfinder.org/quaker/near/TX/Alpine/12461',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting( 2,'Friends Meeting of Austin','AU TX',1,'Austin','Texas','http://www.austinquakers.org',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting( 3,'Baton Rouge Friends Meeting','BA LA',2,'Baton Rouge','Louisiana','http://www.batonrougefriends.net',response.quarterlies,false));
-            response.meetings.push(me.createFakeMeeting( 5,'Coastal Bend Friends Meeting','CC TX',2,'Corpus Christi','Texas','http://www.quakerfinder.org/quaker/near/TX/Corpus%20Christi/12266',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting( 6,'Bryan-College Station Friends Worship Group','CS TX',2,'Bryan-College Station','Texas',null,response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting( 7,'Dallas Friends Meeting','DA TX',1,'Dallas','Texas','http://www.dallasquakers.org/',response.quarterlies,false));
-            response.meetings.push(me.createFakeMeeting( 8,'Fayetteville Friends Meeting','FA AR',3,'Fayetteville','Arkansas','http://fayettevillefriends.org',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting( 9,'Fort Worth Monthly Meeting','FW TX',null,'Fort Worth','Texas','http://www.scym.org/fortworth',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(10,'Galveston Friends Meeting','GA TX',2,'Galveston','Texas','http://www.quakerfinder.org/quaker/near/TX/Galveston/12269',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(11,'Hill Country Friends Monthly Meeting','HC TX',null,'Hill Country','Texas','http://www.quakerfinder.org/quaker/near/TX/Kerrville/11836',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(12,'Houston Live Oak Friends Meeting','HO TX',2,'Houston','Texas','http://www.friendshouston.org/',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(13,'Little Rock Friends Meeting','LR AR',3,'Little Rock','Arkansas','http://www.scym.org/littlerock',response.quarterlies,false));
-            response.meetings.push(me.createFakeMeeting(14,'Lubbock Monthly Meeting','LU TX',null,'Lubbock','Texas','http://www.lubbockquakers.org',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(15,'Friends Meeting of New Orleans','NO LA',2,'New Orleans','Louisiana','http://fmno.quaker.org',response.quarterlies,false));
-            response.meetings.push(me.createFakeMeeting(16,'Oklahoma City Friends Meeting','OKC',3,'Oklahoma City','Oklahoma','http://rsof-okc.com',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(17,'Rio Grande Valley Worship Group','RIO',1,'Rio Grande Valley','Texas','http://www.rgvquakers.org',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(18,'Friends Meeting of San Antonio','SA TX',1,'San Antonio','Texas','http://www.sanantonioquakers.org',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(19,'Stillwater Friends Meeting','ST OK',3,'Stillwater','Oklahoma','http://www.quakerfinder.org/quaker/near/OK/Stillwater/12191',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(20,'Sunrise Friends Meeting','SUN',null,'Springfield','Missouri','http://www.quakerfinder.org/quaker/near/MO/Springfield/12080',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(21,'Green Country Friends Meeting','TU OK',3,'Tulsa','Oklahoma','http://www.scym.org/greencountry',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(22,'Acadiana Friends Meeting','ACDN',3,'Lafayette','Four-states area (TX,AR,OK,LA)','http://www.batonrougefriends.net',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(23,'Tyler Worship Group','CDTY',null,'Tyler','Four-states area (TX,AR,OK,LA)',null,response.quarterlies,false));
-            response.meetings.push(me.createFakeMeeting(24,'Ruston Worship Group','CDRU',null,'Ruston','Louisiana',null,response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(25,'Texarkana Worship Group','CDTA',null,'Texarkana','Four-states area (TX,AR,OK,LA)','http://www.quakerfinder.org/quaker/near/AR/Texarkana/12389',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(26,'Norman Friends Meeting','NFM',3,'Norman','Oklahoma','http://normanquakers.org/',response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(27,'Kiamichi Worship Group','KIA',3,'McAlester','Oklahoma',null,response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(28,'Longview Worship Group','LV TX',null,'Longview','Texas',null,response.quarterlies,true));
-            response.meetings.push(me.createFakeMeeting(29,'Bayou Quakers Worship Group','BY TX',2,'Houston','Texas',null,response.quarterlies,true));
-            return new fakeServiceResponse(response);
-        }
-
-        private createFakeMeeting(id, name,affiliationCode, quarterlyId, area, state, url, quarterlies, active) : scymMeeting {
-            var me = this;
-            var meeting = new scymMeeting();
-            meeting.affiliationCode = affiliationCode;
-            meeting.url = url;
-            meeting.active = 1;
-            meeting.area = area;
-            meeting.detailText = 'detail text here.';
-            meeting.editState = editState.unchanged;
-            meeting.lastUpdate = '2015-08-03';
-            meeting.longitude = null;
-            meeting.latitude = null;
-            meeting.meetingId = id;
-            meeting.meetingName = name;
-            meeting.note = 'let have some notes';
-            meeting.mailFormLink = '/mailform?box=' + meeting.affiliationCode;
-            meeting.quarterlyMeetingId = quarterlyId;
-            meeting.state = state;
-            meeting.url = url;
-            meeting.quarterlyMeeting = me.getQuarterlyMeetingById(meeting.quarterlyMeetingId,quarterlies);
-            meeting.active = active;
-            return meeting;
-        }
-
-
 
     }
 }

@@ -426,4 +426,64 @@ class ScymMeeting extends DateStampedEntity
         return $this->active;
     }
 
+    public function updateFromDataTransferObject($dto) {
+        $this->meetingid  = $dto->meetingId;
+        $this->meetingname  = $dto->meetingName;
+        $this->state  = $dto->state;
+        $this->area  = $dto->area;
+        $this->affiliationcode  = $dto->affiliationCode;
+        $this->worshiptimes  = $dto->worshipTimes;
+        $this->worshiplocation  = $dto->worshipLocation;
+        $this->url  = $dto->url;
+        $this->detailtext  = $dto->detailText;
+        $this->note  = $dto->note;
+        $this->longitude  = $dto->latitude;
+        $this->latitude  = $dto->longitude;
+        $this->active  = $dto->active;
+        return (!(empty($this->meetingname)|| empty($this->worshiplocation)));
+        /*
+                Deal with these externally
+                $this->  = $dto->quarterlyMeetingId;
+                $this->  = $dto->email;
+                $this->  = $dto->editState;
+        */
+    }
+
+    public function getDataTransferObject() {
+        $result = new \stdClass();
+
+        $result->meetingId = $this->meetingid;
+        $result->meetingName  = $this->meetingname;
+        $result->state  = $this->state;
+        $result->area  = $this->area;
+        $result->affiliationCode  = $this->affiliationcode;
+        $result->worshipTimes = $this->worshiptimes;
+        $result->worshipLocation = $this->worshiplocation;
+        $result->url = $this->url;
+        $result->detailText = $this->detailtext;
+        $result->note = $this->note;
+        $result->latitude = $this->latitude;
+        $result->longitude = $this->longitude;
+        $result->active = $this->active;
+        $result->updatedBy = $this->updatedby;
+        $result->quarterlyMeetingId = null;
+        $result->quarterlyMeetingName = '';
+        $result->lastUpdate = $this->lastUpdateAsString();
+        $result->editState = 0; // unchanged
+
+        $quarterly = $this->getQuarterlyMeeting();
+        if ($quarterly) {
+            $result->quarterlyMeetingId = $quarterly->getQuarterlyMeetingId();
+            $result->quarterlyMeetingName = $quarterly->getQuarterlyMeetingName();
+        }
+
+        // externally assigned
+        $result->email = '';
+        $result->mailFormLink = '';
+
+        return $result;
+    }
+
+
+
 }

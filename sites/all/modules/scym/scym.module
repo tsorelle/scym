@@ -32,6 +32,11 @@ function scym_permission()
             'description' => 'Add and update persons and addresses in the directory.'
         ),
 
+        'administer meeting directory' => array(
+            'title' => 'Administer Meeting Directory',
+            'description' => 'Add and meetings and worship groups in the directory.'
+        ),
+
         'view directory' => array(
             'title' => 'View Member Directory',
             'description' => 'Access persons and addresses in the directory.'
@@ -41,7 +46,6 @@ function scym_permission()
             'title' => 'Register Document',
             'description' => 'Register uploaded document.'
         ),
-
 
         'manage web site tasks' => array(
             'title' => 'Manage Web Site Tasks',
