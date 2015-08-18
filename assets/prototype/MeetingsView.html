@@ -58,18 +58,26 @@
 
             <div class="col-md-6" data-bind="foreach:meetingsColumn2" >
                 <h2 data-bind="text:meetingName"></h2>
-                <div><strong>Worship location:</strong> <span data-bind="text:area"></span><span data-bind="visible:worshipLocation">, <span data-bind="text:worshipLocation"></span></span></div>
-                <div data-bind="visible:worshipTimes"><strong>Worship times: </strong><span data-bind="text:worshipTimes"></span></div>
-                <div>
-                    <a style="padding-right: 10px" href="#" data-bind="visible:url,attr: { href : url }">
-                        Web site
-                    </a>
-                    <a style="padding-right: 10px"  href="#" data-bind="visible:mailFormLink,attr: { href : mailFormLink }">
-                        E-mail
-                    </a>
-                    <a href="#" data-bind="click: $parent.showMeetingForm" >
-                        More . . .
-                    </a>
+                <div class="meeting-info">
+                    <div data-bind="visible:active==0" >
+                        <strong>Inactive</strong>
+                        <a href="#" style="padding-left: 5px" data-bind="click: $parent.showMeetingForm" >
+                            More information . . .
+                        </a>
+                    </div>
+                    <div data-bind="visible:active"><strong>Worship location:</strong> <span data-bind="text:area"></span><span data-bind="visible:worshipLocation">, <span data-bind="text:worshipLocation"></span></span></div>
+                    <div data-bind="visible:active==1 && worshipTimes"><strong>Worship times: </strong><span data-bind="text:worshipTimes"></span></div>
+                    <div data-bind="visible:active">
+                        <a style="padding-right: 10px" href="#" data-bind="visible:url,attr: { href : url }">
+                            Web site
+                        </a>
+                        <a style="padding-right: 10px"  href="#" data-bind="visible:mailFormLink,attr: { href : mailFormLink }">
+                            E-mail
+                        </a>
+                        <a href="#" data-bind="click: $parent.showMeetingForm" >
+                            More . . .
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

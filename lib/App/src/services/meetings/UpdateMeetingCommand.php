@@ -58,7 +58,7 @@ class UpdateMeetingCommand extends TServiceCommand
         $mailbox = $mailmanager->findByCode($request->affiliationCode);
         if (!empty($request->email)) {
             if ($mailbox == null) {
-                $mailbox = $mailmanager->addMailbox($request->affiliationCode, $request->MeetingName, $request->email, 'Meeting contac.');
+                $mailbox = $mailmanager->addMailbox($request->affiliationCode, $request->meetingName, $request->email, 'Meeting contact');
             } else {
                 $mailbox->setEmail($request->email);
                 $mailmanager->updateMailbox($mailbox);
