@@ -440,7 +440,7 @@ class ScymMeeting extends DateStampedEntity
         $this->longitude  = $dto->latitude;
         $this->latitude  = $dto->longitude;
         $this->active  = $dto->active;
-        return (!(empty($this->meetingname)|| empty($this->worshiplocation)));
+        return (!empty($this->meetingname));
         /*
                 Deal with these externally
                 $this->  = $dto->quarterlyMeetingId;

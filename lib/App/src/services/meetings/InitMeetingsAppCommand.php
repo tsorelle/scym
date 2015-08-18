@@ -50,7 +50,7 @@ class InitMeetingsAppCommand extends TServiceCommand
             $code = $meeting->getAffiliationcode();
             $mailbox = $mailboxManager->findByCode($code);
             $dto->mailFormLink = empty($mailbox) ? '' : '/mailform?box='.$code;
-
+            $dto->email = empty($mailbox) ? '' : $mailbox->getEmail();
             array_push($result,$dto);
         }
         return $result;

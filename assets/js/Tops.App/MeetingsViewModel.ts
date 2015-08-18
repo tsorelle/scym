@@ -134,7 +134,7 @@ module Tops {
             me.worshipTimes(meeting.worshipTimes);
             me.hasMailbox(meeting.mailFormLink ? true : false);
             me.active(meeting.active ? true : false);
-            me.email('');
+            me.email(meeting.email);
             if (meeting.quarterlyMeetingId) {
                 me.quarterlyMeeting(<IListItem>{
                     Text: meeting.quarterlyMeetingName,
@@ -200,6 +200,7 @@ module Tops {
 
         public update(meeting: scymMeeting) {
             var me = this;
+            meeting.active = me.active() ? 1 : 0;
             meeting.affiliationCode = me.affiliationCode();
             meeting.area = me.area();
             meeting.detailText = me.detailText();

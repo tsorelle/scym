@@ -65,6 +65,7 @@ class UpdateMeetingCommand extends TServiceCommand
             }
         }
         $result->mailFormLink = empty($mailbox) ? '' : '/mailform?box='.$request->affiliationCode;
+        $result->email = $request->email;
         $this->setReturnValue($result);
     }
 }
