@@ -48,6 +48,12 @@ class TDbServiceManager
         $em->flush();
     }
 
+    public function persistEntity($entity) {
+        $em = $this->getEntityManager();
+        $em->persist($entity);
+    }
+
+
     public function deleteEntity($entity) {
         $em = $this->getEntityManager();
         $em->remove($entity);
@@ -56,7 +62,7 @@ class TDbServiceManager
 
 
 
-    protected function saveChanges() {
+    public function saveChanges() {
         if ($this->entityManager != null) {
             $this->entityManager->flush();
             $this->entityManager = null;

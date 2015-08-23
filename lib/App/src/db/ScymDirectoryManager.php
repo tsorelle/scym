@@ -188,5 +188,33 @@ class ScymDirectoryManager extends TDbServiceManager
         $this->updateEntity($address);
     }
 
+    public function getEmailForNewsletter() {
+        $repository = $this->getPersonsRepository();
+        $persons = $repository->findBy(array('active'=>1,'newsletter'=>1));
+        $result = array();
+        $rec = "\"First Name\",\"Last Name\",\"Email Address\"\n";
+        array_push($result,$rec);
+        foreach ($persons as $p) {
+            $email = $p->getEmail();
+            if (!empty($email)) {
+                $first = $p->getFirstName();
+                $last = $p->getLastName();
+                $rec = "\"".$p->getFirstName()."\",\"".$p->getLastName()."\",\"".$email."\"\n";
+                array_push($result,$rec);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param $address
+     * @return ScymPerson[]
+     */
+    public function getPersonByEmail($address) {
+        $repository = $this->getPersonsRepository();
+        $persons = $repository->findBy(array('email'=>$address));
+        return $persons;
+    }
+
 
 }

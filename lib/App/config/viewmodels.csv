@@ -3,8 +3,8 @@ meetings/local,ScymMeetingsViewModel
 mailboxes,MailboxesViewModel
 mailform,MailFormViewModel
 meetings/local,MeetingsViewModel
+management/emailings,EMailingsViewModel
 datepickertest,DatePickerTestViewModel
 helloworld,HelloWorldViewModel
 registerdocument,RegisterDocumentViewModel
 testpage,TestPageViewModel
-

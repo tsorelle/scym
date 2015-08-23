@@ -214,6 +214,7 @@ function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     $isRegistrar = $currentUser->isAuthorized('administer registrations');
     $manageTasks = $currentUser->isAuthorized('manage web site tasks');
     $registerDocuments = $currentUser->isAuthorized('register documents');
+    $manageDirectory = $currentUser->isAuthorized('administer directory');
     if ($manageTasks) {
         $items .= _scymtheme_menuLi('\tasks','Manage Web Site','Task List');
     }
@@ -222,6 +223,9 @@ function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     }
     if ($registerDocuments) {
         $items .= _scymtheme_menuLi('\RegisterDocument','Register Uploaded Document','Register Document');
+    }
+    if ($manageDirectory) {
+        $items .= _scymtheme_menuLi('\management\EMailings','Manage mailing lists','Manage mailing lists');
     }
     if ($isRegistrar) {
         $items .= _scymtheme_menuLi('\RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');
@@ -274,7 +278,12 @@ function scymtheme_preprocess_page(&$variables) {
     $variables['primary_nav'] = FALSE;
     if ($variables['main_menu']) {
         // Build links.
-        $variables['primary_nav'] = menu_tree(variable_get('menu_main_links_source', 'main-menu'));
+        if ($variables['logged_in']) {
+            $variables['primary_nav'] = menu_tree(variable_get('menu_main_links_source', 'main-menu'));
+        }
+        else {
+            $variables['primary_nav'] = menu_tree('menu-main-menu-anonymous');
+        }
         // Provide default theme wrapper function.
         $variables['primary_nav']['#theme_wrappers'] = array('menu_tree__primary');
     }

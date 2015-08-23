@@ -51,7 +51,41 @@ function scym_permission()
             'title' => 'Manage Web Site Tasks',
             'description' => 'Add and update tasks.'
         ),
+
+        'export directory' => array(
+            'title' => 'Download member lists',
+            'description' => 'Download directory lists as CSV files.'
+        )
     );
+
+}
+
+
+function scym_handle_download($downloadType = null) {
+    $manager = new \App\db\ScymDirectoryManager();
+    $lines = $manager->getEmailForNewsletter();
+    ob_start();
+    header("Content-type: application/excel");header("Content-Disposition: attachment; filename=scymdir.csv");
+    foreach ($lines as $line) {
+        print $line;
+    }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function scym_menu()
+{
+    $items = array();
+
+    $items['scym/download'] = array(
+        'page callback' => 'scym_handle_download',
+        'access arguments' => array('export directory'), // 'access content'),
+        'type' => MENU_CALLBACK,
+    );
+
+
+    return $items;
 
 }
 
