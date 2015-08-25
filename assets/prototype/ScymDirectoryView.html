@@ -364,6 +364,18 @@
                         <input class="form-control" id="addressname-input" data-bind="value:addressForm.addressname"/>
                     </div>
                     <div class="form-group">
+                        <label for="address-type" class="control-label">Address type</label>
+                        <select class="form-control" id="address-type"
+                                data-bind="value:addressForm.addressTypeId">
+                            <option value="1">Residence</option>
+                            <option value="2">SCYM Meeting</option>
+                            <option value="3">Friends Organization</option>
+                            <option value="4">Other Yearly Meeting</option>
+                            <option value="5">Other Friends Meeting or Worship Group</option>
+                            <option value="6">Other Organization or Business</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="address-input" class="control-label">Address</label>
                         <input class="form-control" id="address-input" data-bind="value:addressForm.address1"/><br>
                         <input class="form-control" id="address2-input" data-bind="value:addressForm.address2"/>

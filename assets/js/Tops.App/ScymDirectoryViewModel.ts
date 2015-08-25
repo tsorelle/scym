@@ -46,6 +46,7 @@ module Tops {
     export class scymAddress {
         public addressId : any = null; // database entity id
         public addressname = '';
+        public addressTypeId : number = 1;
         public address1 = '';
         public address2 = '';
         public city = '';
@@ -777,6 +778,7 @@ module Tops {
         public addressname= ko.observable('');
         public address1= ko.observable('');
         public address2= ko.observable('');
+        public addressTypeId = ko.observable(1);
         public city= ko.observable('');
         public state= ko.observable('');
         public postalcode= ko.observable('');
@@ -850,6 +852,7 @@ module Tops {
             me.sortkey('');
             me.lastUpdate('');
             me.addressId(null);
+            me.addressTypeId(1);
         }
 
         private clearValidations() {
@@ -894,6 +897,7 @@ module Tops {
             me.lastUpdate(address.lastUpdate);
             me.addressId(address.addressId);
             me.newsletter(address.newsletter);
+            me.addressTypeId(address.addressTypeId);
         };
 
         public updateScymAddress(address: scymAddress) {
@@ -910,6 +914,7 @@ module Tops {
             address.active = me.active();
             address.sortkey = me.sortkey();
             address.newsletter = me.newsletter();
+            address.addressTypeId = me.addressTypeId();
         }
     }
 

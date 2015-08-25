@@ -70,7 +70,7 @@
 }
 
 .panel-footer a {
-  color: black;
+  color: black !important;
 }
 
 .panel-footer h3 {
@@ -146,4 +146,15 @@ h2.block-title {
 #meetings-application-container h2 {
   font-size: 24px;
   color: black;
+}
+
+@media print {
+  .region-page-top,
+  #site-header,
+  #header-sub-title,
+  .nav,
+  .footer
+  {
+    display: none !important;
+  }
 }

@@ -465,6 +465,7 @@ class ScymAddress extends DateStampedEntity
         $result = new \stdClass();
 
         $result->addressId = $this->addressid;
+        $result->addressTypeId = $this->addresstype;
         $result->addressname = $this->addressname;
         $result->address1 = $this->address1;
         $result->address2 = $this->address2;
@@ -487,6 +488,7 @@ class ScymAddress extends DateStampedEntity
     public function updateFromDataTransferObject(\stdClass $dto)
     {
         $this->addressid = $dto->addressId;
+        $this->addresstype = $dto->addressTypeId;
         $this->addressname = $dto->addressname;
         $this->address1 = $dto->address1;
         $this->address2 = $dto->address2;

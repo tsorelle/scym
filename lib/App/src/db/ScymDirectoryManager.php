@@ -190,13 +190,19 @@ class ScymDirectoryManager extends TDbServiceManager
 
     public function getEmailForNewsletter() {
         $repository = $this->getPersonsRepository();
-        $persons = $repository->findBy(array('active'=>1,'newsletter'=>1));
+        $persons = $repository->findBy(array('active'=>1,'newsletter'=>1),array('email'=>'ASC'));
         $result = array();
         $rec = "\"First Name\",\"Last Name\",\"Email Address\"\n";
         array_push($result,$rec);
+        $previousEmail = null;
         foreach ($persons as $p) {
             $email = $p->getEmail();
+
             if (!empty($email)) {
+                if ($email == $previousEmail) {
+                    continue; // skip duplicate addresses
+                }
+                $previousEmail = $email;
                 $first = $p->getFirstName();
                 $last = $p->getLastName();
                 $rec = "\"".$p->getFirstName()."\",\"".$p->getLastName()."\",\"".$email."\"\n";
