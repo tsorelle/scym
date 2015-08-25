@@ -412,6 +412,11 @@
                         <input id="address-newsletter-input" type="checkbox" data-bind="checked:addressForm.newsletter"/>
                         <label for="address-newsletter-input"  class="control-label">  Send newsletter (postal)</label>
                     </div>
+                    <div class="form-group">
+                        <label for="addr-directory-listing-input" class="control-label">Directory listing:</label>
+                        <select class="form-control" id="addr-directory-listing-input"
+                                data-bind="options: addressForm.directoryListingTypes,optionsText:'Name',value: addressForm.selectedDirectoryListingType"></select>
+                    </div>
 
                     <div class="form-group">
                         <label for="address-sortkey-input" class="control-label">Sort key</label>

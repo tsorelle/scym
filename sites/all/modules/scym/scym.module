@@ -12,6 +12,7 @@
  * UPDATE system SET weight= -2 NAME='scymtheme' AND TYPE = 'theme';
  *
  */
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Implements hook_permission().
@@ -61,9 +62,21 @@ function scym_permission()
 }
 
 
+
 function scym_handle_download($downloadType = null) {
-    $manager = new \App\db\ScymDirectoryManager();
-    $lines = $manager->getEmailForNewsletter();
+    $downloadManager = new \App\src\ScymDownloadManager();
+    $lines = array();
+    switch($downloadType) {
+        case 'newsletter' :
+            $lines = $downloadManager->getNewsletterList();
+            break;
+        case 'addresses' :
+            $lines = $downloadManager->getAddressesList();
+            break;
+        case 'contacts' :
+            $lines = $downloadManager->getContactsList();
+            break;
+    }
     ob_start();
     header("Content-type: application/excel");header("Content-Disposition: attachment; filename=scymdir.csv");
     foreach ($lines as $line) {

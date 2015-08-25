@@ -320,7 +320,7 @@ class ScymPerson extends DateStampedEntity
      * Set directorylistingtypeid
      *
      * @param integer $directorylistingtypeid
-     * @return Persons
+     * @return ScymPerson
      */
     public function setDirectoryListingTypeId($directorylistingtypeid)
     {

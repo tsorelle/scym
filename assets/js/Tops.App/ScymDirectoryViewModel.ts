@@ -58,6 +58,7 @@ module Tops {
         public newsletter : number = 1;
         public active : number = 1;
         public sortkey = '';
+        public directorylistingtypeid: number=1;
         public lastUpdate : string = '';
 
         public id : string = ''; // client side id
@@ -500,6 +501,27 @@ module Tops {
                 me.viewState('empty');
             }
         }
+
+        public directoryListingTypeId = ko.observable(1);
+        public selectedDirectoryListingType : KnockoutObservable<INameValuePair> = ko.observable(null);
+        public directoryListingTypes = ko.observableArray<INameValuePair>([]);
+        protected getDirectoryListingItem = () => {
+            var me = this;
+            var lookup = me.directoryListingTypes();
+            var id = me.directoryListingTypeId();
+            if (!id) {
+                id = 0;
+            }
+            var key = id.toString();
+
+            var result = _.find(lookup,function(item : INameValuePair) {
+                return item.Value == key;
+            },me);
+            return result;
+        };
+
+
+
     }
 
     /**
@@ -522,14 +544,11 @@ module Tops {
         public sortkey = ko.observable('');
         public affiliationcode = ko.observable('');
         public otheraffiliation = ko.observable('');
-        public directorylistingtypeid= ko.observable(1);
         public lastUpdate = ko.observable('');
         public organization = ko.observable('');
 
         public selectedAffiliation : KnockoutObservable<INameValuePair> = ko.observable(null);
-        public selectedDirectoryListingType : KnockoutObservable<INameValuePair> = ko.observable(null);
         public affiliations = ko.observableArray<INameValuePair>([]);
-        public directoryListingTypes = ko.observableArray<INameValuePair>([]);
 
         public affiliation : KnockoutComputed<string>;
         public hasAffiliation : KnockoutComputed<boolean>;
@@ -566,21 +585,6 @@ module Tops {
             var me = this;
             var lookup = me.affiliations();
             var key = me.affiliationcode();
-            var result = _.find(lookup,function(item : INameValuePair) {
-                return item.Value == key;
-            },me);
-            return result;
-        };
-
-        private getDirectoryListingItem = () => {
-            var me = this;
-            var lookup = me.directoryListingTypes();
-            var id = me.directorylistingtypeid();
-            if (!id) {
-                id = 0;
-            }
-            var key = id.toString();
-
             var result = _.find(lookup,function(item : INameValuePair) {
                 return item.Value == key;
             },me);
@@ -630,7 +634,7 @@ module Tops {
             me.sortkey('');
             me.affiliationcode('');
             me.otheraffiliation('');
-            me.directorylistingtypeid= ko.observable(1);
+            me.directoryListingTypeId = ko.observable(1);
             me.lastUpdate('');
             me.personId('');
             me.organization('');
@@ -671,7 +675,7 @@ module Tops {
             me.sortkey(person.sortkey);
             me.affiliationcode(person.affiliationcode);
             me.otheraffiliation(person.otheraffiliation);
-            me.directorylistingtypeid(person.directorylistingtypeid);
+            me.directoryListingTypeId(person.directorylistingtypeid);
             me.lastUpdate(person.lastUpdate);
             me.personId(person.personId);
             me.organization(person.organization);
@@ -694,9 +698,9 @@ module Tops {
             var listingType = me.selectedDirectoryListingType();
             if (listingType) {
                 var listingCode = listingType.Value ? Number(listingType.Value) : 0;
-                me.directorylistingtypeid(listingCode);
+                me.directoryListingTypeId(listingCode);
             }
-            person.directorylistingtypeid = me.directorylistingtypeid();
+            person.directorylistingtypeid = me.directoryListingTypeId();
 
             person.personId = me.personId();
             person.dateOfBirth = me.dateOfBirth();
@@ -790,7 +794,6 @@ module Tops {
         public lastUpdate = ko.observable('');
         public newsletter = ko.observable(0);
         public cityLocation : KnockoutComputed<string>;
-
         public addressNameError = ko.observable('');
 
         constructor() {
@@ -853,6 +856,7 @@ module Tops {
             me.lastUpdate('');
             me.addressId(null);
             me.addressTypeId(1);
+            me.directoryListingTypeId(1);
         }
 
         private clearValidations() {
@@ -898,6 +902,9 @@ module Tops {
             me.addressId(address.addressId);
             me.newsletter(address.newsletter);
             me.addressTypeId(address.addressTypeId);
+            me.directoryListingTypeId(address.directorylistingtypeid);
+            var directoryListingItem = me.getDirectoryListingItem();
+            me.selectedDirectoryListingType(directoryListingItem);
         };
 
         public updateScymAddress(address: scymAddress) {
@@ -915,6 +922,13 @@ module Tops {
             address.sortkey = me.sortkey();
             address.newsletter = me.newsletter();
             address.addressTypeId = me.addressTypeId();
+
+            var listingType = me.selectedDirectoryListingType();
+            if (listingType) {
+                var listingCode = listingType.Value ? Number(listingType.Value) : 0;
+                me.directoryListingTypeId(listingCode);
+            }
+            address.directorylistingtypeid = me.directoryListingTypeId();
         }
     }
 
@@ -1004,6 +1018,7 @@ module Tops {
                 me.userCanEdit(response.canEdit);
                 me.personForm.affiliations(response.affiliationCodes);
                 me.personForm.directoryListingTypes(response.directoryListingTypes);
+                me.addressForm.directoryListingTypes(response.directoryListingTypes);
                 me.userIsAuthorized(true);
             }
             else {

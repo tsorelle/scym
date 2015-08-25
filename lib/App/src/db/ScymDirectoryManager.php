@@ -212,6 +212,125 @@ class ScymDirectoryManager extends TDbServiceManager
         return $result;
     }
 
+    const addressDownloadHeader = '"addressName","address1","address2","city","state","zip","country"';
+
+    private function getAddressDownloadRecord(ScymAddress $address, $excludeEmpty = true) {
+        $name = $address->getAddressname();
+        $addr1 = $address->getAddress1();
+        $addr2 = $address->getAddress2();
+
+        if   ($excludeEmpty && (empty($name) || (empty($addr1) && empty($addr2)))) {
+            return null;
+        }
+
+        $city = $address->getCity();
+        $state = $address->getState();
+        $zip = $address->getPostalcode();
+        $country = $address->getCountry();
+        return 
+            '"'.($name? $name : '').'",'.
+            '"'.($addr1 ?  $addr1 : '').'",'.
+            '"'.($addr2 ? $addr2 : '').'",'.
+            '"'.($city? $city : '').'",'.
+            '"'.($state? $state : '').'",'.
+            '"'.($zip ? $zip : '').'",'.
+            '"'.($country?  $country: '').'"';
+    }
+
+    public function getAddressListForDownload($whereClause) {
+        $result = array();
+        array_push($result,self::addressDownloadHeader);
+        $em = $this->getEntityManager();
+        if ($whereClause) {
+            $whereClause = ' AND ('.$whereClause.') ';
+        }
+        else {
+            $whereClause = '';
+        }
+        $sql = 'SELECT a FROM App\db\scym\ScymAddress a WHERE a.active=1 '.$whereClause.' ORDER BY a.addressname';
+        $query = $em->createQuery($sql);
+        $addresses = $query->getResult();
+        foreach($addresses as $address) {
+            $rec = $this->getAddressDownloadRecord($address);
+            if (!empty($rec)) {
+                array_push($result, $rec);
+            }
+        }
+        return $result;
+    }
+    
+    private function getContactDownloadRecord(ScymPerson $person)
+    {
+        $firstName        = $person->getFirstname();
+        $lastName         = $person->getLastname();
+        $middleName       = $person->getMiddlename();
+        $phone1             = $person->getPhone();
+        $phone2             = $person->getPhone2();
+        $email            = $person->getEmail();
+        $dob            = $person->getDateOfBirth();
+
+        if ($dob == null) {
+            $dob = '';
+        }
+        else {
+            $dob = $dob->format('Y-m-d');
+        }
+
+        $junior           = $person->getJunior();
+        $affiliationCode  = $person->getAffiliationcode();
+
+        $rec =
+            '"'.($firstName ? $firstName : '').'",'.
+            '"'.($lastName ? $lastName : '').'",'.
+            '"'.($middleName ? $middleName : '').'",'.
+            '"'.($phone1 ? $phone1 : '').'",'.
+            '"'.($phone2 ? $phone2 : '').'",'.
+            '"'.($email ? $email : '').'",'.
+            '"'.$dob.'",'.
+            '"'.($junior ? 1 : 0).'",'.
+            '"'.($affiliationCode ?  $affiliationCode : '').'",';
+        $address = $person->getAddress();
+        if ($address == null) {
+            $rec .= '"","","","","","",""';
+        }
+        else {
+            $addressRec = $this->getAddressDownloadRecord($address);
+            $rec .= $addressRec;
+        }
+        $householdPhone = '';
+        if ($address) {
+            $phone   = $address->getPhone();
+            if (!empty($householdPhone)) {
+                $householdPhone = $phone;
+            }
+        };
+        $rec .= ',"'.$householdPhone.'"';
+        return $rec;
+    }
+
+    public function getContactListForDownload($whereClause) {
+        $em = $this->getEntityManager();
+        if ($whereClause) {
+            $whereClause = ' AND ('.$whereClause.') ';
+        }
+        else {
+            $whereClause = '';
+        }
+        $result = array();
+        $header = '"firstName","lastName","middleName","phone1","phone2","email","dateOfBirth","junior","affiliation",'.self::addressDownloadHeader.',"householdPhone"';
+        array_push($result,$header);
+        $sql = 'SELECT p FROM App\db\scym\ScymPerson p WHERE p.active=1 '.$whereClause.' ORDER BY p.firstname,p.lastname';
+        $query = $em->createQuery($sql);
+        $persons = $query->getResult();
+        foreach($persons as $person) {
+            $rec = $this->getContactDownloadRecord($person);
+            if (!empty($rec)) {
+                array_push($result, $rec);
+            }
+        }
+        return $result;
+    }
+
     /**
      * @param $address
      * @return ScymPerson[]
@@ -221,6 +340,7 @@ class ScymDirectoryManager extends TDbServiceManager
         $persons = $repository->findBy(array('email'=>$address));
         return $persons;
     }
+
 
 
 }

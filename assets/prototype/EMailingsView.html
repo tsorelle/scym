@@ -1,9 +1,10 @@
 <!-- ******************  START FORM ****************************************************************************  -->
 <div>
+    <form method="post" action="/scym/download/newsletter">
     <h2>Tasks</h2>
 
     <ul>
-        <li><a href="/scym/download" target="_blank">Download current list</a> </li>
+        <li><input type="submit" value="Download current list" class="btn btn-link" style="padding: 0;color:#871A1A;" /> </li>
         <li><a href="https://vr2.verticalresponse.com/users/sign_in" target="_blank">Log into Vertical Response</a> </li>
         <li>
             Load Corrections:
@@ -11,6 +12,7 @@
                    data-bind="event: {change: onFileSelected }"  />
         </li>
     </ul>
+    </form>
 </div>
 
 <p><strong><span data-bind="text:fileLoadMessage"></span></strong></p>

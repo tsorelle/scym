@@ -122,6 +122,7 @@ class ScymDirectoryManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    /*
     public function testGetFamilyResponseForPersonNoAddress() {
         $testPersonId = 289;
         $manager = $this->getDirectoryManager();
@@ -134,7 +135,7 @@ class ScymDirectoryManagerTest extends \PHPUnit_Framework_TestCase
         $found = $this->findPersonInFamilyDto($actual,$testPersonId);
         $this->assertTrue($found,'Person not found in DTO');
     }
-
+*/
 
     public function testGetFamilyResponseForAddress() {
         $testPersonId = 180;
@@ -295,5 +296,17 @@ class ScymDirectoryManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($found);
     }
 
+    public function testAddressDownload() {
+        $manager = $this->getDirectoryManager();
+        $actual = $manager->getAddressListForDownload(null);
+        $this->assertNotEmpty($actual);
+
+    }
+
+    public function testContactsDownload() {
+        $manager = $this->getDirectoryManager();
+        $actual = $manager->getContactListForDownload(null);
+        $this->assertNotEmpty($actual);
+    }
 
 }

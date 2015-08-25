@@ -143,6 +143,14 @@ class ScymAddress extends DateStampedEntity
     protected $active = '1';
 
     /**
+     * @var integer
+     *
+     * @Column(name="directoryListingTypeId", type="integer", nullable=false)
+     */
+    protected $directorylistingtypeid = '1';
+
+
+    /**
      * @var string
      *
      * @Column(name="sortkey", type="string", length=80, nullable=true)
@@ -436,6 +444,31 @@ class ScymAddress extends DateStampedEntity
     }
 
     /**
+     * Set directorylistingtypeid
+     *
+     * @param integer $directorylistingtypeid
+     * @return ScymAddress
+     */
+    public function setDirectoryListingTypeId($directorylistingtypeid)
+    {
+        $this->directorylistingtypeid = $directorylistingtypeid;
+
+        return $this;
+    }
+
+    /**
+     * Get directorylistingtypeid
+     *
+     * @return integer
+     */
+    public function getDirectoryListingTypeId()
+    {
+        return $this->directorylistingtypeid;
+    }
+
+
+
+    /**
      * Set sortkey
      *
      * @param string $sortkey
@@ -480,6 +513,7 @@ class ScymAddress extends DateStampedEntity
         $result->sortkey = $this->sortkey;
         $result->lastUpdate = $this->lastUpdateAsString();
         $result->id = $this->addressid; // client side id
+        $result->directorylistingtypeid = $this->directorylistingtypeid;
         $result->editState = 0; // unchanged
 
         return $result;
@@ -500,6 +534,7 @@ class ScymAddress extends DateStampedEntity
         $this->notes = $dto->notes;
         $this->newsletter = $dto->newsletter;
         $this->active = $dto->active;
+        $this->directorylistingtypeid= $dto->directorylistingtypeid;
         $this->sortkey = $dto->sortkey;
     }
 
