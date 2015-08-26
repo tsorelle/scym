@@ -147,7 +147,7 @@ class ScymAddress extends DateStampedEntity
      *
      * @Column(name="directoryListingTypeId", type="integer", nullable=false)
      */
-    protected $directorylistingtypeid = '1';
+    protected $directoryListingTypeId = '1';
 
 
     /**
@@ -451,7 +451,7 @@ class ScymAddress extends DateStampedEntity
      */
     public function setDirectoryListingTypeId($directorylistingtypeid)
     {
-        $this->directorylistingtypeid = $directorylistingtypeid;
+        $this->directoryListingTypeId = $directorylistingtypeid;
 
         return $this;
     }
@@ -463,7 +463,7 @@ class ScymAddress extends DateStampedEntity
      */
     public function getDirectoryListingTypeId()
     {
-        return $this->directorylistingtypeid;
+        return $this->directoryListingTypeId;
     }
 
 
@@ -513,7 +513,7 @@ class ScymAddress extends DateStampedEntity
         $result->sortkey = $this->sortkey;
         $result->lastUpdate = $this->lastUpdateAsString();
         $result->id = $this->addressid; // client side id
-        $result->directorylistingtypeid = $this->directorylistingtypeid;
+        $result->directorylistingtypeid = $this->directoryListingTypeId;
         $result->editState = 0; // unchanged
 
         return $result;

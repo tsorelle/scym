@@ -237,23 +237,27 @@ class ScymDirectoryManager extends TDbServiceManager
             '"'.($country?  $country: '').'"';
     }
 
-    public function getAddressListForDownload($whereClause) {
-        $result = array();
-        array_push($result,self::addressDownloadHeader);
-        $em = $this->getEntityManager();
+    public function getAddressListForDownload($directoryOnly=false,$residenceOnly=false) {
+        $whereClause = '';
+        if ($directoryOnly) {
+            $whereClause = 'a.directoryListingTypeId=1 ';
+        }
+        if ($residenceOnly) {
+            $whereClause = $whereClause. ($whereClause ? ' AND ' : '').'a.addresstype=1';
+        }
         if ($whereClause) {
             $whereClause = ' AND ('.$whereClause.') ';
         }
-        else {
-            $whereClause = '';
-        }
         $sql = 'SELECT a FROM App\db\scym\ScymAddress a WHERE a.active=1 '.$whereClause.' ORDER BY a.addressname';
+        $result = array();
+        array_push($result,self::addressDownloadHeader."\n");
+        $em = $this->getEntityManager();
         $query = $em->createQuery($sql);
         $addresses = $query->getResult();
         foreach($addresses as $address) {
             $rec = $this->getAddressDownloadRecord($address);
             if (!empty($rec)) {
-                array_push($result, $rec);
+                array_push($result, "$rec\n");
             }
         }
         return $result;
@@ -308,16 +312,23 @@ class ScymDirectoryManager extends TDbServiceManager
         return $rec;
     }
 
-    public function getContactListForDownload($whereClause) {
-        $em = $this->getEntityManager();
+    public function getContactListForDownload($directoryOnly=false,$includeKids=false,$affiliationCode=null) {
+        $whereClause = '';
+        if ($directoryOnly) {
+            $whereClause = 'p.directoryListingTypeId=1 ';
+        }
+        if (!$includeKids) {
+            $whereClause = $whereClause. ($whereClause ? ' AND ' : '').'p.junior <> 1';
+        }
+        if ($affiliationCode) {
+            $whereClause = $whereClause. ($whereClause ? ' AND ' : '')."p.affiliationcode='$affiliationCode'";
+        }
         if ($whereClause) {
             $whereClause = ' AND ('.$whereClause.') ';
         }
-        else {
-            $whereClause = '';
-        }
+        $em = $this->getEntityManager();
         $result = array();
-        $header = '"firstName","lastName","middleName","phone1","phone2","email","dateOfBirth","junior","affiliation",'.self::addressDownloadHeader.',"householdPhone"';
+        $header = '"firstName","lastName","middleName","phone1","phone2","email","dateOfBirth","junior","affiliation",'.self::addressDownloadHeader.',"householdPhone"'."\n";
         array_push($result,$header);
         $sql = 'SELECT p FROM App\db\scym\ScymPerson p WHERE p.active=1 '.$whereClause.' ORDER BY p.firstname,p.lastname';
         $query = $em->createQuery($sql);
@@ -325,7 +336,7 @@ class ScymDirectoryManager extends TDbServiceManager
         foreach($persons as $person) {
             $rec = $this->getContactDownloadRecord($person);
             if (!empty($rec)) {
-                array_push($result, $rec);
+                array_push($result, "$rec\n");
             }
         }
         return $result;

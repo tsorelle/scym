@@ -1,4 +1,5 @@
 members/directory,ScymDirectoryViewModel
+members/download,DownloadsViewModel
 meetings/local,ScymMeetingsViewModel
 mailboxes,MailboxesViewModel
 mailform,MailFormViewModel

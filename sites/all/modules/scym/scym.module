@@ -64,7 +64,7 @@ function scym_permission()
 
 
 function scym_handle_download($downloadType = null) {
-    $downloadManager = new \App\src\ScymDownloadManager();
+    $downloadManager = new \App\sys\ScymDownloadManager();
     $lines = array();
     switch($downloadType) {
         case 'newsletter' :
@@ -78,7 +78,7 @@ function scym_handle_download($downloadType = null) {
             break;
     }
     ob_start();
-    header("Content-type: application/excel");header("Content-Disposition: attachment; filename=scymdir.csv");
+    header("Content-type: application/excel");header("Content-Disposition: attachment; filename=scym-$downloadType-list.csv");
     foreach ($lines as $line) {
         print $line;
     }

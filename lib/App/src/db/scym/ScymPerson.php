@@ -161,7 +161,7 @@ class ScymPerson extends DateStampedEntity
      *
      * @Column(name="directoryListingTypeId", type="integer", nullable=false)
      */
-    private $directorylistingtypeid = '1';
+    private $directoryListingTypeId = '1';
 
 
 
@@ -319,12 +319,12 @@ class ScymPerson extends DateStampedEntity
     /**
      * Set directorylistingtypeid
      *
-     * @param integer $directorylistingtypeid
+     * @param integer $directoryListingTypeId
      * @return ScymPerson
      */
-    public function setDirectoryListingTypeId($directorylistingtypeid)
+    public function setDirectoryListingTypeId($directoryListingTypeId)
     {
-        $this->directorylistingtypeid = $directorylistingtypeid;
+        $this->directoryListingTypeId = $directoryListingTypeId;
 
         return $this;
     }
@@ -336,7 +336,7 @@ class ScymPerson extends DateStampedEntity
      */
     public function getDirectoryListingTypeId()
     {
-        return $this->directorylistingtypeid;
+        return $this->directoryListingTypeId;
     }
 
 
@@ -662,7 +662,7 @@ class ScymPerson extends DateStampedEntity
         $this->sortkey= $dto->sortkey;
         $this->affiliationcode= $dto->affiliationcode;
         $this->otheraffiliation= $dto->otheraffiliation;
-        $this->directorylistingtypeid= $dto->directorylistingtypeid;
+        $this->directoryListingTypeId = $dto->directorylistingtypeid;
         $this->organization= $dto->organization;
         $this->sortkey= $dto->sortkey;
         return true;
@@ -688,7 +688,7 @@ class ScymPerson extends DateStampedEntity
         $result->sortkey = $this->sortkey;
         $result->affiliationcode = $this->affiliationcode;
         $result->otheraffiliation = $this->otheraffiliation;
-        $result->directorylistingtypeid = $this->directorylistingtypeid;
+        $result->directorylistingtypeid = $this->directoryListingTypeId;
         $result->organization = $this->organization;
         $result->sortkey = $this->sortkey;
         $result->lastUpdate = $this->lastUpdateAsString();

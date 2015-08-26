@@ -226,6 +226,7 @@ function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     }
     if ($manageDirectory) {
         $items .= _scymtheme_menuLi('\management\EMailings','Manage mailing lists','Manage mailing lists');
+        $items .= _scymtheme_menuLi('\members\download','Directory downloads','Download directory lists');
     }
     if ($isRegistrar) {
         $items .= _scymtheme_menuLi('\RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');

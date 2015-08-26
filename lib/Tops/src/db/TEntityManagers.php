@@ -61,7 +61,7 @@ class TEntityManagers {
         $config = TDbConfiguration::GetConfiguration();
         $databaseId = $config->Value("type/$typeKey");
         // temporary workaround to force proxy generation on server
-        // $isDevMode = true;
+        $isDevMode = true;
 
         if ($isDevMode === null) {
 
