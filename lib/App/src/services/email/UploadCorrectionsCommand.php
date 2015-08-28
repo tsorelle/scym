@@ -21,40 +21,17 @@ class UploadCorrectionsCommand extends TServiceCommand
 
     protected function run()
     {
-        $bounces = array();
         $corrections = $this->getRequest();
         $manager = new ScymDirectoryManager();
-        $updateCount = 0;
-        foreach($corrections as $correction) {
-            $address = trim($correction->address);
-            $status = trim($correction->status);
-            if ((!empty($address)) && (!empty($status))) {
-                $persons = $manager->getPersonByEmail($address);
-                foreach($persons as $person) {
-                    $updateCount++;
-                    $person->setNewsletter(0);
-                    if ($status != 'unsubscribed') {
-                        $bounceItem = new BounceListItem();
-                        $bounceItem->personId = $person->getPersonid();
-                        $bounceItem->name = $person->getFullName();
-                        $bounceItem->email = $address;
-                        $bounceItem->correction = '';
-                        $bounceItem->validation = '';
-                        array_push($bounces,$bounceItem);
-                        // invalid email
-                        $person->setEmail('');
-                    }
-                    $manager->persistEntity($person);
-                }
-            }
+        $updateCount = $manager->processEmailCorrections($corrections);
+        $bounces = $manager->getEmailBounces();
+        $this->setReturnValue($bounces);
+        if ($updateCount == 0) {
+            $this->addInfoMessage("No corrections were made. Records may have been already updated.");
         }
-        $this->addInfoMessage('Update completed.');
-        if ($updateCount) {
+        else {
             $plural = ($updateCount > 1) ? 's were' : ' was';
             $this->addInfoMessage("$updateCount correction$plural made");
-            $manager->saveChanges();
         }
-        $this->setReturnValue($bounces);
     }
-
 }

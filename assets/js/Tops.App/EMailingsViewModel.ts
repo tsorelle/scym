@@ -21,6 +21,7 @@ module Tops {
         public personId: number;
         public name: string;
         public email : string = '';
+        public remove: boolean = false;
         public correction: string = '';
         public validation : string = '';
     }
@@ -70,6 +71,14 @@ module Tops {
                 function() {
                     // do view model initializations here.
 
+                    me.application.hideServiceMessages();
+                    me.application.showWaiter('Initializing...');
+
+                    me.peanut.executeService('email.InitEmailListManagement',null, me.handleInitializationResponse)
+                        .always(function() {
+                            me.application.hideWaiter();
+                        });
+
                     if (successFunction) {
                         successFunction();
                     }
@@ -77,12 +86,29 @@ module Tops {
             );
         }
 
+        private handleInitializationResponse = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var bounces = <BounceListItem[]>serviceResponse.Value;
+                me.setBounces(bounces);
+            }
+        };
+
+        private setBounces(bounces: BounceListItem[] ) {
+            var me = this;
+            _.each(bounces,function(bounce : BounceListItem){
+                bounce.remove = false;
+            },this);
+
+            me.bounceList(bounces);
+        }
+
         private resetForms() {
             var me = this;
             me.fileLoadMessage('');
             me.correctionsCount(0);
             me.corrections = [];
-            me.bounceList([]);
+            // me.bounceList([]);
             me.bounceValidationErrors('');
         }
         public onFileSelected = () => {
@@ -142,41 +168,6 @@ module Tops {
             me.application.hideServiceMessages();
             me.application.showWaiter('Uploading corrections...');
 
-            /*
-            var fakeData = [
-                {
-                    personId: 1,
-                    name: 'Tom Turkey',
-                    email : 'tom@foo.com',
-                    correction: '',
-                    validation: ''
-                },
-                {
-                    personId: 2,
-                    name: 'Joe User',
-                    email : 'joe@user.com',
-                    correction: '',
-                    validation: ''
-                },
-                {
-                    personId: 3,
-                    name: 'Elmer Fudd',
-                    email : 'elmer@warner.com',
-                    correction: '',
-                    validation: ''
-                },
-                {
-                    personId: 4,
-                    name: 'Mickey Mouse',
-                    email : 'mickey@mouse.com',
-                    correction: '',
-                    validation: ''
-                },
-            ];
-            var response = new fakeServiceResponse(fakeData);
-            me.handleCorrectionUploadResponse(response);
-            */
-
             me.peanut.executeService('email.UploadCorrections',request, me.handleCorrectionUploadResponse)
                 .always(function() {
                     me.application.hideWaiter();
@@ -189,7 +180,7 @@ module Tops {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var bounces = <BounceListItem[]>serviceResponse.Value;
-                me.bounceList(bounces);
+                me.setBounces(bounces);
             }
         };
 
@@ -223,6 +214,10 @@ module Tops {
             }
 
             var request = _.filter(bounces, function(bounceItem : BounceListItem) {
+                if (bounceItem.remove) {
+                    bounceItem.correction = '';
+                    return true;
+                }
                 var fix = bounceItem.correction ? bounceItem.correction.trim() : '';
                 return (fix != '');
             },me);
@@ -243,6 +238,8 @@ module Tops {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 me.resetForms();
+                var bounces = <BounceListItem[]>serviceResponse.Value;
+                me.setBounces(bounces);
             }
         };
 

@@ -27,19 +27,19 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Name</th><th>Email</th><th>Correction</th><th>&nbsp;</th>
+                <th>Name</th><th>Email</th><th>Correction</th><th>&nbsp;</th><th>&nbsp;</th>
             </tr>
         </thead>
         <tbody data-bind="foreach:bounceList">
             <tr>
                 <td data-bind="text:name"></td><td data-bind="text:email"></td>
                 <td><input data-bind="value:correction" /></td>
+                <td><input type="checkbox" data-bind="checked:remove"/> Remove </td>
                 <td data-bind="text:validation" style="color: red"></td>
             </tr>
         </tbody>
     </table>
 
     <button class="btn btn-default" data-bind="click:uploadBounceCorrections" style="margin-right: 20px">Upload bounce corrections</button>
-    <button class="btn btn-link" data-bind="click:cancelBounceFixes" style="margin-right: 20px">Cancel bounce corrections</button>
 </div>
 <!-- ******************  END FORM ****************************************************************************  -->

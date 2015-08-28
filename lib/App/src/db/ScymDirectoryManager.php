@@ -11,6 +11,7 @@ namespace App\db;
 
 use App\db\scym\ScymAddress;
 use App\db\scym\ScymPerson;
+use App\db\scym\ScymEmailBounce;
 use Doctrine\ORM\EntityRepository;
 use Tops\db\TDbServiceManager;
 use Tops\sys\TNameValuePair;
@@ -352,6 +353,118 @@ class ScymDirectoryManager extends TDbServiceManager
         return $persons;
     }
 
+    public function getEmailBounces()
+    {
+        $repository = $this->getRepository('App\db\scym\ScymEmailBounce');
+        $bounces = $repository->findAll();
+        $result = array();
+        foreach ($bounces as $bounce) {
+            array_push($result, $bounce->getDataTransferObject());
+        }
+        return $result;
+    }
 
+    /**
+     * @param $repository
+     * @param $email
+     * @return ScymEmailBounce | null
+     */
+    public function getEmailBounce(EntityRepository $repository, $email) {
+        $bounces = $repository->findBy(array('email' => $email));
+        if (empty($bounces)) {
+            return null;
+        }
+        return $bounces[0];
+    }
+
+    public function resolveEmailBounces(array $updates)
+    {
+        $em = $this->getEntityManager();
+
+        $repository = $this->getRepository('App\db\scym\ScymEmailBounce');
+        foreach ($updates as $update) {
+            $bounce = $this->getEmailBounce($repository,$update->email);
+            if ($bounce) {
+                if ($update->correction) {
+                    $person = $bounce->getPerson();
+                    $person->setNewsletter(1);
+                    $person->setEmail($update->email);
+                }
+                $em->remove($bounce);
+            }
+        }
+        $this->saveChanges();
+        return $this->getEmailBounces();
+    }
+
+    public function addEmailBounces($bounces) {
+        $em = $this->getEntityManager();
+        $repository = $this->getRepository('App\db\scym\ScymEmailBounce');
+        foreach ($bounces as $bounce) {
+            $entity = $this->getEmailBounce($repository,$bounce->email);
+            if ($entity == null) {
+                $entity = new ScymEmailBounce();
+                $entity->setEmail($bounce->email);
+                $entity->setPerson($bounce->person);
+                $em->persist($entity);
+            }
+        }
+    }
+
+    public function processBounceCorrections($bounces) {
+        $updateCount = 0;
+        $em = $this->getEntityManager();
+        $bouceRepository = $this->getRepository('App\db\scym\ScymEmailBounce');
+        foreach($bounces as $bounceItem) {
+            $bounce = $this->getEmailBounce($bouceRepository,$bounceItem->email);
+            if ($bounce) {
+                $updateCount++;
+                if ($bounceItem->correction && !$bounceItem->remove) {
+                    $person = $bounce->getPerson();
+                    if ($person) {
+                        $person->setEmail($bounceItem->correction);
+                        $em->persist($person);
+                    }
+                }
+                $em->remove($bounce);
+            }
+        }
+        $this->saveChanges();
+        return $updateCount;
+    }
+
+    public function processEmailCorrections($corrections) {
+        $updateCount = 0;
+        $em = $this->getEntityManager();
+        $bouceRepository = $this->getRepository('App\db\scym\ScymEmailBounce');
+        foreach($corrections as $correction) {
+            $address = trim($correction->address);
+            $status = trim($correction->status);
+            if ((!empty($address)) && (!empty($status))) {
+                $persons = $this->getPersonByEmail($address);
+                foreach($persons as $person) {
+                    $updateCount++;
+                    $bounceEntity = null;
+                    $person->setNewsletter(0);
+                    if ($status != 'unsubscribed') {
+                        $bounceEntity = new ScymEmailBounce();
+                        $person->setEmail('');
+                    }
+                    $em->persist($person);
+                    if ($bounceEntity) {
+                        if (!$this->getEmailBounce($bouceRepository,$address)) {
+                            $bounceEntity->setEmail($address);
+                            $bounceEntity->setPerson($person);
+                            $em->persist($bounceEntity);
+                        }
+                    }
+                }
+            }
+        }
+        if ($updateCount) {
+            $this->saveChanges();
+        }
+        return $updateCount;
+    }
 
 }
