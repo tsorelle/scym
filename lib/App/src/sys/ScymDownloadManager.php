@@ -22,8 +22,9 @@ class ScymDownloadManager
         $request = Request::createFromGlobals();
         $directoryOnly = $request->request->has('directoryonly');
         $residenceOnly = $request->request->has('residenceonly');
+        $newsletter = $request->request->has('newsletter');
         $manager = new \App\db\ScymDirectoryManager();
-        $result = $manager->getAddressListForDownload($directoryOnly,$residenceOnly);
+        $result = $manager->getAddressListForDownload($directoryOnly,$residenceOnly,$newsletter);
 
         return $result;
 

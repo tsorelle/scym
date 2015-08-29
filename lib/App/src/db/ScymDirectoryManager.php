@@ -238,7 +238,7 @@ class ScymDirectoryManager extends TDbServiceManager
             '"'.($country?  $country: '').'"';
     }
 
-    public function getAddressListForDownload($directoryOnly=false,$residenceOnly=false) {
+    public function getAddressListForDownload($directoryOnly=false,$residenceOnly=false,$newsletter=false) {
         $whereClause = '';
         if ($directoryOnly) {
             $whereClause = 'a.directoryListingTypeId=1 ';
@@ -246,6 +246,10 @@ class ScymDirectoryManager extends TDbServiceManager
         if ($residenceOnly) {
             $whereClause = $whereClause. ($whereClause ? ' AND ' : '').'a.addresstype=1';
         }
+        if ($newsletter) {
+            $whereClause = $whereClause. ($whereClause ? ' AND ' : '').'a.newsletter=1';
+        }
+
         if ($whereClause) {
             $whereClause = ' AND ('.$whereClause.') ';
         }

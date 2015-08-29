@@ -22,6 +22,7 @@ module Tops {
         public addressesDirListingOnly= ko.observable(false);
         public residencesOnly = ko.observable(false);
         public includeKids = ko.observable(true);
+        public newsletter = ko.observable(false);
 
         // Constructor
         constructor() {
