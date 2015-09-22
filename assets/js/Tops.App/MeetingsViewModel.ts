@@ -7,14 +7,16 @@
 
 // reference to jqueryui required if date popups are used.
 /// <reference path='../typings/jqueryui/jqueryui.d.ts' />
-
+/// <reference path='meetings.d.ts' />
+/// <reference path='../typings/googlemapsv3/google.maps.d.ts' />
 
 module Tops {
-    export class scymMeeting {
+    export class scymMeeting implements IScymMeeting {
         public meetingId  : any = null;
         public meetingName  = '';
         public state  = '';
-        public area  = '';
+        public area = '';
+        public address  = '';
         public affiliationCode  = '';
         public worshipTimes = '';
         public worshipLocation = '';
@@ -45,19 +47,14 @@ module Tops {
         public editState : number = editState.created;
     }
 
-    interface IInitMeetingsResponse {
-        meetings: scymMeeting[];
-        quarterlies: IListItem[];
-        canEdit: boolean;
-    }
-
     export class meetingObservable {
         public active = ko.observable(true);
-        public meetingId  = ko.observable();
-        public meetingName  = ko.observable('');
-        public state  = ko.observable('');
-        public area  = ko.observable('');
-        public affiliationCode  = ko.observable('');
+        public meetingId = ko.observable();
+        public meetingName = ko.observable('');
+        public state = ko.observable('');
+        public area = ko.observable('');
+        public address = ko.observable('');
+        public affiliationCode = ko.observable('');
         public worshipTimes = ko.observable('');
         public worshipLocation = ko.observable('');
         public url = ko.observable('');
@@ -72,7 +69,7 @@ module Tops {
         public viewState = ko.observable('view');
         public hasMailbox = ko.observable(false);
         public email = ko.observable('');
-        public quarterlyMeeting : KnockoutObservable<IListItem> = ko.observable(null);
+        public quarterlyMeeting:KnockoutObservable<IListItem> = ko.observable(null);
         public states = ko.observableArray([]);
 
         // validation
@@ -97,6 +94,7 @@ module Tops {
             me.meetingId(null);
             me.meetingName('');
             me.affiliationCode('');
+            me.address('');
             me.area('');
             me.state('');
             me.worshipLocation('');
@@ -115,11 +113,12 @@ module Tops {
             me.longitude(null);
             me.clearErrors();
         }
-        
-        public assign(meeting: scymMeeting) {
+
+        public assign(meeting:scymMeeting) {
             var me = this;
             me.meetingId(meeting.meetingId);
             me.affiliationCode(meeting.affiliationCode);
+            me.address(meeting.address);
             me.area(meeting.area);
             me.detailText(meeting.detailText);
             me.lastUpdate(meeting.lastUpdate);
@@ -149,7 +148,7 @@ module Tops {
         }
 
 
-        public validate = (meetings : scymMeeting[]):boolean => {
+        public validate = (meetings:scymMeeting[]):boolean => {
             var me = this;
             me.clearErrors();
             var valid = true;
@@ -161,7 +160,7 @@ module Tops {
 
             value = me.area();
             if (!value) {
-                me.areaError(": Please enter the city or area where the meeting is located.");
+                me.areaError(": Please city or area where the meeting is located.");
                 valid = false;
             }
 
@@ -177,12 +176,12 @@ module Tops {
             value = me.affiliationCode();
             if (value) {
                 value = value.toLowerCase();
-                var meeting = _.find(meetings,function(m : scymMeeting){
+                var meeting = _.find(meetings, function (m:scymMeeting) {
                     var code = m.affiliationCode;
                     if (code) {
                         return code.toLowerCase() == value;
                     }
-                },me);
+                }, me);
                 if (meeting && (meeting.meetingId != me.meetingId())) {
                     me.affiliationCodeError('Affiliation codes must be unique. Another meeting uses this one.');
                     valid = false;
@@ -198,10 +197,11 @@ module Tops {
         };
 
 
-        public update(meeting: scymMeeting) {
+        public update(meeting:scymMeeting) {
             var me = this;
             meeting.active = me.active() ? 1 : 0;
             meeting.affiliationCode = me.affiliationCode();
+            meeting.address = me.address();
             meeting.area = me.area();
             meeting.detailText = me.detailText();
             meeting.latitude = me.latitude();
@@ -214,8 +214,10 @@ module Tops {
             meeting.worshipTimes = me.worshipTimes();
             meeting.email = me.email();
             var quarterly = me.quarterlyMeeting();
-            meeting.quarterlyMeetingId = (quarterly)? quarterly.Value : null;
+            meeting.quarterlyMeetingId = (quarterly) ? quarterly.Value : null;
             meeting.editState = me.meetingId() ? editState.updated : editState.created;
+
+
         }
     }
 
@@ -225,7 +227,7 @@ module Tops {
         private application: Tops.IPeanutClient;
         private peanut: Tops.Peanut;
         private selectedMeeting : scymMeeting;
-
+        private mapApiInitialized = false;
 
         // observables
         meetings  : scymMeeting[] = [];
@@ -280,6 +282,11 @@ module Tops {
                 }
             );
         }
+
+        initMap = () => {
+            var me = this;
+            me.mapApiInitialized = true;
+        };
 
         getInitializations(doneFunction?: () => void) {
             var me = this;
@@ -475,16 +482,42 @@ module Tops {
             if (me.meetingForm.validate(me.meetings)) {
                 var meeting = me.selectedMeeting;
                 me.meetingForm.update(meeting);
-                me.hideForm();
-
-                me.application.hideServiceMessages();
-                me.application.showWaiter('Updating meeting...');
-
-                 me.peanut.executeService('meetings.UpdateMeeting',meeting, me.handleMeetingUpdate)
-                     .always(function() {
-                         me.application.hideWaiter();
-                     });
+                var address = (meeting.address) ? meeting.address : meeting.area;
+                if (!address) {
+                    meeting.latitude = null;
+                    meeting.longitude = null;
+                    me.executeMeetingUpdate(meeting);
+                }
+                else {
+                    var geoCoder = new google.maps.Geocoder();
+                    geoCoder.geocode({'address': address}, function (results:google.maps.GeocoderResult[], status:google.maps.GeocoderStatus) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                            var location = results[0].geometry.location;
+                            meeting.latitude = location.lat();
+                            meeting.longitude = location.lng();
+                        }
+                        else {
+                            // alert("Geocode was not successful for the following reason: " + status);
+                            meeting.latitude = null;
+                            meeting.longitude = null;
+                        }
+                        me.executeMeetingUpdate(meeting);
+                    });
+                }
             }
+        };
+
+        executeMeetingUpdate = (meeting: scymMeeting) => {
+            var me = this;
+            me.hideForm();
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Updating meeting...');
+
+            me.peanut.executeService('meetings.UpdateMeeting',meeting, me.handleMeetingUpdate)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+
         };
 
         private handleMeetingUpdate = (serviceResponse: IServiceResponse) => {

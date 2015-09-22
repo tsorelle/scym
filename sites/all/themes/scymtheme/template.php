@@ -22,13 +22,13 @@ use Tops\sys\TUser;
 function scymtheme_status_messages($variables) {
     $vmPath = TViewModel::getVmPath();
     $result = bootstrap_status_messages($variables);
-    if (!empty($vmPath)) {
+    if ($vmPath !== null) {
         $result = "$result\n<messages-component></messages-component>";
     }
     return $result;
 }
 
-/**
+/*
  * Process variables for comment.tpl.php.
  *
  * @see comment.tpl.php

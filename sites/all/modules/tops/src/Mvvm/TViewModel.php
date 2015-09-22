@@ -129,6 +129,9 @@ class TViewModel
         return null;
     }
 
+    public static function mappingRequired($vmPath) {
+
+    }
     private static function getVMPathList() {
         if (self::$vmPaths === null) {
             self::$vmPaths = array();
@@ -138,11 +141,21 @@ class TViewModel
                 $vmDirectory = '/assets/js/Tops.App';
                 $vmRootPath = \Tops\sys\TPath::FromRoot($vmDirectory);
                 while(!feof($configFile)) {
+                    $item = new \stdClass();
                     $parts =  explode(',',fgets($configFile));
-                    if (sizeof($parts) > 1) {
+                    $partsCount = sizeof($parts);
+                    if ($partsCount > 1) {
                         $key = trim($parts[0]);
                         $value = trim($parts[1]);
-                        self::$vmPaths[$key] = $vmDirectory.'/'.$value.'.js';
+                        $item->path = $vmDirectory.'/'.$value.'.js';
+                        if ($partsCount > 2) {
+                            $item->requires = trim($parts[2]);
+                        }
+                        else {
+                            $item->requires = '';
+                        }
+                        self::$vmPaths[$key] = $item;
+                        // self::$vmPaths[$key] = $vmDirectory.'/'.$value.'.js';
                     }
                 }
                 fclose($configFile);

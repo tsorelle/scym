@@ -81,5 +81,10 @@
   <?php print $page_top; ?>
   <?php print $page; ?>
   <?php print $page_bottom; ?>
+  <?php if(!empty($googleApiKey)) : ?>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=<?php print $googleApiKey; ?>&callback=ViewModel.initMap">
+    </script>
+  <?php endif; ?>
 </body>
 </html>

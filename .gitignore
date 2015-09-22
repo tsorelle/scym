@@ -14,3 +14,5 @@ scripts/*
 themes/*
 lib/vendor/*
 lib/test/*
+lib/tools/migration/*.csv
+lib/tools/migration/*.txt

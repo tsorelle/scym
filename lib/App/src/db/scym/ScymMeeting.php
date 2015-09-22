@@ -53,6 +53,14 @@ class ScymMeeting extends DateStampedEntity
     /**
      * @var string
      *
+     * @Column(name="address", type="string", length=150, nullable=true)
+     */
+    private $address;
+
+
+    /**
+     * @var string
+     *
      * @Column(name="affiliationCode", type="string", length=20, nullable=true)
      */
     private $affiliationcode = '';
@@ -93,16 +101,16 @@ class ScymMeeting extends DateStampedEntity
     private $note;
 
     /**
-     * @var integer
+     * @var float
      *
-     * @Column(name="latitude", type="integer", nullable=true)
+     * @Column(name="latitude", type="float", precision=10, scale=0, nullable=true)
      */
     private $latitude;
 
     /**
-     * @var integer
+     * @var float
      *
-     * @Column(name="longitude", type="integer", nullable=true)
+     * @Column(name="longitude", type="float", precision=10, scale=0, nullable=true)
      */
     private $longitude;
 
@@ -212,12 +220,36 @@ class ScymMeeting extends DateStampedEntity
     /**
      * Get area
      *
-     * @return string 
+     * @return string
      */
     public function getArea()
     {
         return $this->area;
     }
+
+    /**
+     * Set address
+     *
+     * @param string $address
+     * @return ScymMeeting
+     */
+    public function setAddress($address)
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * Get address
+     *
+     * @return string
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
 
     /**
      * Set affiliationcode
@@ -360,7 +392,7 @@ class ScymMeeting extends DateStampedEntity
     /**
      * Set latitude
      *
-     * @param integer $latitude
+     * @param float $latitude
      * @return ScymMeeting
      */
     public function setLatitude($latitude)
@@ -373,7 +405,7 @@ class ScymMeeting extends DateStampedEntity
     /**
      * Get latitude
      *
-     * @return integer 
+     * @return float
      */
     public function getLatitude()
     {
@@ -426,19 +458,25 @@ class ScymMeeting extends DateStampedEntity
         return $this->active;
     }
 
+    private function convertNumber($value)
+    {
+        return ($value === null || is_numeric($value)) ? $value : null;
+    }
+
     public function updateFromDataTransferObject($dto) {
         $this->meetingid  = $dto->meetingId;
         $this->meetingname  = $dto->meetingName;
         $this->state  = $dto->state;
         $this->area  = $dto->area;
+        $this->address  = $dto->address;
         $this->affiliationcode  = $dto->affiliationCode;
         $this->worshiptimes  = $dto->worshipTimes;
         $this->worshiplocation  = $dto->worshipLocation;
         $this->url  = $dto->url;
         $this->detailtext  = $dto->detailText;
         $this->note  = $dto->note;
-        $this->longitude  = $dto->latitude;
-        $this->latitude  = $dto->longitude;
+        $this->longitude  = $this->convertNumber($dto->latitude);
+        $this->latitude  = $this->convertNumber($dto->longitude);
         $this->active  = $dto->active;
         return (!empty($this->meetingname));
         /*
@@ -456,6 +494,7 @@ class ScymMeeting extends DateStampedEntity
         $result->meetingName  = $this->meetingname;
         $result->state  = $this->state;
         $result->area  = $this->area;
+        $result->address = $this->address;
         $result->affiliationCode  = $this->affiliationcode;
         $result->worshipTimes = $this->worshiptimes;
         $result->worshipLocation = $this->worshiplocation;

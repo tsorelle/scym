@@ -6,18 +6,18 @@
                 <div class="col-md-1">
                     <strong>Filter:</strong>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     by Quarterly Meeting: <select data-bind="options: quarterlies,
                                optionsText: 'Text',
                                value: quarterlyMeetingFilter,
                                optionsCaption: '-- All --'"></select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     by State: <select data-bind="options: states,
                                value: statesFilter,
                                optionsCaption: '-- All --'"></select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div data-bind="visible:userCanEdit">
                         <input id="active-filter" type="checkbox" data-bind="checked:activeFilter"/>
                           Active&nbsp;only
@@ -143,8 +143,6 @@
 
                         </div>
 
-
-
                         <div class="row">
                             <div class="form-group col-md-8" data-bind="css:{'has-error': meetingForm.areaError}" >
                                 <label for="area" class="control-label">City of worship location:<span data-bind="text:meetingForm.areaError"></span></label>
@@ -179,7 +177,10 @@
                             <label for="times" class="control-label">Worship times:</label>
                             <input class="form-control" id="times" data-bind="value:meetingForm.worshipTimes"/>
                         </div>
-
+                        <div class="form-group" >
+                            <label for="address" class="control-label">Mapping address or city,state:</label>
+                            <input class="form-control" id="address" data-bind="value:meetingForm.address"/>
+                        </div>
                         <div class="form-group" data-bind="css:{'has-error': meetingForm.emailError}" >
                             <label for="email" class="control-label">Enter an e-mail to update or create mailbox:<span data-bind="text:meetingForm.emailError"></span></label>
                             <input class="form-control" id="email" data-bind="value:meetingForm.email"/>

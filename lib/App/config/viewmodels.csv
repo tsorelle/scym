@@ -1,11 +1,11 @@
 members/directory,ScymDirectoryViewModel
 members/download,DownloadsViewModel
-meetings/local,ScymMeetingsViewModel
 mailboxes,MailboxesViewModel
 mailform,MailFormViewModel
-meetings/local,MeetingsViewModel
+meetings/local,MeetingsViewModel,maps.api
 management/emailings,EMailingsViewModel
 datepickertest,DatePickerTestViewModel
 helloworld,HelloWorldViewModel
 registerdocument,RegisterDocumentViewModel
 testpage,TestPageViewModel
+meetings/gmap,MeetingsMapViewModel,maps.api
