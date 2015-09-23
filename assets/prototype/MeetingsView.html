@@ -169,21 +169,29 @@
                                                optionsCaption: 'No quarterly meeting'"></select>
 
                         </div>
-                        <div class="form-group" >
-                            <label for="location" class="control-label">Worship location:</label>
-                            <input class="form-control" id="location" data-bind="value:meetingForm.worshipLocation"/>
-                        </div>
-                        <div class="form-group" >
-                            <label for="times" class="control-label">Worship times:</label>
-                            <input class="form-control" id="times" data-bind="value:meetingForm.worshipTimes"/>
+                        <div class="row">
+                            <div class="form-group col-md-8" >
+                                <label for="location" class="control-label">Worship location:</label>
+                                <input class="form-control" id="location" data-bind="value:meetingForm.worshipLocation"/>
+                            </div>
+                            <div class="form-group col-md-4" >
+                                <label for="times" class="control-label">Worship times:</label>
+                                <input class="form-control" id="times" data-bind="value:meetingForm.worshipTimes"/>
+                            </div>
                         </div>
                         <div class="form-group" >
                             <label for="address" class="control-label">Mapping address or city,state:</label>
                             <input class="form-control" id="address" data-bind="value:meetingForm.address"/>
                         </div>
-                        <div class="form-group" data-bind="css:{'has-error': meetingForm.emailError}" >
-                            <label for="email" class="control-label">Enter an e-mail to update or create mailbox:<span data-bind="text:meetingForm.emailError"></span></label>
-                            <input class="form-control" id="email" data-bind="value:meetingForm.email"/>
+                        <div class="row">
+                            <div class="form-group col-md-6" data-bind="css:{'has-error': meetingForm.emailError}" >
+                                <label for="email" class="control-label">E-mail:<span data-bind="text:meetingForm.emailError"></span></label>
+                                <input class="form-control" id="email" data-bind="value:meetingForm.email"/>
+                            </div>
+                            <div class="form-group col-md-6" data-bind="css:{'has-error': meetingForm.emailError}" >
+                                <label for="url" class="control-label">Web site:<span data-bind="text:meetingForm.emailError"></span></label>
+                                <input class="form-control" id="url" data-bind="value:meetingForm.url"/>
+                            </div>
                         </div>
 
                         <div class="form-group">
