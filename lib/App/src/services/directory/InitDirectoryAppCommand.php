@@ -29,7 +29,16 @@ class InitDirectoryAppCommand extends TServiceCommand
 
         $result->affiliationCodes = $manager->getAffiliationCodeList();
         $result->directoryListingTypes = $manager->getDirectoryListingTypeList();
-
+        $result->family = null;
+        $personId = $this->getRequest();
+        if ($personId) {
+            $person = $manager->getPersonById($personId);
+            if (empty($person)) {
+                $this->addErrorMessage('Person not found for id ' . $personId);
+            } else {
+                $result->family = GetFamilyResponse::BuildResponseForPerson($person);
+            }
+        }
         $this->setReturnValue($result);
     }
 

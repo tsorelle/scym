@@ -80,19 +80,22 @@ module Tops {
         address: scymAddress;
     }
 
+
+
     /**
      * Related persons and address DTO as returned by service
      */
-    export class scymFamily {
-        public address : scymAddress;
-        public persons: scymPerson[] = [];
-        public selectedPersonId = 0;
+    export interface IScymFamily {
+        address : scymAddress;
+        persons: scymPerson[];
+        selectedPersonId : any;
     }
 
     export interface IInitDirectoryResponse {
         canEdit : boolean;
         directoryListingTypes : INameValuePair[];
         affiliationCodes : INameValuePair[];
+        family : IScymFamily;
     }
 
 
@@ -116,7 +119,7 @@ module Tops {
          * @param family
          * @returns {scymPerson} first person in list
          */
-        public setFamily(family: scymFamily){
+        public setFamily(family: IScymFamily){
             var me = this;
             me.setAddress(family.address);
             var selected = me.setPersons(family.persons,family.selectedPersonId);
@@ -1001,7 +1004,12 @@ module Tops {
         getInitializations(doneFunction?: () => void) {
             var me = this;
             me.application.hideServiceMessages();
-            me.peanut.executeService('directory.InitDirectoryApp', '', me.handleInitializationResponse)
+
+            var personId = me.peanut.getRequestParam('pid');
+
+
+
+            me.peanut.executeService('directory.InitDirectoryApp',personId, me.handleInitializationResponse)
                 .always(function () {
                     me.application.hideWaiter();
                     if (doneFunction) {
@@ -1020,6 +1028,10 @@ module Tops {
                 me.personForm.directoryListingTypes(response.directoryListingTypes);
                 me.addressForm.directoryListingTypes(response.directoryListingTypes);
                 me.userIsAuthorized(true);
+                if (response.family) {
+                    me.searchType('Persons');
+                    me.selectFamily(response.family);
+                }
             }
             else {
                 me.userCanEdit(false);
@@ -1254,7 +1266,7 @@ module Tops {
         private handleChangePersonAddress = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var family = <scymFamily>serviceResponse.Value;
+                var family = <IScymFamily>serviceResponse.Value;
                 var currentPersonId = family.selectedPersonId;
                 me.addressesList.reset();
                 var selected = me.family.setFamily(family);
@@ -1281,13 +1293,18 @@ module Tops {
         }
 
 
+        private selectFamily = (family: IScymFamily) => {
+            var me = this;
+            me.addressPersonsList([]);
+            var selected = me.family.setFamily(family);
+            me.refreshFamilyForms(selected);
+        };
+
         private handleFamilyResponse = (serviceResponse: IServiceResponse)=> {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var family = <scymFamily>serviceResponse.Value;
-                me.addressPersonsList([]);
-                var selected = me.family.setFamily(family);
-                me.refreshFamilyForms(selected);
+                var family = <IScymFamily>serviceResponse.Value;
+                me.selectFamily(family);
             }
         };
 
@@ -1295,7 +1312,7 @@ module Tops {
             var me = this;
             me.addressPersonsList([]);
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var family = <scymFamily>serviceResponse.Value;
+                var family = <IScymFamily>serviceResponse.Value;
                 // var currentSelected = me.family.getSelected();
                 // var personId = currentSelected ? currentSelected.personId : 0;
                 var selected = me.family.setFamily(family);
@@ -1383,6 +1400,7 @@ module Tops {
                 });
 
          };
+
 
 
         /**

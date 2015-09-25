@@ -23,4 +23,9 @@ class InitDirectoryResponse
      * @var \stdClass[]
      */
     public $affiliationCodes;// : INameValuePair[];
+
+    /**
+     * @var \stdClass
+     */
+    public $family; // : IScymFamily
 }
