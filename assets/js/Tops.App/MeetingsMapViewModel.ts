@@ -82,6 +82,11 @@ module Tops {
                 /****
                  * Here's where you can initialize the map with the data returned from the service.
                  ****/
+                var meetings = response.meetings;
+                for (var i=0; i<meetings.length; i++) {
+                    console.info(meetings[i].meetingName);
+                    // document.write(meetings[i].meetingName);
+                }
             }
             else {
                 // do stuff here if errors in response
