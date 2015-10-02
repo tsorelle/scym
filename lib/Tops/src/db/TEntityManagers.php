@@ -30,6 +30,7 @@ class TEntityManagers {
     public static function Get($key='application',$isDevMode=null)
     {
         self::initialize();
+        $isDevMode=true; // remove to optimize later.
         if (array_key_exists($key,self::$managers))
             return self::$managers[$key];
         return self::createManager($key,$isDevMode);
