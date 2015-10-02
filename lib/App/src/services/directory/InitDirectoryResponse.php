@@ -25,6 +25,12 @@ class InitDirectoryResponse
     public $affiliationCodes;// : INameValuePair[];
 
     /**
+     * @var \stdClass[]
+     */
+    public $membershipTypes;// : INameValuePair[];
+
+
+    /**
      * @var \stdClass
      */
     public $family; // : IScymFamily

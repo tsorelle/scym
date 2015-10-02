@@ -148,6 +148,14 @@ class ScymPerson extends DateStampedEntity
      */
     private $affiliationcode;
 
+    /**
+     * @var integer
+     *
+     * @Column(name="membershipTypeId", type="integer", nullable=true)
+     */
+    private $membershiptypeid;
+
+
 
     /**
      * @var string
@@ -599,6 +607,29 @@ class ScymPerson extends DateStampedEntity
         return $this->affiliationcode;
     }
 
+    /**
+     * Set membershiptypeid
+     *
+     * @param integer $membershiptypeid
+     * @return ScymPerson
+     */
+    public function setMembershiptypeid($membershiptypeid)
+    {
+        $this->membershiptypeid = $membershiptypeid;
+
+        return $this;
+    }
+
+    /**
+     * Get membershiptypeid
+     *
+     * @return integer
+     */
+    public function getMembershiptypeid()
+    {
+        return $this->membershiptypeid;
+    }
+
 
     private function appendName($name, $next) {
         if (empty($name)) {
@@ -661,6 +692,7 @@ class ScymPerson extends DateStampedEntity
         $this->active= $dto->active;
         $this->sortkey= $dto->sortkey;
         $this->affiliationcode= $dto->affiliationcode;
+        $this->membershiptypeid = $dto->membershiptypeid;
         $this->otheraffiliation= $dto->otheraffiliation;
         $this->directoryListingTypeId = $dto->directorylistingtypeid;
         $this->organization= $dto->organization;
@@ -687,6 +719,7 @@ class ScymPerson extends DateStampedEntity
         $result->active = $this->active;
         $result->sortkey = $this->sortkey;
         $result->affiliationcode = $this->affiliationcode;
+        $result->membershiptypeid = $this->membershiptypeid;
         $result->otheraffiliation = $this->otheraffiliation;
         $result->directorylistingtypeid = $this->directoryListingTypeId;
         $result->organization = $this->organization;

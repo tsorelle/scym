@@ -96,6 +96,10 @@
                             <strong>Meeting: </strong>
                             <span data-bind="text:personForm.affiliation"></span>
                         </div>
+                        <div data-bind="visible:personForm.membershipType">
+                            <strong>Membership: </strong>
+                            <span data-bind="text:personForm.membershipType"></span>
+                        </div>
                         <div data-bind="visible:personForm.otheraffiliation">
                             <strong>Meeting:</strong><br>
                             <span data-bind="text:personForm.otheraffiliation"></span>
@@ -198,6 +202,11 @@
                             <label for="affiliation-input" class="control-label">SCYM Meeting or Worship Group</label>
                             <select class="form-control" id="affiliation-input"
                                     data-bind="options: personForm.affiliations,optionsText:'Name',value: personForm.selectedAffiliation,optionsCaption:'Select meeting...'"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="membership-input" class="control-label">Membership</label>
+                            <select class="form-control" id="membership-input"
+                                    data-bind="options: personForm.membershipTypes,optionsText:'Name',value: personForm.selectedMembershipType"></select>
                         </div>
                         <div class="form-group">
                             <label for="otheraffiliation-input"  class="control-label">Meeting (outside of SCYM)</label>

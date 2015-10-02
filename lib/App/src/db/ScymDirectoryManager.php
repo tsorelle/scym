@@ -50,6 +50,15 @@ class ScymDirectoryManager extends TDbServiceManager
         return $result;
     }
 
+    /**
+     * @return \App\db\scym\ScymMembershipType[];
+     */
+    private function getMembershipTypes() {
+        $repository = $this->getRepository('App\db\scym\ScymMembershipType');
+        $result = $repository->findAll();
+        return $result;
+    }
+
     public function getAffiliationCodeList()
     {
         $result = array();
@@ -71,6 +80,18 @@ class ScymDirectoryManager extends TDbServiceManager
         }
         return $result;
     }
+
+    public function getMembershipTypeList() {
+        $result = array();
+        $types = $this->getMembershipTypes();
+        foreach($types as $type) {
+            if ($type->getActive()) {
+                TNameValuePair::AddToArray($result, $type->getMembershiptypename(), $type->getMembershiptypeid());
+            }
+        }
+        return $result;
+    }
+
 
     /**
      * @param $searchString
