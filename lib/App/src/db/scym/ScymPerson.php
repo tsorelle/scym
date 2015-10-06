@@ -696,7 +696,6 @@ class ScymPerson extends DateStampedEntity
         $this->active= $dto->active;
         $this->sortkey= $dto->sortkey;
         $this->affiliationcode= $dto->affiliationcode;
-        // $this->membershiptypeid = $dto->membershiptypeid;
         $this->otheraffiliation= $dto->otheraffiliation;
         $this->directoryListingTypeId = $dto->directorylistingtypeid;
         $this->organization= $dto->organization;
@@ -725,7 +724,6 @@ class ScymPerson extends DateStampedEntity
         $result->sortkey = $this->sortkey;
         $result->affiliationcode = $this->affiliationcode;
         $result->memberaffiliation = $this->memberaffiliation;
-        /// $result->membershiptypeid = $this->membershiptypeid;
         $result->otheraffiliation = $this->otheraffiliation;
         $result->directorylistingtypeid = $this->directoryListingTypeId;
         $result->organization = $this->organization;

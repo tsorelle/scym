@@ -159,7 +159,7 @@ function scymtheme_preprocess_node(&$variables) {
 function _scymtheme_typeToLi($type)
 {
     $first = substr($type->type,0,1);
-    $article = ($first == 'a' || $first == 'i' || $first == 'o' || $first == 'u') ? 'an ' : 'a ';
+    $article = ($first == 'a' || $first == 'e' || $first == 'i' || $first == 'o' || $first == 'u') ? 'an ' : 'a ';
 
     $href = '/node/add/'.str_replace('_','-',$type->type);
     $title = strip_tags($type->description);
