@@ -32,7 +32,8 @@ module Tops {
         public active: number = 1;
         public sortkey : string = '';
         public affiliationcode : string = '';
-        public membershiptypeid : any = null;
+        public memberaffiliation : string = '';
+        // public membershiptypeid : any = null;
         public otheraffiliation : string = '';
         public directorylistingtypeid: number=1;
         public lastUpdate : string = '';
@@ -96,7 +97,7 @@ module Tops {
         canEdit : boolean;
         directoryListingTypes : INameValuePair[];
         affiliationCodes : INameValuePair[];
-        membershipTypes : INameValuePair[];
+        // membershipTypes : INameValuePair[];
         family : IScymFamily;
     }
 
@@ -548,7 +549,7 @@ module Tops {
         public active= ko.observable(1);
         public sortkey = ko.observable('');
         public affiliationcode = ko.observable('');
-        public membershiptypeid = ko.observable('0');
+        public memberaffiliation = ko.observable('');
 
         public otheraffiliation = ko.observable('');
         public lastUpdate = ko.observable('');
@@ -556,30 +557,39 @@ module Tops {
 
         public selectedAffiliation : KnockoutObservable<INameValuePair> = ko.observable(null);
         public affiliations = ko.observableArray<INameValuePair>([]);
+        public selectedMembershipAffiliation : KnockoutObservable<INameValuePair> = ko.observable(null);
 
-        public selectedMembershipType : KnockoutObservable<INameValuePair> = ko.observable(null);
-        public membershipTypes = ko.observableArray<INameValuePair>([]);
-
-        public membershipType : KnockoutComputed<string>;
         public affiliation : KnockoutComputed<string>;
+        public membership : KnockoutComputed<string>;
         public hasAffiliation : KnockoutComputed<boolean>;
+        public hasMembership : KnockoutComputed<boolean>;
         public emailLink : KnockoutComputed<string>;
+
         // public directoryListing: KnockoutComputed<string>;
 
         public firstNameError = ko.observable('');
         public lastNameError = ko.observable('');
         public emailError = ko.observable('');
+        public affiliationError = ko.observable('');
+        public showOutsideMeeting = ko.observable(false);
+        public membershipType = ko.observable('');
+        private ignoreTriggers = false;
+
 
         constructor() {
             super();
             var me = this;
             // me.directoryListing = ko.computed(me.computeDirectoryListing);
-            me.membershipType = ko.computed(me.computeMembershipType);
+            // me.membershipType = ko.computed(me.computeMembershipType);
             me.affiliation = ko.computed(me.computeAffiliation);
+            me.membership = ko.computed(me.computeMembership);
             me.hasAffiliation = ko.computed(me.computeHasAffiliation);
+            me.hasMembership = ko.computed(me.computeHasMembership);
             me.emailLink = ko.computed(me.computeEmailLink);
+            me.selectedAffiliation.subscribe(me.onAffiliationCodeSelected);
+            me.selectedMembershipAffiliation.subscribe(me.onMemberAffiliationSelected);
+            me.membershipType.subscribe(me.onMembershiptypeChanged);
         }
-
 
         /*
         computeDirectoryListing = () => {
@@ -593,48 +603,120 @@ module Tops {
         };
         */
 
-        private getAffiliationItem = () => {
+        private getAffiliationItem = (key: string) => {
             var me = this;
             var lookup = me.affiliations();
-            var key = me.affiliationcode();
             var result = _.find(lookup,function(item : INameValuePair) {
                 return item.Value == key;
             },me);
             return result;
         };
 
-        private getMembershipItem = () => {
+        onAffiliationCodeSelected = (selected : INameValuePair) => {
             var me = this;
-            var lookup = me.membershipTypes();
-            var key = me.membershiptypeid();
-            if (!key) {
-                key = '0';
-            }
+            if (!me.ignoreTriggers) {
+                if (selected) {
+                    me.affiliationcode(selected.Value);
+                }
+                else {
+                    me.affiliationcode('');
+                }
+                me.setMembershipType();
 
-            var result = _.find(lookup,function(item : INameValuePair) {
-                return item.Value == key;
-            },me);
-            return result;
+            }
         };
+
+        onMemberAffiliationSelected = (selected : INameValuePair) => {
+            var me = this;
+            if (!me.ignoreTriggers) {
+                if (selected) {
+                    me.memberaffiliation(selected.Value);
+                }
+                else {
+                    me.memberaffiliation('');
+                }
+                me.setMembershipType();
+
+            }
+        };
+
+        onMembershiptypeChanged = (value : string) => {
+            var me = this;
+            if (!me.ignoreTriggers) {
+                if (value == 'attender') {
+                    me.setMembershipAffiliation('NONE');
+                }
+                else if (value == 'member') {
+                    var attending = me.affiliationcode();
+                    me.setMembershipAffiliation(attending);
+                }
+            }
+        };
+
+        setMembershipAffiliation(value : string) {
+            var me = this;
+            me.ignoreTriggers = true;
+            var item = me.getAffiliationItem(value);
+            me.selectedMembershipAffiliation(item);
+            me.memberaffiliation(value);
+            me.ignoreTriggers = false;
+        }
+
+        setMembershipType = () => {
+            var me = this;
+            var type = me.getMembershipType();
+            me.ignoreTriggers = true;
+            me.membershipType(type);
+            me.ignoreTriggers = false;
+        };
+
+        getMembershipType() {
+            var me = this;
+            var attender = me.affiliationcode();
+            var member = me.memberaffiliation();
+            if (member == 'OTHER' || attender=='OTHER') {
+                me.showOutsideMeeting(true);
+                return 'other';
+            }
+            me.showOutsideMeeting(false);
+            if (attender == 'NONE' || attender == '') {
+                return '';
+            }
+            if (member == 'NONE' || member == '') {
+                return 'attender';
+            }
+            if (member == attender) {
+                return 'member';
+            }
+            return 'other';
+        }
 
         computeAffiliation = () => {
             var me = this;
-            var result = me.getAffiliationItem();
+            var key = me.affiliationcode();
+            var result = me.getAffiliationItem(key);
             return result ? result.Name : '';
         };
 
-        computeMembershipType = () => {
+        computeMembership = () => {
             var me = this;
-            var result = me.getMembershipItem();
-            if (!result) {
-                return '';
-            }
-            return result.Value == '0' ? '' : result.Name;
+            var key = me.memberaffiliation();
+            var result = me.getAffiliationItem(key);
+            return result ? result.Name : '';
         };
 
         computeHasAffiliation = () => {
             var me = this;
             var code = me.affiliationcode();
+            if (code == 'NONE' || code === '' || code === null ) {
+                return false;
+            }
+            return true;
+        };
+
+        computeHasMembership = () => {
+            var me = this;
+            var code = me.memberaffiliation();
             if (code == 'NONE' || code === '' || code === null ) {
                 return false;
             }
@@ -668,7 +750,7 @@ module Tops {
             me.active(1);
             me.sortkey('');
             me.affiliationcode('');
-            me.membershiptypeid('0');
+            me.memberaffiliation('');
 
             me.otheraffiliation('');
             me.directoryListingTypeId = ko.observable(1);
@@ -676,7 +758,8 @@ module Tops {
             me.personId('');
             me.organization('');
             me.selectedAffiliation(null);
-            me.selectedMembershipType(null);
+            me.selectedMembershipAffiliation(null);
+            me.membershipType('');
         }
 
         public clearValidations() {
@@ -684,6 +767,7 @@ module Tops {
             me.firstNameError('');
             me.lastNameError('');
             me.emailError('');
+            me.affiliationError('');
             me.hasErrors(false);
         }
 
@@ -712,18 +796,19 @@ module Tops {
             me.active(person.active);
             me.sortkey(person.sortkey);
             me.affiliationcode(person.affiliationcode);
-            me.membershiptypeid(person.membershiptypeid);
+            me.memberaffiliation(person.memberaffiliation);
             me.otheraffiliation(person.otheraffiliation);
             me.directoryListingTypeId(person.directorylistingtypeid);
             me.lastUpdate(person.lastUpdate);
             me.personId(person.personId);
             me.organization(person.organization);
-            var affiliationItem = me.getAffiliationItem();
+            var affiliationItem = me.getAffiliationItem(person.affiliationcode);
             me.selectedAffiliation(affiliationItem);
+            affiliationItem = me.getAffiliationItem(person.memberaffiliation);
+            me.selectedMembershipAffiliation(affiliationItem);
             var directoryListingItem = me.getDirectoryListingItem();
             me.selectedDirectoryListingType(directoryListingItem);
-            var membershipTypeIterm = me.getMembershipItem();
-            me.selectedMembershipType(membershipTypeIterm);
+            me.setMembershipType();
         };
 
         public updateScymPerson = (person: scymPerson) => {
@@ -736,26 +821,29 @@ module Tops {
             }
             person.affiliationcode = me.affiliationcode();
 
+            affiliation = me.selectedMembershipAffiliation();
+            var membershipAffiliationCode = affiliation ? affiliation.Value : 'NONE';
+            if (affiliation) {
+                me.memberaffiliation(membershipAffiliationCode);
+            }
+            person.memberaffiliation = membershipAffiliationCode;
+
             var listingType = me.selectedDirectoryListingType();
             if (listingType) {
                 var listingCode = listingType.Value ? Number(listingType.Value) : 0;
                 me.directoryListingTypeId(listingCode);
             }
 
-            var membershipTypeId = 0;
-            var membershipType = me.selectedMembershipType();
-            if (membershipType) {
-                membershipTypeId = membershipType.Value ? Number(membershipType.Value) : 0;
-            }
-
             person.directorylistingtypeid = me.directoryListingTypeId();
-
             person.personId = me.personId();
             person.dateOfBirth = me.dateOfBirth();
+            if (person.dateOfBirth) {
+                me.junior(0);
+            }
+            person.junior = me.junior();
             person.email = me.email();
             person.firstName = me.firstName();
             person.lastName = me.lastName();
-            person.junior = me.junior();
             person.middleName = me.middleName();
             person.newsletter = me.newsletter();
             person.notes = me.notes();
@@ -765,7 +853,6 @@ module Tops {
             person.sortkey = me.sortkey();
             person.username = me.username();
             person.organization = me.organization();
-            person.membershiptypeid = membershipTypeId;
         };
 
         public validate = ():boolean => {
@@ -789,6 +876,11 @@ module Tops {
                     me.emailError(': Please enter a valid email address.');
                     valid = false;
                 }
+            }
+            value = me.affiliationcode();
+            if (!value) {
+                me.affiliationError(': Please select the attended meeting, or "None".');
+                valid = false;
             }
 
             me.hasErrors(!valid);
@@ -1005,6 +1097,7 @@ module Tops {
         addressesList =  new searchListObservable(2,12);
         addressPersonsList = ko.observableArray<INameValuePair>();
         userCanEdit = ko.observable(true);
+        debugMode = ko.observable(false);
         userIsAuthorized = ko.observable(false);
 
 
@@ -1072,7 +1165,7 @@ module Tops {
                 me.userCanEdit(response.canEdit);
                 me.personForm.affiliations(response.affiliationCodes);
                 me.personForm.directoryListingTypes(response.directoryListingTypes);
-                me.personForm.membershipTypes(response.membershipTypes);
+                // me.personForm.membershipTypes(response.membershipTypes);
                 me.addressForm.directoryListingTypes(response.directoryListingTypes);
                 me.userIsAuthorized(true);
                 if (response.family) {

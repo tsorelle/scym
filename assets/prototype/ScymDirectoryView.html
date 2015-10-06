@@ -96,9 +96,9 @@
                             <strong>Meeting: </strong>
                             <span data-bind="text:personForm.affiliation"></span>
                         </div>
-                        <div data-bind="visible:personForm.membershipType">
+                        <div data-bind="visible:personForm.hasMembership">
                             <strong>Membership: </strong>
-                            <span data-bind="text:personForm.membershipType"></span>
+                            <span data-bind="text:personForm.membership"></span>
                         </div>
                         <div data-bind="visible:personForm.otheraffiliation">
                             <strong>Meeting:</strong><br>
@@ -190,25 +190,32 @@
                             <input class="form-control" id="phone2-input" data-bind="value:personForm.phone2"/>
                         </div>
                         <div class="form-group">
-                            <input id="junior-input" type="checkbox" data-bind="checked:personForm.junior"/>
-                            <label for="junior-input" class="control-label">  Young Friend (18 or younger)</label>
-                        </div>
-                        <div class="form-group">
                             <label for="dob-input" class="control-label">Date of birth (kids only)</label>
                             <input class="form-control datepicker" type="text" id="dob-input" data-bind="value:personForm.dateOfBirth"/>
                         </div>
-
-                        <div class="form-group">
-                            <label for="affiliation-input" class="control-label">SCYM Meeting or Worship Group</label>
+                        <div class="form-group" data-bind="visible:personForm.dateOfBirth() == ''">
+                            <input id="junior-input" type="checkbox" data-bind="checked:personForm.junior"/>
+                            <label for="junior-input" class="control-label">  Young Friend (18 or younger - if date of birth unknown)</label>
+                        </div>
+                        <div class="form-group"  data-bind="css:{'has-error': personForm.affiliationError}" >
+                            <label for="affiliation-input" class="control-label">Attending meeting or worship group<span data-bind="text:personForm.affiliationError"></span></label>
                             <select class="form-control" id="affiliation-input"
-                                    data-bind="options: personForm.affiliations,optionsText:'Name',value: personForm.selectedAffiliation,optionsCaption:'Select meeting...'"></select>
+                                    data-bind="options: personForm.affiliations,optionsText:'Name',value: personForm.selectedAffiliation,optionsCaption:'Select meeting or worship group...'"></select>
                         </div>
-                        <div class="form-group">
-                            <label for="membership-input" class="control-label">Membership</label>
+                        <div class="form-group" data-bind="visible: personForm.selectedAffiliation">
+                            <input type="radio"  name="membershipType" value="attender" data-bind="checked: personForm.membershipType" /> <span style="margin-right: 1em">Attender</span>
+                            <input type="radio"  name="membershipType" value="member" data-bind="checked: personForm.membershipType" /> <span style="margin-right: 1em">Member</span>
+                            <input type="radio" name="membershipType"  value="other" data-bind="checked: personForm.membershipType" /> <span style="margin-right: 1em">Other: member of a different meeting</span>
+                        </div>
+                        <div data-bind="visible: debugMode">
+                            Attends: <span data-bind="text:personForm.affiliationcode"></span>  Member: <span data-bind="text:personForm.memberaffiliation"></span> Type: <span data-bind="text:personForm.membershipType"></span>
+                        </div>
+                        <div class="form-group" data-bind="visible: personForm.membershipType() == 'other'">
+                            <label for="membership-input" class="control-label">Membership in meeting</label>
                             <select class="form-control" id="membership-input"
-                                    data-bind="options: personForm.membershipTypes,optionsText:'Name',value: personForm.selectedMembershipType"></select>
+                                    data-bind="options: personForm.affiliations,optionsText:'Name',value: personForm.selectedMembershipAffiliation,optionsCaption:'Select meeting...'"></select>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" data-bind="visible: personForm.showOutsideMeeting">
                             <label for="otheraffiliation-input"  class="control-label">Meeting (outside of SCYM)</label>
                             <input class="form-control" id="otheraffiliation-input" data-bind="value:personForm.otheraffiliation"/>
                         </div>
@@ -234,7 +241,6 @@
                             <textarea class="form-control" id="notes-input" data-bind="value:personForm.detailText"></textarea>
                         </div>
                     </fieldset>
-
                 </div>
                 <div id="person-search-panel"  data-bind="visible:personForm.viewState() == 'search'">
                     <form>

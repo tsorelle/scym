@@ -198,10 +198,10 @@ class DateStampedEntity {
 
     protected function formatDtoDate($dateValue,$format='F j, Y')
     {
-        if (!empty($dateValue)) {
-           return $dateValue->format($format);
+        if (empty($dateValue) || $dateValue->date == '0000-01-01 00:00:00.000000') {
+            return '';
         }
-        return '';
+        return $dateValue->format($format);
     }
 
 

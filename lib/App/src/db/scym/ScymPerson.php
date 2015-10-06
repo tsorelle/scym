@@ -148,13 +148,13 @@ class ScymPerson extends DateStampedEntity
      */
     private $affiliationcode;
 
-    /**
-     * @var integer
-     *
-     * @Column(name="membershipTypeId", type="integer", nullable=true)
-     */
-    private $membershiptypeid;
 
+    /**
+     * @var string
+     *
+     * @Column(name="memberAffiliation", type="string", length=30, nullable=true)
+     */
+    private $memberaffiliation;
 
 
     /**
@@ -453,7 +453,12 @@ class ScymPerson extends DateStampedEntity
      */
     public function setDateOfBirth($dateOfBirth)
     {
-        $this->dateOfBirth = $dateOfBirth;
+        if (empty($dateOfBirth)) {
+            $this->dateOfBirth = null;
+        }
+        else {
+            $this->dateOfBirth = $dateOfBirth;
+        }
 
         return $this;
     }
@@ -608,28 +613,27 @@ class ScymPerson extends DateStampedEntity
     }
 
     /**
-     * Set membershiptypeid
+     * Set memberaffiliation
      *
-     * @param integer $membershiptypeid
+     * @param string $memberaffiliation
      * @return ScymPerson
      */
-    public function setMembershiptypeid($membershiptypeid)
+    public function setMemberaffiliation($memberaffiliation)
     {
-        $this->membershiptypeid = $membershiptypeid;
+        $this->memberaffiliation = $memberaffiliation;
 
         return $this;
     }
 
     /**
-     * Get membershiptypeid
+     * Get memberaffiliation
      *
-     * @return integer
+     * @return string
      */
-    public function getMembershiptypeid()
+    public function getMemberaffiliation()
     {
-        return $this->membershiptypeid;
+        return $this->memberaffiliation;
     }
-
 
     private function appendName($name, $next) {
         if (empty($name)) {
@@ -692,11 +696,12 @@ class ScymPerson extends DateStampedEntity
         $this->active= $dto->active;
         $this->sortkey= $dto->sortkey;
         $this->affiliationcode= $dto->affiliationcode;
-        $this->membershiptypeid = $dto->membershiptypeid;
+        // $this->membershiptypeid = $dto->membershiptypeid;
         $this->otheraffiliation= $dto->otheraffiliation;
         $this->directoryListingTypeId = $dto->directorylistingtypeid;
         $this->organization= $dto->organization;
         $this->sortkey= $dto->sortkey;
+        $this->memberaffiliation = $dto->memberaffiliation;
         return true;
     }
 
@@ -719,7 +724,8 @@ class ScymPerson extends DateStampedEntity
         $result->active = $this->active;
         $result->sortkey = $this->sortkey;
         $result->affiliationcode = $this->affiliationcode;
-        $result->membershiptypeid = $this->membershiptypeid;
+        $result->memberaffiliation = $this->memberaffiliation;
+        /// $result->membershiptypeid = $this->membershiptypeid;
         $result->otheraffiliation = $this->otheraffiliation;
         $result->directorylistingtypeid = $this->directoryListingTypeId;
         $result->organization = $this->organization;

@@ -29,7 +29,7 @@ class InitDirectoryAppCommand extends TServiceCommand
 
         $result->affiliationCodes = $manager->getAffiliationCodeList();
         $result->directoryListingTypes = $manager->getDirectoryListingTypeList();
-        $result->membershipTypes = $manager->getMembershipTypeList();
+        // $result->membershipTypes = $manager->getMembershipTypeList();
         $result->family = null;
         $personId = $this->getRequest();
         if ($personId) {
