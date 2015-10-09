@@ -132,27 +132,33 @@ class TViewModel
     public static function mappingRequired($vmPath) {
 
     }
+
+    public static function getVmDirectory() {
+        // maybe replace with configuration some day
+        return '/assets/js/Tops.App';
+    }
+
     private static function getVMPathList() {
         if (self::$vmPaths === null) {
             self::$vmPaths = array();
             $configpath = TPath::ConfigPath('viewmodels.csv');
             $configFile = @fopen($configpath,'r');
             if ($configFile) {
-                $vmDirectory = '/assets/js/Tops.App';
-                $vmRootPath = \Tops\sys\TPath::FromRoot($vmDirectory);
+                $vmDirectory = self::getVmDirectory();
+                // $vmRootPath = \Tops\sys\TPath::FromRoot($vmDirectory);
                 while(!feof($configFile)) {
                     $item = new \stdClass();
                     $parts =  explode(',',fgets($configFile));
                     $partsCount = sizeof($parts);
+                    $item->requires = array();
                     if ($partsCount > 1) {
                         $key = trim($parts[0]);
                         $value = trim($parts[1]);
                         $item->path = $vmDirectory.'/'.$value.'.js';
                         if ($partsCount > 2) {
-                            $item->requires = trim($parts[2]);
-                        }
-                        else {
-                            $item->requires = '';
+                            for ($i = 2; $i < $partsCount; $i++) {
+                                $item->requires[$i-2] = trim($parts[$i]);
+                            }
                         }
                         self::$vmPaths[$key] = $item;
                         // self::$vmPaths[$key] = $vmDirectory.'/'.$value.'.js';

@@ -145,13 +145,19 @@ class TopsModule {
         $variables['peanut_viewmodel_src'] = $vmPath ? $vmPath->path : '';
         // $variables['tops_js_debug'] =  \Tops\sys\TTracer::JsDebuggingOn();
         if ($hasVm) {
-            $isMap = $vmPath->requires == 'maps.api';
-            // $initJs =  "ViewModel.init('//', function() {  ko.applyBindings(ViewModel); }); jQuery(function() {jQuery( '.datepicker' ).datepicker();}); ";
             $initJs =  "ViewModel.init('//', function() {  ko.applyBindings(ViewModel); });";
-            if ($isMap) {
-                $mapKey = 'AIzaSyDPaIAgncWvvzfrsnw53PTxmLow3Tu4WEg';
-                $variables['googleApiKey'] = $mapKey;
+            foreach ($vmPath->requires as $requirement) {
+                if ($requirement == 'maps.api') {
+                    $mapKey = 'AIzaSyDPaIAgncWvvzfrsnw53PTxmLow3Tu4WEg';
+                    $variables['googleApiKey'] = $mapKey;
+                } else {
+                    $href = (strpos($requirement, 'url:') === 0) ?
+                        substr($requirement, 4) :
+                        TViewModel::getVmDirectory() . '/' . $requirement;
+                    drupal_add_js($href, array('group' => 'JS_THEME', 'scope' => 'footer'));
+                }
             }
+
             drupal_add_library('system', 'ui.datepicker');
             drupal_add_library('tops','peanut.app');
             drupal_add_js($vmPath->path,array('group'=>'JS_THEME', 'scope'=>'footer'));
