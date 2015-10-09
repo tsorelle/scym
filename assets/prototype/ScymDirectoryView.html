@@ -84,7 +84,7 @@
                     <form>
                     <fieldset id="person-view-fields">
                         <legend data-bind="text:personFormHeader"></legend>
-                        <div id="person-view-buttons" data-bind="visible:userCanEdit() && (addressForm.viewState() == 'view' || addressForm.viewState() == 'empty')">
+                        <div id="person-view-buttons" data-bind="visible:showPersonViewButtons">
                             <button class="btn btn-default" data-bind="click:editPerson">Edit</button>
                             <button class="btn btn-default" data-bind="click:movePerson">
                                 <span data-bind="visible:family.hasAddress">Move</span>
@@ -311,8 +311,8 @@
                                     <li><a href="#" data-bind="click:$parent.selectPerson"><span data-bind="text: Name"></span></a></li>
                                 </ul>
                             </div>
-                            <button class="btn btn-default" data-bind="click:editAddress,visible:userCanEdit() && (personForm.viewState() == 'view' || personForm.viewState() == 'empty')">Edit</button>
-                            <button class="btn btn-default" data-bind="click:findPersonForAddress, visible:family.personCount()<2 && (userCanEdit() && (personForm.viewState() == 'view' || personForm.viewState() == 'empty'))">Add person</button>
+                            <button class="btn btn-default" data-bind="click:editAddress,visible:showEditButton">Edit</button>
+                            <button class="btn btn-default" data-bind="click:findPersonForAddress, visible:showAddPersonButton">Add person</button>
                             <button class="btn btn-default" data-bind="click:deleteAddress, visible:userCanEdit">Delete</button>
                         </div>
                         <div id='streetaddress-view'>

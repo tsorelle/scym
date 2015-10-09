@@ -603,6 +603,7 @@ module Tops {
         };
         */
 
+
         private getAffiliationItem = (key: string) => {
             var me = this;
             var lookup = me.affiliations();
@@ -1099,7 +1100,9 @@ module Tops {
         userCanEdit = ko.observable(true);
         debugMode = ko.observable(false);
         userIsAuthorized = ko.observable(false);
-
+        public showEditButton: KnockoutComputed<boolean>;
+        public showAddPersonButton: KnockoutComputed<boolean>;
+        public showPersonViewButtons : KnockoutComputed<boolean>;
 
         // Constructor
         constructor() {
@@ -1109,7 +1112,29 @@ module Tops {
             me.peanut = me.application.peanut;
 
             me.personFormHeader = ko.computed(me.computePersonFormHeader);
+            me.showEditButton = ko.computed(me.computeShowEditButton);
+            me.showAddPersonButton = ko.computed(me.computeShowAddPersonButton);
+            me.showPersonViewButtons = ko.computed(me.computeShowPersonViewButtons);
         }
+
+        private computeShowPersonViewButtons = () => {
+            var me = this;
+            return (me.userCanEdit() && (me.addressForm.viewState() == 'view' || me.addressForm.viewState() == 'empty'));
+        };
+
+        private computeShowAddPersonButton = () => {
+            var me = this;
+            return (me.family.personCount() < 2 &&
+                (me.userCanEdit() && (me.personForm.viewState() == 'view' || me.personForm.viewState() == 'empty')));
+        };
+
+        private computeShowEditButton = () => {
+            var me = this;
+            // userCanEdit() && (personForm.viewState() == 'view' || personForm.viewState() == 'empty'
+            return me.userCanEdit() && (me.personForm.viewState() == 'view' || me.personForm.viewState() == 'empty');
+        };
+
+
 
         /**
          * @param applicationPath - root path of application or location of service script
