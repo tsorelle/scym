@@ -75,6 +75,11 @@
   <?php print $scripts; ?>
 </head>
 <body class="<?php print $classes; ?>" <?php print $attributes;?>>
+<!--
+<div style="background-color: yellow;color: firebrick; padding: 5px; border: 1px solid black">
+   This site is for testing only. The real SCYM site is <a href="http://www.scym.org"><strong>http://www.scym.org</strong></a>
+</div>
+-->
   <div id="skip-link">
     <a href="#main-content" class="element-invisible element-focusable"><?php print t('Skip to main content'); ?></a>
   </div>

@@ -11,7 +11,7 @@ declare module Tops {
         showProgress(message: string) : void;
         setProgress(count: number) : void;
 
-        peanut: Tops.Peanut;
+        // peanut: Tops.Peanut;
         viewModel: any;
         serviceUrl: string;
         applicationPath: string;

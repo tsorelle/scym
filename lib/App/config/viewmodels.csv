@@ -8,4 +8,4 @@ datepickertest,DatePickerTestViewModel
 helloworld,HelloWorldViewModel
 registerdocument,RegisterDocumentViewModel
 testpage,TestPageViewModel
-meetings/gmap,MeetingsMapViewModel,maps.api
+meetings/gmap,MeetingsMapViewModel,maps.api,url:http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js

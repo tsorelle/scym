@@ -165,11 +165,11 @@ module Tops {
         peanut: Tops.Peanut;
         viewModel: any;
 
-        // Drupal 8
+        // Drupal 7/8
         // See modules/tops/tops.routing.yml and modules/tops/src/controller/TopsController.php
         serviceUrl: string = "tops/service";
 
-        // Drupal 6/7 or PHP
+        // Drupal 6 or PHP
         // serviceUrl: string = "topsService.php";
 
 
@@ -227,13 +227,22 @@ module Tops {
                 if (path.charAt(0) != "/")
                     me.applicationPath = "/";
                 me.applicationPath = me.applicationPath + path;
-                if (path.charAt(path.length - 1) != "/")
+                if (path.charAt(path.length - 1) != "/") {
                     me.applicationPath = me.applicationPath + "/";
+                }
             }
-            else
+            else {
                 me.applicationPath = "/";
+            }
 
-            me.applicationPath = location.protocol + '//' + location.hostname + me.applicationPath;
+            var port = location.port;
+            if ((!port) || port == '8080') {
+                port = '';
+            }
+            else {
+                port = ':' + port;
+            }
+            me.applicationPath = location.protocol + '//' + location.hostname + port + me.applicationPath;
         }
 
         showServiceMessages(messages: Tops.IServiceMessage[]): void {

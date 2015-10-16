@@ -145,16 +145,21 @@ class TopsModule {
         $variables['peanut_viewmodel_src'] = $vmPath ? $vmPath->path : '';
         // $variables['tops_js_debug'] =  \Tops\sys\TTracer::JsDebuggingOn();
         if ($hasVm) {
-            $initJs =  "ViewModel.init('//', function() {  ko.applyBindings(ViewModel); });";
+            $initJs =  "ViewModel.init('/', function() {  ko.applyBindings(ViewModel); });";
             foreach ($vmPath->requires as $requirement) {
                 if ($requirement == 'maps.api') {
                     $mapKey = 'AIzaSyDPaIAgncWvvzfrsnw53PTxmLow3Tu4WEg';
                     $variables['googleApiKey'] = $mapKey;
                 } else {
-                    $href = (strpos($requirement, 'url:') === 0) ?
-                        substr($requirement, 4) :
-                        TViewModel::getVmDirectory() . '/' . $requirement;
-                    drupal_add_js($href, array('group' => 'JS_THEME', 'scope' => 'footer'));
+                    $pos = strpos($requirement, 'url:');
+                    if ($pos === 0) {
+                        $src = substr($requirement, 4);
+                    }
+                    else {
+                        $src = TViewModel::getVmDirectory() . '/' . $requirement;
+                    }
+
+                    drupal_add_js($src, array('group' => 'JS_THEME', 'scope' => 'footer'));
                 }
             }
 
