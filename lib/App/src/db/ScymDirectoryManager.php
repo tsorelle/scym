@@ -193,20 +193,24 @@ class ScymDirectoryManager extends TDbServiceManager
         $repository = $this->getPersonsRepository();
         $persons = $repository->findBy(array('active'=>1,'newsletter'=>1),array('email'=>'ASC'));
         $result = array();
-        $rec = "\"First Name\",\"Last Name\",\"Email Address\"\n";
+        // $rec = "\"First Name\",\"Last Name\",\"Email Address\"\n";
+        $rec = "\"Email Address\",\"First Name\",\"Last Name\"\n";
         array_push($result,$rec);
         $previousEmail = null;
         foreach ($persons as $p) {
             $email = $p->getEmail();
-
             if (!empty($email)) {
                 if ($email == $previousEmail) {
                     continue; // skip duplicate addresses
                 }
                 $previousEmail = $email;
                 $first = $p->getFirstName();
+                $first = str_replace("\""," ",$first);
+                $first = str_replace(","," ",$first);
                 $last = $p->getLastName();
-                $rec = "\"".$p->getFirstName()."\",\"".$p->getLastName()."\",\"".$email."\"\n";
+                $last = str_replace("\""," ",$last);
+                $last = str_replace(","," ",$last);
+                $rec = "\"$email\",\"$first\",\"$last\"\n";
                 array_push($result,$rec);
             }
         }

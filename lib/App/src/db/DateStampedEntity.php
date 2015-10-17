@@ -210,4 +210,21 @@ class DateStampedEntity {
         return $this->formatDtoDate($this->dateupdated,$format);
     }
 
+    protected function convertDate($dateString) {
+        try {
+            $dateValue = empty($dateString) ? null : new \DateTime($dateString);
+        }
+        catch(\Exception $ex) {
+            return false;
+        }
+        return $dateValue;
+    }
+
+    protected function convertDefaultDate($dateString) {
+        if (empty($dateString)) {
+            return new \DateTime();
+        }
+        $dateValue = $this->convertDate($dateString);
+        return $dateValue;
+    }
 }

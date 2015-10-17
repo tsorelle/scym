@@ -534,9 +534,7 @@ class ScymAddress extends DateStampedEntity
         $this->notes = $dto->notes;
         $this->newsletter = $dto->newsletter;
         $this->active = $dto->active;
-        $this->directorylistingtypeid= $dto->directorylistingtypeid;
+        $this->directorylistingtypeid = $dto->directorylistingtypeid;
         $this->sortkey = $dto->sortkey;
     }
-
-
 }
