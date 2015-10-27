@@ -7,7 +7,8 @@
  */
 
 namespace App\db;
-//abstract 
+//abstract
+use Tops\sys\TDateTime;
 
 /**
  * @MappedSuperclass
@@ -198,10 +199,7 @@ class DateStampedEntity {
 
     protected function formatDtoDate($dateValue,$format='F j, Y')
     {
-        if (empty($dateValue) || $dateValue->format('Y-m-d H:i:s') == '0000-01-01 00:00:00') {
-            return '';
-        }
-        return $dateValue->format($format);
+        return TDateTime::format($dateValue,$format);
     }
 
 

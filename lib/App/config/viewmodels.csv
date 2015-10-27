@@ -1,4 +1,4 @@
-members/directory,ScymDirectoryViewModel
+members/directory,ScymDirectoryViewModel,formComponents
 members/download,DownloadsViewModel
 mailboxes,MailboxesViewModel
 mailform,MailFormViewModel

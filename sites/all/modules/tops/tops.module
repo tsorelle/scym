@@ -65,6 +65,20 @@ function tops_help($path, $arg) {
     \Drupal\tops\TopsModule::GetHelpContent($path,$arg);
 }
 
+/**
+ * Implements hook_mail_alter().
+
+function tops_mail_alter(&$message)
+{
+    $id = $message['id'];
+    print "<pre>";
+    print "$id\n\n";
+    print_r($message['headers']);
+    print "</pre>";
+    exit ("Temporarily disabled. Try later please.");
+}
+ */
+
 
 /**
 *  Implement hook_init()

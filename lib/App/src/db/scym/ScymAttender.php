@@ -152,16 +152,16 @@ class ScymAttender extends DateStampedEntity
     /**
      * @var boolean
      *
-     * @Column(name="generation", type="boolean", nullable=true)
+     * @Column(name="generationId", type="boolean", nullable=true)
      */
-    private $generation = '1';
+    private $generationId = '1'; // lookup: generations
 
     /**
      * @var string
      *
      * @Column(name="gradeLevel", type="string", length=2, nullable=true)
      */
-    private $gradeLevel;
+    private $gradeLevel; // 'PS','K', 1 .. 13
 
     /**
      * @var integer
@@ -173,9 +173,9 @@ class ScymAttender extends DateStampedEntity
     /**
      * @var integer
      *
-     * @Column(name="feeCredit", type="integer", nullable=true)
+     * @Column(name="creditTypeId", type="integer", nullable=true)
      */
-    private $feeCredit = '0'; //todo: what is feeCredit?
+    private $creditTypeId = '0'; // formerly: feeCredit, lookup: creditTypes
 
     /**
      * @var boolean
@@ -629,26 +629,26 @@ class ScymAttender extends DateStampedEntity
     }
 
     /**
-     * Set generation
+     * Set generationId
      *
-     * @param boolean $generation
+     * @param boolean $generationId
      * @return ScymAttender
      */
-    public function setGeneration($generation)
+    public function setGenerationId($generationId)
     {
-        $this->generation = $generation;
+        $this->generationId = $generationId;
 
         return $this;
     }
 
     /**
-     * Get generation
+     * Get generationId
      *
      * @return boolean
      */
-    public function getGeneration()
+    public function getGenerationId()
     {
-        return $this->generation;
+        return $this->generationId;
     }
 
     /**
@@ -698,26 +698,26 @@ class ScymAttender extends DateStampedEntity
     }
 
     /**
-     * Set feecredit
+     * Set creditTypeId
      *
-     * @param integer $feecredit
+     * @param integer $creditTypeId
      * @return ScymAttender
      */
-    public function setFeeCredit($feecredit)
+    public function setCreditTypeId($creditTypeId)
     {
-        $this->feeCredit = $feecredit;
+        $this->creditTypeId = $creditTypeId;
 
         return $this;
     }
 
     /**
-     * Get feecredit
+     * Get feeCreditId
      *
      * @return integer
      */
-    public function getFeecredit()
+    public function getCreditTypeId()
     {
-        return $this->feeCredit;
+        return $this->creditTypeId;
     }
 
     /**
@@ -814,7 +814,6 @@ class ScymAttender extends DateStampedEntity
         $this->middleName            =  $dto->middleName;
         $this->affiliationCode         =  $dto->affiliationCode;
         $this->otherAffiliation      =  $dto->otherAffiliation;
-        $this->personId              =  $dto->personId;
         $this->firstTimer            =  $dto->firstTimer;
         $this->teacher               =  $dto->teacher;
         $this->financialAidRequested =  $dto->financialAidRequested;
@@ -827,10 +826,10 @@ class ScymAttender extends DateStampedEntity
         $this->housingTypeId         =  $dto->housingTypeId;
         $this->vegetarian            =  $dto->vegetarian;
         $this->attended              =  $dto->attended;
-        $this->generation            =  $dto->generation;
+        $this->generationId            =  $dto->generationId;
         $this->gradeLevel            =  $dto->gradeLevel;
         $this->ageGroupId            =  $dto->ageGroupId;
-        $this->feeCredit             =  $dto->feeCredit;
+        $this->creditTypeId          =  $dto->creditTypeId;
         $this->singleOccupant        =  $dto->singleOccupant;
         $this->glutenFree            =  $dto->glutenFree;
         return true;
@@ -859,10 +858,10 @@ class ScymAttender extends DateStampedEntity
         $result->housingTypeId         =  $this->housingTypeId;
         $result->vegetarian            =  $this->vegetarian;
         $result->attended              =  $this->attended;
-        $result->generation            =  $this->generation;
+        $result->generationId            =  $this->generationId;
         $result->gradeLevel            =  $this->gradeLevel;
         $result->ageGroupId            =  $this->ageGroupId;
-        $result->feeCredit             =  $this->feeCredit;
+        $result->creditTypeId           =  $this->creditTypeId;
         $result->singleOccupant        =  $this->singleOccupant;
         $result->glutenFree            =  $this->glutenFree;
 

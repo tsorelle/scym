@@ -78,7 +78,7 @@ class ScymRegistration extends DateStampedEntity
      *
      * @Column(name="statusId", type="integer", nullable=false)
      */
-    private $statusId = '1';
+    private $statusId = '1'; // lookup: registration statustypes
 
     /**
      * @var string
