@@ -8,7 +8,7 @@
 
 namespace App\db;
 
-use App\db\scym\ScymSessionDate;
+use App\db\scym\ScymAnnualSession;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Tops\db\TDbServiceManager;
@@ -18,10 +18,10 @@ class ScymRegistrationsManager extends TDbServiceManager
 {
     /**
      * @param null $year
-     * @return null|ScymSessionDate
+     * @return null|ScymAnnualSession
      */
-    public function getSessionYear($year = null) {
-        $repository =  $this->getRepository('App\db\scym\ScymSessionDate');
+    public function getSession($year = null) {
+        $repository =  $this->getRepository('App\db\scym\ScymAnnualSession');
         if (empty($year)) {
             $year = date("Y");
         }
