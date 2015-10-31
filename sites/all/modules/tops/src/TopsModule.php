@@ -197,6 +197,16 @@ class TopsModule {
             ),
         );
 
+        $libraries['headjs'] = array(
+            'title' => 'Head JS Load',
+            'website' => 'http://cdnjs.cloudflare.com',
+            'version' => '1.0.3',
+            'js' => array(
+                'http://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.js' => array('type'=>'external', 'group' => JS_LIBRARY,  'weight' => '1')
+            )
+
+        );
+
         $libraries['peanut'] = array(
             'title' => 'Peanut Service Library',
             'version' => '1.0',
@@ -205,7 +215,7 @@ class TopsModule {
             ),
             'dependencies' => array(
                 array('system', 'jquery'),
-                array('tops','knockoutjs'),
+                array('tops','knockoutjs')
                 // we also need bootstrap but will rely on bootstrap module for that
             ),
         );
@@ -229,6 +239,7 @@ class TopsModule {
                 array('system', 'jquery'),
                 array('tops','knockoutjs'),
                 array('tops','underscorejs'),
+                array('tops','headjs'),
                 array('tops','peanut')
                 // we also need bootstrap but will rely on bootstrap module for that
             )

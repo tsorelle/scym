@@ -10,6 +10,7 @@ declare module Tops {
         hideWaiter() : void;
         showProgress(message: string) : void;
         setProgress(count: number) : void;
+        loadComponent(name: string, successFunction?: () => void);
 
         peanut: any; // Tops.Peanut;
         viewModel: any;

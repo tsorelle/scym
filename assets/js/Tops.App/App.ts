@@ -4,6 +4,8 @@
 ///<reference path='../Tops.Peanut/Peanut.d.ts' />
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path="../typings/bootstrap/bootstrap.d.ts" />
+/// <reference path="../typings/custom/head.load.d.ts" />
+/// <reference path="../components/TkoComponentLoader.ts" />
 module Tops {
     export class mailBox {
         id:string;
@@ -164,6 +166,7 @@ module Tops {
         applicationPath: string = "";
         peanut: Tops.Peanut;
         viewModel: any;
+        componentLoader: TkoComponentLoader = null;
 
         // Drupal 7/8
         // See modules/tops/tops.routing.yml and modules/tops/src/controller/TopsController.php
@@ -179,6 +182,21 @@ module Tops {
             var htmlSource =  this.applicationPath +
                 'assets/templates/' + fileName + '.html';
             jQuery.get(htmlSource, successFunction);
+        }
+
+        public loadComponent(name: string, successFunction?: () => void) {
+            var me = this;
+            if (me.componentLoader) {
+                me.componentLoader.load(name, successFunction);
+            }
+            else
+            {
+                head.load(this.applicationPath + 'assets/js/components/TkoComponentLoader.js', function() {
+                        me.componentLoader = new TkoComponentLoader(me.applicationPath);
+                        me.componentLoader.load(name, successFunction);
+                    }
+                );
+            }
         }
 
         private registerComponent(name: string, vm: any, successFunction?: () => void) {
