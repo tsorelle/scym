@@ -153,6 +153,14 @@ class ScymRegistration extends DateStampedEntity
     /**
      * @var boolean
      *
+     * @Column(name="confirmed", type="boolean", nullable=true)
+     */
+    private $confirmed = '0';
+
+
+    /**
+     * @var boolean
+     *
      * @Column(name="arrivalTime", type="boolean", nullable=true)
      */
     private $arrivalTime;
@@ -554,6 +562,30 @@ class ScymRegistration extends DateStampedEntity
     }
 
     /**
+     * Set contactRequested
+     *
+     * @param boolean $contactRequested
+     * @return ScymRegistration
+     */
+    public function setConfirmed($confirmed)
+    {
+        $this->confirmed = $confirmed;
+
+        return $this;
+    }
+
+    /**
+     * Get confirmed
+     *
+     * @return boolean
+     */
+    public function getConfirmed()
+    {
+        return $this->confirmed;
+    }
+
+
+    /**
      * Set arrivalTime
      *
      * @param boolean $arrivalTime
@@ -800,6 +832,7 @@ class ScymRegistration extends DateStampedEntity
         $result->notes                    = $this->notes ;
         $result->feesReceivedDate         = $this->formatDtoDate($this->feesReceivedDate);
         $result->contactRequested         = $this->contactRequested;
+        $result->confirmed                = $this->confirmed;
         $result->arrivalTime              = $this->arrivalTime;
         $result->departureTime            = $this->departureTime;
         $result->scymNotes                = $this->scymNotes;
@@ -840,6 +873,7 @@ class ScymRegistration extends DateStampedEntity
         $this->amountPaid               = $dto->amountPaid;
         $this->notes                    = $dto->notes ;
         $this->contactRequested         = $dto->contactRequested;
+        $this->confirmed                = $dto->confirmed;
         $this->arrivalTime              = $dto->arrivalTime;
         $this->departureTime            = $dto->departureTime;
         $this->scymNotes                = $dto->scymNotes;

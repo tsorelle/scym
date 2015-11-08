@@ -163,6 +163,8 @@ class TopsModule {
                 }
             }
 
+
+
             drupal_add_library('system', 'ui.datepicker');
             drupal_add_library('tops','peanut.app');
             drupal_add_js($vmPath->path,array('group'=>'JS_THEME', 'scope'=>'footer'));

@@ -184,6 +184,10 @@ module Tops {
             jQuery.get(htmlSource, successFunction);
         }
 
+        public loadCSS(name: string, successFunction?: () => void) {
+            head.load(this.applicationPath + 'assets/css/' + name, successFunction);
+        }
+
         public loadComponent(name: string, successFunction?: () => void) {
             var me = this;
             if (me.componentLoader) {

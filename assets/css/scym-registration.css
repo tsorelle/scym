@@ -1,0 +1,27 @@
+#reg-form-header-row {
+    background-image: url('../img/pictures/gfc-flowers-bkg-2.jpg');
+    background-repeat: no-repeat;
+    margin-bottom: 5px;
+}
+#reg-form-header-row h3 {
+    margin-top: 65px;
+    padding-left: 10px;
+    text-shadow: 2px 2px white;
+    font-weight: bold;
+    font-size: 28px;
+    margin-bottom: 35px;
+    width: 100%;
+    text-align: center;
+    color: #337ab7;
+}
+.reg-nav-tab {
+    padding-bottom: 5px;
+}
+.reg-nav-tab button {
+    padding: 5px;
+    text-align: left;
+}
+
+.reg-instruction {
+    font-size: 18px;
+}

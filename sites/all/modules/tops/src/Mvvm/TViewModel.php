@@ -155,9 +155,16 @@ class TViewModel
                         $key = trim($parts[0]);
                         $value = trim($parts[1]);
                         $item->path = $vmDirectory.'/'.$value.'.js';
+                        $item->messagesComponent = true;
                         if ($partsCount > 2) {
                             for ($i = 2; $i < $partsCount; $i++) {
-                                $item->requires[$i-2] = trim($parts[$i]);
+                                $requirement =  trim($parts[$i]);
+                                if ($requirement == 'no-messages')  {
+                                    $item->messagesComponent = false;
+                                }
+                                else {
+                                    $item->requires[$i - 2] = trim($parts[$i]);
+                                }
                             }
                         }
                         self::$vmPaths[$key] = $item;

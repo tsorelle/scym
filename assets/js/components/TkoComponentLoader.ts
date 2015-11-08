@@ -3,6 +3,7 @@
  */
 /// <reference path='../typings/jquery/jquery.d.ts' />
 /// <reference path="../typings/knockout/knockout.d.ts" />
+/// <reference path="../typings/custom/head.load.d.ts" />
 module Tops {
     export class TkoComponentLoader {
         static instance : TkoComponentLoader;
@@ -43,7 +44,7 @@ module Tops {
             var htmlPath = me.applicationPath + me.htmlPath + '/' + fileName + '.html';
             jQuery.get(htmlPath, function (htmlSource:string) {
                 var src = me.applicationPath + me.vmPath + '/' + fileName + '.js';
-                jQuery.getScript(src, function () {
+                head.load(src, function () {
                     var vm = me.getVM(name);
                     if (vm) {
                         ko.components.register(name, {

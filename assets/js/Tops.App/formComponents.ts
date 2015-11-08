@@ -56,7 +56,14 @@ module Tops {
             }
         }
 
-
+        /**
+         * Set view state, iqnore any constraints
+         * @param state
+         */
+        public setViewState(state = 'view') {
+            var me = this;
+            me.viewState(state);
+        }
     }
 
     // * Base class for observable container that handles search results.
@@ -174,7 +181,4 @@ module Tops {
             }
         }
     }
-
-
-
 }

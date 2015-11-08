@@ -1,0 +1,295 @@
+<!-- ******************  START FORM ****************************************************************************  -->
+<div id="application-container" style="display:none" class="view-model-container" style="display: none">
+    <div id="reg-header">
+        <h4>
+            <span data-bind="text:datesText"></span>
+            -
+            <span data-bind="text:locationText"></span>
+        </h4>
+
+        <div id="reg-form-header-row" class="clearfix">
+            <h3 data-bind="text:formTitle"></h3>
+        </div>
+    </div>
+    <div id="forms" class="row">
+        <div id="nav-column" class="col-md-2" data-bind="visible:registrationForm.registrationCode">
+            <div class="reg-nav-tab" data-bind="visible: registerButton.isVisible">
+                <button type="button" data-bind="attr: {class: registerButton.css, title: registerButton.title}, click: showSummaryForm" >
+                    <span data-bind="text:registerButton.label"></span>
+                    <span aria-hidden="true"
+                          data-bind="visible: registerButton.iconClasses, attr:{class: registerButton.iconClasses}"></span>
+                </button>
+            </div>
+
+            <div id="contact-button" class="reg-nav-tab" data-bind="visible: contactButton.isVisible">
+                <button type="button" data-bind="attr: {class: contactButton.css, title: contactButton.title}, click: showContactForm" >
+                    <span data-bind="text:contactButton.label"></span>
+                    <span aria-hidden="true"
+                          data-bind="visible: contactButton.iconClasses, attr:{class: contactButton.iconClasses}"></span>
+                </button>
+            </div>
+
+            <div id="attenders-button" class="reg-nav-tab" data-bind="visible: attendersButton.isVisible">
+                <button type="button" data-bind="attr: {class: attendersButton.css, title: attendersButton.title}, click: showAttenderForm" >
+                    <span data-bind="text:attendersButton.label"></span>
+                    <span aria-hidden="true"
+                          data-bind="visible: attendersButton.iconClasses, attr:{class: attendersButton.iconClasses}"></span>
+                </button>
+            </div>
+
+            <div id="account-button" class="reg-nav-tab" data-bind="visible: accountButton.isVisible">
+                <button type="button" data-bind="attr: {class: accountButton.css, title: accountButton.title}, click: showAccountsForm" >
+                    <span data-bind="text:accountButton.label"></span>
+                    <span aria-hidden="true"
+                          data-bind="visible: accountButton.iconClasses, attr:{class: accountButton.iconClasses}"></span>
+                </button>
+            </div>
+            <div class="reg-nav-tab" data-bind="visible:changesToSave">
+                <button type="button" class="btn  btn-lg btn-block  btn-danger" data-bind="click: saveChanges"  >
+                    Save changes
+                </button>
+            </div>
+            <div id="button-help">
+                <span class="whats-this">
+                    <a tabindex="0" role="button" data-toggle="popover"
+                       data-trigger="focus" title="Navigation buttons"
+                       data-placement="bottom"
+                       data-content="Use the buttons to select sections of your registration. Green buttons with check mark indicate you are ready to go. Orange with arrow means more information is needed. The red button means to save your changes and blue is for information. ">
+                        What are these buttons?</a>
+                </span>
+            </div>
+
+
+        </div>
+        <div id="form-column" class="col-md-10">
+            <div data-bind="visible:debugging">currentForm: <span data-bind="text:currentForm()"></span></div>
+            <messages-component></messages-component>
+            <div id="welcome-form" data-bind="visible:currentForm() == 'welcome'">
+                <div id="welcome-authenticated"  data-bind="visible:user.authenticated">
+                    <p><span class="reg-instruction" >Welcome <span data-bind="text:user.name"></span></span>
+                        <br/>
+                        Not <span data-bind="text:user.name"></span>?  Please sign out.</span>
+                    </p>
+                    <button type="button" class="btn btn-success btn-md"
+                            data-bind="visible:registrationId, click:getRegistration">
+                        <span >Continue  or update your registration </span>
+                        <span class="glyphicon glyphicon-forward"></span>
+                    </button>
+                    <button type="button" class="btn btn-success btn-md"
+                            data-bind="visible:!registrationId(), click:newRegistration">
+                        <span data-bind="visible:!registrationId()">Start your registration </span>
+                        <span class="glyphicon glyphicon-forward"></span>
+                    </button>
+                </div>
+
+                <div id="welcome-anonymous" data-bind="visible: !user.authenticated()">
+                    <p>
+                        <strong><em>Take note:</em></strong> If you have a web site account, you may sign in for a more convenient registration experience.<br>
+                        Or you can answer our security question and click one of the buttons below to get started.
+                    </p>
+
+                    <div class="form-group" data-bind="css:{'has-error': startupForm.validationError}">
+                        <label for="securityQuestion" class="control-label">Security question
+                            <span data-bind="text:startupForm.validationError"></span>
+                        </label>
+                            <span class="whats-this">
+                                <a tabindex="0" role="button" data-toggle="popover"
+                                   data-trigger="focus" title="Security question"
+                                   data-placement="bottom"
+                                   data-content="This question is to discourage spam and other attempts to hack the site.">
+                                    What's this?</a>
+                            </span><br>
+                        <div>
+                            What is the name of the founder of Quakerism?
+                        </div>
+                        <input class="form-control" id="securityQuestion" data-bind="value:startupForm.securityAnswer"/>
+                    </div>
+
+                    <p>
+                        <button type="button" class="btn btn-success btn-md" data-bind="click:startRegistration">Start your registration
+                            <span class="glyphicon glyphicon-forward"></span></button>
+                    </p>
+                    <p>
+                        <button type="button" class="btn btn-success btn-md" data-bind="click:startLookup">Find your existing registration
+                            <span class="glyphicon glyphicon-forward"></span></button>
+                    </p>
+                </div>
+            </div>
+            <div id="lookup-form" data-bind="visible:currentForm() == 'lookup'">
+                <p class="reg-instruction">Please enter your e-mail address, or your lookup code.
+                                                        <span class="whats-this">
+                                                            <a tabindex="0" role="button" data-toggle="popover"
+                                                               data-trigger="focus" title="Lookup code"
+                                                               data-placement="bottom"
+                                                               data-content="When you entered your registration previously you were asked for an e-mail address or a lookup code. A lookup code is like a password used to find your registration.">
+                                                                What's this?</a>
+                                                        </span>
+
+                </p>
+                <div class="form-group" data-bind="css:{'has-error': lookupForm.validationError}">
+                    <label for = "lookupCode" data-bind="visible:lookupForm.validationError"><span data-bind="text:lookupForm.validationError" class="error-label"></span></label>
+                    <input id="lookupCode" type="text" class="form-control" data-bind="value: lookupForm.lookupCode">
+                </div>
+                <p>
+                    <button type="button" class="btn btn-success btn-md" data-bind="click:findRegistration">Continue
+                        <span class="glyphicon glyphicon-forward"></span></button>
+                </p>
+                <p>
+                    <br>Can't find it? <br>
+                    <button type="button" class="btn btn-success btn-md" data-bind="click:newRegistration">Start a new registration
+                        <span class="glyphicon glyphicon-forward"></span></button>
+                </p>
+            </div>
+            <div id="registration-summary-form" data-bind="visible:currentForm() == 'registration'">
+                <div id="lookup-code" data-bind="visible:!registrationForm.registrationCode()">
+                    <p class="reg-instruction">Please enter your e-mail address.</p>
+                    <p>
+                        If you don't have an email address or if there is another registration using yours
+                        enter a word or phrase that you can use later to look up your registration.
+                    </p>
+                    <div class="form-group" data-bind="css:{'has-error': lookupForm.validationError}">
+                        <div data-bind="text:lookupForm.validationError" class="error-label"></div>
+                        <input id="newRegistrationCode" type="text" class="form-control" data-bind="value: lookupForm.lookupCode">
+                    </div>
+                    <p>
+                        <button type="button" class="btn btn-success btn-md" data-bind="click:onLookupCodeEntered">Continue
+                            <span class="glyphicon glyphicon-forward"></span></button>
+                    </p>
+                </div>
+                <div id="reg-status-panel" data-bind="visible:registrationForm.registrationCode">
+                    <div id="reg-status-new" data-bind="visible:!registrationForm.id()">
+                        <p class="reg-instruction">
+                            Your registration is almost ready to submit.  Your next steps are:
+                        </p>
+                        <ol>
+                            <li data-bind="visible:!contactButton.isComplete()">Complete the contact form</li>
+                            <li data-bind="visible:!attendersButton.isComplete()">Add one or more attenders</li>
+                            <li data-bind="visible:!accountButton.isComplete()">View and save the account form</li>
+                            <li>Save your changes</li>
+                        </ol>
+                    </div>
+                    <div id="reg-status-info" data-bind="visible:registrationForm.id">
+                        Registration status info here.
+                    </div>
+                </div>
+            </div>
+            <div id="contact-form" data-bind="visible:currentForm() == 'contact'">
+                <fieldset>
+                    <legend>Address and Other Details</legend>
+                    <div data-bind="visible:debugging">Viewstate: <span data-bind="text:registrationForm.contactInfoForm.viewState()"></span></div>
+                    <div id="contact-edit-panel" data-bind="visible:registrationForm.contactInfoForm.viewState() == 'edit'">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group" data-bind="css:{'has-error': registrationForm.contactInfoForm.nameError}" >
+                                    <label for="addressname-input" class="control-label">Name<span data-bind="text:registrationForm.contactInfoForm.nameError"></span></label>
+                                    <input class="form-control" id="addressname-input" data-bind="value:registrationForm.contactInfoForm.name"/>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" data-bind="css:{'has-error': registrationForm.contactInfoForm.emailError}" >
+                                    <label for email-input class="control-label">
+                                        E-mail<span data-bind="text:registrationForm.contactInfoForm.emailError"></span>
+                                    </label>
+                                    <input class="form-control" id="email-input" data-bind="value:registrationForm.contactInfoForm.email"/>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for phone-input class="control-label">
+                                        Phone
+                                    </label>
+                                    <input class="form-control" id="phone-input" data-bind="value:registrationForm.contactInfoForm.phone"/>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for address-input class="control-label">
+                                        Street address
+                                    </label>
+                                    <input class="form-control" id="address-input" data-bind="value:registrationForm.contactInfoForm.address"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for city-input class="control-label">
+                                        City
+                                    </label>
+                                    <span> (enter City, State/Province, Postal code)</span>
+                                    <input class="form-control" id="city-input" data-bind="value:registrationForm.contactInfoForm.city"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="notes-input" class="control-label">Notes</label>
+                                    <span>(Please add any questions or comments for the reqistrar.</span>
+                                    <textarea class="form-control" id="notes-input" data-bind="value:registrationForm.contactInfoForm.notes"></textarea>
+                                </div>
+                                <div id="registration-edit-buttons" data-bind="visible:registrationForm.id">
+                                    <button class="btn btn-primary" data-bind="click:saveRegistration">Save</button>
+                                    <button class="btn btn-default" data-bind="click:cancelRegistrationEdit">Cancel</button>
+                                </div>
+                                <div class="alert alert-danger" role="alert" data-bind="visible:registrationForm.contactInfoForm.hasErrors">
+                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                    <span class="sr-only">Error:</span>
+                                    Please correct errors before saving.
+                                </div>
+                                <div id="registration-buttons">
+                                    <button class="btn btn-primary" data-bind="visible: attenderList.length == 0,click:addAttenders">Add attenders</button>
+                                    <button class="btn btn-primary" data-bind="visible: attenderList.length,click:saveContactInfo">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="contact-view-panel" data-bind="visible:registrationForm.contactInfoForm.viewState() == 'view'">
+                        <div id="contact-view-buttons">
+                            <h3>Contact View</h3>
+                            <button class="btn btn-primary" data-bind="click:editContactForm">Update</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div id="attenders-form" data-bind="visible:currentForm() == 'attenders'">
+                <div id="attenders-list-panel" data-bind="visible:attenderForm.viewState() != 'edit'">
+                    <h3>Attenders List</h3>
+                </div>
+                <div id="attender-edit-panel" data-bind="visible:attenderForm.viewState() == 'edit'">
+                    <fieldset>
+                        <legend>Attender</legend>
+
+                    </fieldset>
+                    <div id="attender-buttons">
+                        <div id="attender-buttons-new-registration" data-bind="">
+                            <button class="btn btn-primary" data-bind="visible: !registrationForm.id(),click:saveAttenderAddNext">Add another</button>
+                            <button class="btn btn-primary" data-bind="visible: !registrationForm.id(),click:saveAttenderAndDone">Done</button>
+                            <button class="btn btn-primary" data-bind="visible: registrationForm.id(),click:saveAttender">Save</button>
+                            <button class="btn btn-primary" data-bind="click:cancelAttenderEdit">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="finance-form" data-bind="visible:currentForm() == 'accounts'">
+                <div id="finance-edit-panel" data-bind="visible:registrationForm.financeInfoForm.viewState() == 'edit'">
+                    <h3>Finance edit panel</h3>
+                    <div id="finance-edit-buttons">
+                        <button class="btn btn-primary" data-bind="click:saveFinanceInfo">Save</button>
+                    </div>
+
+                </div>
+                <div id="finance-view-panel" data-bind="visible:registrationForm.financeInfoForm.viewState() == 'view'">
+                    <h3>Finance view panel</h3>
+                    <div id="finance-view-buttons">
+                        <button class="btn btn-primary" data-bind="click:editAccountsForm">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ******************  END FORM ****************************************************************************  -->
