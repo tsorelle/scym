@@ -57,15 +57,14 @@ declare module Tops {
         gradeLevel : string; // 'PS','K', 1 .. 13
         ageGroupId : any; // lookup agegroups
         creditTypeId : number; // formerly: feeCredit, lookup: creditTypes
+        meals: number[];
     }
     export interface IRegistration {
         info : IRegistrationInfo;
         attendees : IAttender[];
     }
 
-    export interface IAgeGroup {
-        ageGroupId : any;
-        groupName : string;
+    export interface IAgeGroup extends IListItem {
         cutoffAge : any;
     }
 
@@ -88,12 +87,30 @@ declare module Tops {
         getLookupTables: number;
     }
 
+    export interface IAttenderLookups {
+        specialNeedsTypes: IListItem[];
+        housingTypes: IListItem[];
+        generationTypes : IListItem[];
+        affiliationCodes : IListItem[];
+        ageGroups : IAgeGroup[];
+        creditTypes : IListItem[];
+        gradeLevels : IListItem[];
+    }
+
     export interface IGetRegistrationResponse {
         registration : IRegistration;
         statusTypes : IListItem[];
-        specialNeedsTypes: IListItem[];
-        generationTypes : IListItem[];
-        creditTypes : IListItem[];
-        ageGroups : IAgeGroup[];
     }
+
+    export interface IGetAttenderResponse {
+        attender: IAttender;
+        lookups: IAttenderLookups;
+    }
+
+    export interface IGetAttenderRequest {
+        id : any;
+        includeLookups : number;
+    }
+
+
 }

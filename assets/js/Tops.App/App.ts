@@ -6,6 +6,8 @@
 /// <reference path="../typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../typings/custom/head.load.d.ts" />
 /// <reference path="../components/TkoComponentLoader.ts" />
+/// <reference path='../typings/underscore/underscore.d.ts' />
+
 module Tops {
     export class mailBox {
         id:string;
@@ -183,6 +185,53 @@ module Tops {
                 'assets/templates/' + fileName + '.html';
             jQuery.get(htmlSource, successFunction);
         }
+
+        private expandFileName(fileName: string ) {
+            if (!fileName) {
+                return '';
+            }
+            var fileExtension = fileName.substr((fileName.lastIndexOf('.') + 1));
+            if (fileExtension) {
+                switch (fileExtension.toLowerCase()) {
+                    case 'css' :
+                        return this.applicationPath + 'assets/css/' + fileName;
+                    case 'js' :
+                        return this.applicationPath + 'assets/js/components/' + fileName;
+                }
+            }
+            return fileName;
+
+        }
+        public loadResources(names: any, successFunction?: () => void) {
+            var me = this;
+            var params : any = null;
+            if (_.isArray(names)) {
+                params = [];
+                for(var i = 0; i < names.length; i++) {
+                    var path = me.expandFileName(names[i]);
+                    params.push(path);
+                }
+            }
+            else {
+                params = me.expandFileName(names);
+            }
+            head.load(params, successFunction);
+        }
+
+        public loadJS(names: any, successFunction?: () => void) {
+            var params: any = null;
+            if (_.isArray(names)) {
+                params = [];
+                for(var i = 0; i < names.length; i++) {
+                    params.push(this.applicationPath + 'assets/js/components/' + names[i]);
+                }
+            }
+            else {
+                params = names;
+            }
+            head.load(params, successFunction);
+        }
+
 
         public loadCSS(name: string, successFunction?: () => void) {
             head.load(this.applicationPath + 'assets/css/' + name, successFunction);

@@ -12,6 +12,8 @@ declare module Tops {
         setProgress(count: number) : void;
         loadComponent(name: string, successFunction?: () => void);
         loadCSS(name: string, successFunction?: () => void);
+        loadJS(names: any, successFunction?: () => void);
+        loadResources(names: any, successFunction?: () => void);
         peanut: any; // Tops.Peanut;
         viewModel: any;
         serviceUrl: string;

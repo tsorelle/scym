@@ -656,6 +656,7 @@ module Tops {
 
         debugging = ko.observable(false);
 
+        registrationStatus : number = -1;
         changesToSave = ko.observable(false);
         currentForm = ko.observable('');
         sessionInfo = new AnnualSessionInfo();
@@ -802,6 +803,9 @@ module Tops {
              });
              */
             window.onbeforeunload = function() {
+                if (me.registrationStatus === 1) {
+                    me.changesToSave(true) ;
+                }
                 if (me.changesToSave()) {
                     return "**** WARNING: If you reload or leave this page your changes will be lost. ****";
                 }
@@ -819,6 +823,10 @@ module Tops {
                     );
                 });
         }
+
+        public canLeavePage = () => {
+
+        };
 
         public getInitialInfo(successFunction?: () => void) {
             var me = this;
@@ -999,6 +1007,9 @@ module Tops {
             }
             if (me.registrationForm.id()) {
                 me.registrationForm.contactInfoForm.view();
+            }
+            else {
+                me.registrationStatus = 1;
             }
             me.contactButton.setStatus('complete');
             return true;

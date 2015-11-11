@@ -1,5 +1,6 @@
 <!-- ******************  START FORM ****************************************************************************  -->
 <div id="application-container" style="display:none" class="view-model-container" style="display: none">
+    <!-- app header -->
     <div id="reg-header">
         <h4>
             <span data-bind="text:datesText"></span>
@@ -11,37 +12,39 @@
             <h3 data-bind="text:formTitle"></h3>
         </div>
     </div>
-    <div id="forms" class="row">
+    <!-- app body -->
+    <div id="app-body" class="row">
+        <!-- form navigation -->
         <div id="nav-column" class="col-md-2" data-bind="visible:registrationForm.registrationCode">
             <div class="reg-nav-tab" data-bind="visible: registerButton.isVisible">
                 <button type="button" data-bind="attr: {class: registerButton.css, title: registerButton.title}, click: showSummaryForm" >
                     <span data-bind="text:registerButton.label"></span>
-                    <span aria-hidden="true"
-                          data-bind="visible: registerButton.iconClasses, attr:{class: registerButton.iconClasses}"></span>
+                                                        <span aria-hidden="true"
+                                                              data-bind="visible: registerButton.iconClasses, attr:{class: registerButton.iconClasses}"></span>
                 </button>
             </div>
 
             <div id="contact-button" class="reg-nav-tab" data-bind="visible: contactButton.isVisible">
                 <button type="button" data-bind="attr: {class: contactButton.css, title: contactButton.title}, click: showContactForm" >
                     <span data-bind="text:contactButton.label"></span>
-                    <span aria-hidden="true"
-                          data-bind="visible: contactButton.iconClasses, attr:{class: contactButton.iconClasses}"></span>
+                                                        <span aria-hidden="true"
+                                                              data-bind="visible: contactButton.iconClasses, attr:{class: contactButton.iconClasses}"></span>
                 </button>
             </div>
 
             <div id="attenders-button" class="reg-nav-tab" data-bind="visible: attendersButton.isVisible">
                 <button type="button" data-bind="attr: {class: attendersButton.css, title: attendersButton.title}, click: showAttenderForm" >
                     <span data-bind="text:attendersButton.label"></span>
-                    <span aria-hidden="true"
-                          data-bind="visible: attendersButton.iconClasses, attr:{class: attendersButton.iconClasses}"></span>
+                                                        <span aria-hidden="true"
+                                                              data-bind="visible: attendersButton.iconClasses, attr:{class: attendersButton.iconClasses}"></span>
                 </button>
             </div>
 
             <div id="account-button" class="reg-nav-tab" data-bind="visible: accountButton.isVisible">
                 <button type="button" data-bind="attr: {class: accountButton.css, title: accountButton.title}, click: showAccountsForm" >
                     <span data-bind="text:accountButton.label"></span>
-                    <span aria-hidden="true"
-                          data-bind="visible: accountButton.iconClasses, attr:{class: accountButton.iconClasses}"></span>
+                                                        <span aria-hidden="true"
+                                                              data-bind="visible: accountButton.iconClasses, attr:{class: accountButton.iconClasses}"></span>
                 </button>
             </div>
             <div class="reg-nav-tab" data-bind="visible:changesToSave">
@@ -50,20 +53,22 @@
                 </button>
             </div>
             <div id="button-help">
-                <span class="whats-this">
-                    <a tabindex="0" role="button" data-toggle="popover"
-                       data-trigger="focus" title="Navigation buttons"
-                       data-placement="bottom"
-                       data-content="Use the buttons to select sections of your registration. Green buttons with check mark indicate you are ready to go. Orange with arrow means more information is needed. The red button means to save your changes and blue is for information. ">
-                        What are these buttons?</a>
-                </span>
+                                                    <span class="whats-this">
+                                                        <a tabindex="0" role="button" data-toggle="popover"
+                                                           data-trigger="focus" title="Navigation buttons"
+                                                           data-placement="bottom"
+                                                           data-content="Use the buttons to select sections of your registration. Green buttons with check mark indicate you are ready to go. Orange with arrow means more information is needed. The red button means to save your changes and blue is for information. ">
+                                                            What are these buttons?</a>
+                                                    </span>
             </div>
 
 
         </div>
+        <!-- forms -->
         <div id="form-column" class="col-md-10">
             <div data-bind="visible:debugging">currentForm: <span data-bind="text:currentForm()"></span></div>
             <messages-component></messages-component>
+            <!-- welcome form -->
             <div id="welcome-form" data-bind="visible:currentForm() == 'welcome'">
                 <div id="welcome-authenticated"  data-bind="visible:user.authenticated">
                     <p><span class="reg-instruction" >Welcome <span data-bind="text:user.name"></span></span>
@@ -92,13 +97,13 @@
                         <label for="securityQuestion" class="control-label">Security question
                             <span data-bind="text:startupForm.validationError"></span>
                         </label>
-                            <span class="whats-this">
-                                <a tabindex="0" role="button" data-toggle="popover"
-                                   data-trigger="focus" title="Security question"
-                                   data-placement="bottom"
-                                   data-content="This question is to discourage spam and other attempts to hack the site.">
-                                    What's this?</a>
-                            </span><br>
+                                                                    <span class="whats-this">
+                                                                        <a tabindex="0" role="button" data-toggle="popover"
+                                                                           data-trigger="focus" title="Security question"
+                                                                           data-placement="bottom"
+                                                                           data-content="This question is to discourage spam and other attempts to hack the site.">
+                                                                            What's this?</a>
+                                                                    </span><br>
                         <div>
                             What is the name of the founder of Quakerism?
                         </div>
@@ -115,6 +120,7 @@
                     </p>
                 </div>
             </div>
+            <!-- lookup existing registration form -->
             <div id="lookup-form" data-bind="visible:currentForm() == 'lookup'">
                 <p class="reg-instruction">Please enter your e-mail address, or your lookup code.
                                                         <span class="whats-this">
@@ -140,22 +146,24 @@
                         <span class="glyphicon glyphicon-forward"></span></button>
                 </p>
             </div>
-            <div id="registration-summary-form" data-bind="visible:currentForm() == 'registration'">
-                <div id="lookup-code" data-bind="visible:!registrationForm.registrationCode()">
-                    <p class="reg-instruction">Please enter your e-mail address.</p>
-                    <p>
-                        If you don't have an email address or if there is another registration using yours
-                        enter a word or phrase that you can use later to look up your registration.
-                    </p>
-                    <div class="form-group" data-bind="css:{'has-error': lookupForm.validationError}">
-                        <div data-bind="text:lookupForm.validationError" class="error-label"></div>
-                        <input id="newRegistrationCode" type="text" class="form-control" data-bind="value: lookupForm.lookupCode">
-                    </div>
-                    <p>
-                        <button type="button" class="btn btn-success btn-md" data-bind="click:onLookupCodeEntered">Continue
-                            <span class="glyphicon glyphicon-forward"></span></button>
-                    </p>
+            <!-- new registration startup form -->
+            <div id="startnew-form" data-bind="visible:currentForm() == 'startnew'">
+                <p class="reg-instruction">Please enter your e-mail address.</p>
+                <p>
+                    If you don't have an email address or if there is another registration using yours
+                    enter a word or phrase that you can use later to look up your registration.
+                </p>
+                <div class="form-group" data-bind="css:{'has-error': lookupForm.validationError}">
+                    <div data-bind="text:lookupForm.validationError" class="error-label"></div>
+                    <input id="newRegistrationCode" type="text" class="form-control" data-bind="value: lookupForm.lookupCode">
                 </div>
+                <p>
+                    <button type="button" class="btn btn-success btn-md" data-bind="click:startNewRegistration">Continue
+                        <span class="glyphicon glyphicon-forward"></span></button>
+                </p>
+            </div>
+            <!-- registration summary form -->
+            <div id="registration-summary-form" data-bind="visible:currentForm() == 'registration'">
                 <div id="reg-status-panel" data-bind="visible:registrationForm.registrationCode">
                     <div id="reg-status-new" data-bind="visible:!registrationForm.id()">
                         <p class="reg-instruction">
@@ -173,10 +181,12 @@
                     </div>
                 </div>
             </div>
+            <!-- contact form -->
             <div id="contact-form" data-bind="visible:currentForm() == 'contact'">
                 <fieldset>
                     <legend>Address and Other Details</legend>
                     <div data-bind="visible:debugging">Viewstate: <span data-bind="text:registrationForm.contactInfoForm.viewState()"></span></div>
+                    <!-- edit panel -->
                     <div id="contact-edit-panel" data-bind="visible:registrationForm.contactInfoForm.viewState() == 'edit'">
                         <div class="row">
                             <div class="col-md-12">
@@ -242,19 +252,55 @@
                                 </div>
                                 <div id="registration-buttons">
                                     <button class="btn btn-primary" data-bind="visible: attenderList.length == 0,click:addAttenders">Add attenders</button>
-                                    <button class="btn btn-primary" data-bind="visible: attenderList.length,click:saveContactInfo">Save</button>
+                                    <!-- button class="btn btn-primary" data-bind="visible: attenderList.length,click:saveContactInfo">Save</button -->
+                                    <button class="btn btn-primary" data-bind="click:saveContactInfo">Save</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div id="contact-view-panel" data-bind="visible:registrationForm.contactInfoForm.viewState() == 'view'">
+                    <!-- view panel -->
+                    <div id="contact-view-panel" data-bind="visible:registrationForm.contactInfoForm.viewState() != 'edit'">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Name<span data-bind="visible:registrationForm.contactInfoForm.hasAddress"> and address</span></label>
+                                    <div data-bind="text:registrationForm.contactInfoForm.name"></div>
+                                    <div data-bind="text:registrationForm.contactInfoForm.address"></div>
+                                    <div data-bind="text:registrationForm.contactInfoForm.city"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group" data-bind="visible:registrationForm.contactInfoForm.email">
+                                    <label class="control-label">Email</label>
+                                    <div data-bind="text:registrationForm.contactInfoForm.email"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
+                                <div class="form-group" data-bind="visible:registrationForm.contactInfoForm.phone">
+                                    <label class="control-label">Phone</label>
+                                    <div data-bind="text:registrationForm.contactInfoForm.phone"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" data-bind="visible:registrationForm.contactInfoForm.notes">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">Notes</label>
+                                    <div data-bind="text:registrationForm.contactInfoForm.notes"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div id="contact-view-buttons">
-                            <h3>Contact View</h3>
                             <button class="btn btn-primary" data-bind="click:editContactForm">Update</button>
                         </div>
                     </div>
                 </fieldset>
             </div>
+            <!-- attenders form -->
             <div id="attenders-form" data-bind="visible:currentForm() == 'attenders'">
                 <div id="attenders-list-panel" data-bind="visible:attenderForm.viewState() != 'edit'">
                     <h3>Attenders List</h3>
@@ -262,6 +308,200 @@
                 <div id="attender-edit-panel" data-bind="visible:attenderForm.viewState() == 'edit'">
                     <fieldset>
                         <legend>Attender</legend>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="attender-errors" class="alert alert-danger" role="alert" data-bind="visible:attenderForm.hasErrors">
+                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                    <span class="sr-only">Error:</span>
+                                    Please correct errors before saving.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group" data-bind="css:{'has-error': attenderForm.firstNameError}" >
+                                    <label for="firstName" class="control-label">First name<span data-bind="text:attenderForm.firstNameError"></span></label>
+                                    <input class="form-control" id="firstName" data-bind="value:attenderForm.firstName"/>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="middleName" class="control-label">Middle name</label>
+                                    <input class="form-control" id="middleName" data-bind="value:attenderForm.middleName"/>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" data-bind="css:{'has-error': attenderForm.lastNameError}">
+                                    <label for="lastName" class="control-label">Last name<span data-bind="text:attenderForm.lastNameError"></span></label>
+                                    <input class="form-control" id="lastName" data-bind="value:attenderForm.lastName"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <Label>First time attender?&nbsp;</Label> <input type="checkbox" data-bind="checked: attenderForm.firstTimer" />
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" >
+                                    <label for="creditType-input" class="control-label">I am attending as a . . .</label>
+                                    <select class="form-control" id="creditType-input"
+                                            data-bind="options: attenderForm.creditTypes,optionsText:'Text',value: attenderForm.selectedCreditType"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" >
+                                    <label for="generation-input" class="control-label">Generation</label>
+                                    <select class="form-control" id="generation-input"
+                                            data-bind="options: attenderForm.generationTypes,optionsText:'Text',value: attenderForm.selectedGenerationType">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="dob-input" class="control-label">Date of birth (kids only)</label>
+                                    <input class="form-control datepicker" type="text" id="dob-input" data-bind="value:attenderForm.dateOfBirth"/>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" >
+                                    <label for="grade-input" class="control-label">Grade level</label>
+                                    <select class="form-control" id="grade-input"
+                                            data-bind="options: attenderForm.gradeLevels,optionsText:'Text',value: attenderForm.selectedGradeLevel,optionsCaption:'Select...'"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-4"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" >
+                                    <label for="affiliation-input" class="control-label">SCYM Meeting</label>
+                                    <select class="form-control" id="affiliation-input"
+                                            data-bind="options: attenderForm.affiliationCodes,optionsText:'Text',value: attenderForm.selectedAffiliationCode,optionsCaption:'Select...'"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="otherAffiliation-input" class="control-label">Other affiliation</label><span> (Friends organization or other yearly meeting)</span>
+                                    <input class="form-control" id="otherAffiliation-input" data-bind="value:attenderForm.otherAffiliation"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group" >
+                                    <label for="arrival-input" class="control-label">Arrival time</label>
+                                    <select class="form-control" id="arrival-input"
+                                            data-bind="options: attenderForm.timePeriods,optionsText:'Text',value: attenderForm.selectedArrivalTime"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" >
+                                    <label for="departure-input" class="control-label">Departure time</label>
+                                    <select class="form-control" id="departure-input"
+                                            data-bind="options: attenderForm.timePeriods,optionsText:'Text',value: attenderForm.selectedDepartureTime"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" >
+                                    <label for="housing-input" class="control-label">Housing preference</label>
+                                                                        <span>
+                                                                          Single occupant? <input type="checkbox" data-bind="checked: attenderForm.singleOccupant" />
+                                                                        </span>
+                                    <select class="form-control" id="housing-input"
+                                            data-bind="options: attenderForm.housingTypes,optionsText:'Text',value: attenderForm.selectedhousingType,optionsCaption:'Select...'"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="#">More housing information...</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Meals</label><span>(Be sure to check meals for <strong>THIS</strong> attender</span>
+                                    <div>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <th>&nbsp;</th><th>Breakfast</th><th>Lunch</th><th>Dinner</th>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>Thursday</td>
+                                                <td>&nbsp;</td>
+                                                <td>&nbsp;</td>
+                                                <td>
+                                                    <input type="checkbox" data-bind="checked: attenderForm.mealThursDinner" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Fridayday</td>
+                                                <td>
+                                                    <input type="checkbox" data-bind="checked: attenderForm.mealFriBreakfast" />
+                                                </td>
+                                                <td>
+                                                    <input type="checkbox" data-bind="checked: attenderForm.mealFriLunch" />
+                                                </td>
+                                                <td>
+                                                    <input type="checkbox" data-bind="checked: attenderForm.mealFriDinner" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Saturday</td>
+                                                <td>
+                                                    <input type="checkbox" data-bind="checked: attenderForm.mealSatBreakfast" />
+                                                </td>
+                                                <td>
+                                                    <input type="checkbox" data-bind="checked: attenderForm.mealSatLunch" />
+                                                </td>
+                                                <td>
+                                                    <input type="checkbox" data-bind="checked: attenderForm.mealSatDinner" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sunday</td>
+                                                <td>
+                                                    <input type="checkbox" data-bind="checked: attenderForm.mealSunBreakfast" />
+                                                </td>
+                                                <td colspan="2">
+                                                    <input type="checkbox" data-bind="checked: attenderForm.simpleMeal" />&nbsp;* Simple meal
+                                                </td>
+
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Dietary prefernces</label>
+                                    <div>
+                                        <p><span>Vegetarian&nbsp;</span> <input type="checkbox" data-bind="checked: attenderForm.vegetarian" /></p>
+                                        <p><span>Gluten free&nbsp;</span> <input type="checkbox" data-bind="checked: attenderForm.glutenFree" /></p>
+                                    </div>
+                                </div>
+                                <div class="form-group" >
+                                    <label for="specialNeeds-input" class="control-label">Special needs</label>
+                                    <select class="form-control" id="specialNeeds-input"
+                                            data-bind="options: attenderForm.specialNeedsTypes,optionsText:'Text',value: attenderForm.selectedSpecialNeedsType,optionsCaption:'Select...'"></select>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="notes-input" class="control-label">Notes</label>
+                                    <textarea class="form-control" id="notes-input" data-bind="value:attenderForm.notes"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+
 
                     </fieldset>
                     <div id="attender-buttons">
@@ -274,7 +514,8 @@
                     </div>
                 </div>
             </div>
-            <div id="finance-form" data-bind="visible:currentForm() == 'accounts'">
+            <!-- accounts form -->
+            <div id="accounts-form" data-bind="visible:currentForm() == 'accounts'">
                 <div id="finance-edit-panel" data-bind="visible:registrationForm.financeInfoForm.viewState() == 'edit'">
                     <h3>Finance edit panel</h3>
                     <div id="finance-edit-buttons">
