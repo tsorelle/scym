@@ -31,4 +31,13 @@ class ScymRegistrationsManager extends TDbServiceManager
         }
         return $result;
     }
+
+    public function getUserRegistrationId($username, $year) {
+        $repository =  $this->getRepository('App\db\scym\ScymRegistration');
+        $result = $repository->findOneBy(array('username' => $username, 'year' => $year));
+        if ($result) {
+            return $result->getRegistrationId();
+        }
+        return 0;
+    }
 }

@@ -83,6 +83,14 @@ class ScymRegistration extends DateStampedEntity
     /**
      * @var string
      *
+     * @Column(name="username", type="string", length=100, nullable=true)
+     */
+    private $username;
+
+
+    /**
+     * @var string
+     *
      * @Column(name="name", type="string", length=50, nullable=false)
      */
     private $name;
@@ -329,6 +337,29 @@ class ScymRegistration extends DateStampedEntity
     public function getStatusId()
     {
         return $this->statusId;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     * @return ScymRegistration
+     */
+    public function setUsername($value)
+    {
+        $this->username = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
     }
 
     /**

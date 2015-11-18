@@ -16,20 +16,17 @@ declare module Tops {
         amountPaid : any;
         notes : string;
         feesReceivedDate : any;
-        contactRequested : number;
         arrivalTime : string;
         departureTime : string;
         scymNotes : string;
         statusDate : any;
-        YMDonation : any;
-        simpleMealDonation : any;
-        financialAidRequested  : any;
-        financialAidContribution : any;
-        attended : number;
-        financialAidAmount : any;
         confirmed: number;
-        changed: boolean;
+
+        ymDonation : any;
+        simpleMealDonation : any;
+        aidRequested  : any;
     }
+
     export interface IAttender {
         attenderId: any;
         firstName : string;
@@ -59,13 +56,27 @@ declare module Tops {
         creditTypeId : number; // formerly: feeCredit, lookup: creditTypes
         meals: number[];
     }
-    export interface IRegistration {
-        info : IRegistrationInfo;
-        attendees : IAttender[];
+
+    export interface IRegistrationUpdateRequest {
+        registration : IRegistrationInfo;
+        updatedAttenders : IAttender[];
+        deletedAttenders : any[];
+    }
+
+    export interface ICostUpdateRequest {
+        ymDonation : any;
+        simpleMealDonation : any;
+        aidRequested  : any;
+        attenders : IAttender[];
+        deletedAttenders : any[];
     }
 
     export interface IAgeGroup extends IListItem {
         cutoffAge : any;
+    }
+
+    export interface IHousingTypeListItem extends IListItem {
+        category: any;
     }
 
     export interface IAnnualSessionInfo {
@@ -78,28 +89,15 @@ declare module Tops {
 
     export interface IRegistrationInitResponse {
         sessionInfo : IAnnualSessionInfo;
-        user : IUser;
+        user : IRegistrationUser;
         registrationId : any;
     }
 
-    export interface IGetRegistrationRequest {
-        lookupCode: any,
-        getLookupTables: number;
-    }
 
     export interface IAttenderLookups {
-        specialNeedsTypes: IListItem[];
-        housingTypes: IListItem[];
-        generationTypes : IListItem[];
+        housingTypes: IHousingTypeListItem[];
         affiliationCodes : IListItem[];
         ageGroups : IAgeGroup[];
-        creditTypes : IListItem[];
-        gradeLevels : IListItem[];
-    }
-
-    export interface IGetRegistrationResponse {
-        registration : IRegistration;
-        statusTypes : IListItem[];
     }
 
     export interface IGetAttenderResponse {
@@ -112,5 +110,37 @@ declare module Tops {
         includeLookups : number;
     }
 
+    export interface IFamilyAttender extends INameValuePair {
+        firstName: string;
+        lastName: string;
+        middleName: string;
+        generation: number;
+        dateOfBirth: string;
+    }
+
+    export interface IFindRegistrationAddressResponse {
+        name: string;
+        address: string;
+        city: string;
+        persons: IFamilyAttender[];
+    }
+
+    export interface IAccountSummary {
+        fees : IListItem[];
+        credits: IListItem[];
+        donations: IListItem[];
+        feeTotal: string;
+        creditTotal: string;
+        donationTotal: string;
+        balance: any;
+    }
+
+    export interface IRegistrationResponse {
+        registration: IRegistrationInfo;
+        accountSummary: IAccountSummary;
+        attenderList: IListItem[];
+        housingPreference: string;
+        housingAssignments: IListItem[];
+    }
 
 }

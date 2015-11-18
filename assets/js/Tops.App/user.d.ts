@@ -7,7 +7,10 @@ declare module Tops {
         id:string;
         name:string;
         authenticated : number;
-        authorized: number;
         email:string;
+    }
+    export interface IRegistrationUser extends  IUser {
+        isRegistrar : number;
+        registrationId: any;
     }
 }

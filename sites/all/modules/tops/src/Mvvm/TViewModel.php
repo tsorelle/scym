@@ -98,8 +98,16 @@ class TViewModel
                     return $name;
                 }
             }
+            if ($count <= 2) {
+                return $name;
+            }
+            $path = $pathParts[1];
+            for ($i = 2; $i < $count; $i++) {
+                $path .= '/'.$pathParts[$i];
+            }
+            return $path;
 
-            return  $count > 2 ? $pathParts[1].'/'.$pathParts[2] : $name;
+            //return  $count > 2 ? $pathParts[1].'/'.$pathParts[2] : $name;
         }
 
         return null;

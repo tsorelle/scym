@@ -1,5 +1,6 @@
-// replace all occurances of 'YmRegistration' with the name of your model
-
+/**
+ * Created by Terry on 11/01/2015.
+ */
 /// <reference path='../typings/knockout/knockout.d.ts' />
 /// <reference path='../typings/underscore/underscore.d.ts' />
 /// <reference path='../typings/bootstrap/bootstrap.d.ts' />
@@ -9,8 +10,7 @@
 /// <reference path="user.d.ts" />
 /// <reference path="registration.d.ts" />
 /// <reference path="formComponents.ts" />
-
-// reference to jqueryui required if date popups are used.
+/// <reference path="../components/textParser.ts" />
 /// <reference path='../typings/jqueryui/jqueryui.d.ts' />
 
 module Tops {
@@ -19,15 +19,18 @@ module Tops {
         id : any = 0;
         name = ko.observable('');
         authenticated = ko.observable(false);
-        authorized = ko.observable(false);
+        isRegistrar = ko.observable(false);
         email = ko.observable('');
+        registrationId = ko.observable(0);
 
-        public assign(user : IUser) {
+        public assign(user : IRegistrationUser) {
             var me = this;
             me.id = user ? user.id : 0;
             me.name(user ? user.name : '');
+            me.isRegistrar(user ? (user.isRegistrar == 1) : false);
             me.authenticated(user ? (user.authenticated == 1) : false);
-            me.authorized(user ? (user.authorized == 1) : false);
+            me.email(user ? user.email : '');
+            me.registrationId(user ? user.registrationId : 0);
         }
     }
 
@@ -70,7 +73,15 @@ module Tops {
             me.isComplete(status == 'complete');
         }
 
+        public setComplete() {
+            var me = this;
+            me.setStatus('complete');
+        }
 
+        public setIncomplete() {
+            var me = this;
+            me.setStatus('incomplete');
+        }
 
         public isVisible = ko.observable(false);
         public css = ko.observable('');
@@ -78,22 +89,26 @@ module Tops {
 
     export class financeInfoObservable extends editPanel {
 
-        changed = ko.observable(false);
-
         id  = ko.observable(0);
 
-        YMDonation : KnockoutObservable<any> = ko.observable('');
+        aidRequested  : KnockoutObservable<any> = ko.observable('');
+        ymDonation : KnockoutObservable<any> = ko.observable('');
         simpleMealDonation : KnockoutObservable<any> = ko.observable('');
-        financialAidRequested  : KnockoutObservable<any> = ko.observable('');
-        financialAidContribution : KnockoutObservable<any> = ko.observable('');
-        financialAidAmount : KnockoutObservable<any> = ko.observable('');
 
-        public aidRequestedError = ko.observable('');
-        public aidContributionError = ko.observable('');
-        public aidAmountError = ko.observable('');
-        public ymDonationError = ko.observable('');
-        public simpleMealDonationError = ko.observable('');
+        aidRequestedError = ko.observable('');
+        ymDonationError = ko.observable('');
+        simpleMealDonationError = ko.observable('');
 
+        // summary
+        feesList = ko.observableArray<IListItem>();
+        creditsList = ko.observableArray<IListItem>();
+        donationsList = ko.observableArray<IListItem>();
+        feeTotal= ko.observable('');
+        creditTotal= ko.observable('');
+        donationTotal= ko.observable('');
+        balance= ko.observable('');
+        calculated = ko.observable(false);
+        balanceDue : KnockoutObservable<any> = ko.observable();
 
 
         constructor() {
@@ -109,18 +124,17 @@ module Tops {
             var me=this;
             me.clearValidations();
             me.id(0);
-            me.financialAidAmount('');
-            me.financialAidRequested('');
-            me.financialAidContribution('');
-            me.YMDonation('');
+            me.aidRequested('');
+            me.ymDonation('');
             me.simpleMealDonation('');
             me.isAssigned = false;
+            me.balance('Not yet calculated');
+            me.balanceDue(null);
+            me.calculated(false);
         }
 
         public clearValidations() {
             var me = this;
-            me.aidAmountError('');
-            me.aidContributionError('');
             me.aidRequestedError('');
             me.simpleMealDonationError('');
             me.ymDonationError('');
@@ -134,22 +148,45 @@ module Tops {
             var me=this;
             me.id(registration.registrationId);
             me.clearValidations();
-            me.changed(registration.changed);
-            me.financialAidAmount(registration.financialAidAmount);
-            me.financialAidContribution(registration.financialAidContribution);
-            me.financialAidRequested(registration.financialAidRequested);
-            me.YMDonation(registration.YMDonation);
+            me.aidRequested(registration.aidRequested);
+            me.ymDonation(registration.ymDonation);
             me.simpleMealDonation(registration.simpleMealDonation);
             me.isAssigned = true;
         };
 
+        public assignAccountSummary(summary: IAccountSummary) {
+            var me = this;
+            me.feesList(summary.fees);
+            me.creditsList(summary.credits);
+            me.donationsList(summary.donations);
+            me.feeTotal(summary.feeTotal);
+            me.creditTotal(summary.creditTotal);
+            me.donationTotal(summary.donationTotal);
+            me.balanceDue(summary.balance);
+            if (jQuery.isNumeric(summary.balance)) {
+                me.calculated(true);
+                if (summary.balance == 0) {
+                    me.balance('Paid in full');
+                }
+                else if (summary.balance > 0) {
+                    me.balance(summary.balance);
+                }
+                else {
+                    me.balance('Credit: ' + Math.abs(summary.balance));
+                }
+            }
+            else {
+                me.calculated(false);
+                me.balance("Not calculated yet")
+            }
+
+            me.balance(summary.balance);
+        }
+
         public updateRegistration = (registration: IRegistrationInfo) => {
             var me = this;
-            registration.changed = me.changed();
-            registration.financialAidAmount = me.financialAidAmount();
-            registration.financialAidContribution = me.financialAidContribution();
-            registration.financialAidRequested = me.financialAidContribution();
-            registration.YMDonation = me.YMDonation();
+            registration.aidRequested = me.aidRequested();
+            registration.ymDonation = me.ymDonation();
             registration.simpleMealDonation = me.simpleMealDonation();
         };
 
@@ -183,40 +220,23 @@ module Tops {
             me.clearValidations();
             var valid = true;
 
-            var amount = me.validateCurrency(me.financialAidAmount());
+
+            var amount = me.validateCurrency(me.aidRequested());
             if (amount === false) {
-                me.aidAmountError(" Invalid amount.");
+                me.aidRequestedError(" Invalid amount.");
                 valid = false;
             }
             else {
-                me.financialAidAmount(amount);
+                me.aidRequested(amount);
             }
 
-            amount = me.validateCurrency(me.financialAidContribution());
-            if (amount === false) {
-                me.aidContributionError(" Invalid amount.");
-                valid = false;
-            }
-            else {
-                me.financialAidContribution(amount);
-            }
-
-            amount = me.validateCurrency(me.financialAidRequested());
-            if (amount === false) {
-                me.aidContributionError(" Invalid amount.");
-                valid = false;
-            }
-            else {
-                me.financialAidContribution(amount);
-            }
-
-            amount = me.validateCurrency(me.YMDonation());
+            amount = me.validateCurrency(me.ymDonation());
             if (amount === false) {
                 me.ymDonationError(" Invalid amount.");
                 valid = false;
             }
             else {
-                me.YMDonation(amount);
+                me.ymDonation(amount);
             }
 
             amount = me.validateCurrency(me.simpleMealDonation());
@@ -235,7 +255,6 @@ module Tops {
 
     export class contactInfoObservable extends editPanel {
 
-
         name = ko.observable('');
         address = ko.observable('');
         city = ko.observable('');
@@ -243,14 +262,20 @@ module Tops {
         email = ko.observable('');
         notes = ko.observable('');
 
+        hasAddress: KnockoutComputed<boolean>;
+
         public nameError = ko.observable('');
         public emailError = ko.observable('');
         public codeError = ko.observable('');
+        public contactError = ko.observable('');
 
         constructor() {
             super();
             var me = this;
             me.setViewState('closed');
+            me.hasAddress = ko.computed(function() {
+                return me.address() || me.city() ? true : false;
+            });
         }
 
         /**
@@ -271,6 +296,7 @@ module Tops {
             me.nameError('');
             me.emailError('');
             me.codeError('');
+            me.contactError('');
             me.hasErrors(false);
         }
 
@@ -298,7 +324,33 @@ module Tops {
             var me = this;
             me.clearValidations();
             var valid = true;
+            var name = me.name().trim();
+            me.name(name);
+            var email = me.email().trim();
+            me.email(email);
+            var phone = me.phone().trim();
+            me.phone(phone);
+            var address = me.address().trim();
+            me.address(address);
+            var city = me.city().trim();
+            me.city(city);
+            var hasPhoneOrAddress = phone.length > 0 || (address.length > 0 && city.length > 0);
 
+            if (!name) {
+                me.nameError(': A name is required for this registration.');
+                valid = false;
+            }
+
+            if (email) {
+                if (!Peanut.ValidateEmail(email)) {
+                    me.emailError(': This is not a valid email address');
+                    valid = false;
+                }
+            }
+            else if (!hasPhoneOrAddress) {
+                me.contactError('You must enter some form of contact information: email, phone or address.')
+                valid = false;
+            }
             me.hasErrors(!valid);
             return valid;
         };
@@ -306,10 +358,11 @@ module Tops {
 
     export class registrationObservable {
         id = ko.observable(0);
-        changed = ko.observable(false);
         registrationCode = ko.observable('');
         contactInfoForm = new contactInfoObservable();
         financeInfoForm = new financeInfoObservable();
+        confirmed = ko.observable(false);
+        familyMembers = ko.observableArray<IFamilyAttender>();
 
         public clear() {
             var me = this;
@@ -320,18 +373,17 @@ module Tops {
         public assign(registration:IRegistrationInfo) {
             var me = this;
             me.id(registration.registrationId);
+            me.confirmed(registration.confirmed == 0 ? false : true);
             me.registrationCode(registration.registrationCode);
-            me.changed(registration.changed);
-
             me.contactInfoForm.assign(registration);
             me.financeInfoForm.assign(registration);
         }
 
+        // todo: review this!
         public updateRegistration = (registration: IRegistrationInfo) => {
             var me = this;
             registration.registrationId = me.id();
             registration.registrationCode = me.registrationCode();
-            registration.changed = me.changed();
             me.contactInfoForm.updateRegistration(registration);
             me.financeInfoForm.updateRegistration(registration);
         };
@@ -355,19 +407,46 @@ module Tops {
         arrivalTime  =  ko.observable('');
         departureTime  =  ko.observable('');
         housingTypeId =  ko.observable('');
-        vegetarian =  ko.observable(false);
         attended =  ko.observable(false);
         singleOccupant =  ko.observable(false);
+
+        vegetarian =  ko.observable(false);
         glutenFree =  ko.observable(false);
 
-        // todo: implement lookups for attenders
-        /*
-        specialNeedsTypeId =  ko.observable(''); // lookup: special needs
-        generationId =  ko.observable(''); // lookup: generations
-        gradeLevel =  ko.observable(''); // 'PS','K', 1 .. 13
-        ageGroupId =  ko.observable(''); // lookup agegroups
-        creditTypeId =  ko.observable(''); // formerly: feeCredit, lookup: creditTypes
-        */
+        mealThursDinner =  ko.observable(false);
+        mealFriBreakfast =  ko.observable(false);
+        mealFriLunch =  ko.observable(false);
+        mealFriDinner =  ko.observable(false);
+        mealSatBreakfast =  ko.observable(false);
+        mealSatLunch =  ko.observable(false);
+        mealSatDinner =  ko.observable(false);
+        mealSunBreakfast =  ko.observable(false);
+        simpleMeal = ko.observable(false);
+
+        // lookups
+        specialNeedsTypes = ko.observableArray<IListItem>();
+        housingTypes      = ko.observableArray<IHousingTypeListItem>();
+        generationTypes   = ko.observableArray<IListItem>();
+        affiliationCodes  = ko.observableArray<IListItem>();
+        creditTypes       = ko.observableArray<IListItem>();
+        gradeLevels       = ko.observableArray<IListItem>();
+        ageGroups         = ko.observableArray<IAgeGroup>();
+        timePeriods       = ko.observableArray<IListItem>();
+        lookupsAssigned  = false;
+
+        public selectedSpecialNeedsType  : KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedHousingType       : KnockoutObservable<IHousingTypeListItem> = ko.observable(null);
+        public selectedGenerationType    : KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedAffiliationCode   : KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedCreditType        : KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedAgeGroup          : KnockoutObservable<IAgeGroup> = ko.observable(null);
+        public selectedGradeLevel        : KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedArrivalTime        : KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedDepartureTime     : KnockoutObservable<IListItem> = ko.observable(null);
+
+        attenderFullName = ko.computed(function() {return ''}); // replaced in initialize function
+        isChild = ko.computed(function() {return false}); // replaced in initialize function
+        singleOccupancyApplies = ko.computed(function() {return false}); // replaced in initialize function
 
         // validation
         firstNameError = ko.observable('');  	// required
@@ -375,13 +454,35 @@ module Tops {
         arrivalTimeError = ko.observable(''); 	// required
         departureTimeError = ko.observable(''); 	// required - on or after arrival
         dateOfBirthError = ko.observable('');  	// required if generation code is young friend
-
+        housingPreferenceError = ko.observable('');
 
         constructor() {
             super();
             var me = this;
             me.setViewState('closed');
+            // me.personFormHeader = ko.computed(me.computePersonFormHeader);
+
         }
+
+        initialize = () => {
+            var me = this;
+            // delayed initialization for loaded resources
+            me.attenderFullName = ko.computed(function() {
+                return textParser.makeFullName(me.firstName(),me.lastName(),me.middleName());
+            });
+            me.isChild = ko.computed(function() {
+                var generation = me.selectedGenerationType();
+                return (generation) ?  generation.Value != 1 : false;
+            });
+            me.singleOccupancyApplies = ko.computed(function() {
+                var housing = me.selectedHousingType();
+                if (housing) {
+                    return housing.category == 3;
+                }
+                return false
+            });
+
+        };
 
         /**
          * reset fields
@@ -394,6 +495,8 @@ module Tops {
             me.firstName('');
             me.lastName('');
             me.middleName('');
+
+
             me.dateOfBirth('');
             me.affiliationCode('');
             me.otherAffiliation('');
@@ -405,18 +508,30 @@ module Tops {
             me.linens(false);
             me.arrivalTime('');
             me.departureTime('');
-            me.housingTypeId('');
             me.vegetarian(false);
             me.attended(false);
             me.singleOccupant(false);
             me.glutenFree(false);
 
-            me.setSpecialNeedsType();
-            me.setGeneration();
-            me.setGradeLevel();
-            me.setAgeGroup();
-            me.setCreditType();
-            me.setHousingType();
+            me.mealThursDinner(false);
+            me.mealFriBreakfast(false);
+            me.mealFriLunch(false);
+            me.mealFriDinner(false);
+            me.mealSatBreakfast(false);
+            me.mealSatLunch(false);
+            me.mealSatDinner(false);
+            me.mealSunBreakfast(false);
+            me.simpleMeal(false);
+
+            me.selectedSpecialNeedsType(null);
+            me.selectedHousingType(null);
+            me.setLookupValue(me.generationTypes(), me.selectedGenerationType, 1);
+            me.selectedAffiliationCode(null);
+            me.setLookupValue(me.creditTypes(),me.selectedCreditType, 0);
+            me.selectedAgeGroup(null);
+            me.selectedGradeLevel(null);
+            me.setLookupValue(me.timePeriods(),me.selectedArrivalTime,42);
+            me.setLookupValue(me.timePeriods(),me.selectedDepartureTime,72);
         }
 
         public clearValidations() {
@@ -426,7 +541,153 @@ module Tops {
             me.arrivalTimeError('');
             me.departureTimeError('');
             me.dateOfBirthError('');
+            me.housingPreferenceError('');
             me.hasErrors(false);
+        }
+
+        public assignLookupLists(lists : IAttenderLookups) {
+            var me = this;
+            me.lookupsAssigned = true;
+            me.housingTypes(lists.housingTypes);
+            me.affiliationCodes(lists.affiliationCodes);
+            me.ageGroups(lists.ageGroups);
+
+            var times = me.buildTimeLookup();
+            me.timePeriods(times);
+            me.generationTypes(
+                [
+                    { Text:'Adult',Value:'1',Description:'' },
+                    { Text:'Youth (age 4 through 18)',Value:'2',Description:'' },
+                    { Text:'Infant (through age 3)',Value:'5',Description:'' },
+                    { Text:'',Value:'',Description:'' }
+                ]
+            );
+
+            me.specialNeedsTypes(
+                [
+                    { Text:'Hearing impaired',Value:'1',Description:'' },
+                    { Text:'Mobility impaired',Value:'2',Description:'' },
+                    { Text:'Other, see notes',Value:'500',Description:'' }
+                ]
+            );
+            me.gradeLevels(
+                [
+                    { Text:'Preschool',Value:'PS',Description:'' },
+                    { Text:'Kindergarten',Value:'K',Description:'' },
+                    { Text:'First',Value:'1',Description:'' },
+                    { Text:'Second',Value:'2',Description:'' },
+                    { Text:'Third',Value:'3',Description:'' },
+                    { Text:'Fourth',Value:'4',Description:'' },
+                    { Text:'Fifth',Value:'5',Description:'' },
+                    { Text:'Sixth',Value:'6',Description:'' },
+                    { Text:'Seventh',Value:'7',Description:'' },
+                    { Text:'Eighth',Value:'8',Description:'' },
+                    { Text:'Ninth',Value:'9',Description:'' },
+                    { Text:'Tenth',Value:'10',Description:'' },
+                    { Text:'Eleventh',Value:'11',Description:'' },
+                    { Text:'Twelth',Value:'12',Description:'' }
+                ]
+            );
+            me.creditTypes(
+                [
+                    { Text:'General attender',Value:'0',Description:'' },
+                    { Text:'Teacher',Value:'2',Description:'' },
+                    { Text:'Guest',Value:'3',Description:'' },
+                    { Text:'SCYM Staff',Value:'4',Description:'' }
+                ]
+            );
+        }
+        
+        private buildTimeLookup() : IListItem[] {
+            var me = this;
+            var result = [];
+            var minCode = 42;
+            var maxCode = 72;
+            for(var day=4; day < 8; day += 1) {
+                for(var time = 1; time < 4; time += 1) {
+                    var code = (day * 10) + time;
+                    result.push(
+                        {
+                            Text: me.timeCodeToStr(code),
+                            Value: code,
+                            Description: ''
+                        });
+                }    
+            }
+            return result;
+        }
+        
+        private timeCodeToStr(timeCode) {
+            var time = 'error';
+            var day = 'error';
+            switch (Math.floor(timeCode / 10)) {
+                case 4 :
+                    day = 'Thursday';
+                    break;
+                case 5 :
+                    day = 'Friday';
+                    break;
+                case 6 :
+                    day = 'Saturday';
+                    break;
+                case 7 :
+                    day = 'Sunday';
+                    break;
+            }
+
+            switch (timeCode % 10) {
+                case 1 :
+                    time = 'morning';
+                    break;
+                case 2 :
+                    time = 'noon';
+                    break;
+                case 3 :
+                    time = 'evening';
+                    break;
+            }
+
+            return day+' ' + time;
+        }
+
+        public setDefaults = (attender: IAttender = null) => {
+            var me = this;
+            if (attender) {
+                me.setAttenderMeals(attender);
+                me.setLookupValue(me.timePeriods(), me.selectedArrivalTime, attender.arrivalTime);
+                me.setLookupValue(me.timePeriods(), me.selectedDepartureTime, attender.departureTime);
+                me.setLookupValue(me.housingTypes(), me.selectedHousingType, attender.housingTypeId);
+                me.setLookupValue(me.affiliationCodes(), me.selectedAffiliationCode, attender.affiliationCode);
+            }
+            else {
+                me.mealThursDinner(true);
+                me.mealFriBreakfast(true);
+                me.mealFriLunch(true);
+                me.mealFriDinner(true);
+                me.mealSatBreakfast(true);
+                me.mealSatLunch(true);
+                me.mealSatDinner(true);
+                me.mealSunBreakfast(true);
+                me.simpleMeal(true);
+            }
+        };
+
+        private setAttenderMeals(attender: IAttender) {
+            var me = this;
+            attender.meals.forEach(function(mealtime: number) {
+                switch(mealtime) {
+                    case 43: me.mealThursDinner(true);break;
+                    case 51: me.mealFriBreakfast(true);break;
+                    case 52: me.mealFriLunch(true);break;
+                    case 53: me.mealFriDinner(true);break;
+                    case 61: me.mealSatBreakfast(true);break;
+                    case 62: me.mealSatLunch(true);break;
+                    case 63: me.mealSatDinner(true);break;
+                    case 71: me.mealSunBreakfast(true);break;
+                    case 72: me.simpleMeal(true);break;
+                }
+            });
+
         }
 
         /**
@@ -441,10 +702,7 @@ module Tops {
             me.lastName(attender.lastName);
             me.middleName(attender.middleName);
             me.dateOfBirth(attender.dateOfBirth);
-            me.affiliationCode(attender.affiliationCode);
             me.otherAffiliation(attender.otherAffiliation);
-            me.arrivalTime(attender.arrivalTime);
-            me.departureTime(attender.departureTime);
             me.notes(attender.notes);
 
             //boolean
@@ -457,14 +715,24 @@ module Tops {
             me.attended(attender.attended===1);
             me.singleOccupant(attender.singleOccupant===1);
             me.glutenFree(attender.glutenFree===1);
+            me.setAttenderMeals(attender);
 
-            me.setSpecialNeedsType(attender.specialNeedsTypeId);
-            me.setGeneration( attender.generationId);
-            me.setGradeLevel( attender.gradeLevel);
-            me.setAgeGroup( attender.ageGroupId);
-            me.setCreditType( attender.creditTypeId);
-            me.setHousingType( attender.housingTypeId);
+            me.setLookupValue(me.specialNeedsTypes(), me.selectedSpecialNeedsType, attender.specialNeedsTypeId);
+            me.setLookupValue(me.generationTypes(), me.selectedGenerationType, attender.generationId);
+            me.setLookupValue(me.ageGroups(), me.selectedAgeGroup, attender.ageGroupId);
+            me.setLookupValue(me.generationTypes(), me.selectedGenerationType, attender.generationId);
+            me.setLookupValue(me.creditTypes(),me.selectedCreditType, attender.creditTypeId);
+            me.setLookupValue(me.housingTypes(),me.selectedHousingType, attender.housingTypeId);
+            me.setLookupValue(me.gradeLevels(),me.selectedGradeLevel, attender.gradeLevel);
+            me.setLookupValue(me.timePeriods(),me.selectedArrivalTime, attender.arrivalTime);
+            me.setLookupValue(me.timePeriods(),me.selectedDepartureTime, attender.departureTime);
+            me.setLookupValue(me.affiliationCodes(),me.selectedAffiliationCode, attender.affiliationCode);
         };
+
+        public setGeneration(generationId : any) {
+            var me = this;
+            me.setLookupValue(me.generationTypes(), me.selectedGenerationType, generationId);
+        }
 
         public updateAttender = (attender: IAttender) => {
             var me = this;
@@ -474,7 +742,6 @@ module Tops {
             attender.lastName =              me.lastName();
             attender.middleName =            me.middleName();
             attender.dateOfBirth =           me.dateOfBirth();
-            attender.affiliationCode =       me.affiliationCode();
             attender.otherAffiliation =      me.otherAffiliation();
             attender.arrivalTime =           me.arrivalTime();
             attender.departureTime =         me.departureTime();
@@ -491,72 +758,39 @@ module Tops {
             attender.singleOccupant =        me.singleOccupant() ? 1 : 0;
             attender.glutenFree =            me.glutenFree() ? 1 : 0;
 
-            attender.specialNeedsTypeId = me.getSpecialNeedsTypeId();
-            attender.generationId = me.getGenerationId();
-            attender.gradeLevel = me.getGradeLevel();
-            attender.ageGroupId = me.getAgeGroupId();
-            attender.creditTypeId = me.getCreditTypeId();
-            attender.housingTypeId = me.getHousingTypeId();
+            attender.meals = [];
+            if (me.mealThursDinner())  {attender.meals.push(43);}
+            if (me.mealFriBreakfast()) {attender.meals.push(51);}
+            if (me.mealFriLunch())     {attender.meals.push(52);}
+            if (me.mealFriDinner())    {attender.meals.push(53);}
+            if (me.mealSatBreakfast()) {attender.meals.push(61);}
+            if (me.mealSatLunch())     {attender.meals.push(62);}
+            if (me.mealSatDinner())    {attender.meals.push(63);}
+            if (me.mealSunBreakfast()) {attender.meals.push(71);}
+            if (me.simpleMeal())       {attender.meals.push(72);}
+
+            attender.specialNeedsTypeId =  me.getLookupValue(me.selectedSpecialNeedsType);
+            attender.generationId = me.getLookupValue(me.selectedGenerationType);
+            attender.gradeLevel = me.getLookupValue(me.selectedGradeLevel);
+            attender.ageGroupId = me.getLookupValue(me.selectedAgeGroup);
+            attender.affiliationCode = me.getLookupValue(me.selectedAffiliationCode);
+            attender.creditTypeId = me.getLookupValue(me.selectedCreditType);
+            attender.housingTypeId = me.getLookupValue(me.selectedHousingType);
 
         };
 
-        private setSpecialNeedsType(id: any = null) {
+
+        private setLookupValue(list: IListItem[],  selection : KnockoutObservable<IListItem>, value: any) {
+            var result = _.find(list, function(item : IListItem) {
+                return item.Value == value;
+            });
+            selection(result);
+        }
+
+        private getLookupValue(selection : KnockoutObservable<IListItem>) {
             var me = this;
-            // todo: implement setSpecialNeedsType
-        }
-
-        private setGeneration(id: any = null) {
-            var me = this;
-            // todo: implement setGeneration
-        }
-
-        private setGradeLevel(id: any = null) {
-            var me = this;
-            // todo: implement setGradeLevel
-        }
-
-        private setAgeGroup(id: any = null) {
-            var me = this;
-            // todo: implement setAgeGroup
-        }
-
-        private setCreditType(id: any = null) {
-            var me = this;
-            // todo: implement setCreditType
-        }
-
-        private setHousingType(id: any = null) {
-            var me = this;
-            // todo: implement setHousingType
-        }
-
-
-        private getSpecialNeedsTypeId() : any {
-            // todo: implement getSpecialNeedsTypeId
-            return null;
-        }
-
-        private getGradeLevel() : any {
-            // todo: implement getGradeLevel
-            return null;
-        }
-
-        private getAgeGroupId() : any {
-            // todo: implement getAgeGroupId
-            return null;
-        }
-        private getCreditTypeId()  : any {
-            // todo: implement getCreditTypeId
-            return null;
-        }
-
-        private getHousingTypeId() : any {
-            // todo: implement getHousingTypeId
-            return null;
-        }
-        private getGenerationId() : any {
-            // todo implement getGenerationId
-            return null;
+            var item = selection();
+            return (item) ? item.Value : null;
         }
 
         public validate = ():boolean => {
@@ -564,36 +798,55 @@ module Tops {
             me.clearValidations();
             var valid = true;
 
-            // todo: build attender form
-            return true;
-
-            if (!me.firstName()) {
-                me.firstNameError('First name is required.');
+            var first = me.firstName().trim();
+            me.firstName(first);
+            var last = me.lastName().trim();
+            me.lastName(last);
+            if (!first) {
+                me.firstNameError(': First name is required.');
                 valid = false;
             }
 
-            if (!me.lastName()) {
-                me.lastNameError('First name is required.');
+            if (!last) {
+                me.lastNameError(': Last name is required.');
                 valid = false;
             }
 
-            if (!me.arrivalTime()) {
-                me.arrivalTimeError('Arrival time is required. Approximate is ok.');
+            var arrival = null;
+            var departure = null;
+            if (me.selectedArrivalTime()) {
+                arrival = me.selectedArrivalTime().Value;
+            }
+            else {
+                me.arrivalTimeError(': Arrival time is required. Approximate is ok.');
                 valid = false;
             }
 
-            if (!me.departureTime()) {
-                me.departureTimeError('Departure time is required. Approximate is ok.');
+            if (me.selectedDepartureTime()) {
+                departure = me.selectedDepartureTime().Value;
+            }
+            else
+            {
+                me.departureTimeError(': Departure time is required. Approximate is ok.');
                 valid = false;
             }
 
-            if (me.arrivalTime() && me.departureTime() && me.arrivalTime() > me.departureTime()) {
-                me.arrivalTimeError('Arrival time must precede departure.  Right?');
+            if (arrival && departure && arrival > departure) {
+                me.arrivalTimeError(': Arrival time must precede departure.');
                 valid = false;
             }
 
-            if (me.getGenerationId() == 2 && !me.dateOfBirth()) {  // todo: get generation id for kids
-                me.dateOfBirthError('Date of birth is required for children. Approximate is ok.');
+            var generationId = me.getLookupValue(me.selectedGenerationType);
+            if (generationId) {
+                if (generationId != 1 && !me.dateOfBirth()) {
+                    me.dateOfBirthError(': Date of birth is required for children. Approximate is ok.');
+                    valid = false;
+                }
+            }
+
+            var housingPreference = me.selectedHousingType();
+            if (!housingPreference) {
+                me.housingPreferenceError(': You must select your housing preference.');
                 valid = false;
             }
 
@@ -612,21 +865,24 @@ module Tops {
     class startupFormObservable {
         securityAnswer = ko.observable('');
         validationError = ko.observable('');
+        askSecurityQuestion = ko.observable(true);
 
         public validate = () => {
             var me = this;
-            var answer = me.securityAnswer().replace(/\s/g, "").toLowerCase();
-            me.securityAnswer('');
-            if (!answer) {
-                me.validationError(': Please answer the security question.');
-                return false;
-            }
+            if (me.askSecurityQuestion()) {
+                var answer = me.securityAnswer().replace(/\s/g, "").toLowerCase();
+                me.securityAnswer('');
+                if (!answer) {
+                    me.validationError(': Please answer the security question.');
+                    return false;
+                }
 
-            if (answer != 'georgefox') {
-                me.validationError(': Your answer to the security question is incorrect.');
-                return false;
+                if (answer != 'georgefox') {
+                    me.validationError(': Your answer to the security question is incorrect.');
+                    return false;
+                }
             }
-
+            me.askSecurityQuestion(false);
             return true;
 
         }
@@ -656,27 +912,52 @@ module Tops {
 
         debugging = ko.observable(false);
 
-        registrationStatus : number = -1;
-        changesToSave = ko.observable(false);
-        currentForm = ko.observable('');
+        // state
+        registrationChanged = ko.observable(false);
+        attendersChanged = ko.observable(false);
+        balanceInvalid : KnockoutComputed<boolean>; // used on accounts form
+
+        private currentRegistration: IRegistrationInfo;
         sessionInfo = new AnnualSessionInfo();
+        user = new userObservable();
+        registrationStatus = ko.observable(-1);
+
+        // simple forms
+        lookupCode = ko.observable('');
+        modalInput = ko.observable('');
+
+        // complex forms
         startupForm = new startupFormObservable();
         lookupForm = new lookupFormObservable();
         attenderForm = new attenderObservable();
         registrationForm = new registrationObservable();
-        attenderList : KnockoutObservableArray<IAttender> = ko.observableArray([]);
-        datesText = ko.observable('');
-        locationText = ko.observable('');
-        registrationId : KnockoutObservable<any> =  ko.observable();
-        lookupCode = ko.observable('');
+        familyMemberResults = new searchListObservable(2,6);
+        private familyMembers : IFamilyAttender[] = [];
+        addressSearchResults = new searchListObservable(2,6);
+        addressSearchValue = ko.observable('');
+        addressSearchWarning = ko.observable('');
 
+        // attenders
+        attenderList : KnockoutObservableArray<IListItem> = ko.observableArray([]);
+        private updatedAttenders : IAttender[] = [];
+        private deletedAttenders = [];
+
+        // navigation
+        currentForm = ko.observable('');
+        saveButtonVisible : KnockoutComputed<boolean>;
+        accountReviewed = ko.observable(false);
         registerButton = new regButtonObservable("Summary",'ready');
         contactButton =  new regButtonObservable("Contact");
         attendersButton = new regButtonObservable("Attenders");
         accountButton = new regButtonObservable("Account");
-        user = new userObservable();
 
+        // Display text
         formTitle = ko.observable('Registration Summary');
+        datesText = ko.observable('');
+        locationText = ko.observable('');
+        housingPreference = ko.observable('');
+        housingAssignmentList = ko.observableArray<IListItem>();
+        registrationTitle : KnockoutComputed<string>;
 
         // Constructor
         constructor() {
@@ -684,39 +965,26 @@ module Tops {
             Tops.YmRegistrationViewModel.instance = me;
             me.application = new Tops.Application(me);
             me.peanut = me.application.peanut;
-            // me.changesToSave =  ko.computed(me.checkForUnsavedChanges);
         }
-
-        private getUpdatedAttenders = () => {
-            var me = this;
-            var attenders = me.attenderList();
-            return _.filter(attenders, function(a : IAttender) {
-                return a.changed;
-            },me);
-        };
 
         saveContactInfo = () => {
             var me = this;
-            if (me.registrationForm.contactInfoForm.validate()) {
-                me.changesToSave();
+            if (me.validateContactInfo()) {
                 me.registrationForm.contactInfoForm.view();
-            }
-            else {
-                window.location.assign('#contact-button');
+                window.location.assign('#reg-header');
             }
         };
 
         private checkForUnsavedChanges = ()  => {
             var me = this;
-            var updatedAttenders = me.getUpdatedAttenders();
-            var updateCount = updatedAttenders.length;
+
             if (me.registrationForm.id()) {
-                return (updateCount > 0 || me.registrationForm.changed());
+                return (me.attendersChanged() || me.registrationChanged());
             }
             else {
                 var name = me.registrationForm.contactInfoForm.name();
                 var lookup = me.registrationForm.registrationCode();
-                return (name.trim() && lookup.trim() && updateCount > 0);
+                return (name.trim() && lookup.trim() && me.attendersChanged());
             }
         };
 
@@ -731,36 +999,28 @@ module Tops {
         }
         saveChanges = () => {
             var me = this;
-            if (!me.checkReadyToSave()) {
-                return;
-            }
-
-            if (me.checkRegistrationIsComplete()) {
+            if (me.checkReadyToSave()) {
                 me.uploadChanges();
             }
-            me.showSaveWarning();
         };
 
-        private showSaveWarning() {
-            // todo: implement save modal
-        }
-
-        private uploadChanges() {
+       private uploadChanges() {
             var me = this;
             var request = me.getRegistrationChanges();
             if (!request) {
-                // todo: feedback for cant save - set confirmed
+                me.application.showWarning('No changes were found to save.')
                 return;
             }
-
             me.application.hideServiceMessages();
             me.application.showWaiter('Saving changes...');
 
-            // todo: implement saveChanges service
+           // todo: implement saveChanges service
             // fakes
-            var response = new fakeServiceResponse(null);
-            me.handleSaveChangesResponse(response);
-            me.application.hideWaiter();
+           var data = me.getFakeRegistration();
+           var fakeResponse = new fakeServiceResponse(data);
+           me.handleSaveChangesResponse(fakeResponse);
+           me.application.hideWaiter();
+
             //** end fakes
 
             /*
@@ -770,14 +1030,16 @@ module Tops {
              });
              */
 
-
-            me.changesToSave(false);
-
         }
+
         private handleSaveChangesResponse = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                // todo: handle save changes
+                var response = <IRegistrationResponse>serviceResponse.Value;
+                me.loadRegistration(response);
+                me.attendersButton.setStatus('complete');
+                me.accountButton.setStatus('complete');
+                me.accountReviewed(response.registration.statusId > 1);
             }
         };
 
@@ -797,35 +1059,287 @@ module Tops {
             var me = this;
             // setup messaging and other application initializations
             // initialize date popus if used
-            /*
              jQuery(function() {
-             jQuery( ".datepicker" ).datepicker();
+                jQuery( ".datepicker" ).datepicker(
+                    {
+                        changeYear: true,
+                        yearRange: 'c-20:c+20'
+                    }
+                );
              });
-             */
+
             window.onbeforeunload = function() {
-                if (me.registrationStatus === 1) {
-                    me.changesToSave(true) ;
-                }
-                if (me.changesToSave()) {
+                if (me.hasUnsavedChanges()) {
+                    if (me.registrationStatus() === 1 && me.attendersButton.isComplete()) {
+                        me.accountReviewed(true); // show save button even if we are in 'new registration' wizard mode.
+                    }
                     return "**** WARNING: If you reload or leave this page your changes will be lost. ****";
                 }
             };
 
-
             jQuery('[data-toggle="tooltip"]').tooltip();
             jQuery('[data-toggle="popover"]').popover();
-            me.application.loadCSS('scym-registration.css',
+
+            me.registrationTitle = ko.computed(function() {
+                var result = me.registrationForm.contactInfoForm.name();
+                result = result ? result.trim() : '';
+                return result ? result : 'New Registration';
+            });
+
+            me.saveButtonVisible =  ko.computed(function() {
+                return ((me.registrationChanged() || me.attendersChanged()) &&
+                        (me.registrationStatus() > 1 || me.accountReviewed()));
+            });
+
+            me.balanceInvalid = ko.computed(function() {
+                if (me.registrationStatus() == 1) {
+                    return false;
+                }
+
+                if (me.registrationForm.financeInfoForm.calculated() == false) {
+                    return true;
+                }
+                /*
+                if (me.registrationForm.contactInfoForm.viewState() == 'edit') {
+                    return true;
+                }
+                if (me.attenderForm.viewState() == 'edit') {
+                    return true;
+                }
+                */
+                return (me.attendersChanged() || me.registrationChanged());
+            });
+
+            me.application.initialize(applicationPath,
+                function() {
+                    me.application.loadResources(['scym-registration.css','textParser.js'],
+                        function() {
+                            me.attenderForm.initialize();
+                            me.getInitialInfo(successFunction);
+                        }
+                    );
+                }
+            );
+
+
+            /*
+            me.application.loadResources(['scym-registration.css','textParser.js'],
                 function() {
                     me.application.initialize(applicationPath,
                         function() {
+                            me.attenderForm.initialize();
                             me.getInitialInfo(successFunction);
                         }
                     );
                 });
+            */
         }
 
-        public canLeavePage = () => {
+        
+        showAddressSearch() {
+            var me = this;
+            me.addressSearchValue('');
+            me.addressSearchResults.reset();
+            jQuery("#address-search-modal").modal('show');
+        }
 
+        /**
+         * On click find address button
+         */
+        public findAddresses() {
+            var me = this;
+            me.addressSearchWarning('');
+            var request = new KeyValueDTO();
+            request.Name = 'Addresses';
+            request.Value = me.addressSearchValue();
+
+            if (!request.Value) {
+                return;
+            }
+
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Searching...');
+
+            // fakes
+
+            var fakeData : INameValuePair[] = [
+                {
+                    Name: 'Terry SoRelle and Liz Yeats',
+                    Value: '1'
+                },
+                {
+                    Name: 'Somebody Lovesme',
+                    Value: '2'
+                },
+                {
+                    Name: 'Somebody Lovesme',
+                    Value: '2'
+                },
+                {
+                    Name: 'Terry SoRelle and Liz Yeats',
+                    Value: '1'
+                },
+                {
+                    Name: 'Somebody Lovesme',
+                    Value: '2'
+                },
+                {
+                    Name: 'Somebody Lovesme',
+                    Value: '2'
+                },
+                {
+                    Name: 'Terry SoRelle and Liz Yeats',
+                    Value: '1'
+                },
+                {
+                    Name: 'Somebody Lovesme',
+                    Value: '2'
+                },
+                {
+                    Name: 'Somebody Lovesme',
+                    Value: '2'
+                },
+                {
+                    Name: 'Terry SoRelle and Liz Yeats',
+                    Value: '1'
+                },
+                {
+                    Name: 'Somebody Lovesme',
+                    Value: '2'
+                },
+                {
+                    Name: 'Somebody Lovesme',
+                    Value: '2'
+                },
+                {
+                    Name: 'Nobody Whoosits',
+                    Value: '2'
+                }
+            ];
+
+            // fakeData = []; // test
+
+            var fakeResponse = new fakeServiceResponse(fakeData);
+
+            me.application.hideWaiter();
+            me.showAddressSearchResults(fakeResponse);
+
+            /* service call
+            me.peanut.executeService('directory.DirectorySearch',request, me.showAddressSearchResults)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+            */
+        }
+
+        /**
+         * Service response handler for findAddresses
+         * @param serviceResponse
+         */
+        public showAddressSearchResults = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var list = <INameValuePair[]>serviceResponse.Value;
+                me.addressSearchResults.setList(list);
+                if (list.length == 0) {
+                    me.addressSearchWarning('No addresses were found for this name.');
+                }
+            }
+        };
+
+        /**
+         * On click item link in found panel
+         * @param item
+         */
+        public selectAddress = (item : INameValuePair) => {
+            var me = this;
+            me.addressSearchResults.reset();
+            me.application.showWaiter('Loading address...');
+            me.application.hideServiceMessages();
+
+            // Fakes
+            var fakeData : IFindRegistrationAddressResponse = {
+                name : 'Terry SoRelle and Liz Yeats',
+                address: '904 E. Meadowmere',
+                city: 'Austin, TX 78758',
+                persons: [
+                    {
+                        Value: '1',
+                        Name: 'Liz Yeats',
+                        firstName: 'Liz',
+                        lastName: 'Yeats',
+                        middleName: 'Rosa',
+                        generation: 1,
+                        dateOfBirth: null
+                    },
+                    {
+                        Value: '2',
+                        Name: 'Terry SoRelle',
+                        firstName: 'Terry',
+                        lastName: 'SoRelle',
+                        middleName: '',
+                        generation: 1,
+                        dateOfBirth: null
+                    },
+                    {
+                        Value: '3',
+                        Name: 'Sam Schifman',
+                        firstName: 'Sam',
+                        lastName: 'Schifman',
+                        middleName: 'Benjamin',
+                        generation: 2,
+                        dateOfBirth: '6/5/1979'
+                    }
+                ]
+            } ;
+
+            var fakeResponse = new fakeServiceResponse(fakeData);
+            me.handleSearchAddressResponse(fakeResponse);
+            me.application.hideWaiter();
+            jQuery("#address-search-modal").modal('hide');
+
+            /* service call
+            var request = item.Value;
+            me.peanut.executeService('directory.FindRegistrationAddress',request,me.handleSearchAddressResponse)
+                .always(function() {
+                    me.application.hideWaiter();
+                    jQuery("#address-search-modal").modal('hide');
+                });
+            */
+        };
+
+        private handleSearchAddressResponse = (serviceResponse: IServiceResponse)=> {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var address = <IFindRegistrationAddressResponse>serviceResponse.Value;
+                me.familyMembers = address.persons;
+                me.familyMemberResults.setList(address.persons);
+                me.registrationForm.contactInfoForm.name(address.name);
+                me.registrationForm.contactInfoForm.address(address.address);
+                me.registrationForm.contactInfoForm.city(address.city);
+            }
+        };
+
+        public selectFamilyMember = (member : IFamilyAttender) => {
+            var me = this;
+            me.familyMembers = _.filter(me.familyMembers,function(m: IFamilyAttender){
+                return member.Name != m.Name;
+            });
+            me.familyMemberResults.setList(me.familyMembers);
+            me.attenderForm.firstName(member.firstName);
+            me.attenderForm.middleName(member.middleName);
+            me.attenderForm.lastName(member.lastName);
+            me.attenderForm.setGeneration(member.generation);
+            if (member.generation != 1) {
+                me.attenderForm.dateOfBirth(member.dateOfBirth);
+            }
+            jQuery("#family-member-modal").modal('hide');
+        };
+
+        public endFamilyMemberSelection = () => {
+            var me = this;
+            jQuery("#family-member-modal").modal('hide');
+            me.familyMembers = [];
         };
 
         public getInitialInfo(successFunction?: () => void) {
@@ -833,83 +1347,44 @@ module Tops {
             me.application.hideServiceMessages();
             me.application.showWaiter('Loading...');
 
+
             //testing stub...
-            var loggedIn =
-                false;
-             // true;
-
-            var fakeSessionInfo: IAnnualSessionInfo = {
-                year : '2015',
-                startDate: '2015-04-02',
-                endDate : '2015-05-05',
-                location: 'Greene Family Camp, Bruceville, Texas',
-                datesText: 'April 2nd to 5th, 2015'
-            };
-
-            var fakeResponse = loggedIn ?
-                new fakeServiceResponse(
-                    {
-                        sessionInfo: fakeSessionInfo,
-                        registrationId: 0,
-                        user: {
-                            id : 1,
-                            name: 'Terry SoRelle',
-                            authenticated : true,
-                            authorized: 1,
-                            email: 'terry@mail.com'
-                        }
-                    }
-                )
-               :
-                new fakeServiceResponse(
-                    {
-                        sessionInfo: fakeSessionInfo,
-                        registrationId: 0,
-                        user: {
-                            id : 0,
-                            name: 'Guest',
-                            authenticated : false,
-                            authorized: 0,
-                            email: ''
-                        }
-                    }
-                );
-
+            /*
+            var fakeResponse = me.getFakeInitResponse();
             me.handleInitializationResponse(fakeResponse);
             me.application.hideWaiter();
             if (successFunction) {
                 successFunction();
             }
+            */
             //****** End fake
 
             // service call
-            /*
-            var request = 'registrar'; //
-            me.peanut.executeService('initializeRegistrationApp',request, me.handleInitializationResponse)
+
+            var request = null;
+            me.peanut.executeService('registration.registrationInit',request, me.handleInitializationResponse)
                 .always(function() {
                     me.application.hideWaiter();
                     if (successFunction) {
                         successFunction();
                     }
                 });
-           */
         }
 
-        private handleInitializationResponse = (serviceResponse: IServiceResponse) => {
-            var me = this;
-            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var response = <IRegistrationInitResponse>serviceResponse.Value;
-                me.user.assign(response.user);
-                me.sessionInfo.year = response.sessionInfo.year;
-                me.sessionInfo.startDate = response.sessionInfo.startDate;
-                me.sessionInfo.endDate = response.sessionInfo.endDate;
-                me.datesText(response.sessionInfo.datesText);
-                me.locationText(response.sessionInfo.location);
-                me.setWelcomeForm();
-                me.registrationId(response.registrationId);
-                jQuery('#application-container').show();
-            }
-        };
+       private handleInitializationResponse = (serviceResponse: IServiceResponse) => {
+           var me = this;
+           if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+               var response = <IRegistrationInitResponse>serviceResponse.Value;
+               me.user.assign(response.user);
+               me.sessionInfo.year = response.sessionInfo.year;
+               me.sessionInfo.startDate = response.sessionInfo.startDate;
+               me.sessionInfo.endDate = response.sessionInfo.endDate;
+               me.datesText(response.sessionInfo.datesText);
+               me.locationText(response.sessionInfo.location);
+               me.setWelcomeForm();
+               jQuery('#application-container').show();
+           }
+       };
 
         private setWelcomeForm() {
             var me = this;
@@ -919,7 +1394,79 @@ module Tops {
 
 
         public getRegistration() {
-            alert("getRegistration");
+            var me = this;
+            var request = me.user.registrationId();
+
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Getting your registration...');
+
+            // ** fake **
+            // todo: remove fake and implement service
+            me.fakeRegistrationService();
+
+            /*
+            me.peanut.executeService('registration.GetRegistration',request, me.handleServiceResponseTemplate)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+            */
+        }
+
+        public findRegistration() {
+            var me = this;
+            var code = me.lookupForm.getLookupCode();
+            if (code) {
+                me.application.hideServiceMessages();
+                me.application.showWaiter('Finding registration...');
+
+                // ** fake **
+                // todo: remove fake and implement service
+                me.fakeRegistrationService();
+
+                /*
+                 me.peanut.executeService('registration.findByLookupCode',code, me.handleRegistrationResponse)
+                 .always(function() {
+                 me.application.hideWaiter();
+                 });
+                 */
+            }
+        }
+
+
+
+        private handleRegistrationResponse = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var response = <IRegistrationResponse>serviceResponse.Data;
+                me.loadRegistration(response);
+            }
+            else {
+                me.lookupForm.validationError('Sorry, cannot locate this registration.')
+            }
+
+        };
+
+        private loadRegistration(response : IRegistrationResponse) {
+            var me = this;
+            me.registrationStatus(response.registration.statusId);
+            me.currentRegistration = response.registration;
+            me.registrationForm.assign(response.registration);
+            me.attenderList(response.attenderList);
+            me.registrationForm.financeInfoForm.assignAccountSummary(response.accountSummary);
+            me.registrationChanged(false);
+            me.attendersChanged(false);
+            me.contactButton.setComplete();
+            var buttonStatus = response.attenderList.length == 0 ? 'incomplete' : 'complete';
+            me.attendersButton.setStatus(buttonStatus);
+            me.accountButton.setStatus(buttonStatus);
+            me.registrationForm.financeInfoForm.setViewState(response.registration.statusId == 1 ? 'edit':'view');
+            me.registrationForm.contactInfoForm.setViewState(response.registration.statusId == 1 ? 'edit':'view');
+            me.housingAssignmentList(response.housingAssignments);
+            me.housingPreference(response.housingPreference);
+            me.accountButton.setStatus(response.registration.confirmed ? 'complete' : 'incomplete');
+            me.updatedAttenders = [];
+            me.deletedAttenders = [];
+            me.showSummaryForm();
         }
 
         public startRegistration() {
@@ -934,83 +1481,58 @@ module Tops {
             me.registrationForm.clear();
             me.lookupForm.clear();
             me.formTitle('Begin your registration');
-            me.currentForm('registration');
+            me.currentForm('startnew');
+            if (me.user.authenticated()) {
+                me.lookupForm.lookupCode(me.user.email());
+            }
         }
 
 
         public startLookup() {
             var me = this;
-            if (me.startupForm.validate()) {
+            if (me.user.authenticated() ||  me.startupForm.validate()) {
                 me.lookupForm.clear();
                 me.formTitle('Find your registration');
                 me.currentForm('lookup');
+                if (me.user.authenticated()) {
+                    me.lookupForm.lookupCode(me.user.email());
+                }
             }
         }
 
-        public findRegistration() {
+        startNewRegistration() {
             var me = this;
-            var code = me.lookupForm.getLookupCode();
-            if (code) {
-                me.application.hideServiceMessages();
-                me.application.showWaiter('Finding registration...');
-
-                // todo: remove fake and implement service
-                // ** fake **
-                var result = null;
-                var fakeResponse = new fakeServiceResponse(null);
-                me.handleRegistrationLookupResult(fakeResponse);
-                me.application.hideWaiter();
-                // ** end fake **
-                /*
-
-                me.peanut.executeService('registration.findByLookupCode',code, me.handleRegistrationLookupResult)
-                    .always(function() {
-                        me.application.hideWaiter();
-                    });
-                */
-            }
-        }
-
-        private handleRegistrationLookupResult = (serviceResponse: IServiceResponse) => {
-            var me = this;
-            if (serviceResponse.Result == Peanut.serviceResultSuccess && serviceResponse.Value) {
-                // todo: implement registration edit
-                alert('show ,registration form');
-            }
-            else {
-                me.lookupForm.validationError('Sorry, cannot locate this registration.')
-            }
-        };
-
-        onLookupCodeEntered() {
-            var me = this;
+            me.registrationForm.clear();
+            me.attenderList([]);
             var code = me.lookupForm.getLookupCode();
             if (code) {
                 me.registrationForm.contactInfoForm.edit();
-                me.registrationForm.changed(true);
+                me.registrationChanged(false);
+                me.attendersChanged(false);
                 me.registrationForm.registrationCode(code);
                 if (Peanut.ValidateEmail(code)) {
                     me.registrationForm.contactInfoForm.email(code);
                 }
                 me.contactButton.setStatus('incomplete');
+                me.registrationStatus(1);
+                if (me.user.authenticated) {
+                    me.showAddressSearch();
+                }
                 me.editContactInfo();
             }
         }
 
         endContactEdit() {
-            window.location.assign('#nav-column');
             var me = this;
-            var ready = me.registrationForm.contactInfoForm.validate();
+            var ready = me.validateContactInfo();
             if (!ready) {
-                window.location.assign('#contact-button');
+                window.location.assign('#contact-errors');
                 return false;
             }
             if (me.registrationForm.id()) {
                 me.registrationForm.contactInfoForm.view();
             }
-            else {
-                me.registrationStatus = 1;
-            }
+            window.location.assign('#reg-header');
             me.contactButton.setStatus('complete');
             return true;
         }
@@ -1019,7 +1541,6 @@ module Tops {
             var me = this;
             var ready = me.endContactEdit();
             if (!ready) {
-                window.location.assign('#nav-column');
                 return;
             }
             me.attendersButton.setStatus('incomplete');
@@ -1029,23 +1550,39 @@ module Tops {
         saveFinanceInfo = () => {
             var me = this;
             if (!me.registrationForm.financeInfoForm.validate()) {
-                window.location.assign('#account-button');
-
+                window.location.assign('#account-errors');
                 return;
             }
-            me.changesToSave(true);
-            me.accountButton.setStatus('complete');
-            me.registrationForm.financeInfoForm.view();
-            me.showSummaryForm();
+            me.registrationChanged(true);
+            me.saveChanges();
+        };
+        
+        cancelContactChanges = () => {
+            var me = this;
+            if (me.registrationStatus() == 1) {
+                me.registrationForm.contactInfoForm.clear();
+            }
+            else {
+                me.registrationForm.contactInfoForm.assign(me.currentRegistration);
+                me.registrationForm.contactInfoForm.setViewState();
+            }
+            
+        };
+        
+        cancelFinanceChanges = () => {
+            var me = this;
+            if (me.registrationStatus() == 1) {
+                me.registrationForm.financeInfoForm.clear();
+            }
+            else {
+                me.registrationForm.financeInfoForm.assign(me.currentRegistration);
+                me.registrationForm.financeInfoForm.setViewState();
+            }
         };
 
         private newAttender() {
             var me = this;
-            me.attenderForm.clear();
-            me.currentForm('attender');
-            me.formTitle('New Attender');
-            me.attenderForm.edit();
-            me.showAttenderForm();
+            me.getAttender(0);
         }
 
         saveAttenderAddNext() {
@@ -1055,40 +1592,111 @@ module Tops {
             }
         }
 
+        endAddAttenders = () => {
+            var me = this;
+            me.attenderForm.setViewState();
+            if (me.registrationStatus() == 1) {
+                me.attendersButton.setComplete();
+                me.accountButton.setIncomplete();
+                me.registrationForm.financeInfoForm.edit();
+                me.showAccountsForm();
+            }
+        };
+
         saveAttenderAndDone() {
             var me = this;
             if (me.saveAttender()) {
-                me.registrationForm.financeInfoForm.edit();
-                me.accountButton.setStatus('incomplete');
-                me.attendersButton.setStatus('complete');
-                me.attenderForm.setViewState();
-                me.showAccountsForm();
+                me.endAddAttenders();
             }
         }
 
         cancelAttenderEdit() {
             var me = this;
+            var id = me.attenderForm.id();
+            me.attenderForm.clear();
+            if (me.attenderList().length > 0) {
+                me.showAttendersList();
+            }
+        }
 
+        cancelRegistration() {
+            var me = this;
+            //todo: implement cancelRegistration
+            me.registrationStatus(0);
+            me.contactButton.setStatus('inactive');
+            me.attendersButton.setStatus('inactive');
+            me.accountButton.setStatus('inactive');
         }
 
         showAccountsForm = () => {
             var me = this;
-            me.currentForm('accounts');
-            me.formTitle('Fees and Donations');
-            window.location.assign('#nav-column');
+            if ((!me.registrationForm.financeInfoForm.calculated) ||  me.balanceInvalid()) {
+                me.updateCosts();
+            }
+            else {
+                me.showFeesAndDonationsPage();
+            }
         };
 
+        showAccountDetails = () => {
+            var me = this;
+            me.registrationForm.financeInfoForm.setViewState();
+        };
+
+        private showFeesAndDonationsPage() {
+            var me = this;
+            me.currentForm('accounts');
+            me.formTitle('Fees and Donations');
+            window.location.assign('#form-column');
+        }
+
+        updateCosts = () => {
+            var me = this;
+            var request : ICostUpdateRequest = {
+                ymDonation: me.registrationForm.financeInfoForm.ymDonation(),
+                simpleMealDonation: me.registrationForm.financeInfoForm.simpleMealDonation(),
+                aidRequested: me.registrationForm.financeInfoForm.aidRequested(),
+                attenders: me.updatedAttenders,
+                deletedAttenders: me.deletedAttenders
+            };
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Calculating costs...');
+
+            // fakes
+            var fakeData = me.getFakeAccountSummary();
+            var fakeResponse = new fakeServiceResponse(fakeData);
+            me.handleGetCostResponse(fakeResponse);
+            me.application.hideWaiter();
+
+            // todo: implement GetRegistrationCost service
+            /*
+            me.peanut.executeService('directory.GetRegistrationCost',request, me.handleGetCostResponse)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+            */
+        };
+
+        private handleGetCostResponse = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var response = <IAccountSummary>serviceResponse.Value;
+                me.registrationForm.financeInfoForm.assignAccountSummary(response);
+                me.showFeesAndDonationsPage();
+            }
+        };
 
         showSummaryForm = () => {
             var me = this;
             me.formTitle("Registration");
             me.currentForm("registration");
-            window.location.assign('#nav-column');
+            window.location.assign('#reg-header');
         };
 
         confirmAndSave() {
           var me = this;
             if (!me.registrationForm.financeInfoForm.validate()) {
+                window.location.assign('#account-errors');
                 return;
             }
             me.registrationForm.financeInfoForm.view();
@@ -1102,58 +1710,268 @@ module Tops {
             return (me.attendersButton.isComplete() && me.contactButton.isComplete() && me.accountButton.isComplete());
         }
 
+        validateContactInfo() : boolean {
+            var me = this;
+            var isValid = me.registrationForm.contactInfoForm.validate();
+            if (isValid) {
+                me.registrationChanged(true);
+            }
+            else {
+                window.location.assign('#contact-errors');
+            }
+            return isValid;
+        }
+
+        hasUnsavedChanges() : boolean {
+            var me = this;
+            if (me.registrationStatus() == 1) {
+                return true;
+            }
+            if (me.registrationForm.financeInfoForm.viewState() == 'edit') {
+                return true;
+            }
+            if (me.registrationForm.contactInfoForm.viewState() == 'edit') {
+                return true;
+            }
+            if (me.attenderForm.viewState() == 'edit') {
+                return true;
+            }
+            return (me.registrationChanged() || me.attendersChanged());
+        }
+
         checkReadyToSave() {
             var me = this;
             if (me.registrationForm.financeInfoForm.viewState() == 'edit') {
-                if (!me.registrationForm.financeInfoForm.validate()) {
-                    me.application.showError('Please complete this form');
+                if (me.registrationForm.financeInfoForm.validate()) {
+                    me.registrationForm.financeInfoForm.setViewState();
+                }
+                else {
+//                    me.application.showError('Please complete this form');
+                    window.location.assign('#account-errors');
+                    me.showAccountsForm();
                     return false;
                 }
             }
             if (me.registrationForm.contactInfoForm.viewState() == 'edit') {
-                if (!me.registrationForm.contactInfoForm.validate()) {
+                if (me.validateContactInfo()) {
+                    me.registrationForm.contactInfoForm.setViewState();
+                }
+                else {
                     me.application.showError('Please complete the contact information form.');
+                    me.showContactForm();
+                    return false;
                 }
             }
             if (me.attenderForm.viewState() == 'edit') {
-                if (!me.attenderForm.validate()) {
-                    me.application.showError('Please complete this form.');
-                }
+                me.application.showError('Please complete the attender form.');
+                me.showAttenderForm();
+                return false;
+            }
+
+            if (me.attenderList().length == 0) {
+                me.application.showError('You must add at least one attender');
+                me.showAttenderForm();
+                return false;
             }
 
             return true;
 
         }
 
+        editSelectedAttender = (item: IListItem) => {
+            var me = this;
+            var id = item.Value;
+            var attender = me.getAttender(id);
+        };
+
+        removeSelectedAttender = (item: IListItem) => {
+            var me = this;
+            me.attendersChanged(true);
+            var id = item.Value;
+            var attenderList = me.attenderList();
+            attenderList = _.filter(attenderList,function(attenderItem: IListItem) {
+                return attenderItem.Value != id;
+            });
+            me.attenderList(attenderList);
+            var updated = _.filter(me.updatedAttenders, function(attender: IAttender) {
+                return attender.attenderId != id;
+            });
+            me.updatedAttenders = updated;
+            if (id > 0) {
+                me.deletedAttenders.push(id);
+            }
+        };
+
+        uncancel = () => {
+            var me = this;
+            // todo: implement uncancel
+            alert('Uncancel not implemented yet.')
+        };
 
         saveAttender() {
             var me = this;
+            me.attendersChanged(true);
             if (!me.attenderForm.validate()) {
+                window.location.assign('#attender-errors');
                 return false;
             }
-            me.changesToSave(true);
+
+            var onUpdateList = false;
+            var attender  = null;
+            var id = me.attenderForm.id();
+            var isNew = (!id);
+            if (isNew) {
+                id = me.getTempAttenderId();
+                me.attenderForm.id(id);
+            }
+            else {
+                attender = _.find(me.updatedAttenders,function(a : IAttender){
+                    return a.attenderId == id;
+                });
+                onUpdateList = (attender) ? true : false;
+            }
+
+            if (attender == null) {
+                attender = {};
+            }
+            me.attenderForm.updateAttender(<IAttender>attender);
+
+            if (isNew) {
+                me.attenderList.push(
+                    {
+                        Text: me.attenderForm.attenderFullName(),
+                        Value: id,
+                        Description: ''
+                    }
+                );
+            }
+
+            if (!onUpdateList) {
+                me.updatedAttenders.push(attender);
+            }
+
+            if (me.accountButton.isComplete()) {
+                me.accountReviewed(true);
+            }
             return true;
         }
 
-        showAttendersList() {
+        getTempAttenderId() {
             var me = this;
-            me.attenderForm.setViewState();
+            var result = 0;
+            _.each(me.updatedAttenders,function(attender: IAttender) {
+                if (result > attender.attenderId) {
+                    result = attender.attenderId;
+                }
+            });
+            return result - 1;
+        }
+
+
+        getAttender(attenderId: any) {
+            var me = this;
+            var attender : IAttender = null;
+
+            if (attenderId) {
+                attender = _.find(me.updatedAttenders, function (item:IAttender) {
+                    return item.attenderId == attenderId;
+                });
+                if (attender) {
+                    me.editAttender(attender);
+                    return;
+                }
+            }
+            else {
+                if (me.attenderForm.lookupsAssigned) {
+                    me.editAttender();
+                    return;
+                }
+            }
+
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Getting attender data...');
+
+            var request : IGetAttenderRequest = {
+                id: attenderId,
+                includeLookups: me.attenderForm.lookupsAssigned ? 1 : 0
+            };
+
+            // todo: fakes
+            var fakeAttenderResponse  = {
+                attender: me.getFakeAttender(attenderId),
+                lookups : me.getFakeLookups()
+            };
+            var fakeResponse = new fakeServiceResponse(fakeAttenderResponse);
+            me.application.hideWaiter();
+            me.handleGetAttenderResponse(fakeResponse);
+
+
+            /*
+            me.peanut.executeService('registration.getAttender',request, me.handleGetAttenderResponse)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+                */
+        }
+
+        private handleGetAttenderResponse = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var response = <IGetAttenderResponse>serviceResponse.Value;
+                if (response) {
+                    if (response.lookups) {
+                        me.attenderForm.assignLookupLists(response.lookups);
+                    }
+                }
+                me.editAttender(response.attender);
+            }
+        };
+
+
+        private editAttender(attender: IAttender = null) {
+            var me = this;
+            if (attender) {
+                me.attenderForm.assign(attender);
+                me.formTitle("Update attender: " + textParser.makeFullName(attender.firstName, attender.lastName, attender.middleName));
+            }
+            else {
+                me.attenderForm.clear();
+                me.attenderForm.setDefaults(
+                    me.updatedAttenders.length > 0 ? me.updatedAttenders[0] : null
+                );
+                me.formTitle('New Attender');
+            }
+            me.attenderForm.edit();
+            window.location.assign('#reg-header');
             me.showAttenderForm();
         }
+
+        showWelcomeForm() {
+            var me = this;
+            me.currentForm('welcome');
+        };
+        showAttendersList = () => {
+            var me = this;
+            var me = this;
+            me.attenderForm.setViewState();
+            me.formTitle('Attenders');
+            me.showAttenderForm();
+        };
 
         showAttenderForm = () => {
             var me = this;
             me.currentForm('attenders');
-            me.formTitle('Attenders');
-            window.location.assign('#nav-column');
+            window.location.assign('#reg-header');
+            if (me.attenderForm.id() == 0 && me.familyMembers.length > 0) {
+                jQuery("#family-member-modal").modal('show');
+            }
         };
 
         showContactForm = () => {
             var me = this;
             me.formTitle('Contact Information');
             me.currentForm('contact');
-            window.location.assign('#nav-column');
-            // todo: finish address form markup
+            window.location.assign('#reg-header');
         };
 
         editContactForm = () => {
@@ -1164,40 +1982,56 @@ module Tops {
         editAccountsForm = () => {
             var me = this;
             me.registrationForm.financeInfoForm.edit();
+            me.showAccountsForm();
         };
 
 
         private editContactInfo(){
             var me = this;
             me.registrationForm.contactInfoForm.edit();
-            me.registrationForm.changed(true);
             me.showContactForm();
         }
 
+
         getRegistrationChanges() {
             var me = this;
-            var request =  {
-                registration : {},
-                attenders : []
-            };
-            request.attenders = me.getUpdatedAttenders();
-            if (me.registrationForm.changed()) {
-                me.registrationForm.updateRegistration(<IRegistrationInfo>request.registration);
+            if (me.registrationChanged() || me.attendersChanged()) {
+                var request : IRegistrationUpdateRequest =  {
+                    registration : null,
+                    updatedAttenders : me.updatedAttenders,
+                    deletedAttenders : me.deletedAttenders,
+                };
+                if (me.registrationChanged()) {
+                    request.registration = <IRegistrationInfo>{};
+                    me.registrationForm.updateRegistration(<IRegistrationInfo>request.registration);
+                }
+                return request;
             }
-            else if (request.attenders.length == 0) {
-                return null;
+            return null;
+        }
+
+        sendRegistrarMessage = () => {
+            var me = this;
+            if (me.modalInput()) {
+                // todo: implement send registrar message
+                alert('Send message not implemented yet.');
+                me.modalInput('');
+                jQuery("#registrar-contact-modal").modal('hide');
             }
-            return request;
+        };
+
+
+        showRegistrarContactForm() {
+            var me = this;
+            me.modalInput('');
+            jQuery("#registrar-contact-modal").modal('show');
         }
 
         saveRegistration() {
-
-
-        }
-
-        cancelRegistrationEdit() {
+            // todo: implement saveRegistraion see contact form
 
         }
+
 
 // TEMPLATES
         public serviceCallTemplate() {
@@ -1223,70 +2057,283 @@ module Tops {
         };
 
 // FAKES
-        private getFakeTerryAndLizRegistration() {
+
+        private fakeRegistrationService(isConfirmed = 1) {
             var me = this;
-            var attenders = [];
-            attenders[0] = me.getFakeAttender(1, 'Terry','SoRelle');
-            attenders[1] = me.getFakeAttender(2, 'Liz','Yeats');
-            return me.getFakeRegistration(1,"Terry SoRelle and Liz Yeats",attenders);
+            var data = me.getFakeRegistration(isConfirmed);
+            var fakeResponse = new fakeServiceResponse(data);
+            me.handleRegistrationResponse(fakeResponse);
+            me.application.hideWaiter();
         }
 
-        private getFakeRegistration(id: any, name: string, attenders: IAttender[]) {
-
-        }
-
-        private getFakeAttender(id: any, firstName: string, lastName) {
-            return {
-                // todo: create fake attender
+        private getFakeRegistration(isConfirmed = 0) {
+            var me = this;
+            var accountSummary : IAccountSummary = me.getFakeAccountSummary();
+            var result : IRegistrationResponse = {
+                attenderList: [
+                    {
+                        Text: 'Terry SoRelle',
+                        Value: '1',
+                        Description: ''
+                    },
+                    {
+                        Text: 'Liz Yeats',
+                        Value: '2',
+                        Description: ''
+                    },
+                    {
+                        Text: 'Sam Schifman',
+                        Value: '3',
+                        Description: ''
+                    }
+                ],
+                registration: {
+                    registrationId: 1,
+                    confirmed: isConfirmed,
+                    active: 1,
+                    year: '2015',
+                    registrationCode: 'ABCD',
+                    statusId: 2,
+                    name: 'Terry SoRelle and Liz Yeats',
+                    address: '904 E. Meadowmere',
+                    city: 'Austin, TX 78758',
+                    phone: '532-029-0292',
+                    email: 'terry@mail.com  ',
+                    receivedDate: '10/1/2015',
+                    amountPaid: '0.00',
+                    notes: 'Notes here',
+                    feesReceivedDate: null,
+                    arrivalTime: '42',
+                    departureTime: '71',
+                    scymNotes: '',
+                    statusDate: '10/1/2015',
+                    ymDonation: '',
+                    simpleMealDonation: '',
+                    aidRequested: '',
+                },
+                accountSummary: accountSummary,
+                housingPreference: 'Health House',
+                housingAssignments: [
+                    {
+                        Text: 'Liz, Terry',
+                        Value: 'Health House 10',
+                        Description: 'Friday night through Saturday night'
+                    },
+                    {
+                        Text: 'Sam',
+                        Value: 'Young Friends Dorm',
+                        Description: 'Thursday night through Saturday night'
+                    }
+                ]
             };
+
+            return result;
+        }
+
+        private getFakeAccountSummary() : IAccountSummary {
+            var result : IAccountSummary =
+            {
+                fees: [
+                    {
+                        Text: 'Registration fee',
+                        Value: '$55.00',
+                        Description: 'Terry'
+                    },
+                    {
+                        Text: 'Registration fee',
+                        Value: '$55.00',
+                        Description: 'Liz'
+                    },
+                    {
+                        Text: 'Adult Lodging and meals three nights',
+                        Value: '$195.00',
+                        Description: 'Terry 3 nights'
+                    },
+                    {
+                        Text: 'Adult Lodging and meals three nights',
+                        Value: '$195.00',
+                        Description: 'Terry 3 nights'
+                    }
+                ],
+                credits: [
+                    {
+                        Text: 'Financial aid',
+                        Value: '$20.00',
+                        Description: ''
+                    }
+                ],
+                donations: [
+                    {
+                        Text: 'Simple meal',
+                        Value: '$20.00',
+                        Description: ''
+                    },
+                    {
+                        Text: 'General',
+                        Value: '$30.00',
+                        Description: ''
+                    },
+                ],
+                feeTotal: '$365.00',
+                creditTotal: '$150.00',
+                donationTotal: '$50',
+                balance: '265'
+            };
+
+            return result;
+        }
+
+        private getFakeAttender(attenderId : any) {
+            var me = this;
+            if (!attenderId) {
+                return null;
+            }
+
+            var attenderStub = _.find(me.attenderList(), function(item : IListItem) {
+                return item.Value == attenderId;
+            });
+
+            if (!attenderStub) {
+                return null;
+            }
+
+            var result : IAttender = {
+                attenderId: attenderStub.Text,
+                firstName : '',
+                lastName : attenderStub.Value,
+                middleName : '',
+                dateOfBirth : null,
+                affiliationCode : '',
+                otherAffiliation : '',
+                firstTimer : 0,
+                teacher : 0,
+                financialAidRequested : 0,
+                guest : 0,
+                notes : '',
+                linens : 0,
+                arrivalTime  : '',
+                departureTime  : '',
+                vegetarian : 0,
+                attended : 0,
+                singleOccupant : 0,
+                glutenFree : 0,
+                changed: false,
+                housingTypeId : null,
+                specialNeedsTypeId : null, // lookup: special needs
+                generationId : null, // lookup: generations
+                gradeLevel : '', // 'PS','K', 1 .. 13
+                ageGroupId : null, // lookup agegroups
+                creditTypeId : 0, // formerly: feeCredit, lookup: creditTypes
+                meals: []
+            };
+            return result;
+        }
+
+        private getFakeLookups() : IAttenderLookups {
+            var attenderLists  = {
+                housingTypes:
+                    [
+                        { Text:'Day visitor - no housing',Value:'1',Description:'', category: '1' },
+                        { Text:'Early Riser Dorm for Women',Value:'2',Description:'', category: '1' },
+                        { Text:'Night Owl Dorm for Women',Value:'3',Description:'', category: '1' },
+                        { Text:'Early Riser Dorm for Men',Value:'4',Description:'' ,category: '1'},
+                        { Text:'Night Owl Dorm for Men',Value:'5',Description:'' ,category: '1'},
+                        { Text:'Family Cabin',Value:'6',Description:'' ,category: '1'},
+                        { Text:'Solo Parent Cabin (not used)',Value:'7',Description:'' ,category: '1'},
+                        { Text:'Couples Cabin',Value:'8',Description:'' ,category: '1'},
+                        { Text:'Camp Motel',Value:'9',Description:'' ,category: '3'},
+                        { Text:'Health House (special needs)',Value:'10',Description:'' ,category: '3'},
+                        { Text:'Tenting',Value:'11',Description:'' ,category: '1'},
+                        { Text:'Adult Young Friends Dorm',Value:'12',Description:'' ,category: '1'},
+                        { Text:'Female Young Frends Dorm',Value:'13',Description:'' ,category: '1'},
+                        { Text:'Male Young Friends Dorm',Value:'14',Description:'' ,category: '1'},
+                        { Text:'Jr. Young Friends Female',Value:'16',Description:'' ,category: '1'},
+                        { Text:'Jr. Young Friends Male',Value:'17',Description:'' ,category: '1'},
+                        { Text:'Mothers with Children Dorm',Value:'18',Description:'' ,category: '1'},
+                        { Text:'Fathers with Children Dorm',Value:'19',Description:'' ,category: '1'}
+                    ],
+                affiliationCodes :
+                    [
+                        { Text:'Acadiana Friends Meeting',Value:'ACDN',Description:'' },
+                        { Text:'Alpine Friends Worship Group',Value:'AL TX',Description:'' },
+                        { Text:'Friends Meeting of Austin',Value:'AU TX',Description:'' },
+                        { Text:'Baton Rouge Friends Meeting',Value:'BA LA',Description:'' },
+                        { Text:'Caddo Four States Preparatory Meeting',Value:'CADDO4',Description:'' },
+                        { Text:'Coastal Bend Friends Meeting',Value:'CC TX',Description:'' },
+                        { Text:'College Station Friends Worship Group',Value:'CS TX',Description:'' },
+                        { Text:'Dallas Monthly Meeting of Friends',Value:'DA TX',Description:'' },
+                        { Text:'Fayetteville Friends',Value:'FA AR',Description:'' },
+                        { Text:'Fort Worth Monthly Meeting',Value:'FW TX',Description:'' },
+                        { Text:'Galveston Friends Meeting',Value:'GA TX',Description:'' },
+                        { Text:'Hill Country Friends Monthly Meeting',Value:'HC TX',Description:'' },
+                        { Text:'Houston Live Oak Friends Meeting',Value:'HO TX',Description:'' },
+                        { Text:'Little Rock Friends Meeting',Value:'LR AR',Description:'' },
+                        { Text:'Lubbock Monthly Meeting',Value:'LU TX',Description:'' },
+                        { Text:'Norman Friends Meeting',Value:'NFS',Description:'' },
+                        { Text:'Friends Meeting of New Orleans',Value:'NO LA',Description:'' },
+                        { Text:'No SCYM affiliation',Value:'NONE',Description:'' },
+                        { Text:'Oklahoma City Friends Meeting',Value:'OKC',Description:'' },
+                        { Text:'Rio Grande Valley Worship Group',Value:'RIO',Description:'' },
+                        { Text:'Friends Meeting of San Antonio',Value:'SA TX',Description:'' },
+                        { Text:'Stillwater Friends Meeting',Value:'ST OK',Description:'' },
+                        { Text:'Sunrise Friends Meeting',Value:'SUN',Description:'' },
+                        { Text:'Tulsa Green Country',Value:'TU OK',Description:'' }
+                    ],
+                ageGroups : 
+                    [
+                        { Text:'Little Friends',Value:'1',Description:'' },
+                        { Text:'Lower Elementary',Value:'2',Description:'' },
+                        { Text:'Upper Elementary',Value:'3',Description:'' },
+                        { Text:'Junior High',Value:'4',Description:'' },
+                        { Text:'High School',Value:'5',Description:'' }
+                    ]
+            };
+
+            return <IAttenderLookups>attenderLists;
         }
 
         private getFakeInitResponse() {
-            return {
-                statusTypes: [
-                    {
-                        Text : '',
-                        Value: 0,
-                        Description: ''
-                    },
+            var loggedIn =
+                // false;
+                true;
 
-                ], //IListItem[];
-                specialNeedsTypes: [
-                    {
-                        Text : '',
-                        Value: 0,
-                        Description: ''
-                    }
-                ], //IListItem[];
-                generationTypes: [
-                    {
-                        Text : '',
-                        Value: 0,
-                        Description: ''
-                    }
-                ], //IListItem[];
-                creditTypes: [
-                    {
-                        Text : '',
-                        Value: 0,
-                        Description: ''
-                    }
-                ], //IListItem[];
-                ageGroups: [
-                    {
-                        ageGroupId: 0,
-                        groupName: '',
-                        cutoffAge: 0,
-                    },
-                ], //IAgeGroup[];
-                user: {
-                    id: 1,
-                    name: "Terry SoRelle",
-                    authenticated : 1,
-                    authorized: 1,
-                    email: 'terry@test.org'
-                }
+
+            var fakeSessionInfo: IAnnualSessionInfo = {
+                year : '2015',
+                startDate: '2015-04-02',
+                endDate : '2015-05-05',
+                location: 'Greene Family Camp, Bruceville, Texas',
+                datesText: 'April 2nd to 5th, 2015'
             };
+
+            return loggedIn ?
+                new fakeServiceResponse(
+                    {
+                        sessionInfo: fakeSessionInfo,
+                        registrationId: 1,
+                        user: {
+                            id : 1,
+                            name: 'Terry SoRelle',
+                            authenticated : true,
+                            authorized: 1,
+                            email: 'terry@mail.com'
+                        }
+                    }
+                )
+                :
+                new fakeServiceResponse(
+                    {
+                        sessionInfo: fakeSessionInfo,
+                        registrationId: 0,
+                        user: {
+                            id : 0,
+                            name: 'Guest',
+                            authenticated : false,
+                            authorized: 0,
+                            email: ''
+                        }
+                    }
+                );
         }
     }
 }
