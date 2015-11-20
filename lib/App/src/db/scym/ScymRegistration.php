@@ -40,9 +40,6 @@ class ScymRegistration extends DateStampedEntity
         return $this->attenders;
     }
 
-
-
-
     /**
      * @var integer
      *

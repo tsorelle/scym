@@ -22,7 +22,16 @@ class ScymCreditType
     /**
      * @var string
      *
-     * @Column(name="creditType", type="string", length=30, nullable=true)
+     * @Column(name="creditTypeCode", type="string", length=20, nullable=true)
+     */
+    private $credittypecode;
+
+
+
+    /**
+     * @var string
+     *
+     * @Column(name="creditTypeName", type="string", length=30, nullable=true)
      */
     private $credittypename;
 
@@ -43,6 +52,30 @@ class ScymCreditType
     {
         return $this->credittypeid;
     }
+
+    /**
+     * Get credittypecode
+     *
+     * @return integer
+     */
+    public function getCreditTypeCode()
+    {
+        return $this->credittypecode;
+    }
+
+    /**
+     * Set credittypecode
+     *
+     * @param string $value
+     * @return ScymCreditType
+     */
+    public function setCreditTypeCode($value)
+    {
+        $this->credittypecode = $value;
+
+        return $this;
+    }
+
 
     /**
      * Set credittype
@@ -88,5 +121,13 @@ class ScymCreditType
     public function getActive()
     {
         return $this->active;
+    }
+
+    public function getDataTransferObject() {
+        $result = new \stdClass();
+        $result->creditTypeId    = $this->credittypeid;
+        $result->creditTypeCode  = $this->credittypecode;
+        $result->creditTypeName  = $this->credittypename;
+        return $result;
     }
 }

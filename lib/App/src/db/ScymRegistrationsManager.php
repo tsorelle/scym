@@ -9,6 +9,8 @@
 namespace App\db;
 
 use App\db\scym\ScymAnnualSession;
+use App\db\scym\ScymFee;
+use App\db\scym\ScymRegistration;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Tops\db\TDbServiceManager;
@@ -22,12 +24,29 @@ class ScymRegistrationsManager extends TDbServiceManager
      */
     public function getSession($year = null) {
         $repository =  $this->getRepository('App\db\scym\ScymAnnualSession');
+        /**
+         * @var $result ScymAnnualSession
+         */
+        $result=null;
         if (empty($year)) {
             $year = date("Y");
+            $result = $repository->find($year);
+            if (empty($result)) {
+                throw new Exception("Yearly meeting year $year is not in the annualsessions table.");
+            }
+            // if we are 60 days past the yearly meeting end date for the curren year, go to next year.
+            $endDate = clone $result->getEnd(); // must clone because $endDate->add would change $result->end
+            $today = new \DateTime();
+            if ($today > $endDate->add(new \DateInterval('P60D'))) {
+                $year++;
+                $result = null; // try again
+            }
         }
-        $result = $repository->find($year);
-        if (empty($result)) {
-            throw new Exception("Yearly meeting year $year is not in the ymdates table.");
+        if ($result == null) {
+            $result = $repository->find($year);
+            if (empty($result)) {
+                throw new Exception("Yearly meeting year $year is not in the annualsessions table.");
+            }
         }
         return $result;
     }
@@ -39,5 +58,66 @@ class ScymRegistrationsManager extends TDbServiceManager
             return $result->getRegistrationId();
         }
         return 0;
+    }
+
+    public function getFeeTables() {
+        $repository =  $this->getRepository('App\db\scym\ScymFee');
+        $fees = $repository->findAll();
+        $result = array();
+        foreach ($fees as $fee) {
+            $item = $fee->getDataTransferObject();
+            $result[$item->feeCode] = $item;
+        }
+        return $result;
+    }
+
+    public function getFeeDescriptions() {
+        $repository =  $this->getRepository('App\db\scym\ScymFee');
+        $fees = $repository->findAll();
+        $result = array();
+        foreach ($fees as $fee) {
+            /**
+             * @var $fee ScymFee
+             */
+            $result[$fee->getFeeTypeId()] = $fee->getDescription();
+        }
+        return $result;
+    }
+
+    public function getCreditTypes() {
+        $repository =  $this->getRepository('App\db\scym\ScymCreditType');
+        $types = $repository->findBy(array('active' => 1));
+        $result = array();
+        foreach ($types as $type) {
+            $item = $type->getDataTransferObject();
+            $result[$item->creditTypeCode] = $item;
+        }
+        return $result;
+
+    }
+
+    public function getHousingTypes() {
+        $repository =  $this->getRepository('App\db\scym\ScymHousingType');
+        $types = $repository->findBy(array('active' => 1));
+        $result = array();
+        foreach ($types as $type) {
+            $item = $type->getDataTransferObject();
+            $result[$item->housingTypeId] = $item;
+        }
+        return $result;
+    }
+
+    /**
+     * @param $id
+     * @return ScymRegistration
+     * @throws \Exception
+     */
+    public function getRegistration($id) {
+        $repository =  $this->getRepository('App\db\scym\ScymRegistration');
+        $result = $repository->find($id);
+        if ($result == null) {
+            throw new \Exception("Cannot find registration #$id");
+        }
+        return $result;
     }
 }

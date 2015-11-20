@@ -7,10 +7,7 @@
  */
 namespace App\services\registration;
 
-use App\db\ScymDirectoryManager;
-use App\db\ScymMeetingsManager;
 use App\db\ScymRegistrationsManager;
-use App\db\TScymMailboxManager;
 use Tops\services;
 use Tops\services\TServiceCommand;
 use Tops\sys\IUser;

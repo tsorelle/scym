@@ -152,4 +152,13 @@ class ScymHousingType
     {
         return $this->active;
     }
+
+    public function getDataTransferObject() {
+        $result = new \stdClass();
+        $result->housingTypeId           = $this->housingTypeId;
+        $result->housingTypeCode         = $this->housingTypeCode;
+        $result->housingTypeDescription  = $this->housingTypeDescription;
+        $result->category                = $this->category;
+        return $result;
+    }
 }

@@ -125,10 +125,19 @@ declare module Tops {
         persons: IFamilyAttender[];
     }
 
+    export interface IPaymentItem {
+        paymentId : any;
+        dateReceived : any; // date
+        amount: number; // currency
+        checkNumber : string; // number or 'cash'
+        payor : string;
+    }
+
     export interface IAccountSummary {
         fees : IListItem[];
         credits: IListItem[];
         donations: IListItem[];
+        payments: IPaymentItem[];
         feeTotal: string;
         creditTotal: string;
         donationTotal: string;

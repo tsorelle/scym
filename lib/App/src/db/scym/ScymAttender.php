@@ -3,6 +3,7 @@
 
 namespace App\db\scym;
 
+use App\db\api\IAttenderCostInfo;
 use App\db\DateStampedEntity;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -10,9 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
  * ScymAttender
  *
  * @Table(name="attenders", indexes={@Index(name="registration_fk", columns={"registrationId"})})
- * @Entity
+ * @Entity @HasLifecycleCallbacks
  */
-class ScymAttender extends DateStampedEntity
+class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
 {
     /**
      * @var integer
@@ -866,5 +867,14 @@ class ScymAttender extends DateStampedEntity
         $result->glutenFree            =  $this->glutenFree;
 
         return $result;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getMeals()
+    {
+        return array();
+        // TODO: Implement getMeals() method.
     }
 }

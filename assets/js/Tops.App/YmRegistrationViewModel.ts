@@ -379,7 +379,6 @@ module Tops {
             me.financeInfoForm.assign(registration);
         }
 
-        // todo: review this!
         public updateRegistration = (registration: IRegistrationInfo) => {
             var me = this;
             registration.registrationId = me.id();
@@ -1014,7 +1013,7 @@ module Tops {
             me.application.hideServiceMessages();
             me.application.showWaiter('Saving changes...');
 
-           // todo: implement saveChanges service
+           // todo: saveChanges service
             // fakes
            var data = me.getFakeRegistration();
            var fakeResponse = new fakeServiceResponse(data);
@@ -1401,7 +1400,7 @@ module Tops {
             me.application.showWaiter('Getting your registration...');
 
             // ** fake **
-            // todo: remove fake and implement service
+            // todo: getRegistration service
             me.fakeRegistrationService();
 
             /*
@@ -1420,7 +1419,7 @@ module Tops {
                 me.application.showWaiter('Finding registration...');
 
                 // ** fake **
-                // todo: remove fake and implement service
+                // todo: findByLookupCode service
                 me.fakeRegistrationService();
 
                 /*
@@ -1630,7 +1629,7 @@ module Tops {
 
         showAccountsForm = () => {
             var me = this;
-            if ((!me.registrationForm.financeInfoForm.calculated) ||  me.balanceInvalid()) {
+            if ((!me.registrationForm.financeInfoForm.calculated()) ||  me.balanceInvalid()) {
                 me.updateCosts();
             }
             else {
@@ -1663,18 +1662,19 @@ module Tops {
             me.application.showWaiter('Calculating costs...');
 
             // fakes
+            /*
             var fakeData = me.getFakeAccountSummary();
             var fakeResponse = new fakeServiceResponse(fakeData);
             me.handleGetCostResponse(fakeResponse);
             me.application.hideWaiter();
+            */
+            // todo: GetRegistrationCost service
 
-            // todo: implement GetRegistrationCost service
-            /*
-            me.peanut.executeService('directory.GetRegistrationCost',request, me.handleGetCostResponse)
+            me.peanut.executeService('registration.GetRegistrationCost',request, me.handleGetCostResponse)
                 .always(function() {
                     me.application.hideWaiter();
                 });
-            */
+
         };
 
         private handleGetCostResponse = (serviceResponse: IServiceResponse) => {
@@ -1896,7 +1896,7 @@ module Tops {
                 includeLookups: me.attenderForm.lookupsAssigned ? 1 : 0
             };
 
-            // todo: fakes
+            // todo: getAttender service
             var fakeAttenderResponse  = {
                 attender: me.getFakeAttender(attenderId),
                 lookups : me.getFakeLookups()
@@ -2027,11 +2027,6 @@ module Tops {
             jQuery("#registrar-contact-modal").modal('show');
         }
 
-        saveRegistration() {
-            // todo: implement saveRegistraion see contact form
-
-        }
-
 
 // TEMPLATES
         public serviceCallTemplate() {
@@ -2133,6 +2128,7 @@ module Tops {
         private getFakeAccountSummary() : IAccountSummary {
             var result : IAccountSummary =
             {
+                payments: [],
                 fees: [
                     {
                         Text: 'Registration fee',
