@@ -6,14 +6,16 @@
  * Time: 12:21 PM
  */
 
-namespace App\src\db;
+namespace App\db;
 
 
+use App\db\api\FeeTypeDto;
 use App\db\api\IAttenderCostInfo;
 use App\db\api\RegistrationAccount;
 use App\db\scym\ScymAnnualSession;
 use App\db\scym\ScymCharge;
 use App\db\scym\ScymCredit;
+use App\db\scym\ScymDonation;
 use App\db\scym\ScymRegistration;
 use App\db\ScymRegistrationsManager;
 
@@ -23,6 +25,8 @@ class ScymAccountManager
     private $credits = array();
     private $charges = array();
     private $donations = array();
+    private $aidEligiableTotal = 0.00;
+    private $aidRequestedTotal = 0.00;
 
     const SCYM_SUBSIDY = 2;
     const SIMPLE_MEAL = 3;
@@ -46,25 +50,23 @@ class ScymAccountManager
     const HOUSING_TYPE_COUPLES = 8;
     const HOUSING_TYPE_HEALTH = 10;
 
+    const DONATION_ID_YM = 2;
+    const DONATION_ID_SIMPLEMEAL = 3;
+
 
     /**
      * @var ScymRegistrationsManager
      */
     private $registrationsManager;
 
+    /**
+     * @var FeeTypeDto[]
+     */
     private $fees;
     private $housingTypes;
     private $creditTypes;
     private $registrationId = 0;
-    /**
-     * @var $receivedData DateTime
-     */
-    private $receivedDate = null;
 
-    /**
-     * @var $sessionInfo ScymAnnualSession
-     */
-    private $sessionInfo = null;
 
     public function __construct(ScymRegistrationsManager $manager = null)
     {
@@ -84,9 +86,32 @@ class ScymAccountManager
         $this->donations = array();
     }
 
-    private function createRegistrationItems($isLate,$ymDonation, $simpleMealDonation, $aidRequested)
+    /**
+     * @param $feeCode
+     * @return FeeTypeDto
+     * @throws \Exception
+     */
+    private function getFeeType($feeCode)
     {
-
+        if (array_key_exists($feeCode,$this->fees)) {
+            return $this->fees[$feeCode];
+        }
+        throw new \Exception("Fee code '$feeCode' not found.");
+    }
+    private function createRegistrationItems($year,\DateTime $receivedDate,$ymDonation, $simpleMealDonation, $aidRequested)
+    {
+        $sessionInfo = $this->registrationsManager->getSession($year);
+        if ($receivedDate > $sessionInfo->getDeadline()) {
+            $lateFee = $this->getFeeType('LATE');
+            $basis = "Late registration received ".$receivedDate->format('m/d/Y').'.';
+            $this->addCharge($lateFee->unitAmount,$lateFee->feeTypeId,$$basis);
+        }
+        if (!empty($ymDonation)) {
+            $this->addDonation($ymDonation,self::DONATION_ID_YM);
+        }
+        if (!empty($simpleMealDonation)) {
+            $this->addDonation($ymDonation,self::DONATION_ID_SIMPLEMEAL);
+        }
     }
 
     private function createAttenderItems(IAttenderCostInfo $attender)
@@ -97,23 +122,36 @@ class ScymAccountManager
 
     private function addCredit($amount,$creditTypeId,$description) {
         $credit = ScymCredit::newCredit($amount,$description,$creditTypeId);
+        if ($this->registrationId) {
+            $credit->setRegistrationid($this->registrationId);
+        }
+        $this->
         array_push($this->credits,$credit);
     }
 
-    private function addCharge($amount,$basis,$feeTypeId) {
+    private function addCharge($amount,$feeTypeId,$basis,$canWaive = true) {
         $charge = ScymCharge::newCharge($amount,$basis,$feeTypeId);
+        if ($this->registrationId) {
+            $charge->setRegistrationid($this->registrationId);
+        }
         array_push($this->charges,$charge);
+        if (!$canWaive) {
+            $this->aidEligiableTotal += $amount;
+        }
     }
 
-    private function addDonation() {
-
+    private function addDonation($amount,$donationTypeId) {
+        $donation = ScymDonation::createDonation($donationTypeId,$amount);
+        if ($this->registrationId) {
+            $donation->setRegistrationid($this->registrationId);
+        }
+        array_push($this->donations,$donation);
     }
 
-    private function doCalculations($attenders, $isLate = false, $ymDonation = null, $simpleMealDonation = null, $aidRequested = null)
+    private function doCalculations($year=null, \DateTime $recievedDate=null, array $attenders, $ymDonation = null, $simpleMealDonation = null, $aidRequested = null)
     {
         $this->clear();
-
-        $this->createRegistrationItems($isLate, $ymDonation, $simpleMealDonation, $aidRequested);
+        $this->createRegistrationItems($year, $recievedDate, $ymDonation, $simpleMealDonation, $aidRequested);
         foreach ($attenders as $attender) {
             $this->createAttenderItems($attender);
         }
@@ -128,23 +166,28 @@ class ScymAccountManager
     public function calculate($attenders, $ymDonation = null, $simpleMealDonation = null, $aidRequested = null)
     {
         $this->registrationId = 0;
-        $this->sessionInfo = $this->registrationsManager->getSession(); // for current year
-        return $this->doCalculations($attenders, $ymDonation, $simpleMealDonation, $aidRequested);
+        $today = new \DateTime();
+        return $this->doCalculations(null,$today,$attenders, $ymDonation, $simpleMealDonation, $aidRequested);
     }
 
     public function recalculateForRegistration($registrationId)
     {
         $registration = $this->registrationsManager->getRegistration($registrationId);
-        $this->registrationId = $registration->getRegistrationId();
         return $this->recalculate($registration);
     }
 
     public function recalculate(ScymRegistration $registration)
     {
         $this->clear();
-        $this->sessionInfo = $this->registrationsManager->getSession($registration->getYear());
+        $this->registrationId = $registration->getRegistrationId();
         // todo: clear existing items
-        $summary = $this->doCalculations($registration->getYMDonation(), $registration->getSimpleMealDonation(), $registration->getFinancialAidRequested());
+        $summary = $this->doCalculations(
+            $registration->getYear(),
+            $registration->getReceivedDate(),
+            $registration->getAttenders(),
+            $registration->getYMDonation(),
+            $registration->getSimpleMealDonation(),
+            $registration->getFinancialAidRequested());
         // todo: add new items
         return $summary;
     }

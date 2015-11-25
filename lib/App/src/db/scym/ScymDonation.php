@@ -153,4 +153,15 @@ class ScymDonation extends DateStampedEntity implements ICostItem
     {
         return $this->note;
     }
+
+    public static function createDonation($donationTypeId,$amount,$note = null)
+    {
+        $result = new ScymDonation();
+        $result->setDonationtypeid($donationTypeId);
+        $result->setAmount($amount);
+        if (!empty($note)) {
+            $result->setNote($note);
+        }
+        return $result;
+    }
 }

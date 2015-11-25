@@ -669,7 +669,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <fieldset>
-                                <Label>Balance due</Label>
+                                <legend>Balance due</legend>
                                 <p>
                                     The balance for your registration is
                                     <strong><span data-bind="text:registrationForm.financeInfoForm.balance"></span></strong>
@@ -681,7 +681,7 @@
                             </fieldset>
 
                             <fieldset>
-                                <label>Financial Aid</label>
+                                <legend>Financial Aid</legend>
                                 <p>
                                     Assistance for financial need is available up to $250.
                                 </p>
@@ -692,19 +692,28 @@
                             </fieldset>
                         </div>
                         <div class="col-md-6">
+
                             <fieldset>
-                                <label>Donations</label>
-                                <p>
-                                    Donations for the simple meal go to a social concerns project or organization seleted by the Yearly Meeting. Other donations
-                                    are used to defray the costs of the annual session and other Yearly Meeting expenses.
-                                </p>
-                                <div class="form-group" data-bind="css:{'has-error': registrationForm.financeInfoForm.simpleMealDonationError}" >
-                                    <label for="simplemeal-input" class="control-label">Simple meal donation<span data-bind="text:registrationForm.financeInfoForm.simpleMealDonationError"></span></label>
-                                    <input class="form-control" id="simplemeal-input" data-bind="value:registrationForm.financeInfoForm.simpleMealDonation"/>
-                                </div>
-                                <div class="form-group" data-bind="css:{'has-error': registrationForm.financeInfoForm.ymDonationError}" >
-                                    <label for="ymdonation-input" class="control-label">Donation to Yearly Meeting<span data-bind="text:registrationForm.financeInfoForm.ymDonationError"></span></label>
-                                    <input class="form-control" id="ymdonation-input" data-bind="value:registrationForm.financeInfoForm.ymDonation"/>
+                                <legend>Donations</legend>
+                                <div data-bind="foreach:registrationForm.financeInfoForm.fundContributions">
+                                <div class="form-group" data-bind="css:{'has-error': ErrorMessage}"  style="margin-bottom: 0">
+                                        <label class="control-label">
+                                            <span data-bind="text:Text"></span>
+                                            <span data-bind="text:ErrorMessage"></span>
+                                        </label>
+                                        <input class="form-control"
+                                               data-bind="value:Value"/>
+                                    </div>
+                                    <p>
+                                        <span class="whats-this">
+                                            <a class="description-link"
+                                               data-bind="attr: {'data-content' : Description}"
+                                               tabindex="0" role="button" data-toggle="popover"
+                                               data-trigger="focus"
+                                               data-placement="bottom"
+                                            > What is the '<span data-bind="text:Text"></span>?' </a>
+                                        </span>
+                                    </p>
                                 </div>
                             </fieldset>
                         </div>

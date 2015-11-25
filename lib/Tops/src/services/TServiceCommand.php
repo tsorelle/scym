@@ -53,6 +53,32 @@ abstract class TServiceCommand {
         $this->context->SetReturnValue($value);
     }
 
+    /**
+     * Get return value for unit testing
+     * @return mixed|null
+     */
+    private function getReturnValue() {
+        $response = $this->context->GetResponse();
+        return ($response == null) ? null : $response->Value;
+    }
+
+    public function runTest($request)
+    {
+        $this->context = new TServiceContext();
+        $this->setRequest($request);
+        $this->run();
+        return $this->getReturnValue();
+    }
+
+    /**
+     * Set request for unit testing.
+     * @param $value
+     */
+    public function setRequest($value) {
+        $this->request = $value;
+    }
+
+
     public function getRequest() {
 
         return $this->request;

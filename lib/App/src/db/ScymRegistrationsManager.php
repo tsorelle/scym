@@ -9,6 +9,7 @@
 namespace App\db;
 
 use App\db\scym\ScymAnnualSession;
+use App\db\scym\ScymDonationType;
 use App\db\scym\ScymFee;
 use App\db\scym\ScymRegistration;
 use Doctrine\ORM\EntityRepository;
@@ -29,7 +30,7 @@ class ScymRegistrationsManager extends TDbServiceManager
          */
         $result=null;
         if (empty($year)) {
-            $year = date("Y");
+            $year = date("Y"); // current year
             $result = $repository->find($year);
             if (empty($result)) {
                 throw new Exception("Yearly meeting year $year is not in the annualsessions table.");
@@ -65,6 +66,9 @@ class ScymRegistrationsManager extends TDbServiceManager
         $fees = $repository->findAll();
         $result = array();
         foreach ($fees as $fee) {
+            /**
+             * @var $fee ScymFee
+             */
             $item = $fee->getDataTransferObject();
             $result[$item->feeCode] = $item;
         }
@@ -117,6 +121,20 @@ class ScymRegistrationsManager extends TDbServiceManager
         $result = $repository->find($id);
         if ($result == null) {
             throw new \Exception("Cannot find registration #$id");
+        }
+        return $result;
+    }
+
+    public function getFundList() {
+        $repository =  $this->getRepository('App\db\scym\ScymDonationType');
+        $types = $repository->findBy(array('registrationform' => 1));
+        $result = array();
+        foreach ($types as $type) {
+            /**
+             * @var $type ScymDonationType
+             */
+            $item = $type->toLookupItem();
+            array_push($result, $item);
         }
         return $result;
     }

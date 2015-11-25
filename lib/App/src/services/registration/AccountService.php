@@ -91,8 +91,11 @@ class AccountService
     private function makeDonationsList(array $donations) {
         $result = array();
         foreach($donations as $donation) {
-            /** @var $donation \App\db\scym\ScymDonation  */
+            /**
+             * @var $donation ScymDonation
+             */
             $item = $this->makeLookupItem($donation,$this->getDonationType($donation));
+            $item->key = $donation->getDonationid();
             array_push($result,$item);
         }
         return $result;

@@ -191,6 +191,8 @@ class ScymCredit extends DateStampedEntity implements ICostItem
      * @param $description
      * @param $creditTypeId
      * @return ScymCredit
+     *
+     * Create new credit instance.
      */
     public static function newCredit($amount,$description,$creditTypeId,$note=null) {
         $result = new ScymCredit();

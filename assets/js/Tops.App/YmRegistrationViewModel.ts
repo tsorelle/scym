@@ -87,17 +87,14 @@ module Tops {
         public css = ko.observable('');
     }
 
+
     export class financeInfoObservable extends editPanel {
 
         id  = ko.observable(0);
 
+        fundContributions : KnockoutObservableArray<IIndexedInput> = ko.observableArray([]);
         aidRequested  : KnockoutObservable<any> = ko.observable('');
-        ymDonation : KnockoutObservable<any> = ko.observable('');
-        simpleMealDonation : KnockoutObservable<any> = ko.observable('');
-
         aidRequestedError = ko.observable('');
-        ymDonationError = ko.observable('');
-        simpleMealDonationError = ko.observable('');
 
         // summary
         feesList = ko.observableArray<IListItem>();
@@ -109,7 +106,6 @@ module Tops {
         balance= ko.observable('');
         calculated = ko.observable(false);
         balanceDue : KnockoutObservable<any> = ko.observable();
-
 
         constructor() {
             super();
@@ -125,19 +121,29 @@ module Tops {
             me.clearValidations();
             me.id(0);
             me.aidRequested('');
-            me.ymDonation('');
-            me.simpleMealDonation('');
             me.isAssigned = false;
             me.balance('Not yet calculated');
             me.balanceDue(null);
+            var donations = me.fundContributions.removeAll();
+            _.each(donations,function(item : IInputItem) {
+                item.Value = '';
+            },me);
+            me.fundContributions(donations);
             me.calculated(false);
         }
 
         public clearValidations() {
             var me = this;
             me.aidRequestedError('');
-            me.simpleMealDonationError('');
-            me.ymDonationError('');
+//            me.simpleMealDonationError('');
+//            me.ymDonationError('');
+            var donationFields = me.fundContributions.removeAll();
+            if (donationFields.length > 0) {
+                _.each(donationFields, function(item : IInputItem) {
+                    item.ErrorMessage = '';
+                },me);
+                me.setFundContributions(donationFields);
+            }
             me.hasErrors(false);
         }
 
@@ -149,12 +155,15 @@ module Tops {
             me.id(registration.registrationId);
             me.clearValidations();
             me.aidRequested(registration.aidRequested);
-            me.ymDonation(registration.ymDonation);
-            me.simpleMealDonation(registration.simpleMealDonation);
+            // me.ymDonation(registration.ymDonation);
+            // me.simpleMealDonation(registration.simpleMealDonation);
+            me.fundContributions([]);
             me.isAssigned = true;
         };
 
-        public assignAccountSummary(summary: IAccountSummary) {
+
+
+        public assignAccountSummary = (summary: IAccountSummary) => {
             var me = this;
             me.feesList(summary.fees);
             me.creditsList(summary.credits);
@@ -181,13 +190,59 @@ module Tops {
             }
 
             me.balance(summary.balance);
+            me.setDonations(summary.donations, summary.funds);
+        };
+
+        public getDonations = () : IKeyValuePair[] => {
+            var me = this;
+            var result : IKeyValuePair[] = [];
+            var donations = me.fundContributions();
+            _.each(donations, function(donation : IIndexedInput) {
+                if (donation.Value) {
+                    var item:IKeyValuePair = {
+                        Key: donation.Key,
+                        Value: donation.Value
+                    };
+                    result.push(item);
         }
+            },me);
+
+            return result;
+        };
+
+        private setFundContributions(contributions) {
+            var me = this;
+            me.fundContributions(contributions);
+            jQuery('.description-link').popover();
+        }
+
+        public setDonations = (donations: IIndexedItem[], funds : ILookupItem[]) => {
+            var me = this;
+            var contributions : IIndexedInput[] = [];
+            if (funds == null) {
+                funds = me.fundContributions.removeAll();
+            }
+            _.each(funds, function(item : ILookupItem) {
+                var donation = _.find(donations, function(i : IIndexedItem) {
+                    return i.Key == item.Key;
+                },me);
+                var donationItem : IIndexedInput = {
+                        Text: item.Text,
+                        Key: item.Key,
+                        Description: item.Description,
+                        Value: (donation) ? donation.Value : '',
+                        ErrorMessage: ''
+                    };
+                contributions.push(donationItem);
+            },me);
+            me.setFundContributions(contributions);
+        };
 
         public updateRegistration = (registration: IRegistrationInfo) => {
             var me = this;
             registration.aidRequested = me.aidRequested();
-            registration.ymDonation = me.ymDonation();
-            registration.simpleMealDonation = me.simpleMealDonation();
+            // registration.ymDonation = me.ymDonation();
+            // registration.simpleMealDonation = me.simpleMealDonation();
         };
 
         validateCurrency(value: string) : any {
@@ -230,23 +285,19 @@ module Tops {
                 me.aidRequested(amount);
             }
 
-            amount = me.validateCurrency(me.ymDonation());
+            var contributions = me.fundContributions();
+            me.fundContributions([]);
+            _.each(contributions,function(item : IIndexedInput){
+                amount = me.validateCurrency(item.Value);
             if (amount === false) {
-                me.ymDonationError(" Invalid amount.");
+                    item.ErrorMessage = ":  Invalid amount.";
                 valid = false;
             }
             else {
-                me.ymDonation(amount);
+                    item.Value = amount;
             }
-
-            amount = me.validateCurrency(me.simpleMealDonation());
-            if (amount === false) {
-                me.simpleMealDonationError(" Invalid amount.");
-                valid = false;
-            }
-            else {
-                me.simpleMealDonation(amount);
-            }
+            },me);
+            me.setFundContributions(contributions);
 
             me.hasErrors(!valid);
             return valid;
@@ -1652,11 +1703,11 @@ module Tops {
         updateCosts = () => {
             var me = this;
             var request : ICostUpdateRequest = {
-                ymDonation: me.registrationForm.financeInfoForm.ymDonation(),
-                simpleMealDonation: me.registrationForm.financeInfoForm.simpleMealDonation(),
                 aidRequested: me.registrationForm.financeInfoForm.aidRequested(),
+                donations: me.registrationForm.financeInfoForm.getDonations(),
                 attenders: me.updatedAttenders,
-                deletedAttenders: me.deletedAttenders
+                deletedAttenders: me.deletedAttenders,
+                getFundList: me.registrationForm.financeInfoForm.fundContributions().length > 0 ? 0 : 1
             };
             me.application.hideServiceMessages();
             me.application.showWaiter('Calculating costs...');
@@ -2000,6 +2051,7 @@ module Tops {
                     registration : null,
                     updatedAttenders : me.updatedAttenders,
                     deletedAttenders : me.deletedAttenders,
+                    contributions : me.registrationForm.financeInfoForm.getDonations()
                 };
                 if (me.registrationChanged()) {
                     request.registration = <IRegistrationInfo>{};
@@ -2102,8 +2154,8 @@ module Tops {
                     departureTime: '71',
                     scymNotes: '',
                     statusDate: '10/1/2015',
-                    ymDonation: '',
-                    simpleMealDonation: '',
+                    // ymDonation: '',
+                    // simpleMealDonation: '',
                     aidRequested: '',
                 },
                 accountSummary: accountSummary,
@@ -2129,6 +2181,37 @@ module Tops {
             var result : IAccountSummary =
             {
                 payments: [],
+                funds: [
+                    {
+                        Key: 1,
+                        Text: 'Yearly Meeting Subsidy',
+                        Description: 'This fund is used to support yearly meeting expenses. Your contribution makes it possible to include youth and others who may not be able to affort the full fees.'
+                    },
+                    {
+                        Key: 2,
+                        Text: 'Simple meal',
+                        Description: 'A simple, picknic style, meal is served on Sunday. Your contribution goes to support a social concerns project or organization selected by the Yearly Meeting.'
+                    },
+                    {
+                        Key: 3,
+                        Text: 'Youth fund',
+                        Description: 'The youths just want to have fun. Your contribution helps the good times roll.'
+                    },
+                ],
+                donations: [
+                    {
+                        Key: 2,
+                        Text: 'Simple meal',
+                        Value: '$20.00',
+                        Description: ''
+                    },
+                    {
+                        Key: 3,
+                        Text: 'Youth',
+                        Value: '$30.00',
+                        Description: ''
+                    },
+                ],
                 fees: [
                     {
                         Text: 'Registration fee',
@@ -2157,18 +2240,6 @@ module Tops {
                         Value: '$20.00',
                         Description: ''
                     }
-                ],
-                donations: [
-                    {
-                        Text: 'Simple meal',
-                        Value: '$20.00',
-                        Description: ''
-                    },
-                    {
-                        Text: 'General',
-                        Value: '$30.00',
-                        Description: ''
-                    },
                 ],
                 feeTotal: '$365.00',
                 creditTotal: '$150.00',

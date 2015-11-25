@@ -49,10 +49,33 @@ declare module Tops {
         Value: string;
     }
 
+    export interface IKeyValuePair {
+        Key: any;
+        Value: any;
+    }
+
+    export interface ILookupItem {
+        Key: any;
+        Text: string;
+        Description: string;
+    }
+
     export interface IListItem {
         Text: string;
         Value: any;
         Description: string;
     }
 
+    export interface IIndexedItem extends IListItem {
+        Key: any;
+    }
+
+    export interface IInputItem extends IListItem {
+        Value: any;
+        ErrorMessage: string;
+    }
+
+    export interface IIndexedInput extends IInputItem {
+        Key: any;
+    }
 }

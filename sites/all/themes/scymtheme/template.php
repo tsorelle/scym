@@ -28,7 +28,7 @@ function scymtheme_status_messages($variables) {
     return $result;
 }
 
-/*
+/**
  * Process variables for comment.tpl.php.
  *
  * @see comment.tpl.php
@@ -215,6 +215,7 @@ function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     $manageTasks = $currentUser->isAuthorized('manage web site tasks');
     $registerDocuments = $currentUser->isAuthorized('register documents');
     $manageDirectory = $currentUser->isAuthorized('administer directory');
+    $isAdmin = $currentUser->isAdmin();
     if ($manageTasks) {
         $items .= _scymtheme_menuLi('\tasks','Manage Web Site','Task List');
     }
@@ -230,6 +231,9 @@ function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     }
     if ($isRegistrar) {
         $items .= _scymtheme_menuLi('\RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');
+    }
+    if ($isAdmin) {
+        $items .= _scymtheme_menuLi('/admin/dashboard','Administrator Dashboard','Administrator Dashboard');
     }
 
 

@@ -27,6 +27,12 @@ class ScymCreditType
     private $credittypecode;
 
 
+    /**
+     * @var string
+     *
+     * @Column(name="description", type="string", length=50, nullable=true)
+     */
+    private $description;
 
     /**
      * @var string
@@ -101,6 +107,31 @@ class ScymCreditType
     }
 
     /**
+     * Set credittype
+     *
+     * @param string $value
+     * @return ScymCreditType
+     */
+    public function setDescription($value)
+    {
+        $this->description = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+
+
+    /**
      * Set active
      *
      * @param boolean $active
@@ -128,6 +159,7 @@ class ScymCreditType
         $result->creditTypeId    = $this->credittypeid;
         $result->creditTypeCode  = $this->credittypecode;
         $result->creditTypeName  = $this->credittypename;
+        $result->description     = $this->description;
         return $result;
     }
 }

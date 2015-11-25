@@ -21,9 +21,6 @@ declare module Tops {
         scymNotes : string;
         statusDate : any;
         confirmed: number;
-
-        ymDonation : any;
-        simpleMealDonation : any;
         aidRequested  : any;
     }
 
@@ -61,14 +58,15 @@ declare module Tops {
         registration : IRegistrationInfo;
         updatedAttenders : IAttender[];
         deletedAttenders : any[];
+        contributions: IKeyValuePair[];
     }
 
     export interface ICostUpdateRequest {
-        ymDonation : any;
-        simpleMealDonation : any;
         aidRequested  : any;
         attenders : IAttender[];
         deletedAttenders : any[];
+        donations: IKeyValuePair[];
+        getFundList: number;
     }
 
     export interface IAgeGroup extends IListItem {
@@ -134,9 +132,10 @@ declare module Tops {
     }
 
     export interface IAccountSummary {
+        funds: ILookupItem[];
         fees : IListItem[];
         credits: IListItem[];
-        donations: IListItem[];
+        donations: IIndexedItem[];
         payments: IPaymentItem[];
         feeTotal: string;
         creditTotal: string;

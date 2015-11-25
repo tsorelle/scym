@@ -8,8 +8,9 @@
 
 namespace App\services\registration;
 
+use App\db\api\AttenderCostInfoDto;
 use App\db\ScymRegistrationsManager;
-use App\src\db\ScymAccountManager;
+use App\db\ScymAccountManager;
 use Tops\services;
 use Tops\services\TServiceCommand;
 use Tops\sys\IUser;
@@ -18,6 +19,8 @@ use Tops\sys\TUser;
 /**
  * Class GetRegistrationCostCommand
  * @package App\services\registration
+ *
+ * Calculate registration cost without saving changes.
  *
  * Service Contract
  *	Request
@@ -81,9 +84,20 @@ class GetRegistrationCostCommand  extends TServiceCommand
         }
         $registrationsManager = new ScymRegistrationsManager();
         $accountManager = new ScymAccountManager($registrationsManager);
-        $costs = $accountManager->calculate($request->attenders);
+        $attenders = $this->buildAttenderList($request);
+        $costs = $accountManager->calculate($attenders);
         $accountService = new AccountService($registrationsManager);
         $summary = $accountService->formatAccountSummary($costs);
+        $summary->funds = ($request->getFundList) ? $registrationsManager->getFundList() : [];
         $this->setReturnValue($summary);
+    }
+
+    private function buildAttenderList($request)
+    {
+        $result = array();
+        foreach($request->attenders as $attender) {
+            array_push($result,new AttenderCostInfoDto($attender));
+        }
+        return $result;
     }
 }

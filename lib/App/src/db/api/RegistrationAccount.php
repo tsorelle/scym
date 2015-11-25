@@ -37,7 +37,7 @@ class RegistrationAccount
         $this->donationsTotal = self::computeTotal($this->donations);
         $this->chargesTotal = self::computeTotal($this->charges);
         $this->creditTotal = self::computeTotal($this->credits);
-        $this->balance = ($this->paymentTotal + $this->creditTotal) - ($this->chargesTotal + $this);
+        $this->balance = ($this->paymentTotal + $this->creditTotal) - ($this->chargesTotal + $this->donationsTotal);
     }
 
     /**

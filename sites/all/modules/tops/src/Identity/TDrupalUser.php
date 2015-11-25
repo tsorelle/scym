@@ -216,7 +216,7 @@ class TDrupalUser extends TAbstractUser  {
     public function isAdmin()
     {
         if ($this->drupalUser) {
-            return ($this->drupalUser->id() == 1 || $this->isMemberOf('Administator'));
+            return ($this->drupalUser->id() == 1 || $this->isMemberOf('administrator'));
         }
         return false;
     }

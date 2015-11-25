@@ -1,6 +1,7 @@
 <?php
 namespace App\db\scym;
 
+use App\db\api\FeeTypeDto;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -241,9 +242,12 @@ class ScymFee
         return $this->canwaive;
     }
 
+    /**
+     * @return FeeTypeDto
+     */
     public function getDataTransferObject()
     {
-        $result = new \stdClass();
+        $result = new FeeTypeDto();
         $result->feeTypeId     = $this->feetypeid;
         $result->feeCode       = $this->feecode;
         $result->feeCatagoryId = $this->feecatagoryid;
@@ -254,5 +258,4 @@ class ScymFee
         $result->canWaive      = $this->canwaive;
         return $result;
     }
-
 }

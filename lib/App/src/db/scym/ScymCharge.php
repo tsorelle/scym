@@ -190,6 +190,8 @@ class ScymCharge extends DateStampedEntity implements ICostItem
      * @param $basis
      * @param $feeTypeId
      * @return ScymCharge
+     *
+     * Create new charge object
      */
     public static function newCharge($amount,$basis,$feeTypeId)
     {
