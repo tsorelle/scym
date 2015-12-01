@@ -4,6 +4,7 @@ namespace App\db\scym;
 
 use App\db\api\ICostItem;
 use App\db\DateStampedEntity;
+use App\db\api\IDonationInfo;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -12,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @Table(name="donations")
  * @Entity  @HasLifecycleCallbacks
  */
-class ScymDonation extends DateStampedEntity implements ICostItem
+class ScymDonation extends DateStampedEntity implements IDonationInfo
 {
     /**
      * @var integer

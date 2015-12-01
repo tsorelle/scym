@@ -8,13 +8,12 @@
 
 namespace App\services\registration;
 
-use App\db\api\AttenderCostInfoDto;
+use App\db\api\AttenderCostFacade;
+use App\db\api\IAttenderCostInfo;
 use App\db\ScymRegistrationsManager;
 use App\db\ScymAccountManager;
 use Tops\services;
 use Tops\services\TServiceCommand;
-use Tops\sys\IUser;
-use Tops\sys\TUser;
 
 /**
  * Class GetRegistrationCostCommand
@@ -26,10 +25,10 @@ use Tops\sys\TUser;
  *	Request
  *   ===========
  *    export interface ICostUpdateRequest {
- *        ymDonation : any; // currency or null
- *        simpleMealDonation : any;// currency or null
- *        aidRequested  : any; // currency or null???
  *        attenders : IAttender[];
+ *        deletedAttenders : any[]; // id numbers of attenders to be deleted
+ *        donations: IKeyValuePair[];  // Key = donationTypeId, Value = amount (currency)
+ *        aidRequested  : any; // currency or null
  *    }
  *
  *	export interface IAttender {  // relevant data only other fields ignored
@@ -82,9 +81,9 @@ class GetRegistrationCostCommand  extends TServiceCommand
             $this->addErrorMessage('Invalid request received.');
             return;
         }
+        $attenders = $this->buildAttenderList($request);
         $registrationsManager = new ScymRegistrationsManager();
         $accountManager = new ScymAccountManager($registrationsManager);
-        $attenders = $this->buildAttenderList($request);
         $costs = $accountManager->calculate($attenders);
         $accountService = new AccountService($registrationsManager);
         $summary = $accountService->formatAccountSummary($costs);
@@ -92,12 +91,17 @@ class GetRegistrationCostCommand  extends TServiceCommand
         $this->setReturnValue($summary);
     }
 
+    /**
+     * @param $request
+     * @return IAttenderCostInfo[]
+     */
     private function buildAttenderList($request)
     {
         $result = array();
         foreach($request->attenders as $attender) {
-            array_push($result,new AttenderCostInfoDto($attender));
+            array_push($result,new AttenderCostFacade($attender));
         }
         return $result;
     }
+
 }

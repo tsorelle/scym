@@ -9,7 +9,7 @@
 namespace App\db\api;
 
 
-class AttenderCostInfoDto implements IAttenderCostInfo
+class AttenderCostFacade implements IAttenderCostInfo
 {
     private $data;
 
@@ -144,5 +144,15 @@ class AttenderCostInfoDto implements IAttenderCostInfo
     public function getMeals()
     {
         return $this->data->meals;
+    }
+
+    /**
+     * Get specialneeds
+     *
+     * @return integer
+     */
+    public function getSpecialNeedsTypeId()
+    {
+        return $this->data->specialNeedsTypeId;
     }
 }

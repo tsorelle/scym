@@ -535,18 +535,28 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Housing options</label>
+                                    <label>Housing options and other needs</label>
+                                    <div style="margin-bottom: 5px">
+                                       Need linens? <input type="checkbox" data-bind="checked: attenderForm.linens" />&nbsp;
+                                        <span class="whats-this">
+                                            <a tabindex="0" role="button" data-toggle="popover"
+                                               data-trigger="focus" title="Linens"
+                                               data-placement="bottom"
+                                               data-content="Attenders usually bring their own bedding and linens. If you are unable to bring your own, or if you forget, linens are available at a small additional charge.">
+                                                What's this?</a>
+                                        </span>
+                                    </div>
                                     <div data-bind="visible:attenderForm.singleOccupancyApplies" style="margin-bottom: 6px" >
                                         Reserve private room for one? <input type="checkbox" data-bind="checked: attenderForm.singleOccupant" />
 										<span class="whats-this">
 											<a tabindex="0" role="button" data-toggle="popover"
                                                data-trigger="focus" title="Single occupancy"
                                                data-placement="bottom"
-                                               data-content="Check this to reserve your motel or health house room as private for one person.">
+                                               data-content="Check this to reserve your motel or health house room as private for one person. An additional charge will be applied.">
                                                 What's this?</a>
 										</span>
                                     </div>
-                                    <div>
+                                    <div style="margin-bottom: 5px">
                                         <a href="#" data-toggle="modal" data-target="#housing-info">More housing information...</a>
                                     </div>
                                 </div>
@@ -673,7 +683,7 @@
                                 <p>
                                     The balance for your registration is
                                     <strong><span data-bind="text:registrationForm.financeInfoForm.balance"></span></strong>
-                                    <a href="#" data-bind="click:showAccountDetails" style="padding-left: 5px">See details here >></a>.
+                                    <a href="#" data-bind="click:showAccountDetails,visible:registrationForm.financeInfoForm.calculated" style="padding-left: 5px">See details here >></a>.
                                 </p>
                                 <div data-bind="visible:balanceInvalid" class="warning-label">
                                     Warning, changes were made. Please save your registration to recalculate.
@@ -683,7 +693,7 @@
                             <fieldset>
                                 <legend>Financial Aid</legend>
                                 <p>
-                                    Assistance for financial need is available up to $250.
+                                    Assistance for financial need is available up to <span data-bind="text:registrationForm.financeInfoForm.aidEligibility"></span>.
                                 </p>
                                 <div class="form-group" data-bind="css:{'has-error': registrationForm.financeInfoForm.aidRequestedError}" >
                                     <label for="aidrequested-input" class="control-label">Financial aid amount requested<span data-bind="text:registrationForm.financeInfoForm.aidRequestedError"></span></label>
@@ -796,7 +806,7 @@
                         <legend>Financial aid and donations</legend>
                         <p>You may request financial aid and make donations to the Yearly Meeting here.</p>
                         <div id="finance-view-buttons">
-                            <button class="btn btn-primary" data-bind="click:editAccountsForm">Update</button>
+                            <button class="btn btn-primary" data-bind="click:showFeesAndDonationsPage">Update</button>
                         </div>
                     </fieldset>
                     <fieldset  data-bind="visible:registrationStatus() == 1">

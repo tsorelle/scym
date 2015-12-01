@@ -1,5 +1,6 @@
 <?php
 namespace App\db\scym;
+use App\db\api\CreditTypeDto;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -154,8 +155,11 @@ class ScymCreditType
         return $this->active;
     }
 
+    /**
+     * @return CreditTypeDto
+     */
     public function getDataTransferObject() {
-        $result = new \stdClass();
+        $result = new CreditTypeDto();
         $result->creditTypeId    = $this->credittypeid;
         $result->creditTypeCode  = $this->credittypecode;
         $result->creditTypeName  = $this->credittypename;

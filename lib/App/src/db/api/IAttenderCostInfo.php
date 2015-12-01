@@ -98,4 +98,12 @@ interface IAttenderCostInfo
      * @return int[]
      */
     public function getMeals();
+
+    /**
+     * Get specialneeds
+     *
+     * @return integer
+     */
+    public function getSpecialNeedsTypeId();
+
 }

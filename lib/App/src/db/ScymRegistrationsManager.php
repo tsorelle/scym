@@ -8,9 +8,13 @@
 
 namespace App\db;
 
+use App\db\api\CreditTypeDto;
+use App\db\api\HousingTypeDto;
 use App\db\scym\ScymAnnualSession;
+use App\db\scym\ScymCreditType;
 use App\db\scym\ScymDonationType;
 use App\db\scym\ScymFee;
+use App\db\scym\ScymHousingType;
 use App\db\scym\ScymRegistration;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -75,6 +79,20 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $result;
     }
 
+    public function getNonWaivableFees() {
+        $em = $this->getEntityManager();
+        $q = $em->createQuery("select f from App\db\scym\ScymFee f where f.canwaive = 0");
+        $fees = $q->getResult();
+        $result = array();
+        foreach ($fees as $fee) {
+            /**
+             * @var $fee ScymFee
+             */
+            array_push($result,$fee->getFeeTypeId());
+        }
+        return $result;
+    }
+
     public function getFeeDescriptions() {
         $repository =  $this->getRepository('App\db\scym\ScymFee');
         $fees = $repository->findAll();
@@ -88,23 +106,36 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $result;
     }
 
+    /**
+     * @return CreditTypeDto[]
+     */
     public function getCreditTypes() {
         $repository =  $this->getRepository('App\db\scym\ScymCreditType');
         $types = $repository->findBy(array('active' => 1));
         $result = array();
         foreach ($types as $type) {
+            /**
+             * @var $type ScymCreditType
+             */
             $item = $type->getDataTransferObject();
-            $result[$item->creditTypeCode] = $item;
+            $id = $type->getCreditTypeid();
+            $result[$id] = $item;
         }
         return $result;
 
     }
 
+    /**
+     * @return HousingTypeDto[]
+     */
     public function getHousingTypes() {
         $repository =  $this->getRepository('App\db\scym\ScymHousingType');
         $types = $repository->findBy(array('active' => 1));
         $result = array();
         foreach ($types as $type) {
+            /**
+             * @var $type ScymHousingType
+             */
             $item = $type->getDataTransferObject();
             $result[$item->housingTypeId] = $item;
         }

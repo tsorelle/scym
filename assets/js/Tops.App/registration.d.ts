@@ -140,6 +140,7 @@ declare module Tops {
         feeTotal: string;
         creditTotal: string;
         donationTotal: string;
+        aidEligibility: string;
         balance: any;
     }
 

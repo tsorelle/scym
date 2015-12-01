@@ -9,6 +9,7 @@
 namespace App\db\api;
 
 
+use App\db\FeeTypeManager;
 use App\db\scym\ScymCharge;
 use App\db\scym\ScymCredit;
 use App\db\scym\ScymDonation;
@@ -17,27 +18,33 @@ use App\db\scym\ScymPayment;
 
 class RegistrationAccount
 {
-    public function __construct($charges,$credits,$donations,$payments)
+    public function __construct($charges,$credits,$donations, $aidEligibility = 0.00, array $payments = null)
     {
         $this->payments = ($payments == null) ? array() : $payments;
         $this->charges = ($charges == null) ? array() : $charges;
         $this->credits = ($credits == null) ? array() : $credits;
         $this->donations = ($donations == null) ? array() : $donations;
+        $this->aidEligibility = $aidEligibility;
         $this->calculate();
     }
 
+    /**
+     * @var $nonWaivable int[]
+     */
+    private $nonWaivable = null;
     private $paymentTotal = 0.00;
     private $creditTotal = 0.00;
     private $chargesTotal = 0.00;
     private $donationsTotal = 0.00;
     private $balance = 0.00;
+    private $aidEligibility = 0.00;
 
     public function calculate() {
         $this->paymentTotal = self::computeTotal($this->payments);
         $this->donationsTotal = self::computeTotal($this->donations);
-        $this->chargesTotal = self::computeTotal($this->charges);
         $this->creditTotal = self::computeTotal($this->credits);
-        $this->balance = ($this->paymentTotal + $this->creditTotal) - ($this->chargesTotal + $this->donationsTotal);
+        $this->chargesTotal = self::computeTotal($this->charges);
+        $this->balance = ($this->chargesTotal + $this->donationsTotal) - ($this->paymentTotal + $this->creditTotal);
     }
 
     /**
@@ -89,6 +96,7 @@ class RegistrationAccount
      */
     private $charges;
 
+
     private static function computeTotal($items) {
         $result = 0.00;
         foreach($items as $item) {
@@ -99,6 +107,7 @@ class RegistrationAccount
         }
         return $result;
     }
+
     public function getPaymentTotal()
     {
         return $this->paymentTotal;
@@ -122,6 +131,10 @@ class RegistrationAccount
 
     public function getBalance() {
         return $this->balance;
+    }
+
+    public function getAidEligibility() {
+        return $this->aidEligibility;
     }
 
     public function getTotals() {

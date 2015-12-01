@@ -9,8 +9,11 @@
 namespace App\db;
 
 
+use App\db\api\CreditTypeDto;
 use App\db\api\FeeTypeDto;
+use App\db\api\HousingTypeDto;
 use App\db\api\IAttenderCostInfo;
+use App\db\api\IDonationInfo;
 use App\db\api\RegistrationAccount;
 use App\db\scym\ScymAnnualSession;
 use App\db\scym\ScymCharge;
@@ -18,18 +21,17 @@ use App\db\scym\ScymCredit;
 use App\db\scym\ScymDonation;
 use App\db\scym\ScymRegistration;
 use App\db\ScymRegistrationsManager;
+use Doctrine\Common\Collections\ArrayCollection;
+use Tops\sys\TKeyValuePair;
 
 class ScymAccountManager
 {
-    private $payments = array();
     private $credits = array();
     private $charges = array();
     private $donations = array();
-    private $aidEligiableTotal = 0.00;
+    private $payments = array();
+    private $aidEligibleTotal = 0.00;
     private $aidRequestedTotal = 0.00;
-
-    const SCYM_SUBSIDY = 2;
-    const SIMPLE_MEAL = 3;
 
     const THURSDAY = 4;
     const FRIDAY = 5;
@@ -39,6 +41,7 @@ class ScymAccountManager
     const GENERATION_ADULT = 1;
     const GENERATION_YOUTH = 2; // 13-18
     const GENERATION_CHILD = 3; //4-12
+    const GENERATION_INFANT = 5;
 
     const HOUSINGFEE_TYPE_DORM = 1;
     const HOUSINGFEE_TYPE_FAM = 2;
@@ -50,8 +53,8 @@ class ScymAccountManager
     const HOUSING_TYPE_COUPLES = 8;
     const HOUSING_TYPE_HEALTH = 10;
 
-    const DONATION_ID_YM = 2;
-    const DONATION_ID_SIMPLEMEAL = 3;
+    const CREDIT_FINCIAL_AID = 1;
+
 
 
     /**
@@ -60,7 +63,7 @@ class ScymAccountManager
     private $registrationsManager;
 
     /**
-     * @var FeeTypeDto[]
+     * @var FeeTypeManager
      */
     private $fees;
     private $housingTypes;
@@ -71,7 +74,8 @@ class ScymAccountManager
     public function __construct(ScymRegistrationsManager $manager = null)
     {
         $this->registrationsManager = $manager != null ? $manager : new ScymRegistrationsManager();
-        $this->fees = $this->registrationsManager->getFeeTables();
+        $fees = $this->registrationsManager->getFeeTables();
+        $this->fees = new FeeTypeManager($fees);
         $sessionInfo = $this->registrationsManager->getSession();
         $this->housingTypes = $this->registrationsManager->getHousingTypes();
         $this->creditTypes = $this->registrationsManager->getCreditTypes();
@@ -80,53 +84,138 @@ class ScymAccountManager
 
     private function clear()
     {
-        $this->payments = array();
         $this->credits = array();
         $this->charges = array();
         $this->donations = array();
+        $this->aidEligibleTotal = 0.0;
     }
 
     /**
-     * @param $feeCode
-     * @return FeeTypeDto
+     * @param $typeId
+     * @return CreditTypeDto
      * @throws \Exception
      */
-    private function getFeeType($feeCode)
-    {
-        if (array_key_exists($feeCode,$this->fees)) {
-            return $this->fees[$feeCode];
+    private function getCreditType($typeId) {
+        if (array_key_exists($typeId,$this->creditTypes)) {
+            return $this->creditTypes[$typeId];
         }
-        throw new \Exception("Fee code '$feeCode' not found.");
+        throw new \Exception("Credit type #$typeId not found.");
     }
-    private function createRegistrationItems($year,\DateTime $receivedDate,$ymDonation, $simpleMealDonation, $aidRequested)
+
+    /**
+     * @param $typeId
+     * @return HousingTypeDto
+     * @throws \Exception
+     */
+    private function getHousingType($typeId) {
+        if (array_key_exists($typeId,$this->housingTypes)) {
+            return $this->housingTypes[$typeId];
+        }
+        throw new \Exception("Housing type #$typeId not found.");
+    }
+
+    private function applyLateFee($year,\DateTime $receivedDate)
     {
         $sessionInfo = $this->registrationsManager->getSession($year);
         if ($receivedDate > $sessionInfo->getDeadline()) {
-            $lateFee = $this->getFeeType('LATE');
+            $lateFee = $this->fees->getFeeType('LATE');
             $basis = "Late registration received ".$receivedDate->format('m/d/Y').'.';
-            $this->addCharge($lateFee->unitAmount,$lateFee->feeTypeId,$$basis);
+            $this->addCharge($lateFee->unitAmount,$lateFee->feeTypeId,$basis);
         }
-        if (!empty($ymDonation)) {
-            $this->addDonation($ymDonation,self::DONATION_ID_YM);
+    }
+
+    private function getNights(IAttenderCostInfo $attender) {
+        $arrivalDay = intval($attender->getArrivalTime() / 10);
+        $departureDay = intval($attender->getDeparturetime() / 10);
+        return $departureDay - $arrivalDay;
+    }
+
+    private function calcForDayVisitor(IAttenderCostInfo $attender) {
+        $days = $this->getNights($attender) + 1;
+        $feeCode = ($attender->getGenerationId() == self::GENERATION_ADULT) ? 'DAY' : 'YOUTHDAY';
+        $this->addAttenderItem($attender,$feeCode,"$days days",$days);
+        $meals = $attender->getMeals();
+        $mealCount = count($meals);
+        if (!empty($mealCount)) {
+            $this->addAttenderItem($attender,'MEAL',"$mealCount meals",$mealCount);
         }
-        if (!empty($simpleMealDonation)) {
-            $this->addDonation($ymDonation,self::DONATION_ID_SIMPLEMEAL);
+
+    }
+
+    private function calcForAdult(IAttenderCostInfo $attender) {
+        $this->addAttenderItem($attender,'REG');
+        $housingType = $this->getHousingType($attender->getHousingTypeId());
+        $nights = $this->getNights($attender);
+        $category = $housingType->category == self::HOUSINGFEE_TYPE_DORM ? 'DORM' : 'ROOM';
+        $housingFeeCode = 'ADULT'.$nights.'_'.$category;
+        $note = $nights.' night'.($nights > 1 ? 's' : '');
+        $this->addAttenderItem($attender, $housingFeeCode ,$note);
+        if ($housingType->category == self::HOUSINGFEE_TYPE_MOTEL) {
+            $specialNeeds = $attender->getSpecialNeedsTypeId();
+            if ($housingType->housingTypeCode != 'HEALTH' || empty($specialNeeds)) {
+                $this->addAttenderItem($attender, 'MOTEL_FEE',"Motel room fee $nights nights",$nights);
+                if ($attender->getSingleOccupant()) {
+                    $this->addAttenderItem($attender, 'PRIVATE_ROOM_'.$nights, $note);
+                }
+            }
         }
+    }
+
+    private function calcForYouth(IAttenderCostInfo $attender) {
+        $nights = $this->getNights($attender);
+        $this->addAttenderItem($attender,'YOUTH'.$nights," $nights nights");
     }
 
     private function createAttenderItems(IAttenderCostInfo $attender)
     {
-
+        $generation = $attender->getGenerationId();
+        if ($generation == self::GENERATION_INFANT) {
+            return;
+        }
+        $firstName = $attender->getFirstname();
+        if ($attender->getLinens()) {
+            $this->addAttenderItem($attender, 'LINEN');
+        }
+        $housingType = $attender->getHousingTypeId();
+        if ($housingType == self::HOUSING_TYPE_NONE) {
+            $this->calcForDayVisitor($attender);
+        }
+        else if ($generation != self::GENERATION_ADULT) {
+            $this->calcForYouth($attender);
+        }
+        else { // adult
+            $this->calcForAdult($attender);
+        }
     }
-
 
     private function addCredit($amount,$creditTypeId,$description) {
         $credit = ScymCredit::newCredit($amount,$description,$creditTypeId);
         if ($this->registrationId) {
             $credit->setRegistrationid($this->registrationId);
         }
-        $this->
         array_push($this->credits,$credit);
+    }
+
+    private function addAttenderItem(IAttenderCostInfo $attender, $feeCode, $note='', $count=1) {
+        $fee = $this->fees->getFeeType($feeCode);
+        $amount = $fee->unitAmount * $count;
+        $description =  $attender->getFirstname();
+        if ($note) {
+            $description .= ' ' . $note;
+        }
+
+        $creditType = null;
+        $aidTypeId =  $fee->canWaive ? $attender->getCreditTypeId() : 0;
+        if ($aidTypeId) {
+            $creditType = $this->getCreditType($aidTypeId);
+            $description .= "(fees waived: $creditType->creditTypeName credit)";
+        }
+
+        $this->addCharge($amount,$fee->feeTypeId,$description,$fee->canWaive);
+        if ($creditType) {
+            $this->aidEligibleTotal -= $amount;
+            $this->addCredit($amount, $aidTypeId, $creditType->description);
+        }
     }
 
     private function addCharge($amount,$feeTypeId,$basis,$canWaive = true) {
@@ -135,8 +224,8 @@ class ScymAccountManager
             $charge->setRegistrationid($this->registrationId);
         }
         array_push($this->charges,$charge);
-        if (!$canWaive) {
-            $this->aidEligiableTotal += $amount;
+        if ($canWaive) {
+            $this->aidEligibleTotal += $amount;
         }
     }
 
@@ -148,48 +237,88 @@ class ScymAccountManager
         array_push($this->donations,$donation);
     }
 
-    private function doCalculations($year=null, \DateTime $recievedDate=null, array $attenders, $ymDonation = null, $simpleMealDonation = null, $aidRequested = null)
-    {
-        $this->clear();
-        $this->createRegistrationItems($year, $recievedDate, $ymDonation, $simpleMealDonation, $aidRequested);
-        foreach ($attenders as $attender) {
-            $this->createAttenderItems($attender);
+    private function applyFinancialAid($aidRequested) {
+        if ($aidRequested) {
+            $amount = min($aidRequested, $this->aidEligibleTotal);
+            if ($amount > 0) {
+                $this->addCredit($amount, self::CREDIT_FINCIAL_AID, 'Financial aid');
+            }
         }
+    }
+
+    private function createAccountObject()
+    {
         $result = new RegistrationAccount(
             $this->charges,
             $this->credits,
             $this->donations,
+            $this->aidEligibleTotal,
             $this->payments);
         return $result;
     }
 
-    public function calculate($attenders, $ymDonation = null, $simpleMealDonation = null, $aidRequested = null)
+    private function buildAccount($year, \DateTime $recievedDate, array $attenders, array $donations = array(), $aidRequested = 0.0, array $payments = array())
     {
-        $this->registrationId = 0;
-        $today = new \DateTime();
-        return $this->doCalculations(null,$today,$attenders, $ymDonation, $simpleMealDonation, $aidRequested);
+        $this->clear();
+        $this->payments = $payments;
+        $this->applyLateFee($year, $recievedDate);
+        foreach ($attenders as $attender) {
+            $this->createAttenderItems($attender);
+        }
+        foreach ($donations as $donation) {
+            /**
+             * @var $donation TKeyValuePair
+             */
+            $this->addDonation($donation->Value,$donation->Key);
+        }
+        $this->applyFinancialAid($aidRequested);
+        return $this->createAccountObject();
     }
 
+    /**
+     * @param array $attenders IAttenderCostItem[]
+     * @param array $donations TKeyValuePair
+     * @param float $aidRequested
+     * @return RegistrationAccount
+     */
+    public function calculate(array $attenders, array $donations = array(), $aidRequested = 0.0)
+    {
+        $this->payments = array();
+        $this->registrationId = 0;
+        $today = new \DateTime();
+        $result = $this->buildAccount(null,$today,$attenders,$donations,$aidRequested);
+        return $result;
+    }
+
+    /*
     public function recalculateForRegistration($registrationId)
     {
         $registration = $this->registrationsManager->getRegistration($registrationId);
         return $this->recalculate($registration);
     }
+    */
 
     public function recalculate(ScymRegistration $registration)
     {
-        $this->clear();
         $this->registrationId = $registration->getRegistrationId();
+
+        // todo: get donations
+        $donations = array(); // fake for now
+
+        // todo: get payments for registration
+        $this->payments = array(); // fake for now
+
         // todo: clear existing items
-        $summary = $this->doCalculations(
+
+        $account = $this->buildAccount(
             $registration->getYear(),
             $registration->getReceivedDate(),
-            $registration->getAttenders(),
-            $registration->getYMDonation(),
-            $registration->getSimpleMealDonation(),
+            $registration->getAttenders()->toArray(),
+            $donations,
             $registration->getFinancialAidRequested());
-        // todo: add new items
-        return $summary;
-    }
 
+        // todo: add new items
+
+        return $account;
+    }
 }

@@ -16,19 +16,20 @@
 module Tops {
 
     export class userObservable {
-        id : any = 0;
+        id:any = 0;
         name = ko.observable('');
         authenticated = ko.observable(false);
         isRegistrar = ko.observable(false);
         email = ko.observable('');
         registrationId = ko.observable(0);
 
-        public assign(user : IRegistrationUser) {
+        public assign(user:IRegistrationUser) {
             var me = this;
             me.id = user ? user.id : 0;
             me.name(user ? user.name : '');
             me.isRegistrar(user ? (user.isRegistrar == 1) : false);
-            me.authenticated(user ? (user.authenticated == 1) : false);
+            var authenticated = user ? (user.authenticated == 1) : false;
+            me.authenticated(authenticated);
             me.email(user ? user.email : '');
             me.registrationId(user ? user.registrationId : 0);
         }
@@ -42,13 +43,13 @@ module Tops {
         title = ko.observable('');
 
 
-        constructor(label: string, status: string = 'inactive') {
+        constructor(label:string, status:string = 'inactive') {
             var me = this;
             me.label(label);
             me.setStatus(status);
         }
 
-        public setStatus(status : string) {
+        public setStatus(status:string) {
             var me = this;
             var label = me.label();
             me.status = status;
@@ -90,22 +91,23 @@ module Tops {
 
     export class financeInfoObservable extends editPanel {
 
-        id  = ko.observable(0);
-
-        fundContributions : KnockoutObservableArray<IIndexedInput> = ko.observableArray([]);
-        aidRequested  : KnockoutObservable<any> = ko.observable('');
+        id = ko.observable(0);
+        funds:ILookupItem[] = [];
+        fundContributions:KnockoutObservableArray<IIndexedInput> = ko.observableArray([]);
+        aidRequested:KnockoutObservable<any> = ko.observable('');
         aidRequestedError = ko.observable('');
 
         // summary
         feesList = ko.observableArray<IListItem>();
         creditsList = ko.observableArray<IListItem>();
         donationsList = ko.observableArray<IListItem>();
-        feeTotal= ko.observable('');
-        creditTotal= ko.observable('');
-        donationTotal= ko.observable('');
-        balance= ko.observable('');
+        feeTotal = ko.observable('');
+        creditTotal = ko.observable('');
+        donationTotal = ko.observable('');
+        balance = ko.observable('');
+        aidEligibility = ko.observable('');
         calculated = ko.observable(false);
-        balanceDue : KnockoutObservable<any> = ko.observable();
+        balanceDue:KnockoutObservable<any> = ko.observable();
 
         constructor() {
             super();
@@ -117,19 +119,12 @@ module Tops {
          * reset fields
          */
         public clear() {
-            var me=this;
+            var me = this;
             me.clearValidations();
             me.id(0);
             me.aidRequested('');
             me.isAssigned = false;
-            me.balance('Not yet calculated');
-            me.balanceDue(null);
-            var donations = me.fundContributions.removeAll();
-            _.each(donations,function(item : IInputItem) {
-                item.Value = '';
-            },me);
-            me.fundContributions(donations);
-            me.calculated(false);
+            me.clearAccountSummary();
         }
 
         public clearValidations() {
@@ -139,31 +134,52 @@ module Tops {
 //            me.ymDonationError('');
             var donationFields = me.fundContributions.removeAll();
             if (donationFields.length > 0) {
-                _.each(donationFields, function(item : IInputItem) {
+                _.each(donationFields, function (item:IInputItem) {
                     item.ErrorMessage = '';
-                },me);
+                }, me);
                 me.setFundContributions(donationFields);
             }
             me.hasErrors(false);
         }
 
         /**
-         * set fields from person DTO
+         * set fields from registration DTO
          */
-        public assign = (registration: IRegistrationInfo) => {
-            var me=this;
+        public assign = (registration:IRegistrationInfo) => {
+            var me = this;
             me.id(registration.registrationId);
             me.clearValidations();
             me.aidRequested(registration.aidRequested);
-            // me.ymDonation(registration.ymDonation);
-            // me.simpleMealDonation(registration.simpleMealDonation);
             me.fundContributions([]);
             me.isAssigned = true;
         };
 
+        private clearAccountSummary() {
+            var me = this;
+            me.feesList([]);
+            me.creditsList([]);
+            me.donationsList([]);
+            me.feeTotal('');
+            me.creditTotal('');
+            me.donationTotal('');
+            me.aidEligibility('');
+            me.balanceDue(null);
+            me.calculated(false);
+            me.balance("Not calculated yet");
+            me.setDonations([]);
+        }
 
+        private currencyValue(stringValue: string) {
+            if (stringValue) {
+                stringValue = stringValue.replace('$','').replace(',','').replace(' ','');
+                if (jQuery.isNumeric(stringValue)) {
+                    return parseFloat(stringValue);
+                }
+            }
+            return null;
+        }
 
-        public assignAccountSummary = (summary: IAccountSummary) => {
+        public assignAccountSummary = (summary:IAccountSummary) => {
             var me = this;
             me.feesList(summary.fees);
             me.creditsList(summary.credits);
@@ -171,41 +187,46 @@ module Tops {
             me.feeTotal(summary.feeTotal);
             me.creditTotal(summary.creditTotal);
             me.donationTotal(summary.donationTotal);
-            me.balanceDue(summary.balance);
-            if (jQuery.isNumeric(summary.balance)) {
-                me.calculated(true);
-                if (summary.balance == 0) {
-                    me.balance('Paid in full');
-                }
-                else if (summary.balance > 0) {
-                    me.balance(summary.balance);
-                }
-                else {
-                    me.balance('Credit: ' + Math.abs(summary.balance));
-                }
-            }
-            else {
+            me.aidEligibility(summary.aidEligibility);
+            var balanceDue = me.currencyValue(summary.balance);
+            me.balanceDue(balanceDue);
+
+            if (balanceDue === null) {
                 me.calculated(false);
                 me.balance("Not calculated yet")
             }
+            else {
+                me.calculated(true);
+                if (balanceDue == 0.00) {
+                    me.balance('Paid in full');
+                }
+                else if (balanceDue > 0) {
+                    me.balance(summary.balance);
+                }
+                else {
+                    me.balance('Credit: ' + Math.abs(balanceDue));
+                }
+            }
 
-            me.balance(summary.balance);
-            me.setDonations(summary.donations, summary.funds);
+            if (summary.funds && summary.funds.length > 0) {
+                me.funds = summary.funds;
+            }
+            me.setDonations(summary.donations);
         };
 
-        public getDonations = () : IKeyValuePair[] => {
+        public getDonations = ():IKeyValuePair[] => {
             var me = this;
-            var result : IKeyValuePair[] = [];
+            var result:IKeyValuePair[] = [];
             var donations = me.fundContributions();
-            _.each(donations, function(donation : IIndexedInput) {
+            _.each(donations, function (donation:IIndexedInput) {
                 if (donation.Value) {
                     var item:IKeyValuePair = {
                         Key: donation.Key,
                         Value: donation.Value
                     };
                     result.push(item);
-        }
-            },me);
+                }
+            }, me);
 
             return result;
         };
@@ -216,36 +237,34 @@ module Tops {
             jQuery('.description-link').popover();
         }
 
-        public setDonations = (donations: IIndexedItem[], funds : ILookupItem[]) => {
+        public setDonations = (donations:IIndexedItem[]) => {
             var me = this;
-            var contributions : IIndexedInput[] = [];
-            if (funds == null) {
-                funds = me.fundContributions.removeAll();
-            }
-            _.each(funds, function(item : ILookupItem) {
-                var donation = _.find(donations, function(i : IIndexedItem) {
+            var contributions:IIndexedInput[] = [];
+            me.fundContributions.removeAll();
+            _.each(me.funds, function (item:ILookupItem) {
+                var donation = _.find(donations, function (i:IIndexedItem) {
                     return i.Key == item.Key;
-                },me);
-                var donationItem : IIndexedInput = {
-                        Text: item.Text,
-                        Key: item.Key,
-                        Description: item.Description,
-                        Value: (donation) ? donation.Value : '',
-                        ErrorMessage: ''
-                    };
+                }, me);
+                var donationItem:IIndexedInput = {
+                    Text: item.Text,
+                    Key: item.Key,
+                    Description: item.Description,
+                    Value: (donation) ? donation.Value : '',
+                    ErrorMessage: ''
+                };
                 contributions.push(donationItem);
-            },me);
+            }, me);
             me.setFundContributions(contributions);
         };
 
-        public updateRegistration = (registration: IRegistrationInfo) => {
+        public updateRegistration = (registration:IRegistrationInfo) => {
             var me = this;
             registration.aidRequested = me.aidRequested();
             // registration.ymDonation = me.ymDonation();
             // registration.simpleMealDonation = me.simpleMealDonation();
         };
 
-        validateCurrency(value: string) : any {
+        validateCurrency(value:string):any {
             var value = value.replace(/\s+/g, '');
             var value = value.replace(',', '');
             var value = value.replace('$', '');
@@ -267,7 +286,7 @@ module Tops {
                 return false;
             }
 
-            return parts[0] + '.' + parts[1].substring(0,2);
+            return parts[0] + '.' + parts[1].substring(0, 2);
         };
 
         public validate = ():boolean => {
@@ -287,16 +306,16 @@ module Tops {
 
             var contributions = me.fundContributions();
             me.fundContributions([]);
-            _.each(contributions,function(item : IIndexedInput){
+            _.each(contributions, function (item:IIndexedInput) {
                 amount = me.validateCurrency(item.Value);
-            if (amount === false) {
+                if (amount === false) {
                     item.ErrorMessage = ":  Invalid amount.";
-                valid = false;
-            }
-            else {
+                    valid = false;
+                }
+                else {
                     item.Value = amount;
-            }
-            },me);
+                }
+            }, me);
             me.setFundContributions(contributions);
 
             me.hasErrors(!valid);
@@ -313,7 +332,7 @@ module Tops {
         email = ko.observable('');
         notes = ko.observable('');
 
-        hasAddress: KnockoutComputed<boolean>;
+        hasAddress:KnockoutComputed<boolean>;
 
         public nameError = ko.observable('');
         public emailError = ko.observable('');
@@ -324,7 +343,7 @@ module Tops {
             super();
             var me = this;
             me.setViewState('closed');
-            me.hasAddress = ko.computed(function() {
+            me.hasAddress = ko.computed(function () {
                 return me.address() || me.city() ? true : false;
             });
         }
@@ -333,7 +352,7 @@ module Tops {
          * reset fields
          */
         public clear() {
-            var me=this;
+            var me = this;
             me.clearValidations();
             me.name('');
             me.address('');
@@ -354,8 +373,8 @@ module Tops {
         /**
          * set fields from person DTO
          */
-        public assign = (registration: IRegistrationInfo) => {
-            var me=this;
+        public assign = (registration:IRegistrationInfo) => {
+            var me = this;
             me.clearValidations();
             me.name(registration.name);
             me.address(registration.address);
@@ -363,7 +382,7 @@ module Tops {
             me.email(registration.email);
         };
 
-        public updateRegistration = (registration: IRegistrationInfo) => {
+        public updateRegistration = (registration:IRegistrationInfo) => {
             var me = this;
             registration.name = me.name();
             registration.address = me.address();
@@ -430,7 +449,7 @@ module Tops {
             me.financeInfoForm.assign(registration);
         }
 
-        public updateRegistration = (registration: IRegistrationInfo) => {
+        public updateRegistration = (registration:IRegistrationInfo) => {
             var me = this;
             registration.registrationId = me.id();
             registration.registrationCode = me.registrationCode();
@@ -442,61 +461,65 @@ module Tops {
     export class attenderObservable extends editPanel {
         public id = ko.observable(0);
         changed = ko.observable(false);
-        firstName =  ko.observable('');
-        lastName =  ko.observable('');
-        middleName =  ko.observable('');
-        dateOfBirth =  ko.observable('');
-        affiliationCode =  ko.observable('');
-        otherAffiliation =  ko.observable('');
-        firstTimer =  ko.observable(false);
-        teacher =  ko.observable(false);
-        financialAidRequested =  ko.observable(false);
-        guest =  ko.observable(false);
-        notes =  ko.observable('');
-        linens =  ko.observable(false);
-        arrivalTime  =  ko.observable('');
-        departureTime  =  ko.observable('');
-        housingTypeId =  ko.observable('');
-        attended =  ko.observable(false);
-        singleOccupant =  ko.observable(false);
+        firstName = ko.observable('');
+        lastName = ko.observable('');
+        middleName = ko.observable('');
+        dateOfBirth = ko.observable('');
+        affiliationCode = ko.observable('');
+        otherAffiliation = ko.observable('');
+        firstTimer = ko.observable(false);
+        teacher = ko.observable(false);
+        financialAidRequested = ko.observable(false);
+        guest = ko.observable(false);
+        notes = ko.observable('');
+        linens = ko.observable(false);
+        housingTypeId = ko.observable('');
+        attended = ko.observable(false);
+        singleOccupant = ko.observable(false);
 
-        vegetarian =  ko.observable(false);
-        glutenFree =  ko.observable(false);
+        vegetarian = ko.observable(false);
+        glutenFree = ko.observable(false);
 
-        mealThursDinner =  ko.observable(false);
-        mealFriBreakfast =  ko.observable(false);
-        mealFriLunch =  ko.observable(false);
-        mealFriDinner =  ko.observable(false);
-        mealSatBreakfast =  ko.observable(false);
-        mealSatLunch =  ko.observable(false);
-        mealSatDinner =  ko.observable(false);
-        mealSunBreakfast =  ko.observable(false);
+        mealThursDinner = ko.observable(false);
+        mealFriBreakfast = ko.observable(false);
+        mealFriLunch = ko.observable(false);
+        mealFriDinner = ko.observable(false);
+        mealSatBreakfast = ko.observable(false);
+        mealSatLunch = ko.observable(false);
+        mealSatDinner = ko.observable(false);
+        mealSunBreakfast = ko.observable(false);
         simpleMeal = ko.observable(false);
 
         // lookups
         specialNeedsTypes = ko.observableArray<IListItem>();
-        housingTypes      = ko.observableArray<IHousingTypeListItem>();
-        generationTypes   = ko.observableArray<IListItem>();
-        affiliationCodes  = ko.observableArray<IListItem>();
-        creditTypes       = ko.observableArray<IListItem>();
-        gradeLevels       = ko.observableArray<IListItem>();
-        ageGroups         = ko.observableArray<IAgeGroup>();
-        timePeriods       = ko.observableArray<IListItem>();
-        lookupsAssigned  = false;
+        housingTypes = ko.observableArray<IHousingTypeListItem>();
+        generationTypes = ko.observableArray<IListItem>();
+        affiliationCodes = ko.observableArray<IListItem>();
+        creditTypes = ko.observableArray<IListItem>();
+        gradeLevels = ko.observableArray<IListItem>();
+        ageGroups = ko.observableArray<IAgeGroup>();
+        timePeriods = ko.observableArray<IListItem>();
+        lookupsAssigned = false;
 
-        public selectedSpecialNeedsType  : KnockoutObservable<IListItem> = ko.observable(null);
-        public selectedHousingType       : KnockoutObservable<IHousingTypeListItem> = ko.observable(null);
-        public selectedGenerationType    : KnockoutObservable<IListItem> = ko.observable(null);
-        public selectedAffiliationCode   : KnockoutObservable<IListItem> = ko.observable(null);
-        public selectedCreditType        : KnockoutObservable<IListItem> = ko.observable(null);
-        public selectedAgeGroup          : KnockoutObservable<IAgeGroup> = ko.observable(null);
-        public selectedGradeLevel        : KnockoutObservable<IListItem> = ko.observable(null);
-        public selectedArrivalTime        : KnockoutObservable<IListItem> = ko.observable(null);
-        public selectedDepartureTime     : KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedSpecialNeedsType:KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedHousingType:KnockoutObservable<IHousingTypeListItem> = ko.observable(null);
+        public selectedGenerationType:KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedAffiliationCode:KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedCreditType:KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedAgeGroup:KnockoutObservable<IAgeGroup> = ko.observable(null);
+        public selectedGradeLevel:KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedArrivalTime:KnockoutObservable<IListItem> = ko.observable(null);
+        public selectedDepartureTime:KnockoutObservable<IListItem> = ko.observable(null);
 
-        attenderFullName = ko.computed(function() {return ''}); // replaced in initialize function
-        isChild = ko.computed(function() {return false}); // replaced in initialize function
-        singleOccupancyApplies = ko.computed(function() {return false}); // replaced in initialize function
+        attenderFullName = ko.computed(function () {
+            return ''
+        }); // replaced in initialize function
+        isChild = ko.computed(function () {
+            return false
+        }); // replaced in initialize function
+        singleOccupancyApplies = ko.computed(function () {
+            return false
+        }); // replaced in initialize function
 
         // validation
         firstNameError = ko.observable('');  	// required
@@ -517,14 +540,14 @@ module Tops {
         initialize = () => {
             var me = this;
             // delayed initialization for loaded resources
-            me.attenderFullName = ko.computed(function() {
-                return textParser.makeFullName(me.firstName(),me.lastName(),me.middleName());
+            me.attenderFullName = ko.computed(function () {
+                return textParser.makeFullName(me.firstName(), me.lastName(), me.middleName());
             });
-            me.isChild = ko.computed(function() {
+            me.isChild = ko.computed(function () {
                 var generation = me.selectedGenerationType();
-                return (generation) ?  generation.Value != 1 : false;
+                return (generation) ? generation.Value != 1 : false;
             });
-            me.singleOccupancyApplies = ko.computed(function() {
+            me.singleOccupancyApplies = ko.computed(function () {
                 var housing = me.selectedHousingType();
                 if (housing) {
                     return housing.category == 3;
@@ -538,7 +561,7 @@ module Tops {
          * reset fields
          */
         public clear() {
-            var me=this;
+            var me = this;
             me.clearValidations();
             me.id(0);
             me.changed(false);
@@ -556,8 +579,6 @@ module Tops {
             me.guest(false);
             me.notes('');
             me.linens(false);
-            me.arrivalTime('');
-            me.departureTime('');
             me.vegetarian(false);
             me.attended(false);
             me.singleOccupant(false);
@@ -577,11 +598,11 @@ module Tops {
             me.selectedHousingType(null);
             me.setLookupValue(me.generationTypes(), me.selectedGenerationType, 1);
             me.selectedAffiliationCode(null);
-            me.setLookupValue(me.creditTypes(),me.selectedCreditType, 0);
+            me.setLookupValue(me.creditTypes(), me.selectedCreditType, 0);
             me.selectedAgeGroup(null);
             me.selectedGradeLevel(null);
-            me.setLookupValue(me.timePeriods(),me.selectedArrivalTime,42);
-            me.setLookupValue(me.timePeriods(),me.selectedDepartureTime,72);
+            me.setLookupValue(me.timePeriods(), me.selectedArrivalTime, 42);
+            me.setLookupValue(me.timePeriods(), me.selectedDepartureTime, 72);
         }
 
         public clearValidations() {
@@ -595,7 +616,7 @@ module Tops {
             me.hasErrors(false);
         }
 
-        public assignLookupLists(lists : IAttenderLookups) {
+        public assignLookupLists(lists:IAttenderLookups) {
             var me = this;
             me.lookupsAssigned = true;
             me.housingTypes(lists.housingTypes);
@@ -606,55 +627,55 @@ module Tops {
             me.timePeriods(times);
             me.generationTypes(
                 [
-                    { Text:'Adult',Value:'1',Description:'' },
-                    { Text:'Youth (age 4 through 18)',Value:'2',Description:'' },
-                    { Text:'Infant (through age 3)',Value:'5',Description:'' },
-                    { Text:'',Value:'',Description:'' }
+                    {Text: 'Adult', Value: '1', Description: ''},
+                    {Text: 'Youth (age 4 through 18)', Value: '2', Description: ''},
+                    {Text: 'Infant (through age 3)', Value: '5', Description: ''},
+                    {Text: '', Value: '', Description: ''}
                 ]
             );
 
             me.specialNeedsTypes(
                 [
-                    { Text:'Hearing impaired',Value:'1',Description:'' },
-                    { Text:'Mobility impaired',Value:'2',Description:'' },
-                    { Text:'Other, see notes',Value:'500',Description:'' }
+                    {Text: 'Hearing impaired', Value: '1', Description: ''},
+                    {Text: 'Mobility impaired', Value: '2', Description: ''},
+                    {Text: 'Other, see notes', Value: '500', Description: ''}
                 ]
             );
             me.gradeLevels(
                 [
-                    { Text:'Preschool',Value:'PS',Description:'' },
-                    { Text:'Kindergarten',Value:'K',Description:'' },
-                    { Text:'First',Value:'1',Description:'' },
-                    { Text:'Second',Value:'2',Description:'' },
-                    { Text:'Third',Value:'3',Description:'' },
-                    { Text:'Fourth',Value:'4',Description:'' },
-                    { Text:'Fifth',Value:'5',Description:'' },
-                    { Text:'Sixth',Value:'6',Description:'' },
-                    { Text:'Seventh',Value:'7',Description:'' },
-                    { Text:'Eighth',Value:'8',Description:'' },
-                    { Text:'Ninth',Value:'9',Description:'' },
-                    { Text:'Tenth',Value:'10',Description:'' },
-                    { Text:'Eleventh',Value:'11',Description:'' },
-                    { Text:'Twelth',Value:'12',Description:'' }
+                    {Text: 'Preschool', Value: 'PS', Description: ''},
+                    {Text: 'Kindergarten', Value: 'K', Description: ''},
+                    {Text: 'First', Value: '1', Description: ''},
+                    {Text: 'Second', Value: '2', Description: ''},
+                    {Text: 'Third', Value: '3', Description: ''},
+                    {Text: 'Fourth', Value: '4', Description: ''},
+                    {Text: 'Fifth', Value: '5', Description: ''},
+                    {Text: 'Sixth', Value: '6', Description: ''},
+                    {Text: 'Seventh', Value: '7', Description: ''},
+                    {Text: 'Eighth', Value: '8', Description: ''},
+                    {Text: 'Ninth', Value: '9', Description: ''},
+                    {Text: 'Tenth', Value: '10', Description: ''},
+                    {Text: 'Eleventh', Value: '11', Description: ''},
+                    {Text: 'Twelth', Value: '12', Description: ''}
                 ]
             );
             me.creditTypes(
                 [
-                    { Text:'General attender',Value:'0',Description:'' },
-                    { Text:'Teacher',Value:'2',Description:'' },
-                    { Text:'Guest',Value:'3',Description:'' },
-                    { Text:'SCYM Staff',Value:'4',Description:'' }
+                    {Text: 'General attender', Value: '0', Description: ''},
+                    {Text: 'Teacher', Value: '2', Description: ''},
+                    {Text: 'Guest', Value: '3', Description: ''},
+                    {Text: 'SCYM Staff', Value: '4', Description: ''}
                 ]
             );
         }
-        
-        private buildTimeLookup() : IListItem[] {
+
+        private buildTimeLookup():IListItem[] {
             var me = this;
             var result = [];
             var minCode = 42;
             var maxCode = 72;
-            for(var day=4; day < 8; day += 1) {
-                for(var time = 1; time < 4; time += 1) {
+            for (var day = 4; day < 8; day += 1) {
+                for (var time = 1; time < 4; time += 1) {
                     var code = (day * 10) + time;
                     result.push(
                         {
@@ -662,11 +683,11 @@ module Tops {
                             Value: code,
                             Description: ''
                         });
-                }    
+                }
             }
             return result;
         }
-        
+
         private timeCodeToStr(timeCode) {
             var time = 'error';
             var day = 'error';
@@ -697,10 +718,10 @@ module Tops {
                     break;
             }
 
-            return day+' ' + time;
+            return day + ' ' + time;
         }
 
-        public setDefaults = (attender: IAttender = null) => {
+        public setDefaults = (attender:IAttender = null) => {
             var me = this;
             if (attender) {
                 me.setAttenderMeals(attender);
@@ -722,19 +743,37 @@ module Tops {
             }
         };
 
-        private setAttenderMeals(attender: IAttender) {
+        private setAttenderMeals(attender:IAttender) {
             var me = this;
-            attender.meals.forEach(function(mealtime: number) {
-                switch(mealtime) {
-                    case 43: me.mealThursDinner(true);break;
-                    case 51: me.mealFriBreakfast(true);break;
-                    case 52: me.mealFriLunch(true);break;
-                    case 53: me.mealFriDinner(true);break;
-                    case 61: me.mealSatBreakfast(true);break;
-                    case 62: me.mealSatLunch(true);break;
-                    case 63: me.mealSatDinner(true);break;
-                    case 71: me.mealSunBreakfast(true);break;
-                    case 72: me.simpleMeal(true);break;
+            attender.meals.forEach(function (mealtime:number) {
+                switch (mealtime) {
+                    case 43:
+                        me.mealThursDinner(true);
+                        break;
+                    case 51:
+                        me.mealFriBreakfast(true);
+                        break;
+                    case 52:
+                        me.mealFriLunch(true);
+                        break;
+                    case 53:
+                        me.mealFriDinner(true);
+                        break;
+                    case 61:
+                        me.mealSatBreakfast(true);
+                        break;
+                    case 62:
+                        me.mealSatLunch(true);
+                        break;
+                    case 63:
+                        me.mealSatDinner(true);
+                        break;
+                    case 71:
+                        me.mealSunBreakfast(true);
+                        break;
+                    case 72:
+                        me.simpleMeal(true);
+                        break;
                 }
             });
 
@@ -743,8 +782,8 @@ module Tops {
         /**
          * set fields from DTO
          */
-        public assign = (attender: IAttender) => {
-            var me=this;
+        public assign = (attender:IAttender) => {
+            var me = this;
             me.clearValidations();
             me.id(attender.attenderId);
             me.changed(attender.changed);
@@ -756,88 +795,105 @@ module Tops {
             me.notes(attender.notes);
 
             //boolean
-            me.firstTimer(attender.firstTimer===1);
-            me.teacher(attender.teacher===1);
-            me.financialAidRequested(attender.financialAidRequested===1);
-            me.guest(attender.guest===1);
-            me.linens(attender.linens===1);
-            me.vegetarian(attender.vegetarian===1);
-            me.attended(attender.attended===1);
-            me.singleOccupant(attender.singleOccupant===1);
-            me.glutenFree(attender.glutenFree===1);
+            me.firstTimer(attender.firstTimer === 1);
+            me.teacher(attender.teacher === 1);
+            me.financialAidRequested(attender.financialAidRequested === 1);
+            me.guest(attender.guest === 1);
+            me.linens(attender.linens === 1);
+            me.vegetarian(attender.vegetarian === 1);
+            me.attended(attender.attended === 1);
+            me.singleOccupant(attender.singleOccupant === 1);
+            me.glutenFree(attender.glutenFree === 1);
             me.setAttenderMeals(attender);
 
             me.setLookupValue(me.specialNeedsTypes(), me.selectedSpecialNeedsType, attender.specialNeedsTypeId);
             me.setLookupValue(me.generationTypes(), me.selectedGenerationType, attender.generationId);
             me.setLookupValue(me.ageGroups(), me.selectedAgeGroup, attender.ageGroupId);
             me.setLookupValue(me.generationTypes(), me.selectedGenerationType, attender.generationId);
-            me.setLookupValue(me.creditTypes(),me.selectedCreditType, attender.creditTypeId);
-            me.setLookupValue(me.housingTypes(),me.selectedHousingType, attender.housingTypeId);
-            me.setLookupValue(me.gradeLevels(),me.selectedGradeLevel, attender.gradeLevel);
-            me.setLookupValue(me.timePeriods(),me.selectedArrivalTime, attender.arrivalTime);
-            me.setLookupValue(me.timePeriods(),me.selectedDepartureTime, attender.departureTime);
-            me.setLookupValue(me.affiliationCodes(),me.selectedAffiliationCode, attender.affiliationCode);
+            me.setLookupValue(me.creditTypes(), me.selectedCreditType, attender.creditTypeId);
+            me.setLookupValue(me.housingTypes(), me.selectedHousingType, attender.housingTypeId);
+            me.setLookupValue(me.gradeLevels(), me.selectedGradeLevel, attender.gradeLevel);
+            me.setLookupValue(me.timePeriods(), me.selectedArrivalTime, attender.arrivalTime);
+            me.setLookupValue(me.timePeriods(), me.selectedDepartureTime, attender.departureTime);
+            me.setLookupValue(me.affiliationCodes(), me.selectedAffiliationCode, attender.affiliationCode);
         };
 
-        public setGeneration(generationId : any) {
+        public setGeneration(generationId:any) {
             var me = this;
             me.setLookupValue(me.generationTypes(), me.selectedGenerationType, generationId);
         }
 
-        public updateAttender = (attender: IAttender) => {
+        public updateAttender = (attender:IAttender) => {
             var me = this;
-            attender.attenderId =            me.id();
-            attender.changed =               me.changed();
-            attender.firstName =             me.firstName();
-            attender.lastName =              me.lastName();
-            attender.middleName =            me.middleName();
-            attender.dateOfBirth =           me.dateOfBirth();
-            attender.otherAffiliation =      me.otherAffiliation();
-            attender.arrivalTime =           me.arrivalTime();
-            attender.departureTime =         me.departureTime();
-            attender.notes =                 me.notes();
+            attender.attenderId = me.id();
+            attender.changed = me.changed();
+            attender.firstName = me.firstName();
+            attender.lastName = me.lastName();
+            attender.middleName = me.middleName();
+            attender.dateOfBirth = me.dateOfBirth();
+            attender.otherAffiliation = me.otherAffiliation();
+            attender.notes = me.notes();
 
             // boolean
-            attender.firstTimer =            me.firstTimer() ? 1 : 0;
-            attender.teacher =               me.teacher() ? 1 : 0;
+            attender.firstTimer = me.firstTimer() ? 1 : 0;
+            attender.teacher = me.teacher() ? 1 : 0;
             attender.financialAidRequested = me.financialAidRequested() ? 1 : 0;
-            attender.guest =                 me.guest() ? 1 : 0;
-            attender.linens =                me.linens() ? 1 : 0;
-            attender.vegetarian =            me.vegetarian() ? 1 : 0;
-            attender.attended =              me.attended() ? 1 : 0;
-            attender.singleOccupant =        me.singleOccupant() ? 1 : 0;
-            attender.glutenFree =            me.glutenFree() ? 1 : 0;
+            attender.guest = me.guest() ? 1 : 0;
+            attender.linens = me.linens() ? 1 : 0;
+            attender.vegetarian = me.vegetarian() ? 1 : 0;
+            attender.attended = me.attended() ? 1 : 0;
+            attender.singleOccupant = me.singleOccupant() ? 1 : 0;
+            attender.glutenFree = me.glutenFree() ? 1 : 0;
 
             attender.meals = [];
-            if (me.mealThursDinner())  {attender.meals.push(43);}
-            if (me.mealFriBreakfast()) {attender.meals.push(51);}
-            if (me.mealFriLunch())     {attender.meals.push(52);}
-            if (me.mealFriDinner())    {attender.meals.push(53);}
-            if (me.mealSatBreakfast()) {attender.meals.push(61);}
-            if (me.mealSatLunch())     {attender.meals.push(62);}
-            if (me.mealSatDinner())    {attender.meals.push(63);}
-            if (me.mealSunBreakfast()) {attender.meals.push(71);}
-            if (me.simpleMeal())       {attender.meals.push(72);}
+            if (me.mealThursDinner()) {
+                attender.meals.push(43);
+            }
+            if (me.mealFriBreakfast()) {
+                attender.meals.push(51);
+            }
+            if (me.mealFriLunch()) {
+                attender.meals.push(52);
+            }
+            if (me.mealFriDinner()) {
+                attender.meals.push(53);
+            }
+            if (me.mealSatBreakfast()) {
+                attender.meals.push(61);
+            }
+            if (me.mealSatLunch()) {
+                attender.meals.push(62);
+            }
+            if (me.mealSatDinner()) {
+                attender.meals.push(63);
+            }
+            if (me.mealSunBreakfast()) {
+                attender.meals.push(71);
+            }
+            if (me.simpleMeal()) {
+                attender.meals.push(72);
+            }
 
-            attender.specialNeedsTypeId =  me.getLookupValue(me.selectedSpecialNeedsType);
+            attender.specialNeedsTypeId = me.getLookupValue(me.selectedSpecialNeedsType);
             attender.generationId = me.getLookupValue(me.selectedGenerationType);
             attender.gradeLevel = me.getLookupValue(me.selectedGradeLevel);
             attender.ageGroupId = me.getLookupValue(me.selectedAgeGroup);
             attender.affiliationCode = me.getLookupValue(me.selectedAffiliationCode);
             attender.creditTypeId = me.getLookupValue(me.selectedCreditType);
             attender.housingTypeId = me.getLookupValue(me.selectedHousingType);
-
+            attender.arrivalTime = me.getLookupValue(me.selectedArrivalTime);
+            attender.departureTime = me.getLookupValue(me.selectedDepartureTime);
         };
 
 
-        private setLookupValue(list: IListItem[],  selection : KnockoutObservable<IListItem>, value: any) {
-            var result = _.find(list, function(item : IListItem) {
+        private setLookupValue(list:IListItem[], selection:KnockoutObservable<IListItem>, value:any) {
+            var result = _.find(list, function (item:IListItem) {
                 return item.Value == value;
             });
             selection(result);
         }
 
-        private getLookupValue(selection : KnockoutObservable<IListItem>) {
+        private getLookupValue(selection:KnockoutObservable<IListItem>) {
             var me = this;
             var item = selection();
             return (item) ? item.Value : null;
@@ -875,8 +931,7 @@ module Tops {
             if (me.selectedDepartureTime()) {
                 departure = me.selectedDepartureTime().Value;
             }
-            else
-            {
+            else {
                 me.departureTimeError(': Departure time is required. Approximate is ok.');
                 valid = false;
             }
@@ -907,9 +962,9 @@ module Tops {
     }
 
     class AnnualSessionInfo {
-        year : any;
-        startDate : any;
-        endDate : any;
+        year:any;
+        startDate:any;
+        endDate:any;
     }
 
     class startupFormObservable {
@@ -956,18 +1011,18 @@ module Tops {
     }
 
     export class YmRegistrationViewModel implements IMainViewModel {
-        static instance: Tops.YmRegistrationViewModel;
-        private application: Tops.IPeanutClient;
-        private peanut: Tops.Peanut;
+        static instance:Tops.YmRegistrationViewModel;
+        private application:Tops.IPeanutClient;
+        private peanut:Tops.Peanut;
 
         debugging = ko.observable(false);
 
         // state
         registrationChanged = ko.observable(false);
         attendersChanged = ko.observable(false);
-        balanceInvalid : KnockoutComputed<boolean>; // used on accounts form
+        balanceInvalid:KnockoutComputed<boolean>; // used on accounts form
 
-        private currentRegistration: IRegistrationInfo;
+        private currentRegistration:IRegistrationInfo;
         sessionInfo = new AnnualSessionInfo();
         user = new userObservable();
         registrationStatus = ko.observable(-1);
@@ -981,23 +1036,23 @@ module Tops {
         lookupForm = new lookupFormObservable();
         attenderForm = new attenderObservable();
         registrationForm = new registrationObservable();
-        familyMemberResults = new searchListObservable(2,6);
-        private familyMembers : IFamilyAttender[] = [];
-        addressSearchResults = new searchListObservable(2,6);
+        familyMemberResults = new searchListObservable(2, 6);
+        private familyMembers:IFamilyAttender[] = [];
+        addressSearchResults = new searchListObservable(2, 6);
         addressSearchValue = ko.observable('');
         addressSearchWarning = ko.observable('');
 
         // attenders
-        attenderList : KnockoutObservableArray<IListItem> = ko.observableArray([]);
-        private updatedAttenders : IAttender[] = [];
+        attenderList:KnockoutObservableArray<IListItem> = ko.observableArray([]);
+        private updatedAttenders:IAttender[] = [];
         private deletedAttenders = [];
 
         // navigation
         currentForm = ko.observable('');
-        saveButtonVisible : KnockoutComputed<boolean>;
+        saveButtonVisible:KnockoutComputed<boolean>;
         accountReviewed = ko.observable(false);
-        registerButton = new regButtonObservable("Summary",'ready');
-        contactButton =  new regButtonObservable("Contact");
+        registerButton = new regButtonObservable("Summary", 'ready');
+        contactButton = new regButtonObservable("Contact");
         attendersButton = new regButtonObservable("Attenders");
         accountButton = new regButtonObservable("Account");
 
@@ -1007,7 +1062,7 @@ module Tops {
         locationText = ko.observable('');
         housingPreference = ko.observable('');
         housingAssignmentList = ko.observableArray<IListItem>();
-        registrationTitle : KnockoutComputed<string>;
+        registrationTitle:KnockoutComputed<string>;
 
         // Constructor
         constructor() {
@@ -1047,6 +1102,7 @@ module Tops {
             }
             return year.toString();
         }
+
         saveChanges = () => {
             var me = this;
             if (me.checkReadyToSave()) {
@@ -1054,7 +1110,7 @@ module Tops {
             }
         };
 
-       private uploadChanges() {
+        private uploadChanges() {
             var me = this;
             var request = me.getRegistrationChanges();
             if (!request) {
@@ -1064,12 +1120,12 @@ module Tops {
             me.application.hideServiceMessages();
             me.application.showWaiter('Saving changes...');
 
-           // todo: saveChanges service
+            // todo: saveChanges service
             // fakes
-           var data = me.getFakeRegistration();
-           var fakeResponse = new fakeServiceResponse(data);
-           me.handleSaveChangesResponse(fakeResponse);
-           me.application.hideWaiter();
+            var data = me.getFakeRegistration();
+            var fakeResponse = new fakeServiceResponse(data);
+            me.handleSaveChangesResponse(fakeResponse);
+            me.application.hideWaiter();
 
             //** end fakes
 
@@ -1082,7 +1138,7 @@ module Tops {
 
         }
 
-        private handleSaveChangesResponse = (serviceResponse: IServiceResponse) => {
+        private handleSaveChangesResponse = (serviceResponse:IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = <IRegistrationResponse>serviceResponse.Value;
@@ -1105,20 +1161,20 @@ module Tops {
          *      });
          *
          */
-        init(applicationPath: string, successFunction?: () => void) {
+        init(applicationPath:string, successFunction?:() => void) {
             var me = this;
             // setup messaging and other application initializations
             // initialize date popus if used
-             jQuery(function() {
-                jQuery( ".datepicker" ).datepicker(
+            jQuery(function () {
+                jQuery(".datepicker").datepicker(
                     {
                         changeYear: true,
                         yearRange: 'c-20:c+20'
                     }
                 );
-             });
+            });
 
-            window.onbeforeunload = function() {
+            window.onbeforeunload = function () {
                 if (me.hasUnsavedChanges()) {
                     if (me.registrationStatus() === 1 && me.attendersButton.isComplete()) {
                         me.accountReviewed(true); // show save button even if we are in 'new registration' wizard mode.
@@ -1130,18 +1186,18 @@ module Tops {
             jQuery('[data-toggle="tooltip"]').tooltip();
             jQuery('[data-toggle="popover"]').popover();
 
-            me.registrationTitle = ko.computed(function() {
+            me.registrationTitle = ko.computed(function () {
                 var result = me.registrationForm.contactInfoForm.name();
                 result = result ? result.trim() : '';
                 return result ? result : 'New Registration';
             });
 
-            me.saveButtonVisible =  ko.computed(function() {
+            me.saveButtonVisible = ko.computed(function () {
                 return ((me.registrationChanged() || me.attendersChanged()) &&
-                        (me.registrationStatus() > 1 || me.accountReviewed()));
+                (me.registrationStatus() > 1 || me.accountReviewed()));
             });
 
-            me.balanceInvalid = ko.computed(function() {
+            me.balanceInvalid = ko.computed(function () {
                 if (me.registrationStatus() == 1) {
                     return false;
                 }
@@ -1149,21 +1205,13 @@ module Tops {
                 if (me.registrationForm.financeInfoForm.calculated() == false) {
                     return true;
                 }
-                /*
-                if (me.registrationForm.contactInfoForm.viewState() == 'edit') {
-                    return true;
-                }
-                if (me.attenderForm.viewState() == 'edit') {
-                    return true;
-                }
-                */
                 return (me.attendersChanged() || me.registrationChanged());
             });
 
             me.application.initialize(applicationPath,
-                function() {
-                    me.application.loadResources(['scym-registration.css','textParser.js'],
-                        function() {
+                function () {
+                    me.application.loadResources(['scym-registration.css', 'textParser.js'],
+                        function () {
                             me.attenderForm.initialize();
                             me.getInitialInfo(successFunction);
                         }
@@ -1173,19 +1221,19 @@ module Tops {
 
 
             /*
-            me.application.loadResources(['scym-registration.css','textParser.js'],
-                function() {
-                    me.application.initialize(applicationPath,
-                        function() {
-                            me.attenderForm.initialize();
-                            me.getInitialInfo(successFunction);
-                        }
-                    );
-                });
-            */
+             me.application.loadResources(['scym-registration.css','textParser.js'],
+             function() {
+             me.application.initialize(applicationPath,
+             function() {
+             me.attenderForm.initialize();
+             me.getInitialInfo(successFunction);
+             }
+             );
+             });
+             */
         }
 
-        
+
         showAddressSearch() {
             var me = this;
             me.addressSearchValue('');
@@ -1212,7 +1260,7 @@ module Tops {
 
             // fakes
 
-            var fakeData : INameValuePair[] = [
+            var fakeData:INameValuePair[] = [
                 {
                     Name: 'Terry SoRelle and Liz Yeats',
                     Value: '1'
@@ -1275,18 +1323,18 @@ module Tops {
             me.showAddressSearchResults(fakeResponse);
 
             /* service call
-            me.peanut.executeService('directory.DirectorySearch',request, me.showAddressSearchResults)
-                .always(function() {
-                    me.application.hideWaiter();
-                });
-            */
+             me.peanut.executeService('directory.DirectorySearch',request, me.showAddressSearchResults)
+             .always(function() {
+             me.application.hideWaiter();
+             });
+             */
         }
 
         /**
          * Service response handler for findAddresses
          * @param serviceResponse
          */
-        public showAddressSearchResults = (serviceResponse: IServiceResponse) => {
+        public showAddressSearchResults = (serviceResponse:IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var list = <INameValuePair[]>serviceResponse.Value;
@@ -1301,15 +1349,15 @@ module Tops {
          * On click item link in found panel
          * @param item
          */
-        public selectAddress = (item : INameValuePair) => {
+        public selectAddress = (item:INameValuePair) => {
             var me = this;
             me.addressSearchResults.reset();
             me.application.showWaiter('Loading address...');
             me.application.hideServiceMessages();
 
             // Fakes
-            var fakeData : IFindRegistrationAddressResponse = {
-                name : 'Terry SoRelle and Liz Yeats',
+            var fakeData:IFindRegistrationAddressResponse = {
+                name: 'Terry SoRelle and Liz Yeats',
                 address: '904 E. Meadowmere',
                 city: 'Austin, TX 78758',
                 persons: [
@@ -1341,7 +1389,7 @@ module Tops {
                         dateOfBirth: '6/5/1979'
                     }
                 ]
-            } ;
+            };
 
             var fakeResponse = new fakeServiceResponse(fakeData);
             me.handleSearchAddressResponse(fakeResponse);
@@ -1349,16 +1397,16 @@ module Tops {
             jQuery("#address-search-modal").modal('hide');
 
             /* service call
-            var request = item.Value;
-            me.peanut.executeService('directory.FindRegistrationAddress',request,me.handleSearchAddressResponse)
-                .always(function() {
-                    me.application.hideWaiter();
-                    jQuery("#address-search-modal").modal('hide');
-                });
-            */
+             var request = item.Value;
+             me.peanut.executeService('directory.FindRegistrationAddress',request,me.handleSearchAddressResponse)
+             .always(function() {
+             me.application.hideWaiter();
+             jQuery("#address-search-modal").modal('hide');
+             });
+             */
         };
 
-        private handleSearchAddressResponse = (serviceResponse: IServiceResponse)=> {
+        private handleSearchAddressResponse = (serviceResponse:IServiceResponse)=> {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var address = <IFindRegistrationAddressResponse>serviceResponse.Value;
@@ -1370,9 +1418,9 @@ module Tops {
             }
         };
 
-        public selectFamilyMember = (member : IFamilyAttender) => {
+        public selectFamilyMember = (member:IFamilyAttender) => {
             var me = this;
-            me.familyMembers = _.filter(me.familyMembers,function(m: IFamilyAttender){
+            me.familyMembers = _.filter(me.familyMembers, function (m:IFamilyAttender) {
                 return member.Name != m.Name;
             });
             me.familyMemberResults.setList(me.familyMembers);
@@ -1392,7 +1440,7 @@ module Tops {
             me.familyMembers = [];
         };
 
-        public getInitialInfo(successFunction?: () => void) {
+        public getInitialInfo(successFunction?:() => void) {
             var me = this;
             me.application.hideServiceMessages();
             me.application.showWaiter('Loading...');
@@ -1400,20 +1448,20 @@ module Tops {
 
             //testing stub...
             /*
-            var fakeResponse = me.getFakeInitResponse();
-            me.handleInitializationResponse(fakeResponse);
-            me.application.hideWaiter();
-            if (successFunction) {
-                successFunction();
-            }
-            */
+             var fakeResponse = me.getFakeInitResponse();
+             me.handleInitializationResponse(fakeResponse);
+             me.application.hideWaiter();
+             if (successFunction) {
+             successFunction();
+             }
+             */
             //****** End fake
 
             // service call
 
             var request = null;
-            me.peanut.executeService('registration.registrationInit',request, me.handleInitializationResponse)
-                .always(function() {
+            me.peanut.executeService('registration.registrationInit', request, me.handleInitializationResponse)
+                .always(function () {
                     me.application.hideWaiter();
                     if (successFunction) {
                         successFunction();
@@ -1421,20 +1469,20 @@ module Tops {
                 });
         }
 
-       private handleInitializationResponse = (serviceResponse: IServiceResponse) => {
-           var me = this;
-           if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-               var response = <IRegistrationInitResponse>serviceResponse.Value;
-               me.user.assign(response.user);
-               me.sessionInfo.year = response.sessionInfo.year;
-               me.sessionInfo.startDate = response.sessionInfo.startDate;
-               me.sessionInfo.endDate = response.sessionInfo.endDate;
-               me.datesText(response.sessionInfo.datesText);
-               me.locationText(response.sessionInfo.location);
-               me.setWelcomeForm();
-               jQuery('#application-container').show();
-           }
-       };
+        private handleInitializationResponse = (serviceResponse:IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var response = <IRegistrationInitResponse>serviceResponse.Value;
+                me.user.assign(response.user);
+                me.sessionInfo.year = response.sessionInfo.year;
+                me.sessionInfo.startDate = response.sessionInfo.startDate;
+                me.sessionInfo.endDate = response.sessionInfo.endDate;
+                me.datesText(response.sessionInfo.datesText);
+                me.locationText(response.sessionInfo.location);
+                me.setWelcomeForm();
+                jQuery('#application-container').show();
+            }
+        };
 
         private setWelcomeForm() {
             var me = this;
@@ -1455,11 +1503,11 @@ module Tops {
             me.fakeRegistrationService();
 
             /*
-            me.peanut.executeService('registration.GetRegistration',request, me.handleServiceResponseTemplate)
-                .always(function() {
-                    me.application.hideWaiter();
-                });
-            */
+             me.peanut.executeService('registration.GetRegistration',request, me.handleServiceResponseTemplate)
+             .always(function() {
+             me.application.hideWaiter();
+             });
+             */
         }
 
         public findRegistration() {
@@ -1483,8 +1531,7 @@ module Tops {
         }
 
 
-
-        private handleRegistrationResponse = (serviceResponse: IServiceResponse) => {
+        private handleRegistrationResponse = (serviceResponse:IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = <IRegistrationResponse>serviceResponse.Data;
@@ -1496,7 +1543,7 @@ module Tops {
 
         };
 
-        private loadRegistration(response : IRegistrationResponse) {
+        private loadRegistration(response:IRegistrationResponse) {
             var me = this;
             me.registrationStatus(response.registration.statusId);
             me.currentRegistration = response.registration;
@@ -1509,8 +1556,8 @@ module Tops {
             var buttonStatus = response.attenderList.length == 0 ? 'incomplete' : 'complete';
             me.attendersButton.setStatus(buttonStatus);
             me.accountButton.setStatus(buttonStatus);
-            me.registrationForm.financeInfoForm.setViewState(response.registration.statusId == 1 ? 'edit':'view');
-            me.registrationForm.contactInfoForm.setViewState(response.registration.statusId == 1 ? 'edit':'view');
+            me.registrationForm.financeInfoForm.setViewState(response.registration.statusId == 1 ? 'edit' : 'view');
+            me.registrationForm.contactInfoForm.setViewState(response.registration.statusId == 1 ? 'edit' : 'view');
             me.housingAssignmentList(response.housingAssignments);
             me.housingPreference(response.housingPreference);
             me.accountButton.setStatus(response.registration.confirmed ? 'complete' : 'incomplete');
@@ -1540,7 +1587,7 @@ module Tops {
 
         public startLookup() {
             var me = this;
-            if (me.user.authenticated() ||  me.startupForm.validate()) {
+            if (me.user.authenticated() || me.startupForm.validate()) {
                 me.lookupForm.clear();
                 me.formTitle('Find your registration');
                 me.currentForm('lookup');
@@ -1565,7 +1612,7 @@ module Tops {
                 }
                 me.contactButton.setStatus('incomplete');
                 me.registrationStatus(1);
-                if (me.user.authenticated) {
+                if (me.user.authenticated()) {
                     me.showAddressSearch();
                 }
                 me.editContactInfo();
@@ -1606,7 +1653,7 @@ module Tops {
             me.registrationChanged(true);
             me.saveChanges();
         };
-        
+
         cancelContactChanges = () => {
             var me = this;
             if (me.registrationStatus() == 1) {
@@ -1616,9 +1663,9 @@ module Tops {
                 me.registrationForm.contactInfoForm.assign(me.currentRegistration);
                 me.registrationForm.contactInfoForm.setViewState();
             }
-            
+
         };
-        
+
         cancelFinanceChanges = () => {
             var me = this;
             if (me.registrationStatus() == 1) {
@@ -1644,6 +1691,7 @@ module Tops {
 
         endAddAttenders = () => {
             var me = this;
+            me.registrationForm.financeInfoForm.calculated(false);
             me.attenderForm.setViewState();
             if (me.registrationStatus() == 1) {
                 me.attendersButton.setComplete();
@@ -1680,7 +1728,7 @@ module Tops {
 
         showAccountsForm = () => {
             var me = this;
-            if ((!me.registrationForm.financeInfoForm.calculated()) ||  me.balanceInvalid()) {
+            if ((!me.registrationForm.financeInfoForm.calculated()) || me.balanceInvalid()) {
                 me.updateCosts();
             }
             else {
@@ -1693,16 +1741,17 @@ module Tops {
             me.registrationForm.financeInfoForm.setViewState();
         };
 
-        private showFeesAndDonationsPage() {
+        public showFeesAndDonationsPage = () => {
             var me = this;
             me.currentForm('accounts');
             me.formTitle('Fees and Donations');
+            me.registrationForm.financeInfoForm.edit();
             window.location.assign('#form-column');
-        }
+        };
 
         updateCosts = () => {
             var me = this;
-            var request : ICostUpdateRequest = {
+            var request:ICostUpdateRequest = {
                 aidRequested: me.registrationForm.financeInfoForm.aidRequested(),
                 donations: me.registrationForm.financeInfoForm.getDonations(),
                 attenders: me.updatedAttenders,
@@ -1714,21 +1763,20 @@ module Tops {
 
             // fakes
             /*
-            var fakeData = me.getFakeAccountSummary();
-            var fakeResponse = new fakeServiceResponse(fakeData);
-            me.handleGetCostResponse(fakeResponse);
-            me.application.hideWaiter();
-            */
-            // todo: GetRegistrationCost service
+             var fakeData = me.getFakeAccountSummary();
+             var fakeResponse = new fakeServiceResponse(fakeData);
+             me.handleGetCostResponse(fakeResponse);
+             me.application.hideWaiter();
+             */
+            // todo: GetRegistrationCost service (in progress)
 
-            me.peanut.executeService('registration.GetRegistrationCost',request, me.handleGetCostResponse)
-                .always(function() {
+            me.peanut.executeService('registration.GetRegistrationCost', request, me.handleGetCostResponse)
+                .always(function () {
                     me.application.hideWaiter();
                 });
-
         };
 
-        private handleGetCostResponse = (serviceResponse: IServiceResponse) => {
+        private handleGetCostResponse = (serviceResponse:IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = <IAccountSummary>serviceResponse.Value;
@@ -1745,14 +1793,14 @@ module Tops {
         };
 
         confirmAndSave() {
-          var me = this;
+            var me = this;
             if (!me.registrationForm.financeInfoForm.validate()) {
                 window.location.assign('#account-errors');
                 return;
             }
             me.registrationForm.financeInfoForm.view();
             me.saveChanges();
-          // todo: what happens when save fails?
+            // todo: what happens when save fails?
             me.showSummaryForm();
         };
 
@@ -1761,7 +1809,7 @@ module Tops {
             return (me.attendersButton.isComplete() && me.contactButton.isComplete() && me.accountButton.isComplete());
         }
 
-        validateContactInfo() : boolean {
+        validateContactInfo():boolean {
             var me = this;
             var isValid = me.registrationForm.contactInfoForm.validate();
             if (isValid) {
@@ -1773,7 +1821,7 @@ module Tops {
             return isValid;
         }
 
-        hasUnsavedChanges() : boolean {
+        hasUnsavedChanges():boolean {
             var me = this;
             if (me.registrationStatus() == 1) {
                 return true;
@@ -1829,22 +1877,22 @@ module Tops {
 
         }
 
-        editSelectedAttender = (item: IListItem) => {
+        editSelectedAttender = (item:IListItem) => {
             var me = this;
             var id = item.Value;
             var attender = me.getAttender(id);
         };
 
-        removeSelectedAttender = (item: IListItem) => {
+        removeSelectedAttender = (item:IListItem) => {
             var me = this;
             me.attendersChanged(true);
             var id = item.Value;
             var attenderList = me.attenderList();
-            attenderList = _.filter(attenderList,function(attenderItem: IListItem) {
+            attenderList = _.filter(attenderList, function (attenderItem:IListItem) {
                 return attenderItem.Value != id;
             });
             me.attenderList(attenderList);
-            var updated = _.filter(me.updatedAttenders, function(attender: IAttender) {
+            var updated = _.filter(me.updatedAttenders, function (attender:IAttender) {
                 return attender.attenderId != id;
             });
             me.updatedAttenders = updated;
@@ -1868,7 +1916,7 @@ module Tops {
             }
 
             var onUpdateList = false;
-            var attender  = null;
+            var attender = null;
             var id = me.attenderForm.id();
             var isNew = (!id);
             if (isNew) {
@@ -1876,7 +1924,7 @@ module Tops {
                 me.attenderForm.id(id);
             }
             else {
-                attender = _.find(me.updatedAttenders,function(a : IAttender){
+                attender = _.find(me.updatedAttenders, function (a:IAttender) {
                     return a.attenderId == id;
                 });
                 onUpdateList = (attender) ? true : false;
@@ -1910,7 +1958,7 @@ module Tops {
         getTempAttenderId() {
             var me = this;
             var result = 0;
-            _.each(me.updatedAttenders,function(attender: IAttender) {
+            _.each(me.updatedAttenders, function (attender:IAttender) {
                 if (result > attender.attenderId) {
                     result = attender.attenderId;
                 }
@@ -1919,9 +1967,9 @@ module Tops {
         }
 
 
-        getAttender(attenderId: any) {
+        getAttender(attenderId:any) {
             var me = this;
-            var attender : IAttender = null;
+            var attender:IAttender = null;
 
             if (attenderId) {
                 attender = _.find(me.updatedAttenders, function (item:IAttender) {
@@ -1942,15 +1990,15 @@ module Tops {
             me.application.hideServiceMessages();
             me.application.showWaiter('Getting attender data...');
 
-            var request : IGetAttenderRequest = {
+            var request:IGetAttenderRequest = {
                 id: attenderId,
                 includeLookups: me.attenderForm.lookupsAssigned ? 1 : 0
             };
 
             // todo: getAttender service
-            var fakeAttenderResponse  = {
+            var fakeAttenderResponse = {
                 attender: me.getFakeAttender(attenderId),
-                lookups : me.getFakeLookups()
+                lookups: me.getFakeLookups()
             };
             var fakeResponse = new fakeServiceResponse(fakeAttenderResponse);
             me.application.hideWaiter();
@@ -1958,14 +2006,14 @@ module Tops {
 
 
             /*
-            me.peanut.executeService('registration.getAttender',request, me.handleGetAttenderResponse)
-                .always(function() {
-                    me.application.hideWaiter();
-                });
-                */
+             me.peanut.executeService('registration.getAttender',request, me.handleGetAttenderResponse)
+             .always(function() {
+             me.application.hideWaiter();
+             });
+             */
         }
 
-        private handleGetAttenderResponse = (serviceResponse: IServiceResponse) => {
+        private handleGetAttenderResponse = (serviceResponse:IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = <IGetAttenderResponse>serviceResponse.Value;
@@ -1979,7 +2027,7 @@ module Tops {
         };
 
 
-        private editAttender(attender: IAttender = null) {
+        private editAttender(attender:IAttender = null) {
             var me = this;
             if (attender) {
                 me.attenderForm.assign(attender);
@@ -2001,6 +2049,7 @@ module Tops {
             var me = this;
             me.currentForm('welcome');
         };
+
         showAttendersList = () => {
             var me = this;
             var me = this;
@@ -2037,7 +2086,7 @@ module Tops {
         };
 
 
-        private editContactInfo(){
+        private editContactInfo() {
             var me = this;
             me.registrationForm.contactInfoForm.edit();
             me.showContactForm();
@@ -2047,11 +2096,11 @@ module Tops {
         getRegistrationChanges() {
             var me = this;
             if (me.registrationChanged() || me.attendersChanged()) {
-                var request : IRegistrationUpdateRequest =  {
-                    registration : null,
-                    updatedAttenders : me.updatedAttenders,
-                    deletedAttenders : me.deletedAttenders,
-                    contributions : me.registrationForm.financeInfoForm.getDonations()
+                var request:IRegistrationUpdateRequest = {
+                    registration: null,
+                    updatedAttenders: me.updatedAttenders,
+                    deletedAttenders: me.deletedAttenders,
+                    contributions: me.registrationForm.financeInfoForm.getDonations()
                 };
                 if (me.registrationChanged()) {
                     request.registration = <IRegistrationInfo>{};
@@ -2088,13 +2137,13 @@ module Tops {
 
             me.application.hideServiceMessages();
             me.application.showWaiter('Message here...');
-            me.peanut.executeService('directory.ServiceName',request, me.handleServiceResponseTemplate)
-                .always(function() {
+            me.peanut.executeService('directory.ServiceName', request, me.handleServiceResponseTemplate)
+                .always(function () {
                     me.application.hideWaiter();
                 });
         }
 
-        private handleServiceResponseTemplate = (serviceResponse: IServiceResponse) => {
+        private handleServiceResponseTemplate = (serviceResponse:IServiceResponse) => {
             // todo: delete handleServiceResponseTemplate when not needed
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
@@ -2115,8 +2164,8 @@ module Tops {
 
         private getFakeRegistration(isConfirmed = 0) {
             var me = this;
-            var accountSummary : IAccountSummary = me.getFakeAccountSummary();
-            var result : IRegistrationResponse = {
+            var accountSummary:IAccountSummary = me.getFakeAccountSummary();
+            var result:IRegistrationResponse = {
                 attenderList: [
                     {
                         Text: 'Terry SoRelle',
@@ -2177,9 +2226,10 @@ module Tops {
             return result;
         }
 
-        private getFakeAccountSummary() : IAccountSummary {
-            var result : IAccountSummary =
+        private getFakeAccountSummary():IAccountSummary {
+            var result:IAccountSummary =
             {
+                aidEligibility : '100.00',
                 payments: [],
                 funds: [
                     {
@@ -2250,13 +2300,13 @@ module Tops {
             return result;
         }
 
-        private getFakeAttender(attenderId : any) {
+        private getFakeAttender(attenderId:any) {
             var me = this;
             if (!attenderId) {
                 return null;
             }
 
-            var attenderStub = _.find(me.attenderList(), function(item : IListItem) {
+            var attenderStub = _.find(me.attenderList(), function (item:IListItem) {
                 return item.Value == attenderId;
             });
 
@@ -2264,96 +2314,93 @@ module Tops {
                 return null;
             }
 
-            var result : IAttender = {
+            var result:IAttender = {
                 attenderId: attenderStub.Text,
-                firstName : '',
-                lastName : attenderStub.Value,
-                middleName : '',
-                dateOfBirth : null,
-                affiliationCode : '',
-                otherAffiliation : '',
-                firstTimer : 0,
-                teacher : 0,
-                financialAidRequested : 0,
-                guest : 0,
-                notes : '',
-                linens : 0,
-                arrivalTime  : '',
-                departureTime  : '',
-                vegetarian : 0,
-                attended : 0,
-                singleOccupant : 0,
-                glutenFree : 0,
+                firstName: '',
+                lastName: attenderStub.Value,
+                middleName: '',
+                dateOfBirth: null,
+                affiliationCode: '',
+                otherAffiliation: '',
+                firstTimer: 0,
+                teacher: 0,
+                financialAidRequested: 0,
+                guest: 0,
+                notes: '',
+                linens: 0,
+                arrivalTime: '',
+                departureTime: '',
+                vegetarian: 0,
+                attended: 0,
+                singleOccupant: 0,
+                glutenFree: 0,
                 changed: false,
-                housingTypeId : null,
-                specialNeedsTypeId : null, // lookup: special needs
-                generationId : null, // lookup: generations
-                gradeLevel : '', // 'PS','K', 1 .. 13
-                ageGroupId : null, // lookup agegroups
-                creditTypeId : 0, // formerly: feeCredit, lookup: creditTypes
+                housingTypeId: null,
+                specialNeedsTypeId: null, // lookup: special needs
+                generationId: null, // lookup: generations
+                gradeLevel: '', // 'PS','K', 1 .. 13
+                ageGroupId: null, // lookup agegroups
+                creditTypeId: 0, // formerly: feeCredit, lookup: creditTypes
                 meals: []
             };
             return result;
         }
 
-        private getFakeLookups() : IAttenderLookups {
-            var attenderLists  = {
-                housingTypes:
-                    [
-                        { Text:'Day visitor - no housing',Value:'1',Description:'', category: '1' },
-                        { Text:'Early Riser Dorm for Women',Value:'2',Description:'', category: '1' },
-                        { Text:'Night Owl Dorm for Women',Value:'3',Description:'', category: '1' },
-                        { Text:'Early Riser Dorm for Men',Value:'4',Description:'' ,category: '1'},
-                        { Text:'Night Owl Dorm for Men',Value:'5',Description:'' ,category: '1'},
-                        { Text:'Family Cabin',Value:'6',Description:'' ,category: '1'},
-                        { Text:'Solo Parent Cabin (not used)',Value:'7',Description:'' ,category: '1'},
-                        { Text:'Couples Cabin',Value:'8',Description:'' ,category: '1'},
-                        { Text:'Camp Motel',Value:'9',Description:'' ,category: '3'},
-                        { Text:'Health House (special needs)',Value:'10',Description:'' ,category: '3'},
-                        { Text:'Tenting',Value:'11',Description:'' ,category: '1'},
-                        { Text:'Adult Young Friends Dorm',Value:'12',Description:'' ,category: '1'},
-                        { Text:'Female Young Frends Dorm',Value:'13',Description:'' ,category: '1'},
-                        { Text:'Male Young Friends Dorm',Value:'14',Description:'' ,category: '1'},
-                        { Text:'Jr. Young Friends Female',Value:'16',Description:'' ,category: '1'},
-                        { Text:'Jr. Young Friends Male',Value:'17',Description:'' ,category: '1'},
-                        { Text:'Mothers with Children Dorm',Value:'18',Description:'' ,category: '1'},
-                        { Text:'Fathers with Children Dorm',Value:'19',Description:'' ,category: '1'}
-                    ],
-                affiliationCodes :
-                    [
-                        { Text:'Acadiana Friends Meeting',Value:'ACDN',Description:'' },
-                        { Text:'Alpine Friends Worship Group',Value:'AL TX',Description:'' },
-                        { Text:'Friends Meeting of Austin',Value:'AU TX',Description:'' },
-                        { Text:'Baton Rouge Friends Meeting',Value:'BA LA',Description:'' },
-                        { Text:'Caddo Four States Preparatory Meeting',Value:'CADDO4',Description:'' },
-                        { Text:'Coastal Bend Friends Meeting',Value:'CC TX',Description:'' },
-                        { Text:'College Station Friends Worship Group',Value:'CS TX',Description:'' },
-                        { Text:'Dallas Monthly Meeting of Friends',Value:'DA TX',Description:'' },
-                        { Text:'Fayetteville Friends',Value:'FA AR',Description:'' },
-                        { Text:'Fort Worth Monthly Meeting',Value:'FW TX',Description:'' },
-                        { Text:'Galveston Friends Meeting',Value:'GA TX',Description:'' },
-                        { Text:'Hill Country Friends Monthly Meeting',Value:'HC TX',Description:'' },
-                        { Text:'Houston Live Oak Friends Meeting',Value:'HO TX',Description:'' },
-                        { Text:'Little Rock Friends Meeting',Value:'LR AR',Description:'' },
-                        { Text:'Lubbock Monthly Meeting',Value:'LU TX',Description:'' },
-                        { Text:'Norman Friends Meeting',Value:'NFS',Description:'' },
-                        { Text:'Friends Meeting of New Orleans',Value:'NO LA',Description:'' },
-                        { Text:'No SCYM affiliation',Value:'NONE',Description:'' },
-                        { Text:'Oklahoma City Friends Meeting',Value:'OKC',Description:'' },
-                        { Text:'Rio Grande Valley Worship Group',Value:'RIO',Description:'' },
-                        { Text:'Friends Meeting of San Antonio',Value:'SA TX',Description:'' },
-                        { Text:'Stillwater Friends Meeting',Value:'ST OK',Description:'' },
-                        { Text:'Sunrise Friends Meeting',Value:'SUN',Description:'' },
-                        { Text:'Tulsa Green Country',Value:'TU OK',Description:'' }
-                    ],
-                ageGroups : 
-                    [
-                        { Text:'Little Friends',Value:'1',Description:'' },
-                        { Text:'Lower Elementary',Value:'2',Description:'' },
-                        { Text:'Upper Elementary',Value:'3',Description:'' },
-                        { Text:'Junior High',Value:'4',Description:'' },
-                        { Text:'High School',Value:'5',Description:'' }
-                    ]
+        private getFakeLookups():IAttenderLookups {
+            var attenderLists = {
+                housingTypes: [
+                    {Text: 'Day visitor - no housing', Value: '1', Description: '', category: '1'},
+                    {Text: 'Early Riser Dorm for Women', Value: '2', Description: '', category: '1'},
+                    {Text: 'Night Owl Dorm for Women', Value: '3', Description: '', category: '1'},
+                    {Text: 'Early Riser Dorm for Men', Value: '4', Description: '', category: '1'},
+                    {Text: 'Night Owl Dorm for Men', Value: '5', Description: '', category: '1'},
+                    {Text: 'Family Cabin', Value: '6', Description: '', category: '1'},
+                    {Text: 'Solo Parent Cabin (not used)', Value: '7', Description: '', category: '1'},
+                    {Text: 'Couples Cabin', Value: '8', Description: '', category: '1'},
+                    {Text: 'Camp Motel', Value: '9', Description: '', category: '3'},
+                    {Text: 'Health House (special needs)', Value: '10', Description: '', category: '3'},
+                    {Text: 'Tenting', Value: '11', Description: '', category: '1'},
+                    {Text: 'Adult Young Friends Dorm', Value: '12', Description: '', category: '1'},
+                    {Text: 'Female Young Frends Dorm', Value: '13', Description: '', category: '1'},
+                    {Text: 'Male Young Friends Dorm', Value: '14', Description: '', category: '1'},
+                    {Text: 'Jr. Young Friends Female', Value: '16', Description: '', category: '1'},
+                    {Text: 'Jr. Young Friends Male', Value: '17', Description: '', category: '1'},
+                    {Text: 'Mothers with Children Dorm', Value: '18', Description: '', category: '1'},
+                    {Text: 'Fathers with Children Dorm', Value: '19', Description: '', category: '1'}
+                ],
+                affiliationCodes: [
+                    {Text: 'Acadiana Friends Meeting', Value: 'ACDN', Description: ''},
+                    {Text: 'Alpine Friends Worship Group', Value: 'AL TX', Description: ''},
+                    {Text: 'Friends Meeting of Austin', Value: 'AU TX', Description: ''},
+                    {Text: 'Baton Rouge Friends Meeting', Value: 'BA LA', Description: ''},
+                    {Text: 'Caddo Four States Preparatory Meeting', Value: 'CADDO4', Description: ''},
+                    {Text: 'Coastal Bend Friends Meeting', Value: 'CC TX', Description: ''},
+                    {Text: 'College Station Friends Worship Group', Value: 'CS TX', Description: ''},
+                    {Text: 'Dallas Monthly Meeting of Friends', Value: 'DA TX', Description: ''},
+                    {Text: 'Fayetteville Friends', Value: 'FA AR', Description: ''},
+                    {Text: 'Fort Worth Monthly Meeting', Value: 'FW TX', Description: ''},
+                    {Text: 'Galveston Friends Meeting', Value: 'GA TX', Description: ''},
+                    {Text: 'Hill Country Friends Monthly Meeting', Value: 'HC TX', Description: ''},
+                    {Text: 'Houston Live Oak Friends Meeting', Value: 'HO TX', Description: ''},
+                    {Text: 'Little Rock Friends Meeting', Value: 'LR AR', Description: ''},
+                    {Text: 'Lubbock Monthly Meeting', Value: 'LU TX', Description: ''},
+                    {Text: 'Norman Friends Meeting', Value: 'NFS', Description: ''},
+                    {Text: 'Friends Meeting of New Orleans', Value: 'NO LA', Description: ''},
+                    {Text: 'No SCYM affiliation', Value: 'NONE', Description: ''},
+                    {Text: 'Oklahoma City Friends Meeting', Value: 'OKC', Description: ''},
+                    {Text: 'Rio Grande Valley Worship Group', Value: 'RIO', Description: ''},
+                    {Text: 'Friends Meeting of San Antonio', Value: 'SA TX', Description: ''},
+                    {Text: 'Stillwater Friends Meeting', Value: 'ST OK', Description: ''},
+                    {Text: 'Sunrise Friends Meeting', Value: 'SUN', Description: ''},
+                    {Text: 'Tulsa Green Country', Value: 'TU OK', Description: ''}
+                ],
+                ageGroups: [
+                    {Text: 'Little Friends', Value: '1', Description: ''},
+                    {Text: 'Lower Elementary', Value: '2', Description: ''},
+                    {Text: 'Upper Elementary', Value: '3', Description: ''},
+                    {Text: 'Junior High', Value: '4', Description: ''},
+                    {Text: 'High School', Value: '5', Description: ''}
+                ]
             };
 
             return <IAttenderLookups>attenderLists;
@@ -2365,10 +2412,10 @@ module Tops {
                 true;
 
 
-            var fakeSessionInfo: IAnnualSessionInfo = {
-                year : '2015',
+            var fakeSessionInfo:IAnnualSessionInfo = {
+                year: '2015',
                 startDate: '2015-04-02',
-                endDate : '2015-05-05',
+                endDate: '2015-05-05',
                 location: 'Greene Family Camp, Bruceville, Texas',
                 datesText: 'April 2nd to 5th, 2015'
             };
@@ -2379,9 +2426,9 @@ module Tops {
                         sessionInfo: fakeSessionInfo,
                         registrationId: 1,
                         user: {
-                            id : 1,
+                            id: 1,
                             name: 'Terry SoRelle',
-                            authenticated : true,
+                            authenticated: true,
                             authorized: 1,
                             email: 'terry@mail.com'
                         }
@@ -2393,9 +2440,9 @@ module Tops {
                         sessionInfo: fakeSessionInfo,
                         registrationId: 0,
                         user: {
-                            id : 0,
+                            id: 0,
                             name: 'Guest',
-                            authenticated : false,
+                            authenticated: false,
                             authorized: 0,
                             email: ''
                         }

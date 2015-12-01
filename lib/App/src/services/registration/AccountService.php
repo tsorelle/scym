@@ -40,6 +40,7 @@ class AccountService
      *        creditTotal: string;
      *        donationTotal: string;
      *        balance: any;
+     *        aidEligibility: string;
      *    }
      */
     public function formatAccountSummary(RegistrationAccount $account) {
@@ -52,6 +53,7 @@ class AccountService
         $result->creditTotal = $this->formatMoney($account->getCreditTotal());
         $result->donationTotal = $this->formatMoney($account->getDonationsTotal());
         $result->balance =  $this->formatMoney($account->getBalance());
+        $result->aidEligibility = $this->formatMoney($account->getAidEligibility());
         return $result;
     }
 
@@ -61,8 +63,9 @@ class AccountService
         foreach($charges as $charge) {
             /** @var $charge \App\db\scym\ScymCharge  */
             $feeTypeId = $charge->getFeetypeid();
-            $feeType = array_key_exists($feeTypeId,$this->feeTypes) ? '' : $this->feeTypes[$feeTypeId];
-            $item = $this->makeLookupItem($charge,$feeType,$charge->getBasis());
+            $feeType = array_key_exists($feeTypeId,$this->feeTypes) ? $this->feeTypes[$feeTypeId] : '';
+            $description = $charge->getBasis();
+            $item = $this->makeLookupItem($charge,$feeType,$description);
             array_push($result,$item);
         }
         return $result;
@@ -115,7 +118,7 @@ class AccountService
     private function makeLookupItem(ICostItem $item, $text,$description='') {
         $result = new \stdClass();
         $result->Text = $text;
-        $result->Desription = $description;
+        $result->Description = $description;
         $result->Value = $this->formatMoney($item->getAmount());
         return $result;
     }
@@ -132,7 +135,8 @@ class AccountService
     }
 
     private function formatMoney($number) {
-        return '$'.(empty($number) || !is_numeric($number)) ?  '0.00' : number_format($number,2,'.',',');
+        $result = (empty($number) || !is_numeric($number)) ? '0.00' : number_format($number, 2, '.', ',');
+        return '$'.$result;
     }
 
 }

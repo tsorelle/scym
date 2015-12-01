@@ -3,6 +3,7 @@
 namespace App\db\scym;
 
 
+use App\db\api\HousingTypeDto;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -153,8 +154,11 @@ class ScymHousingType
         return $this->active;
     }
 
+    /**
+     * @return HousingTypeDto
+     */
     public function getDataTransferObject() {
-        $result = new \stdClass();
+        $result = new HousingTypeDto();
         $result->housingTypeId           = $this->housingTypeId;
         $result->housingTypeCode         = $this->housingTypeCode;
         $result->housingTypeDescription  = $this->housingTypeDescription;
