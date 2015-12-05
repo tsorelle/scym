@@ -274,7 +274,7 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     /**
      * @var \DateTime
      *
-     * @Column(name="receivedDate", type="date", nullable=false)
+     * @Column(name="receivedDate", type="date", nullable=true)
      */
     private $receivedDate;
 
