@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Index;
 use Doctrine\ORM\Mapping\Table;
+use Tops\sys\TDateTime;
 
 
 /**
@@ -666,6 +667,43 @@ class ScymPerson extends DateStampedEntity
         return $name;
     }
 
+    /**
+     * 1  Adult
+     * 2  Youth (age 4 through 18)
+     * 3  Young Friend (age 13 through 18)
+     * 4  Child (age 4 through 12)
+     * 5  Infant (through age 3)
+     */
+
+    /**
+     * @return int
+     */
+    public function getGeneration() {
+        $age = 21;
+        $today = new \DateTime();
+        $dob = $this->getDateOfBirth();
+        if (TDateTime::isEmpty($dob)) {
+            if ($this->getJunior()) {
+                return 2;
+            }
+        }
+        else {
+            $i = date_diff($today,$dob);
+            if ($i !== false) {
+                $age = $i->y;
+            }
+        }
+        if ($age > 18) {
+            return 1;
+        }
+        if ($age >= 13) {
+            return 3;
+        }
+        if ($age >= 4) {
+            return 4;
+        }
+        return 5;
+    }
 
     private function assignDob($dateString) {
         try {

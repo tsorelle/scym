@@ -4,14 +4,13 @@ namespace App\db\scym;
 
 
 use App\db\api\ICostItem;
-use App\db\api\ICreditInfo;
 use App\db\DateStampedEntity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  *
  *
- * @Table(name="credits")
+ * @Table(name="credits", indexes={@Index(name="credits_registration_fk", columns={"registrationId"})})
  * @Entity @HasLifecycleCallbacks
  */
 class ScymCredit extends DateStampedEntity implements ICostItem
@@ -26,11 +25,41 @@ class ScymCredit extends DateStampedEntity implements ICostItem
     private $creditid;
 
     /**
-     * @var integer
+     * @var ScymRegistration
      *
-     * @Column(name="registrationId", type="integer", nullable=false)
+     * @ManyToOne(targetEntity="ScymRegistration",inversedBy="credits")
+     * @JoinColumn(name="registrationId", referencedColumnName="registrationId")
      */
-    private $registrationid = '0';
+    protected $registration;
+
+    /**
+     * Set registration
+     *
+     * @param ScymRegistration $registration
+     * @return ScymCredit
+     */
+    public function setRegistration(ScymRegistration $registration = null)
+    {
+        $this->registration = $registration;
+
+        return $this;
+    }
+
+    /**
+     * Get registration
+     *
+     * @return ScymRegistration
+     */
+    public function getRegistration()
+    {
+        return $this->registration;
+    }
+
+    public function getRegistrationId()
+    {
+        return $this->registration ? $this->registration->getRegistrationid() : null;
+    }
+
 
     /**
      * @var string
@@ -69,29 +98,6 @@ class ScymCredit extends DateStampedEntity implements ICostItem
     public function getCreditid()
     {
         return $this->creditid;
-    }
-
-    /**
-     * Set registrationid
-     *
-     * @param integer $registrationid
-     * @return ScymCredit
-     */
-    public function setRegistrationid($registrationid)
-    {
-        $this->registrationid = $registrationid;
-
-        return $this;
-    }
-
-    /**
-     * Get registrationid
-     *
-     * @return integer
-     */
-    public function getRegistrationid()
-    {
-        return $this->registrationid;
     }
 
     /**

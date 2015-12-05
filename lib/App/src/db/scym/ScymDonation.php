@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * ScymDonation
  *
- * @Table(name="donations")
+ * @Table(name="donations", indexes={@Index(name="donations_registration_fk", columns={"registrationId"})})
  * @Entity  @HasLifecycleCallbacks
  */
 class ScymDonation extends DateStampedEntity implements IDonationInfo
@@ -32,11 +32,41 @@ class ScymDonation extends DateStampedEntity implements IDonationInfo
     private $donationtypeid;
 
     /**
-     * @var integer
+     * @var ScymRegistration
      *
-     * @Column(name="registrationId", type="integer", nullable=false)
+     * @ManyToOne(targetEntity="ScymRegistration",inversedBy="donations")
+     * @JoinColumn(name="registrationId", referencedColumnName="registrationId")
      */
-    private $registrationid = '0';
+    protected $registration;
+
+    /**
+     * Set registration
+     *
+     * @param ScymRegistration $registration
+     * @return ScymDonation
+     */
+    public function setRegistration(ScymRegistration $registration = null)
+    {
+        $this->registration = $registration;
+
+        return $this;
+    }
+
+    /**
+     * Get registration
+     *
+     * @return ScymRegistration
+     */
+    public function getRegistration()
+    {
+        return $this->registration;
+    }
+
+    public function getRegistrationId()
+    {
+        return $this->registration ? $this->registration->getRegistrationid() : null;
+    }
+
 
     /**
      * @var string
@@ -84,29 +114,6 @@ class ScymDonation extends DateStampedEntity implements IDonationInfo
     public function getDonationtypeid()
     {
         return $this->donationtypeid;
-    }
-
-    /**
-     * Set registrationid
-     *
-     * @param integer $registrationid
-     * @return ScymDonation
-     */
-    public function setRegistrationid($registrationid)
-    {
-        $this->registrationid = $registrationid;
-
-        return $this;
-    }
-
-    /**
-     * Get registrationid
-     *
-     * @return integer 
-     */
-    public function getRegistrationid()
-    {
-        return $this->registrationid;
     }
 
     /**

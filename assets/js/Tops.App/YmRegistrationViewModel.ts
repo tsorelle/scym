@@ -1000,6 +1000,7 @@ module Tops {
         public getLookupCode = () => {
             var me = this;
             var code = me.lookupCode().trim();
+            me.lookupCode(code.toLowerCase());
             me.validationError(code ? '' : 'Please enter something.');
             return code;
         };
@@ -1060,7 +1061,6 @@ module Tops {
         formTitle = ko.observable('Registration Summary');
         datesText = ko.observable('');
         locationText = ko.observable('');
-        housingPreference = ko.observable('');
         housingAssignmentList = ko.observableArray<IListItem>();
         registrationTitle:KnockoutComputed<string>;
 
@@ -1121,6 +1121,7 @@ module Tops {
             me.application.showWaiter('Saving changes...');
 
             // todo: saveChanges service
+            /*
             // fakes
             var data = me.getFakeRegistration();
             var fakeResponse = new fakeServiceResponse(data);
@@ -1128,14 +1129,12 @@ module Tops {
             me.application.hideWaiter();
 
             //** end fakes
+            */
 
-            /*
-             me.peanut.executeService('registration.saveChanges',request, me.handleSaveChangesResponse)
-             .always(function() {
-             me.application.hideWaiter();
-             });
-             */
-
+             me.peanut.executeService('registration.SaveRegistrationChanges',request, me.handleSaveChangesResponse)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
         }
 
         private handleSaveChangesResponse = (serviceResponse:IServiceResponse) => {
@@ -1251,83 +1250,11 @@ module Tops {
             request.Name = 'Addresses';
             request.Value = me.addressSearchValue();
 
-            if (!request.Value) {
-                return;
-            }
-
-            me.application.hideServiceMessages();
             me.application.showWaiter('Searching...');
-
-            // fakes
-
-            var fakeData:INameValuePair[] = [
-                {
-                    Name: 'Terry SoRelle and Liz Yeats',
-                    Value: '1'
-                },
-                {
-                    Name: 'Somebody Lovesme',
-                    Value: '2'
-                },
-                {
-                    Name: 'Somebody Lovesme',
-                    Value: '2'
-                },
-                {
-                    Name: 'Terry SoRelle and Liz Yeats',
-                    Value: '1'
-                },
-                {
-                    Name: 'Somebody Lovesme',
-                    Value: '2'
-                },
-                {
-                    Name: 'Somebody Lovesme',
-                    Value: '2'
-                },
-                {
-                    Name: 'Terry SoRelle and Liz Yeats',
-                    Value: '1'
-                },
-                {
-                    Name: 'Somebody Lovesme',
-                    Value: '2'
-                },
-                {
-                    Name: 'Somebody Lovesme',
-                    Value: '2'
-                },
-                {
-                    Name: 'Terry SoRelle and Liz Yeats',
-                    Value: '1'
-                },
-                {
-                    Name: 'Somebody Lovesme',
-                    Value: '2'
-                },
-                {
-                    Name: 'Somebody Lovesme',
-                    Value: '2'
-                },
-                {
-                    Name: 'Nobody Whoosits',
-                    Value: '2'
-                }
-            ];
-
-            // fakeData = []; // test
-
-            var fakeResponse = new fakeServiceResponse(fakeData);
-
-            me.application.hideWaiter();
-            me.showAddressSearchResults(fakeResponse);
-
-            /* service call
              me.peanut.executeService('directory.DirectorySearch',request, me.showAddressSearchResults)
              .always(function() {
-             me.application.hideWaiter();
+                me.application.hideWaiter();
              });
-             */
         }
 
         /**
@@ -1351,59 +1278,15 @@ module Tops {
          */
         public selectAddress = (item:INameValuePair) => {
             var me = this;
+            jQuery("#address-search-modal").modal('hide');
             me.addressSearchResults.reset();
             me.application.showWaiter('Loading address...');
             me.application.hideServiceMessages();
-
-            // Fakes
-            var fakeData:IFindRegistrationAddressResponse = {
-                name: 'Terry SoRelle and Liz Yeats',
-                address: '904 E. Meadowmere',
-                city: 'Austin, TX 78758',
-                persons: [
-                    {
-                        Value: '1',
-                        Name: 'Liz Yeats',
-                        firstName: 'Liz',
-                        lastName: 'Yeats',
-                        middleName: 'Rosa',
-                        generation: 1,
-                        dateOfBirth: null
-                    },
-                    {
-                        Value: '2',
-                        Name: 'Terry SoRelle',
-                        firstName: 'Terry',
-                        lastName: 'SoRelle',
-                        middleName: '',
-                        generation: 1,
-                        dateOfBirth: null
-                    },
-                    {
-                        Value: '3',
-                        Name: 'Sam Schifman',
-                        firstName: 'Sam',
-                        lastName: 'Schifman',
-                        middleName: 'Benjamin',
-                        generation: 2,
-                        dateOfBirth: '6/5/1979'
-                    }
-                ]
-            };
-
-            var fakeResponse = new fakeServiceResponse(fakeData);
-            me.handleSearchAddressResponse(fakeResponse);
-            me.application.hideWaiter();
-            jQuery("#address-search-modal").modal('hide');
-
-            /* service call
              var request = item.Value;
-             me.peanut.executeService('directory.FindRegistrationAddress',request,me.handleSearchAddressResponse)
+             me.peanut.executeService('registration.FindRegistrationAddress',request,me.handleSearchAddressResponse)
              .always(function() {
-             me.application.hideWaiter();
-             jQuery("#address-search-modal").modal('hide');
+                me.application.hideWaiter();
              });
-             */
         };
 
         private handleSearchAddressResponse = (serviceResponse:IServiceResponse)=> {
@@ -1559,7 +1442,6 @@ module Tops {
             me.registrationForm.financeInfoForm.setViewState(response.registration.statusId == 1 ? 'edit' : 'view');
             me.registrationForm.contactInfoForm.setViewState(response.registration.statusId == 1 ? 'edit' : 'view');
             me.housingAssignmentList(response.housingAssignments);
-            me.housingPreference(response.housingPreference);
             me.accountButton.setStatus(response.registration.confirmed ? 'complete' : 'incomplete');
             me.updatedAttenders = [];
             me.deletedAttenders = [];
@@ -1603,6 +1485,31 @@ module Tops {
             me.attenderList([]);
             var code = me.lookupForm.getLookupCode();
             if (code) {
+                me.verifyLookupCode(code);
+            }
+        }
+
+        verifyLookupCode(code: string) {
+            var me = this;
+            var request = code;
+
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Verifying lookup code...');
+            me.peanut.executeService('registration.CheckRegistrationCode', request, me.handleVerifyLookupResponse)
+                .always(function () {
+                    me.application.hideWaiter();
+                });
+        }
+
+        private handleVerifyLookupResponse = (serviceResponse:IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                var code = me.lookupForm.lookupCode();
+                var result = serviceResponse.Value;
+                if (!result) {
+                    me.lookupForm.validationError("Lookup code '"+code+"' is already in use.");
+                    return;
+                }
                 me.registrationForm.contactInfoForm.edit();
                 me.registrationChanged(false);
                 me.attendersChanged(false);
@@ -1617,7 +1524,7 @@ module Tops {
                 }
                 me.editContactInfo();
             }
-        }
+        };
 
         endContactEdit() {
             var me = this;
@@ -1644,7 +1551,7 @@ module Tops {
             me.newAttender();
         }
 
-        saveFinanceInfo = () => {
+        saveFinanceInfo = ()  => {
             var me = this;
             if (!me.registrationForm.financeInfoForm.validate()) {
                 window.location.assign('#account-errors');
@@ -2208,7 +2115,6 @@ module Tops {
                     aidRequested: '',
                 },
                 accountSummary: accountSummary,
-                housingPreference: 'Health House',
                 housingAssignments: [
                     {
                         Text: 'Liz, Terry',

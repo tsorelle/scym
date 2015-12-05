@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * ScymPayment
  *
- * @Table(name="payments")
+ * @Table(name="payments", indexes={@Index(name="payments_registration_fk", columns={"registrationId"})})
  * @Entity  @HasLifecycleCallbacks
  */
 class ScymPayment extends DateStampedEntity implements ICostItem
@@ -57,11 +57,40 @@ class ScymPayment extends DateStampedEntity implements ICostItem
     private $payor;
 
     /**
-     * @var integer
+     * @var ScymRegistration
      *
-     * @Column(name="registrationId", type="integer", nullable=true)
+     * @ManyToOne(targetEntity="ScymRegistration",inversedBy="payments")
+     * @JoinColumn(name="registrationId", referencedColumnName="registrationId")
      */
-    private $registrationid;
+    protected $registration;
+
+    /**
+     * Set registration
+     *
+     * @param ScymRegistration $registration
+     * @return ScymPayment
+     */
+    public function setRegistration(ScymRegistration $registration = null)
+    {
+        $this->registration = $registration;
+
+        return $this;
+    }
+
+    /**
+     * Get registration
+     *
+     * @return ScymRegistration
+     */
+    public function getRegistration()
+    {
+        return $this->registration;
+    }
+
+    public function getRegistrationId()
+    {
+        return $this->registration ? $this->registration->getRegistrationid() : null;
+    }
 
 
     /**
@@ -187,29 +216,6 @@ class ScymPayment extends DateStampedEntity implements ICostItem
     public function getPayor()
     {
         return $this->payor;
-    }
-
-    /**
-     * Set registrationid
-     *
-     * @param integer $registrationid
-     * @return ScymPayment
-     */
-    public function setRegistrationId($registrationid)
-    {
-        $this->registrationid = $registrationid;
-
-        return $this;
-    }
-
-    /**
-     * Get registrationid
-     *
-     * @return integer 
-     */
-    public function getRegistrationId()
-    {
-        return $this->registrationid;
     }
 
 }

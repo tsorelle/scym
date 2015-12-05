@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Charges
  *
- * @Table(name="charges")
+ * @Table(name="charges", indexes={@Index(name="charges_registration_fk", columns={"registrationId"})})
  * @Entity  @HasLifecycleCallbacks
  */
 class ScymCharge extends DateStampedEntity implements ICostItem
@@ -25,11 +25,41 @@ class ScymCharge extends DateStampedEntity implements ICostItem
     private $chargeid;
 
     /**
-     * @var integer
+     * @var ScymRegistration
      *
-     * @Column(name="registrationId", type="integer", nullable=false)
+     * @ManyToOne(targetEntity="ScymRegistration",inversedBy="charges")
+     * @JoinColumn(name="registrationId", referencedColumnName="registrationId")
      */
-    private $registrationid = '0';
+    protected $registration;
+
+    /**
+     * Set registration
+     *
+     * @param ScymRegistration $registration
+     * @return ScymCharge
+     */
+    public function setRegistration(ScymRegistration $registration = null)
+    {
+        $this->registration = $registration;
+
+        return $this;
+    }
+
+    /**
+     * Get registration
+     *
+     * @return ScymRegistration
+     */
+    public function getRegistration()
+    {
+        return $this->registration;
+    }
+
+
+    public function getRegistrationId()
+    {
+        return $this->registration ? $this->registration->getRegistrationid() : null;
+    }
 
     /**
      * @var integer
@@ -68,29 +98,6 @@ class ScymCharge extends DateStampedEntity implements ICostItem
     public function getChargeid()
     {
         return $this->chargeid;
-    }
-
-    /**
-     * Set registrationid
-     *
-     * @param integer $registrationid
-     * @return ScymCharge
-     */
-    public function setRegistrationid($registrationid)
-    {
-        $this->registrationid = $registrationid;
-
-        return $this;
-    }
-
-    /**
-     * Get registrationid
-     *
-     * @return integer 
-     */
-    public function getRegistrationid()
-    {
-        return $this->registrationid;
     }
 
     /**

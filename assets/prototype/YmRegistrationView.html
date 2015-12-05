@@ -198,8 +198,7 @@
                     <div id="reg-status-info" data-bind="visible:registrationStatus() > 1">
                         <div data-bind="visible:registrationStatus() == 2">
                             <p>
-                                You registration has been submitted. After housing assignments are made
-                                you will receive an email message with more details.
+                                You registration has been submitted.
                             </p>
                         </div>
                         <div data-bind="visible:registrationStatus() > 2">
@@ -232,8 +231,11 @@
                         <div>
                             <h4>Housing</h4>
 
-                            <div id="housing-preference" data-bind="visible:!housingAssignmentList().length">
-                                <p data-bind="visible:housingPreference">You requested housing in <span data-bind="text:housingPreference"></span> </p>
+                            <div data-bind="visible:registrationStatus() == 2">
+                                <p>
+                                    Housing assignments will be made based on your preferences. After these assignments are made
+                                    you will receive an email message with more details.
+                                </p>
                             </div>
 
                             <div id="housing-assignments" data-bind="visible:housingAssignmentList().length">

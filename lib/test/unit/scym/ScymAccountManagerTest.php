@@ -9,7 +9,7 @@
 namespace Tops\test\unit\scym;
 
 
-use App\db\api\AttenderCostFacade;
+use App\db\api\AttenderDto;
 use App\db\scym\ScymDonation;
 use App\db\ScymAccountManager;
 use App\db\ScymRegistrationsManager;
@@ -84,11 +84,11 @@ class ScymAccountManagerTest extends \PHPUnit_Framework_TestCase
     {
         $manager = $this->getManager();
         $attender = $this->getFakeAttender();
-        $attenders = array(new AttenderCostFacade($attender));
+        $attenders = array(new AttenderDto($attender));
         $donations = array();
         $aidRequested = 1000.00;
 
-        $account = $manager->calculate($attenders,$donations,$aidRequested);
+        $account = $manager->createAccount($attenders,$donations,$aidRequested);
         $this->assertNotNull($account);
         $expected = 235.00;
         $actual = $account->getChargesTotal();
@@ -118,16 +118,16 @@ class ScymAccountManagerTest extends \PHPUnit_Framework_TestCase
         $attender3->housingTypeId = 14;
 
         $attenders = array(
-            new AttenderCostFacade($attender1),
-            new AttenderCostFacade($attender2),
-            new AttenderCostFacade($attender3)
+            new AttenderDto($attender1),
+            new AttenderDto($attender2),
+            new AttenderDto($attender3)
         );
 
 
         $donations = array();
         $aidRequested = 1000.00;
 
-        $account = $manager->calculate($attenders,$donations,$aidRequested);
+        $account = $manager->createAccount($attenders,$donations,$aidRequested);
         $this->assertNotNull($account);
         // $expected = 309.00;
         // $actual = $account->getChargesTotal();
@@ -159,9 +159,9 @@ class ScymAccountManagerTest extends \PHPUnit_Framework_TestCase
         $attender3->housingTypeId = 14;
 
         $attenders = array(
-            new AttenderCostFacade($attender1),
-            new AttenderCostFacade($attender2),
-            new AttenderCostFacade($attender3)
+            new AttenderDto($attender1),
+            new AttenderDto($attender2),
+            new AttenderDto($attender3)
         );
 
         $donation1 = TKeyValuePair::Create(2,20.00);
@@ -170,7 +170,7 @@ class ScymAccountManagerTest extends \PHPUnit_Framework_TestCase
         $donations = array($donation1,$donation2);
         $aidRequested = 0.0; // 1000.00;
 
-        $account = $manager->calculate($attenders,$donations,$aidRequested);
+        $account = $manager->createAccount($attenders,$donations,$aidRequested);
         $this->assertNotNull($account);
         $expected = 300.00;
         $actual = $account->getAidEligibility();
@@ -202,9 +202,9 @@ class ScymAccountManagerTest extends \PHPUnit_Framework_TestCase
         $attender3->housingTypeId = 14;
 
         $attenders = array(
-            new AttenderCostFacade($attender1),
-            new AttenderCostFacade($attender2),
-            new AttenderCostFacade($attender3)
+            new AttenderDto($attender1),
+            new AttenderDto($attender2),
+            new AttenderDto($attender3)
         );
 
         $donation1 = TKeyValuePair::Create(2,20.00);
@@ -213,7 +213,7 @@ class ScymAccountManagerTest extends \PHPUnit_Framework_TestCase
         $donations = array($donation1,$donation2);
         $aidRequested = 1000.00;
 
-        $account = $manager->calculate($attenders,$donations,$aidRequested);
+        $account = $manager->createAccount($attenders,$donations,$aidRequested);
         $this->assertNotNull($account);
         $expected = 300.00;
         $actual = $account->getAidEligibility();

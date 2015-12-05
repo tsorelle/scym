@@ -148,7 +148,6 @@ declare module Tops {
         registration: IRegistrationInfo;
         accountSummary: IAccountSummary;
         attenderList: IListItem[];
-        housingPreference: string;
         housingAssignments: IListItem[];
     }
 

@@ -8,7 +8,7 @@
 
 namespace App\services\registration;
 
-use App\db\api\AttenderCostFacade;
+use App\db\api\AttenderDto;
 use App\db\api\IAttenderCostInfo;
 use App\db\ScymRegistrationsManager;
 use App\db\ScymAccountManager;
@@ -81,27 +81,15 @@ class GetRegistrationCostCommand  extends TServiceCommand
             $this->addErrorMessage('Invalid request received.');
             return;
         }
-        $attenders = $this->buildAttenderList($request);
+        $attenders = AttenderDto::CreateList($request->attenders);
         $registrationsManager = new ScymRegistrationsManager();
         $accountManager = new ScymAccountManager($registrationsManager);
-        $costs = $accountManager->calculate($attenders);
+        $costs = $accountManager->createAccount($attenders);
         $accountService = new AccountService($registrationsManager);
         $summary = $accountService->formatAccountSummary($costs);
         $summary->funds = ($request->getFundList) ? $registrationsManager->getFundList() : [];
         $this->setReturnValue($summary);
     }
 
-    /**
-     * @param $request
-     * @return IAttenderCostInfo[]
-     */
-    private function buildAttenderList($request)
-    {
-        $result = array();
-        foreach($request->attenders as $attender) {
-            array_push($result,new AttenderCostFacade($attender));
-        }
-        return $result;
-    }
 
 }

@@ -3,18 +3,47 @@
 
 namespace App\db\scym;
 
+use App\db\api\AttenderDto;
 use App\db\api\IAttenderCostInfo;
 use App\db\DateStampedEntity;
 use Doctrine\ORM\Mapping as ORM;
-
+use App\db\scym\ScymMeal;
 /**
  * ScymAttender
  *
- * @Table(name="attenders", indexes={@Index(name="registration_fk", columns={"registrationId"})})
+ * @Table(name="attenders", indexes={@Index(name="attenders_registration_fk", columns={"registrationId"})})
  * @Entity @HasLifecycleCallbacks
  */
 class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
 {
+    public function __construct()
+    {
+        $this->meals = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * @OneToMany(targetEntity="ScymMeal", mappedBy="attender",fetch="EAGER", cascade={"persist", "remove"})
+     */
+    protected $meals;
+
+    public function addMeal(ScymMeal $meal) {
+        $this->meals[] = $meal;
+        $meal->setAttender($this);
+        return $this;
+    }
+
+    public function removeMeal(ScymMeal $meal) {
+        $this->meals->removeElement($meal);
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getMeals()  {
+        return $this->meals;
+    }
+
+
     /**
      * @var integer
      *
@@ -802,37 +831,30 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     }
 
 
-    public function updateFromDataTransferObject($dto)
+    public function updateFromDataTransferObject(AttenderDto $dto)
     {
-        $valid = $this->assignDob($dto->dateOfBirth);
-        if (!$valid) {
-            return false;
-        }
+        $this->attenderId            =  $dto->getAttenderId();
+        $this->firstName             =  $dto->getFirstName();
+        $this->lastName              =  $dto->getLastName();
+        $this->middleName            =  $dto->getMiddleName();
+        $this->affiliationCode       =  $dto->getAffiliationCode();
+        $this->otherAffiliation      =  $dto->getOtherAffiliation();
+        $this->firstTimer            =  $dto->getFirstTimer();
+        $this->notes                 =  $dto->getNotes();
+        $this->linens                =  $dto->getLinens();
+        $this->specialNeedsTypeId    =  $dto->getSpecialNeedsTypeId();
+        $this->arrivalTime           =  $dto->getArrivalTime();
+        $this->departureTime         =  $dto->getDepartureTime();
+        $this->housingTypeId         =  $dto->getHousingTypeId();
+        $this->vegetarian            =  $dto->getVegetarian();
+        $this->attended              =  $dto->getAttended();
+        $this->generationId          =  $dto->getGenerationId();
+        $this->gradeLevel            =  $dto->getGradeLevel();
+        $this->ageGroupId            =  $dto->getAgeGroupId();
+        $this->creditTypeId          =  $dto->getCreditTypeId();
+        $this->singleOccupant        =  $dto->getSingleOccupant();
+        $this->glutenFree            =  $dto->getGlutenFree();
 
-        $this->attenderId            =  $dto->attenderId;
-        $this->firstName             =  $dto->firstName;
-        $this->lastName              =  $dto->lastName;
-        $this->middleName            =  $dto->middleName;
-        $this->affiliationCode         =  $dto->affiliationCode;
-        $this->otherAffiliation      =  $dto->otherAffiliation;
-        $this->firstTimer            =  $dto->firstTimer;
-        $this->teacher               =  $dto->teacher;
-        $this->financialAidRequested =  $dto->financialAidRequested;
-        $this->guest                 =  $dto->guest;
-        $this->notes                 =  $dto->notes;
-        $this->linens                =  $dto->linens;
-        $this->specialNeedsTypeId          =  $dto->specialNeedsTypeId;
-        $this->arrivalTime           =  $dto->arrivalTime;
-        $this->departureTime         =  $dto->departureTime;
-        $this->housingTypeId         =  $dto->housingTypeId;
-        $this->vegetarian            =  $dto->vegetarian;
-        $this->attended              =  $dto->attended;
-        $this->generationId            =  $dto->generationId;
-        $this->gradeLevel            =  $dto->gradeLevel;
-        $this->ageGroupId            =  $dto->ageGroupId;
-        $this->creditTypeId          =  $dto->creditTypeId;
-        $this->singleOccupant        =  $dto->singleOccupant;
-        $this->glutenFree            =  $dto->glutenFree;
         return true;
     }
 
@@ -859,22 +881,80 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
         $result->housingTypeId         =  $this->housingTypeId;
         $result->vegetarian            =  $this->vegetarian;
         $result->attended              =  $this->attended;
-        $result->generationId            =  $this->generationId;
+        $result->generationId          =  $this->generationId;
         $result->gradeLevel            =  $this->gradeLevel;
         $result->ageGroupId            =  $this->ageGroupId;
-        $result->creditTypeId           =  $this->creditTypeId;
+        $result->creditTypeId          =  $this->creditTypeId;
         $result->singleOccupant        =  $this->singleOccupant;
         $result->glutenFree            =  $this->glutenFree;
 
         return $result;
     }
 
-    /**
-     * @return int[]
-     */
-    public function getMeals()
-    {
-        return array();
-        // TODO: Implement getMeals() method.
+    public static function CreateAttender(AttenderDto $dto) {
+        $result = new ScymAttender();
+        $result->updateFromDataTransferObject($dto);
+        $meals = $dto->getMeals();
+        if ($meals !== null) {
+           $result->addMeals($meals);
+        }
+        return $result;
     }
+
+    public function addNewMeal($mealtime)
+    {
+        $meal = new ScymMeal();
+        $meal->setMealtime($mealtime);
+        $this->addMeal($meal);
+    }
+
+    public function addMeals(array $mealtimes) {
+        if ($mealtimes !== null) {
+            foreach ($mealtimes as $mealtime) {
+                if (!$this->meals->contains($mealtime)) {
+                    $this->addNewMeal($mealtime);
+                }
+            }
+        }
+    }
+
+
+    public function updateMeals(array $mealtimes) {
+        $meals = $this->meals->toArray();
+        $currentMeals = array();
+
+        $removed = array();
+        foreach ($meals as $meal) {
+            /**
+             * @var $meal ScymMeal
+             */
+            if (!in_array($meal->getMealtime(),$mealtimes)) {
+                $this->meals->removeElement($meal);
+                array_push($removed,$meal);
+            }
+            else {
+                array_push($currentMeals,$meal->getMealtime());
+            }
+        }
+        foreach ($mealtimes as $mealtime) {
+            if (!in_array($mealtime,$currentMeals)) {
+                $this->addNewMeal($mealtime);
+            }
+        }
+        return $removed;
+    }
+
+    public function getFullName() {
+        $result = $this->firstName ? trim($this->firstName) : '';
+        $middle = $this->middleName ? trim($this->middleName) : '';
+        $last = $this->lastName ? trim($this->lastName) : '';
+        if ($this->middleName) {
+            $result .=  $result ? " $this->middleName" : $this->middleName;
+        }
+        if ($this->lastName) {
+            $result .=  $result ? " $this->lastName" : $this->lastName;
+        }
+        return $result;
+    }
+
 }

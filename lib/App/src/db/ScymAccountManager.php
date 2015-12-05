@@ -135,11 +135,12 @@ class ScymAccountManager
         $feeCode = ($attender->getGenerationId() == self::GENERATION_ADULT) ? 'DAY' : 'YOUTHDAY';
         $this->addAttenderItem($attender,$feeCode,"$days days",$days);
         $meals = $attender->getMeals();
-        $mealCount = count($meals);
-        if (!empty($mealCount)) {
-            $this->addAttenderItem($attender,'MEAL',"$mealCount meals",$mealCount);
+        if ($meals !== null) {
+            $mealCount = count($meals);
+            if (!empty($mealCount)) {
+                $this->addAttenderItem($attender, 'MEAL', "$mealCount meals", $mealCount);
+            }
         }
-
     }
 
     private function calcForAdult(IAttenderCostInfo $attender) {
@@ -190,9 +191,6 @@ class ScymAccountManager
 
     private function addCredit($amount,$creditTypeId,$description) {
         $credit = ScymCredit::newCredit($amount,$description,$creditTypeId);
-        if ($this->registrationId) {
-            $credit->setRegistrationid($this->registrationId);
-        }
         array_push($this->credits,$credit);
     }
 
@@ -220,9 +218,6 @@ class ScymAccountManager
 
     private function addCharge($amount,$feeTypeId,$basis,$canWaive = true) {
         $charge = ScymCharge::newCharge($amount,$basis,$feeTypeId);
-        if ($this->registrationId) {
-            $charge->setRegistrationid($this->registrationId);
-        }
         array_push($this->charges,$charge);
         if ($canWaive) {
             $this->aidEligibleTotal += $amount;
@@ -231,9 +226,6 @@ class ScymAccountManager
 
     private function addDonation($amount,$donationTypeId) {
         $donation = ScymDonation::createDonation($donationTypeId,$amount);
-        if ($this->registrationId) {
-            $donation->setRegistrationid($this->registrationId);
-        }
         array_push($this->donations,$donation);
     }
 
@@ -281,7 +273,7 @@ class ScymAccountManager
      * @param float $aidRequested
      * @return RegistrationAccount
      */
-    public function calculate(array $attenders, array $donations = array(), $aidRequested = 0.0)
+    public function createAccount(array $attenders, array $donations = array(), $aidRequested = 0.0)
     {
         $this->payments = array();
         $this->registrationId = 0;
@@ -290,35 +282,4 @@ class ScymAccountManager
         return $result;
     }
 
-    /*
-    public function recalculateForRegistration($registrationId)
-    {
-        $registration = $this->registrationsManager->getRegistration($registrationId);
-        return $this->recalculate($registration);
-    }
-    */
-
-    public function recalculate(ScymRegistration $registration)
-    {
-        $this->registrationId = $registration->getRegistrationId();
-
-        // todo: get donations
-        $donations = array(); // fake for now
-
-        // todo: get payments for registration
-        $this->payments = array(); // fake for now
-
-        // todo: clear existing items
-
-        $account = $this->buildAccount(
-            $registration->getYear(),
-            $registration->getReceivedDate(),
-            $registration->getAttenders()->toArray(),
-            $donations,
-            $registration->getFinancialAidRequested());
-
-        // todo: add new items
-
-        return $account;
-    }
 }

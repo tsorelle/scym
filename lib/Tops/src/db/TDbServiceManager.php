@@ -61,11 +61,22 @@ class TDbServiceManager
     }
 
 
-
+    /**
+     * Flush changes and reset entity manager.
+     */
     public function saveChanges() {
         if ($this->entityManager != null) {
             $this->entityManager->flush();
             $this->entityManager = null;
+        }
+    }
+
+    /**
+     * Flush changes, keep entity manager.  For intemediate updates.
+     */
+    public function flush() {
+        if ($this->entityManager != null) {
+            $this->entityManager->flush();
         }
     }
 

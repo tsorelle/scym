@@ -3,19 +3,23 @@
 
 namespace App\db\scym;
 
+use App\db\api\AttenderDto;
+use App\db\api\RegistrationAccount;
+use App\db\api\RegistrationDto;
 use App\db\DateStampedEntity;
 use Doctrine\ORM\Mapping as ORM;
+use Tops\sys\TListItem;
 
 /**
  * ScymRegistration
  *
- * @Table(name="registrations")
- * @Entity
+ * @Table(name="registrations", uniqueConstraints={@UniqueConstraint(name="registrationcode_idx", columns={"registrationCode"})})
+ * @Entity @HasLifecycleCallbacks
  */
-class ScymRegistration extends DateStampedEntity
+class ScymRegistration extends DateStampedEntity implements IRegistration
 {
     /**
-     * @OneToMany(targetEntity="ScymAttender", mappedBy="registration",fetch="EAGER")
+     * @OneToMany(targetEntity="ScymAttender", mappedBy="registration",fetch="EXTRA_LAZY", cascade={"persist", "remove"})
      */
     protected $attenders;
 
@@ -29,8 +33,129 @@ class ScymRegistration extends DateStampedEntity
         $this->attenders->removeElement($attender);
     }
 
+    public function findAttender($id) {
+        $attenders = $this->getAttenderList();
+        foreach ($attenders as $attender) {
+            /**
+             * @var $attender ScymAttender
+             */
+            if ($attender->getAttenderId() == $id) {
+                return $attender;
+            }
+        }
+        return null;
+    }
+
+    public function removeAttenderById($id) {
+        $attender = $this->findAttender($id);
+        if ($attender) {
+            $this->attenders->removeElement($attender);
+        }
+        return $attender;
+    }
+
+    public function removeAccountItems() {
+        $removed = array();
+        $credits = $this->getCredits()->toArray();
+        foreach ($credits as $credit) {
+            /**
+             * @var $credit ScymCredit
+             */
+            if ($credit->getCreditid() != 999) { // do not remove manually entered credit
+                $this->credits->removeElement($credit);
+                array_push($removed,$credit);
+            }
+        }
+
+        $charges = $this->getCharges()->toArray();
+        foreach ($charges as $charge) {
+            /**
+             * @var $charge ScymCharge
+             */
+            if ($charge->getFeetypeid() != 999) { // do not remove manually entered charge
+                $this->charges->removeElement($charge);
+                array_push($removed,$charge);
+            }
+        }
+        return $removed;
+    }
+
+    /**
+     * @OneToMany(targetEntity="ScymCharge", mappedBy="registration",fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     */
+    protected $charges;
+
+    public function addcharge(ScymCharge $charge) {
+        $this->charges[] = $charge;
+        $charge->setRegistration($this);
+        return $this;
+    }
+
+    public function removecharge(ScymCharge $charge) {
+        $this->charges->removeElement($charge);
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getCharges()  {
+        return $this->charges;
+    }
+
+    /* ------- Credits -------------------- */
+    /**
+     * @OneToMany(targetEntity="ScymCredit", mappedBy="registration",fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     */
+    protected $credits;
+
+    public function addCredit(ScymCredit $credit) {
+        $this->credits[] = $credit;
+        $credit->setRegistration($this);
+        return $this;
+    }
+
+    public function removeCredit(ScymCredit $credit) {
+        $this->credits->removeElement($credit);
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getCredits()  {
+        return $this->credits;
+    }
+
+    /* -------------- Donations ------------- */
+
+
+    /**
+     * @OneToMany(targetEntity="ScymDonation", mappedBy="registration",fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     */
+    protected $donations;
+
+    public function addDonation(ScymDonation $donation) {
+        $this->donations[] = $donation;
+        $donation->setRegistration($this);
+        return $this;
+    }
+
+    public function removeDonation(ScymDonation $donation) {
+        $this->donations->removeElement($donation);
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getDonations()  {
+        return $this->donations;
+    }
+
     public function __construct() {
         $this->attenders = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->charges = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->credits = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->donations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -39,6 +164,32 @@ class ScymRegistration extends DateStampedEntity
     public function getAttenders()  {
         return $this->attenders;
     }
+
+    /* ------------ Payments --------------- */
+
+    /**
+     * @OneToMany(targetEntity="ScymPayment", mappedBy="registration",fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     */
+    protected $payments;
+
+    public function addPayment(ScymPayment $payment) {
+        $this->payments[] = $payment;
+        $payment->setRegistration($this);
+        return $this;
+    }
+
+    public function removePayment(ScymPayment $payment) {
+        $this->payments->removeElement($payment);
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getPayments()  {
+        return $this->payments;
+    }
+
+
 
     /**
      * @var integer
@@ -66,7 +217,7 @@ class ScymRegistration extends DateStampedEntity
     /**
      * @var string
      *
-     * @Column(name="registrationCode", type="string", length=100, nullable=true)
+     * @Column(name="registrationCode", type="string", length=100, nullable=false)
      */
     private $registrationCode;
 
@@ -878,42 +1029,106 @@ class ScymRegistration extends DateStampedEntity
         return $result;
     }
 
-    public function updateFromDataTransferObject(\stdClass $dto)
+    public static function createNewRegistration(RegistrationDto $dto) {
+        $result = new ScymRegistration();
+
+        $result->updateFromDataTransferObject($dto);
+        return $result;
+    }
+
+    public function updateFromDataTransferObject(RegistrationDto $dto, $updateAdminFields = false)
     {
-        $feesReceivedDate = $this->convertDate($dto->feesReceivedDate);
-        $statusDate =  ($dto->statusId != $dto->priorStatus) ?
-            new \DateTime() :
-            $this->convertDefaultDate($dto->statusDate);
-        $receivedDate = $this->convertDefaultDate($dto->receivedDate);
-        if ($feesReceivedDate === false || $statusDate === false || $receivedDate === false) {
-            return false;
+        if ($dto->getRegistrationId() < 1) {
+            $this->statusDate = new \DateTime();
+            $this->statusId = $dto->getStatusId();
+            if ($this->statusId == 2) {
+                $this->receivedDate = new \DateTime();
+            }
+            $this->registrationCode = $dto->getRegistrationCode();
         }
-        $this->statusDate               = $statusDate;
-        $this->receivedDate             = $receivedDate;
-        $this->feesReceivedDate         = $feesReceivedDate;
-        $this->registrationId           = $dto->registrationId;
-        $this->registrationCode         = $dto->registrationCode;
-        $this->name                     = $dto->name;
-        $this->address                  = $dto->address;
-        $this->city                     = $dto->city  ;
-        $this->phone                    = $dto->phone ;
-        $this->email                    = $dto->email ;
-        $this->amountPaid               = $dto->amountPaid;
-        $this->notes                    = $dto->notes ;
-        $this->contactRequested         = $dto->contactRequested;
-        $this->confirmed                = $dto->confirmed;
-        $this->arrivalTime              = $dto->arrivalTime;
-        $this->departureTime            = $dto->departureTime;
-        $this->scymNotes                = $dto->scymNotes;
-        $this->active                   = $dto->active;
-        $this->YMDonation               = $dto->YMDonation;
-        $this->simpleMealDonation       = $dto->simpleMealDonation;
-        $this->financialAidRequested    = $dto->financialAidRequested;
-        $this->financialAidContribution = $dto->financialAidContribution;
-        $this->attended                 = $dto->attended;
-        $this->financialAidAmount       = $dto->financialAidAmount;
-        $this->statusId                 = $dto->statusId;
+        else if ($dto->getStatusId() != $this->statusId) {
+            $this->statusDate = new \DateTime();
+            $this->statusId = $dto->getStatusId();
+        }
+
+        $this->name                     = $dto->getName();
+        $this->address                  = $dto->getAddress();
+        $this->city                     = $dto->getCity();
+        $this->phone                    = $dto->getPhone();
+        $this->email                    = $dto->getEmail();
+        $this->notes                    = $dto->getNotes();
+        $this->contactRequested         = $dto->getContactRequested();
+        $this->financialAidRequested    = $dto->getFinancialAidRequested();
+
+        if ($updateAdminFields) {
+            $this->confirmed = $dto->getConfirmed();
+            $this->scymNotes = $dto->getScymNotes();
+            $this->feesReceivedDate = $dto->getFeesReceivedDate();
+            $this->attended = $dto->getAttended();
+            $this->financialAidAmount = $dto->getFinancialAidAmount();
+            // $this->amountPaid               = $dto->getAmountPaid();
+            // $this->arrivalTime              = $dto->getArrivalTime();
+            // $this->departureTime            = $dto->getDepartureTime();
+        }
 
         return true;
     }
+
+    public function addAccountItems(RegistrationAccount $account) {
+        $charges = $account->getCharges();
+        foreach ($charges as $charge) {
+            $this->addcharge($charge);
+        }
+        $credits = $account->getCredits();
+        foreach ($credits as $credit) {
+            $this->addCredit($credit);
+        }
+        $donations = $account->getDonations();
+        foreach ($donations as $donation) {
+            $this->addDonation($donation);
+        }
+    }
+
+    public function getAttenderList()
+    {
+        $result = array();
+        $attenders = $this->getAttenders()->toArray();
+        foreach ($attenders as $attender) {
+            /**
+             * @var $attender ScymAttender
+             */
+            TListItem::AddToArray($result,$attender->getFullName(),$attender->getAttenderId());
+        }
+        return $result;
+    }
+
+    /**
+     * @param array $attenderUpdates  IAttender[]
+     */
+    public function updateAttenders(array $attenderUpdates) {
+        foreach ($attenderUpdates as $dto) {
+            /**
+             * @var $dto AttenderDto
+             */
+            $id = $dto->getAttenderId();
+            $attender = $this->findAttender($id);
+            $attender->updateFromDataTransferObject($dto);
+            $mealtimes = $dto->getMeals();
+            if ($mealtimes != null) {
+                $attender->updateMeals($mealtimes);
+            }
+        }
+    }
+
+    public function addAttenders(array $newAttenders) {
+        foreach($newAttenders as $dto) {
+            /**
+             * @var $dto AttenderDto
+             */
+            $attender = ScymAttender::CreateAttender($dto);
+            $this->addAttender($attender);
+        }
+
+    }
+
 }
