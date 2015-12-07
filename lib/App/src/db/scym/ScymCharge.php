@@ -162,7 +162,7 @@ class ScymCharge extends DateStampedEntity implements ICostItem
     /**
      * Get amount
      *
-     * @return string 
+     * @return string
      */
     public function getAmount()
     {

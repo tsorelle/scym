@@ -58,7 +58,7 @@ declare module Tops {
         registration : IRegistrationInfo;
         updatedAttenders : IAttender[];
         deletedAttenders : any[];
-        contributions: IKeyValuePair[];
+        donations: IKeyValuePair[];
     }
 
     export interface ICostUpdateRequest {

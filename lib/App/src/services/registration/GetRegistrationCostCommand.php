@@ -83,6 +83,7 @@ class GetRegistrationCostCommand  extends TServiceCommand
         }
         $attenders = AttenderDto::CreateList($request->attenders);
         $registrationsManager = new ScymRegistrationsManager();
+
         $accountManager = new ScymAccountManager($registrationsManager);
         $costs = $accountManager->createAccount($attenders);
         $accountService = new AccountService($registrationsManager);

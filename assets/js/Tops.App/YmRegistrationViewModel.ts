@@ -1120,18 +1120,7 @@ module Tops {
             me.application.hideServiceMessages();
             me.application.showWaiter('Saving changes...');
 
-            // todo: saveChanges service
-            /*
-            // fakes
-            var data = me.getFakeRegistration();
-            var fakeResponse = new fakeServiceResponse(data);
-            me.handleSaveChangesResponse(fakeResponse);
-            me.application.hideWaiter();
-
-            //** end fakes
-            */
-
-             me.peanut.executeService('registration.SaveRegistrationChanges',request, me.handleSaveChangesResponse)
+            me.peanut.executeService('registration.SaveRegistrationChanges',request, me.handleSaveChangesResponse)
                 .always(function() {
                     me.application.hideWaiter();
                 });
@@ -1329,19 +1318,6 @@ module Tops {
             me.application.showWaiter('Loading...');
 
 
-            //testing stub...
-            /*
-             var fakeResponse = me.getFakeInitResponse();
-             me.handleInitializationResponse(fakeResponse);
-             me.application.hideWaiter();
-             if (successFunction) {
-             successFunction();
-             }
-             */
-            //****** End fake
-
-            // service call
-
             var request = null;
             me.peanut.executeService('registration.registrationInit', request, me.handleInitializationResponse)
                 .always(function () {
@@ -1376,48 +1352,33 @@ module Tops {
 
         public getRegistration() {
             var me = this;
-            var request = me.user.registrationId();
-
+            var request = {type: 'id', value: me.user.registrationId()};
             me.application.hideServiceMessages();
             me.application.showWaiter('Getting your registration...');
-
-            // ** fake **
-            // todo: getRegistration service
-            me.fakeRegistrationService();
-
-            /*
-             me.peanut.executeService('registration.GetRegistration',request, me.handleServiceResponseTemplate)
-             .always(function() {
-             me.application.hideWaiter();
+             me.peanut.executeService('registration.GetRegistration',request, me.handleRegistrationResponse)
+                .always(function() {
+                    me.application.hideWaiter();
              });
-             */
         }
 
         public findRegistration() {
             var me = this;
             var code = me.lookupForm.getLookupCode();
+            var request = {type: 'code', value: code};
             if (code) {
                 me.application.hideServiceMessages();
                 me.application.showWaiter('Finding registration...');
-
-                // ** fake **
-                // todo: findByLookupCode service
-                me.fakeRegistrationService();
-
-                /*
-                 me.peanut.executeService('registration.findByLookupCode',code, me.handleRegistrationResponse)
-                 .always(function() {
-                 me.application.hideWaiter();
-                 });
-                 */
+                me.peanut.executeService('registration.GetRegistration',request, me.handleRegistrationResponse)
+                    .always(function() {
+                        me.application.hideWaiter();
+                    });
             }
         }
-
 
         private handleRegistrationResponse = (serviceResponse:IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var response = <IRegistrationResponse>serviceResponse.Data;
+                var response = <IRegistrationResponse>serviceResponse.Value;
                 me.loadRegistration(response);
             }
             else {
@@ -2004,10 +1965,10 @@ module Tops {
             var me = this;
             if (me.registrationChanged() || me.attendersChanged()) {
                 var request:IRegistrationUpdateRequest = {
-                    registration: null,
+                    registration: <IRegistrationInfo>{registrationId: me.registrationForm.id()},
                     updatedAttenders: me.updatedAttenders,
                     deletedAttenders: me.deletedAttenders,
-                    contributions: me.registrationForm.financeInfoForm.getDonations()
+                    donations: me.registrationForm.financeInfoForm.getDonations()
                 };
                 if (me.registrationChanged()) {
                     request.registration = <IRegistrationInfo>{};

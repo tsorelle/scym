@@ -282,4 +282,33 @@ class ScymAccountManager
         return $result;
     }
 
+    public function createAccountFromRegistration(ScymRegistration $registration) {
+        $account = $this->createAccount(
+            $registration->getAttenders()->toArray(),
+            $registration->getDonations()->toArray(),
+            $registration->getFinancialAidRequested() );
+        $registration->addAccountItems($account);
+        return $account;
+    }
+
+    public function getAccountFromRegistration(ScymRegistration $registration) {
+        $this->payments = $registration->getPayments()->toArray();
+        $this->charges = $registration->getCharges()->toArray();
+        $this->credits = $registration->getCredits()->toArray();
+        $this->donations = $registration->getDonations()->toArray();
+        $this->registrationId = $registration->getRegistrationId();
+        $this->aidEligibleTotal = 0.00;
+        foreach ($this->charges as $charge) {
+            /**
+             * @var $charge ScymCharge
+             */
+            $fee = $this->fees->getFeeTypeById($charge->getFeetypeid());
+            if ($fee->canWaive) {
+                $this->aidEligibleTotal += (float)$charge->getAmount();
+            }
+        }
+
+        return $this->createAccountObject();
+    }
+
 }

@@ -36,4 +36,16 @@ class FeeTypeManager
         throw new \Exception("Fee code '$feeCode' not found.");
     }
 
+    public function getFeeTypeById($id) {
+        foreach ($this->fees as $fee) {
+            /**
+             * @var $fee FeeTypeDto
+             */
+            if ($fee->feeTypeId == $id) {
+                return $fee;
+            }
+        }
+        return null;
+    }
+
 }

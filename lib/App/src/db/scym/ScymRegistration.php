@@ -34,7 +34,7 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     }
 
     public function findAttender($id) {
-        $attenders = $this->getAttenderList();
+        $attenders = $this->getAttenders();
         foreach ($attenders as $attender) {
             /**
              * @var $attender ScymAttender
@@ -472,8 +472,14 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
      */
     public function setStatusId($statusId)
     {
-        $this->statusId = $statusId;
+        if ($statusId == 1 || $statusId > $this->statusId) {
+            $this->statusDate = new \DateTime();
+        }
+        if ($this->receivedDate == null && $statusId > 1) {
+            $this->receivedDate = new \DateTime();
+        }
 
+        $this->statusId = $statusId;
         return $this;
     }
 
@@ -1039,17 +1045,9 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     public function updateFromDataTransferObject(RegistrationDto $dto, $updateAdminFields = false)
     {
         if ($dto->getRegistrationId() < 1) {
-            $this->statusDate = new \DateTime();
-            $this->statusId = $dto->getStatusId();
-            if ($this->statusId == 2) {
-                $this->receivedDate = new \DateTime();
-            }
             $this->registrationCode = $dto->getRegistrationCode();
         }
-        else if ($dto->getStatusId() != $this->statusId) {
-            $this->statusDate = new \DateTime();
-            $this->statusId = $dto->getStatusId();
-        }
+        $this->setStatusId($dto->getStatusId());
 
         $this->name                     = $dto->getName();
         $this->address                  = $dto->getAddress();
@@ -1061,10 +1059,8 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         $this->financialAidRequested    = $dto->getFinancialAidRequested();
 
         if ($updateAdminFields) {
-            $this->confirmed = $dto->getConfirmed();
             $this->scymNotes = $dto->getScymNotes();
             $this->feesReceivedDate = $dto->getFeesReceivedDate();
-            $this->attended = $dto->getAttended();
             $this->financialAidAmount = $dto->getFinancialAidAmount();
             // $this->amountPaid               = $dto->getAmountPaid();
             // $this->arrivalTime              = $dto->getArrivalTime();
@@ -1089,6 +1085,9 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         }
     }
 
+    /**
+     * @return TListItem[]
+     */
     public function getAttenderList()
     {
         $result = array();
@@ -1111,11 +1110,20 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
              * @var $dto AttenderDto
              */
             $id = $dto->getAttenderId();
-            $attender = $this->findAttender($id);
-            $attender->updateFromDataTransferObject($dto);
-            $mealtimes = $dto->getMeals();
-            if ($mealtimes != null) {
-                $attender->updateMeals($mealtimes);
+            if ($id < 1) {
+                /**
+                 * @var $dto AttenderDto
+                 */
+                $attender = ScymAttender::CreateAttender($dto);
+                $this->addAttender($attender);
+            }
+            else {
+                $attender = $this->findAttender($id);
+                $attender->updateFromDataTransferObject($dto);
+                $mealtimes = $dto->getMeals();
+                if ($mealtimes != null) {
+                    $attender->updateMeals($mealtimes);
+                }
             }
         }
     }

@@ -211,11 +211,13 @@ class ScymRegistrationsManager extends TDbServiceManager
     }
 
     public function deleteAttenders(ScymRegistration $registration, array $attenderIds) {
-        $em = $this->getEntityManager();
-        foreach ($attenderIds as $attenderId) {
-            $attender = $registration->removeAttenderById($attenderId);
-            if ($attender) {
-                $em->remove($attenderId);
+        if (!empty($attenderIds)) {
+            $em = $this->getEntityManager();
+            foreach ($attenderIds as $attenderId) {
+                $attender = $registration->removeAttenderById($attenderId);
+                if ($attender) {
+                    $em->remove($attender);
+                }
             }
         }
     }

@@ -7,80 +7,19 @@
  */
 namespace App\services\registration;
 
-use App\db\api\AttenderDto;
-use App\db\api\RegistrationAccount;
-use App\db\api\RegistrationDto;
-use App\db\scym\ScymAttender;
 use App\db\scym\ScymRegistration;
 use App\db\ScymAccountManager;
 use App\db\ScymRegistrationsManager;
 use Tops\services\TServiceCommand;
+use Tops\sys\TUser;
 
 class SaveRegistrationChangesCommand extends TServiceCommand
 {
     /**
+     *  Service API
      *
      *  ******** Request ********************************
-     *      export interface IRegistrationInfo {
-     *          registrationId : any;
-     *          active : number;
-     *          year : string;
-     *          registrationCode : string;
-     *          statusId : number; // lookup: registration statustypes
-     *          name : string;
-     *          address : string;
-     *          city : string;
-     *          phone : string;
-     *          email : string;
-     *          receivedDate : any;
-     *          amountPaid : any;
-     *          notes : string;
-     *          feesReceivedDate : any;
-     *          arrivalTime : string;
-     *          departureTime : string;
-     *          scymNotes : string;
-     *          statusDate : any;
-     *          confirmed: number;
-     *          aidRequested  : any;
-     *      }
-     *
-     *      export interface IAttender {
-     *          attenderId: any;
-     *          firstName : string;
-     *          lastName : string;
-     *          middleName : string;
-     *          dateOfBirth : any;
-     *          affiliationCode : string;
-     *          otherAffiliation : string;
-     *          firstTimer : number;
-     *          teacher : number;
-     *          financialAidRequested : number;
-     *          guest : number;
-     *          notes : string;
-     *          linens : number;
-     *          arrivalTime  : string;
-     *          departureTime  : string;
-     *          vegetarian : number;
-     *          attended : number;
-     *          singleOccupant : number;
-     *          glutenFree : number;
-     *          changed: boolean;
-     *          housingTypeId : any;
-     *          specialNeedsTypeId : any; // lookup: special needs
-     *          generationId : any; // lookup: generations
-     *          gradeLevel : string; // 'PS','K', 1 .. 13
-     *          ageGroupId : any; // lookup agegroups
-     *          creditTypeId : number; // formerly: feeCredit, lookup: creditTypes
-     *          meals: number[];
-     *      }
-     *
-     *      export interface IRegistrationUpdateRequest {
-     *          registration : IRegistrationInfo;
-     *          updatedAttenders : IAttender[];
-     *          deletedAttenders : number[];
-     *          contributions: IKeyValuePair[];
-     *      }
-     *
+     *  @see App\services\registration\RegistrationUpdateRequest
      *
      *  ******** Response ********************************
      *
@@ -128,62 +67,37 @@ class SaveRegistrationChangesCommand extends TServiceCommand
      *      }
      *
      */
+
+    /**
+     * @var ScymRegistrationsManager
+     */
+    private $registrationsManager;
+    
     protected function run()
     {
-        $request = $this->getRequest();
-        if ($request == null || !isset($request->registration)) {
-            throw new \Exception('No request received.');
+        $request =  new RegistrationUpdateRequest( $this->getRequest());
+        $this->registrationsManager = new ScymRegistrationsManager();
+
+        $registration = $request->isNew() ?
+            $this->newRegistration($request) :
+            $this->updateRegistration($request);
+
+        $attenders = $registration->getAttenders()->toArray();
+        if ($registration->getStatusId() == 1 && count($attenders) ) {
+            $registration->setStatusId(2);
         }
-
-        // extract request elements
-        $regInfo = new RegistrationDto($request->registration);
-        $regId = $regInfo->getRegistrationId();
-        $isNew = ($regId < 1);
-        $registrationsManager = new ScymRegistrationsManager();
-
-        $updatedAttenders = (isset($request->updatedAttenders) && is_array($request->updatedAttenders)) ?
-            AttenderDto::CreateList($request->updatedAttenders) :
-            array();
-        $donations = (isset($request->contributions) && is_array($request->contributions)) ?
-            $request->contributions :
-            array();
-
-        $statusId = $regInfo->getStatusId();
-        if ($statusId < 2 && count($updatedAttenders) > 0) {
-            $regInfo->setStatusId(2);
-        }
-
-        if ($isNew) {
-            // create new registration
-            $registration = ScymRegistration::createNewRegistration($regInfo);
-            $registration->addAttenders($updatedAttenders);
-        }
-        else {
-            // update existing
-            $registration = $registrationsManager->getRegistration($regId);
-            $registration->updateFromDataTransferObject($regInfo);
-            if (isset($request->deletedAttenders) && is_array($request->deletedAttenders)) {
-                $registrationsManager->deleteAttenders($registration,$request->deletedAttenders);
-            }
-            $registration->updateAttenders($updatedAttenders);
-            $registrationsManager->clearAccountItems($registration);
-        }
-
-
 
         // save initial changes
-        $registrationsManager->updateEntity($registration);
+        $this->registrationsManager->updateEntity($registration);
 
 
         // build account and summary
-        $accountManager = new ScymAccountManager($registrationsManager);
-        $account = $accountManager->createAccount($registration->getAttenders()->toArray(),
-            $donations,$registration->getFinancialAidRequested() );
-        $registration->addAccountItems($account);
-        $registrationsManager->updateEntity($registration); // save account items
+        $accountManager = new ScymAccountManager($this->registrationsManager);
+        $account = $accountManager->createAccountFromRegistration($registration);
+        $this->registrationsManager->updateEntity($registration); // save account items
 
         // build response
-        $accountService = new AccountService($registrationsManager);
+        $accountService = new AccountService($this->registrationsManager);
         $response = new \StdClass();
         $response->accountSummary = $accountService->formatAccountSummary($account);
         $response->registration = $registration->getDataTransferObject();
@@ -193,5 +107,42 @@ class SaveRegistrationChangesCommand extends TServiceCommand
 
         $this->setReturnValue($response);
 
+    }
+
+    /**
+     * @param $request RegistrationUpdateRequest
+     * @return ScymRegistration
+     */
+    private function newRegistration($request)
+    {
+        $regInfo = $request->getRegistrationInfo();
+        $registration = ScymRegistration::createNewRegistration($regInfo);
+        $registration->addAttenders($request->getUpdatedAttenders());
+        $user = TUser::getCurrent();
+        if ($user->isAuthenticated()) {
+            $userName = $user->getUserName();
+            $userRegId = $this->registrationsManager->getUserRegistrationId($userName,$regInfo->getYear());
+            if (!$userRegId) {
+                $registration->setUsername($userName);
+            }
+        }
+        return $registration;
+    }
+
+    /**
+     * @param $request RegistrationUpdateRequest
+     * @return ScymRegistration
+     */
+    protected function updateRegistration($request)
+    {
+        $registration = $this->registrationsManager->getRegistration($request->getRegistrationId());
+        if ($request->isComplete()) {
+            $registration->updateFromDataTransferObject($request->getRegistrationInfo());
+        }
+        $this->registrationsManager->deleteAttenders($registration, $request->getDeletedAttenders());
+        $attenders = $request->getUpdatedAttenders();
+        $registration->updateAttenders($attenders);
+        $this->registrationsManager->clearAccountItems($registration);
+        return $registration;
     }
 }

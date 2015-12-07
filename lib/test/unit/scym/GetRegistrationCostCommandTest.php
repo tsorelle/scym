@@ -6,6 +6,7 @@
  * Time: 9:26 AM
  */
 use App\services\registration\GetRegistrationCostCommand;
+use App\services\registration\SaveRegistrationChangesCommand;
 
 class RegistrationCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -236,4 +237,6 @@ class RegistrationCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual->aidEligibility);
 
     }
+
+
 }
