@@ -98,7 +98,7 @@ class AccountService
              * @var $donation ScymDonation
              */
             $item = $this->makeLookupItem($donation,$this->getDonationType($donation));
-            $item->key = $donation->getDonationid();
+            $item->Key = $donation->getDonationtypeid();
             array_push($result,$item);
         }
         return $result;

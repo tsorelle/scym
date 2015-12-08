@@ -51,7 +51,7 @@ class SaveRegistrationChangesCommandTest extends \PHPUnit_Framework_TestCase
         $dto->notes = $current->getNotes();
         $dto->arrivalTime = $current->getArrivalTime();
         $dto->departureTime = $current->getDepartureTime();
-        $dto->aidRequested  = $current->getFinancialAidRequested();
+        $dto->financialAidAmount  = $current->getFinancialAidAmount();
         $request->registration = $dto;
     }
 

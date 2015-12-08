@@ -130,13 +130,6 @@ interface IRegistration
     public function getScymNotes();
 
     /**
-     * Get financialAidRequested
-     *
-     * @return boolean
-     */
-    public function getFinancialAidRequested();
-
-    /**
      * Get financialAidContribution
      *
      * @return string

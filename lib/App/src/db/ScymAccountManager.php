@@ -31,7 +31,7 @@ class ScymAccountManager
     private $donations = array();
     private $payments = array();
     private $aidEligibleTotal = 0.00;
-    private $aidRequestedTotal = 0.00;
+    private $aidAmountTotal = 0.00;
 
     const THURSDAY = 4;
     const FRIDAY = 5;
@@ -229,9 +229,9 @@ class ScymAccountManager
         array_push($this->donations,$donation);
     }
 
-    private function applyFinancialAid($aidRequested) {
-        if ($aidRequested) {
-            $amount = min($aidRequested, $this->aidEligibleTotal);
+    private function applyFinancialAid($aidAmount) {
+        if ($aidAmount) {
+            $amount = min($aidAmount, $this->aidEligibleTotal);
             if ($amount > 0) {
                 $this->addCredit($amount, self::CREDIT_FINCIAL_AID, 'Financial aid');
             }
@@ -249,36 +249,31 @@ class ScymAccountManager
         return $result;
     }
 
-    private function buildAccount($year, \DateTime $recievedDate, array $attenders, array $donations = array(), $aidRequested = 0.0, array $payments = array())
+    private function buildAccount($year, \DateTime $recievedDate, array $attenders, array $donations = array(), $aidAmount = 0.0, array $payments = array())
     {
         $this->clear();
         $this->payments = $payments;
+        $this->donations = $donations;
         $this->applyLateFee($year, $recievedDate);
         foreach ($attenders as $attender) {
             $this->createAttenderItems($attender);
         }
-        foreach ($donations as $donation) {
-            /**
-             * @var $donation TKeyValuePair
-             */
-            $this->addDonation($donation->Value,$donation->Key);
-        }
-        $this->applyFinancialAid($aidRequested);
+        $this->applyFinancialAid($aidAmount);
         return $this->createAccountObject();
     }
 
     /**
      * @param array $attenders IAttenderCostItem[]
      * @param array $donations TKeyValuePair
-     * @param float $aidRequested
+     * @param float $aidAmount
      * @return RegistrationAccount
      */
-    public function createAccount(array $attenders, array $donations = array(), $aidRequested = 0.0)
+    public function createAccount(array $attenders, array $donations = array(), $aidAmount = 0.0)
     {
         $this->payments = array();
         $this->registrationId = 0;
         $today = new \DateTime();
-        $result = $this->buildAccount(null,$today,$attenders,$donations,$aidRequested);
+        $result = $this->buildAccount(null,$today,$attenders,$donations,$aidAmount);
         return $result;
     }
 
@@ -286,7 +281,7 @@ class ScymAccountManager
         $account = $this->createAccount(
             $registration->getAttenders()->toArray(),
             $registration->getDonations()->toArray(),
-            $registration->getFinancialAidRequested() );
+            $registration->getFinancialAidAmount() );
         $registration->addAccountItems($account);
         return $account;
     }

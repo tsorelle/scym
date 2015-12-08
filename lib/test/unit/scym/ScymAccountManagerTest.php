@@ -164,8 +164,8 @@ class ScymAccountManagerTest extends \PHPUnit_Framework_TestCase
             new AttenderDto($attender3)
         );
 
-        $donation1 = TKeyValuePair::Create(2,20.00);
-        $donation2 = TKeyValuePair::Create(3,10.0);
+        $donation1 = ScymDonation::createDonation(2,20.00);
+        $donation2 = ScymDonation::createDonation(3,10.0);
 
         $donations = array($donation1,$donation2);
         $aidRequested = 0.0; // 1000.00;
@@ -207,8 +207,8 @@ class ScymAccountManagerTest extends \PHPUnit_Framework_TestCase
             new AttenderDto($attender3)
         );
 
-        $donation1 = TKeyValuePair::Create(2,20.00);
-        $donation2 = TKeyValuePair::Create(3,10.0);
+        $donation1 = ScymDonation::createDonation(2,20.00);
+        $donation2 = ScymDonation::createDonation(3,10.0);
 
         $donations = array($donation1,$donation2);
         $aidRequested = 1000.00;

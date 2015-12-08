@@ -82,10 +82,13 @@ class SaveRegistrationChangesCommand extends TServiceCommand
             $this->newRegistration($request) :
             $this->updateRegistration($request);
 
+        $this->registrationsManager->updateDonations($request->getDonations(),$registration);
+
         $attenders = $registration->getAttenders()->toArray();
         if ($registration->getStatusId() == 1 && count($attenders) ) {
             $registration->setStatusId(2);
         }
+
 
         // save initial changes
         $this->registrationsManager->updateEntity($registration);
@@ -145,4 +148,5 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         $this->registrationsManager->clearAccountItems($registration);
         return $registration;
     }
+
 }

@@ -52,6 +52,7 @@ class GetRegistrationCommand extends TServiceCommand
 
         if ($registration == null) {
             $this->addErrorMessage("Registration '$request->value' was not found.");
+            return;
         }
 
         // build account and summary
@@ -62,6 +63,9 @@ class GetRegistrationCommand extends TServiceCommand
         $accountService = new AccountService($manager);
         $response = new \StdClass();
         $response->accountSummary = $accountService->formatAccountSummary($account);
+        $getFundList = isset($request->getFundList) ? $request->getFundList : false;
+        $response->accountSummary->funds = $getFundList ? $manager->getFundList() : [];
+
         $response->registration = $registration->getDataTransferObject();
         $response->attenderList = $registration->getAttenderList();
         // todo: retrieve and format housing assignments

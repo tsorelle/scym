@@ -237,16 +237,6 @@ class RegistrationDto implements IRegistration
     }
 
     /**
-     * Get financialAidRequested
-     *
-     * @return boolean
-     */
-    public function getFinancialAidRequested()
-    {
-        return isset($this->data->aidRequested) ? $this->data->aidRequested : 0.00;
-    }
-
-    /**
      * Get financialAidContribution
      *
      * @return string

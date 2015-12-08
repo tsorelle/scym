@@ -64,7 +64,7 @@ class RegistrationCommandTest extends \PHPUnit_Framework_TestCase
         $request->deletedAttenders = array();
         $request->donations = array();
         $request->getFundList = 0;
-        $request->aidRequested = 0.0;
+        $request->aidAmount = 0.0;
         return $request;
     }
 

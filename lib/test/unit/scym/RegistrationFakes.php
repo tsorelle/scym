@@ -69,7 +69,7 @@ class RegistrationFakes
         $dto->notes = 'notes';
         $dto->arrivalTime = '43';
         $dto->departureTime = '72';
-        $dto->aidRequested = 0.00;
+        $dto->financialAidAmount = 0.00;
         return $dto;
     }
 

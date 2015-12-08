@@ -21,7 +21,7 @@ declare module Tops {
         scymNotes : string;
         statusDate : any;
         confirmed: number;
-        aidRequested  : any;
+        financialAidAmount  : any;
     }
 
     export interface IAttender {
@@ -62,7 +62,7 @@ declare module Tops {
     }
 
     export interface ICostUpdateRequest {
-        aidRequested  : any;
+        aidAmount  : any;
         attenders : IAttender[];
         deletedAttenders : any[];
         donations: IKeyValuePair[];

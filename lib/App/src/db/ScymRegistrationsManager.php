@@ -230,6 +230,18 @@ class ScymRegistrationsManager extends TDbServiceManager
         }
     }
 
+    public function updateDonations(array $donationItems, ScymRegistration $registration) {
+        if ($donationItems != null) {
+            $removed = $registration->updateDonations($donationItems);
+            if (!empty($removed)) {
+                foreach ($removed as $item) {
+                    $em = $this->getEntityManager();
+                    $em->remove($item);
+                }
+            }
+        }
+    }
+
     public function updateMeals(ScymAttender $attender, array $mealtimes)
     {
         $em = $this->getEntityManager();

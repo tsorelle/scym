@@ -145,16 +145,16 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     private $specialNeedsTypeId; // lookup: special needs
 
     /**
-     * @var boolean
+     * @var int
      *
-     * @Column(name="arrivalTime", type="boolean", nullable=true)
+     * @Column(name="arrivalTime", type="integer", nullable=true)
      */
     private $arrivalTime = '41';
 
     /**
-     * @var boolean
+     * @var int
      *
-     * @Column(name="departureTime", type="boolean", nullable=true)
+     * @Column(name="departureTime", type="integer", nullable=true)
      */
     private $departureTime = '72';
 
@@ -180,9 +180,9 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     private $attended = '0';
 
     /**
-     * @var boolean
+     * @var int
      *
-     * @Column(name="generationId", type="boolean", nullable=true)
+     * @Column(name="generationId", type="integer", nullable=true)
      */
     private $generationId = '1'; // lookup: generations
 
@@ -546,7 +546,7 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     /**
      * Set arrivaltime
      *
-     * @param boolean $arrivaltime
+     * @param int $arrivaltime
      * @return ScymAttender
      */
     public function setArrivalTime($arrivaltime)
@@ -559,7 +559,7 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     /**
      * Get arrivaltime
      *
-     * @return boolean
+     * @return int
      */
     public function getArrivalTime()
     {
@@ -569,7 +569,7 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     /**
      * Set departuretime
      *
-     * @param boolean $departuretime
+     * @param int $departuretime
      * @return ScymAttender
      */
     public function setDepartureTime($departuretime)
@@ -582,7 +582,7 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     /**
      * Get departuretime
      *
-     * @return boolean
+     * @return int
      */
     public function getDeparturetime()
     {
@@ -661,7 +661,7 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     /**
      * Set generationId
      *
-     * @param boolean $generationId
+     * @param int $generationId
      * @return ScymAttender
      */
     public function setGenerationId($generationId)
@@ -674,7 +674,7 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     /**
      * Get generationId
      *
-     * @return boolean
+     * @return int
      */
     public function getGenerationId()
     {

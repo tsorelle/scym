@@ -94,8 +94,8 @@ module Tops {
         id = ko.observable(0);
         funds:ILookupItem[] = [];
         fundContributions:KnockoutObservableArray<IIndexedInput> = ko.observableArray([]);
-        aidRequested:KnockoutObservable<any> = ko.observable('');
-        aidRequestedError = ko.observable('');
+        aidAmount:KnockoutObservable<any> = ko.observable('');
+        aidAmountError = ko.observable('');
 
         // summary
         feesList = ko.observableArray<IListItem>();
@@ -108,6 +108,7 @@ module Tops {
         aidEligibility = ko.observable('');
         calculated = ko.observable(false);
         balanceDue:KnockoutObservable<any> = ko.observable();
+        updatedDonationTotal : number = 0.00;
 
         constructor() {
             super();
@@ -122,14 +123,14 @@ module Tops {
             var me = this;
             me.clearValidations();
             me.id(0);
-            me.aidRequested('');
+            me.aidAmount('');
             me.isAssigned = false;
             me.clearAccountSummary();
         }
 
         public clearValidations() {
             var me = this;
-            me.aidRequestedError('');
+            me.aidAmountError('');
 //            me.simpleMealDonationError('');
 //            me.ymDonationError('');
             var donationFields = me.fundContributions.removeAll();
@@ -149,7 +150,7 @@ module Tops {
             var me = this;
             me.id(registration.registrationId);
             me.clearValidations();
-            me.aidRequested(registration.aidRequested);
+            me.aidAmount(registration.financialAidAmount);
             me.fundContributions([]);
             me.isAssigned = true;
         };
@@ -187,6 +188,7 @@ module Tops {
             me.feeTotal(summary.feeTotal);
             me.creditTotal(summary.creditTotal);
             me.donationTotal(summary.donationTotal);
+            me.updatedDonationTotal = me.validateCurrency(summary.donationTotal);
             me.aidEligibility(summary.aidEligibility);
             var balanceDue = me.currencyValue(summary.balance);
             me.balanceDue(balanceDue);
@@ -259,12 +261,29 @@ module Tops {
 
         public updateRegistration = (registration:IRegistrationInfo) => {
             var me = this;
-            registration.aidRequested = me.aidRequested();
+            registration.financialAidAmount = me.aidAmount();
             // registration.ymDonation = me.ymDonation();
             // registration.simpleMealDonation = me.simpleMealDonation();
         };
 
+        getDonationsTotal() {
+            var me = this;
+            var result = 0.00;
+            var contributions = me.fundContributions();
+            _.each(contributions, function (item:IIndexedInput) {
+                var amount = me.validateCurrency(me.aidAmount());
+                if (amount) {
+                    result += amount;
+                }
+            }, me);
+            return result;
+        }
+
+
         validateCurrency(value:string):any {
+            if (!value) {
+                return '';
+            }
             var value = value.replace(/\s+/g, '');
             var value = value.replace(',', '');
             var value = value.replace('$', '');
@@ -289,23 +308,32 @@ module Tops {
             return parts[0] + '.' + parts[1].substring(0, 2);
         };
 
+        public donationsChanged() {
+            var me = this;
+            var currentTotal = me.donationTotal();
+            var total = me.validateCurrency(currentTotal);
+            total = total ? total : 0.00;
+            return me.updatedDonationTotal != total;
+        }
+
         public validate = ():boolean => {
             var me = this;
             me.clearValidations();
             var valid = true;
 
-
-            var amount = me.validateCurrency(me.aidRequested());
+            var aidAmount = me.aidAmount();
+            var amount = me.validateCurrency(me.aidAmount());
             if (amount === false) {
-                me.aidRequestedError(" Invalid amount.");
+                me.aidAmountError(" Invalid amount.");
                 valid = false;
             }
             else {
-                me.aidRequested(amount);
+                me.aidAmount(amount);
             }
 
             var contributions = me.fundContributions();
             me.fundContributions([]);
+            me.updatedDonationTotal = 0.0;
             _.each(contributions, function (item:IIndexedInput) {
                 amount = me.validateCurrency(item.Value);
                 if (amount === false) {
@@ -314,6 +342,7 @@ module Tops {
                 }
                 else {
                     item.Value = amount;
+                    me.updatedDonationTotal += amount;
                 }
             }, me);
             me.setFundContributions(contributions);
@@ -453,6 +482,7 @@ module Tops {
             var me = this;
             registration.registrationId = me.id();
             registration.registrationCode = me.registrationCode();
+            // registration.financialAidAmount
             me.contactInfoForm.updateRegistration(registration);
             me.financeInfoForm.updateRegistration(registration);
         };
@@ -469,7 +499,7 @@ module Tops {
         otherAffiliation = ko.observable('');
         firstTimer = ko.observable(false);
         teacher = ko.observable(false);
-        financialAidRequested = ko.observable(false);
+        // financialAidRequested = ko.observable(false);
         guest = ko.observable(false);
         notes = ko.observable('');
         linens = ko.observable(false);
@@ -575,7 +605,7 @@ module Tops {
             me.otherAffiliation('');
             me.firstTimer(false);
             me.teacher(false);
-            me.financialAidRequested(false);
+            // me.financialAidRequested(false);
             me.guest(false);
             me.notes('');
             me.linens(false);
@@ -797,7 +827,7 @@ module Tops {
             //boolean
             me.firstTimer(attender.firstTimer === 1);
             me.teacher(attender.teacher === 1);
-            me.financialAidRequested(attender.financialAidRequested === 1);
+            // me.financialAidRequested(attender.financialAidRequested === 1);
             me.guest(attender.guest === 1);
             me.linens(attender.linens === 1);
             me.vegetarian(attender.vegetarian === 1);
@@ -837,7 +867,7 @@ module Tops {
             // boolean
             attender.firstTimer = me.firstTimer() ? 1 : 0;
             attender.teacher = me.teacher() ? 1 : 0;
-            attender.financialAidRequested = me.financialAidRequested() ? 1 : 0;
+            // attender.financialAidRequested = me.financialAidRequested() ? 1 : 0;
             attender.guest = me.guest() ? 1 : 0;
             attender.linens = me.linens() ? 1 : 0;
             attender.vegetarian = me.vegetarian() ? 1 : 0;
@@ -1024,6 +1054,7 @@ module Tops {
         balanceInvalid:KnockoutComputed<boolean>; // used on accounts form
 
         private currentRegistration:IRegistrationInfo;
+        private currentDonationsTotal : string = '';
         sessionInfo = new AnnualSessionInfo();
         user = new userObservable();
         registrationStatus = ko.observable(-1);
@@ -1114,7 +1145,7 @@ module Tops {
             var me = this;
             var request = me.getRegistrationChanges();
             if (!request) {
-                me.application.showWarning('No changes were found to save.')
+                me.application.showWarning('No changes were found to save.');
                 return;
             }
             me.application.hideServiceMessages();
@@ -1352,10 +1383,14 @@ module Tops {
 
         public getRegistration() {
             var me = this;
-            var request = {type: 'id', value: me.user.registrationId()};
+            var request = {
+                type: 'id',
+                value: me.user.registrationId(),
+                getFundList: me.registrationForm.financeInfoForm.fundContributions().length > 0 ? 0 : 1
+            };
             me.application.hideServiceMessages();
             me.application.showWaiter('Getting your registration...');
-             me.peanut.executeService('registration.GetRegistration',request, me.handleRegistrationResponse)
+            me.peanut.executeService('registration.GetRegistration',request, me.handleRegistrationResponse)
                 .always(function() {
                     me.application.hideWaiter();
              });
@@ -1364,7 +1399,11 @@ module Tops {
         public findRegistration() {
             var me = this;
             var code = me.lookupForm.getLookupCode();
-            var request = {type: 'code', value: code};
+            var request = {
+                type: 'code',
+                value: code,
+                getFundList: me.registrationForm.financeInfoForm.fundContributions().length > 0 ? 0 : 1
+            };
             if (code) {
                 me.application.hideServiceMessages();
                 me.application.showWaiter('Finding registration...');
@@ -1391,6 +1430,7 @@ module Tops {
             var me = this;
             me.registrationStatus(response.registration.statusId);
             me.currentRegistration = response.registration;
+            me.currentDonationsTotal = response.accountSummary.donationTotal;
             me.registrationForm.assign(response.registration);
             me.attenderList(response.attenderList);
             me.registrationForm.financeInfoForm.assignAccountSummary(response.accountSummary);
@@ -1620,7 +1660,7 @@ module Tops {
         updateCosts = () => {
             var me = this;
             var request:ICostUpdateRequest = {
-                aidRequested: me.registrationForm.financeInfoForm.aidRequested(),
+                aidAmount: me.registrationForm.financeInfoForm.aidAmount(),
                 donations: me.registrationForm.financeInfoForm.getDonations(),
                 attenders: me.updatedAttenders,
                 deletedAttenders: me.deletedAttenders,
@@ -1665,6 +1705,9 @@ module Tops {
             if (!me.registrationForm.financeInfoForm.validate()) {
                 window.location.assign('#account-errors');
                 return;
+            }
+            if (me.registrationForm.financeInfoForm.donationsChanged()) {
+                me.registrationChanged(true);
             }
             me.registrationForm.financeInfoForm.view();
             me.saveChanges();
@@ -1711,6 +1754,9 @@ module Tops {
             if (me.registrationForm.financeInfoForm.viewState() == 'edit') {
                 if (me.registrationForm.financeInfoForm.validate()) {
                     me.registrationForm.financeInfoForm.setViewState();
+                    if (me.registrationForm.financeInfoForm.donationsChanged()) {
+                        me.registrationChanged(true);
+                    }
                 }
                 else {
 //                    me.application.showError('Please complete this form');
@@ -1874,11 +1920,11 @@ module Tops {
 
 
             /*
-             me.peanut.executeService('registration.getAttender',request, me.handleGetAttenderResponse)
-             .always(function() {
-             me.application.hideWaiter();
-             });
-             */
+            me.peanut.executeService('registration.getAttender',request, me.handleGetAttenderResponse)
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+                */
         }
 
         private handleGetAttenderResponse = (serviceResponse:IServiceResponse) => {
@@ -1963,14 +2009,15 @@ module Tops {
 
         getRegistrationChanges() {
             var me = this;
+            var registrationId = me.registrationForm.id();
             if (me.registrationChanged() || me.attendersChanged()) {
                 var request:IRegistrationUpdateRequest = {
-                    registration: <IRegistrationInfo>{registrationId: me.registrationForm.id()},
+                    registration: <IRegistrationInfo>{registrationId: registrationId},
                     updatedAttenders: me.updatedAttenders,
                     deletedAttenders: me.deletedAttenders,
                     donations: me.registrationForm.financeInfoForm.getDonations()
                 };
-                if (me.registrationChanged()) {
+                if (me.registrationChanged() || registrationId < 1) {
                     request.registration = <IRegistrationInfo>{};
                     me.registrationForm.updateRegistration(<IRegistrationInfo>request.registration);
                 }
@@ -2073,7 +2120,7 @@ module Tops {
                     statusDate: '10/1/2015',
                     // ymDonation: '',
                     // simpleMealDonation: '',
-                    aidRequested: '',
+                    financialAidAmount: '',
                 },
                 accountSummary: accountSummary,
                 housingAssignments: [

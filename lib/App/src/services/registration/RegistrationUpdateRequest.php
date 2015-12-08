@@ -146,7 +146,7 @@ class RegistrationUpdateRequest
     public function getDonations() {
         return   (isset($this->request->donations) && is_array($this->request->donations)) ?
             $this->request->donations :
-            array();
+            null;
     }
     public function getStatusId() {
         return $this->regInfo->getStatusId();

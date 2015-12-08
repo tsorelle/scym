@@ -8,6 +8,7 @@ use App\db\api\RegistrationAccount;
 use App\db\api\RegistrationDto;
 use App\db\DateStampedEntity;
 use Doctrine\ORM\Mapping as ORM;
+use Tops\sys\TKeyValuePair;
 use Tops\sys\TListItem;
 
 /**
@@ -77,6 +78,29 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
                 array_push($removed,$charge);
             }
         }
+
+        return $removed;
+    }
+
+    public function updateDonations(array $donationItems) {
+        $removed = array();
+        $donations = $this->getDonations()->toArray();
+        foreach ($donations as $donation) {
+            /**
+             * @var $charge ScymDonation
+             */
+            $this->donations->removeElement($donation);
+            array_push($removed,$donation);
+        }
+
+        foreach ($donationItems as $donationItem) {
+            /**
+             * @var $donationItem TKeyValuePair
+             */
+            $newDonation = ScymDonation::createDonation($donationItem->Key,$donationItem->Value);
+            $this->addDonation($newDonation);
+        }
+
         return $removed;
     }
 
@@ -142,6 +166,7 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     public function removeDonation(ScymDonation $donation) {
         $this->donations->removeElement($donation);
     }
+
 
     /**
      * @return \Doctrine\Common\Collections\ArrayCollection
@@ -926,7 +951,7 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
      *
      * @return boolean 
      */
-    public function getFinancialAidRequested()
+    public function getAidAmount()
     {
         return $this->financialAidRequested;
     }
@@ -1056,12 +1081,12 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         $this->email                    = $dto->getEmail();
         $this->notes                    = $dto->getNotes();
         $this->contactRequested         = $dto->getContactRequested();
-        $this->financialAidRequested    = $dto->getFinancialAidRequested();
+        $this->financialAidAmount       = $dto->getFinancialAidAmount();
 
         if ($updateAdminFields) {
             $this->scymNotes = $dto->getScymNotes();
             $this->feesReceivedDate = $dto->getFeesReceivedDate();
-            $this->financialAidAmount = $dto->getFinancialAidAmount();
+            // $this->financialAidAmount = $dto->getFinancialAidAmount();
             // $this->amountPaid               = $dto->getAmountPaid();
             // $this->arrivalTime              = $dto->getArrivalTime();
             // $this->departureTime            = $dto->getDepartureTime();
@@ -1078,10 +1103,6 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         $credits = $account->getCredits();
         foreach ($credits as $credit) {
             $this->addCredit($credit);
-        }
-        $donations = $account->getDonations();
-        foreach ($donations as $donation) {
-            $this->addDonation($donation);
         }
     }
 
