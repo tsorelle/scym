@@ -11,17 +11,21 @@ namespace App\db;
 use App\db\api\CreditTypeDto;
 use App\db\api\HousingTypeDto;
 use App\db\scym\api\IAttender;
+use App\db\scym\ScymAgeGroup;
 use App\db\scym\ScymAnnualSession;
 use App\db\scym\ScymAttender;
 use App\db\scym\ScymCreditType;
 use App\db\scym\ScymDonationType;
 use App\db\scym\ScymFee;
 use App\db\scym\ScymHousingType;
+use App\db\scym\ScymMeeting;
 use App\db\scym\ScymRegistration;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Tops\db\TDbServiceManager;
 use Tops\sys\TListItem;
+use Tops\sys\TLookupItem;
+use Tops\sys\TNameValuePair;
 
 class ScymRegistrationsManager extends TDbServiceManager
 {
@@ -144,6 +148,45 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $result;
     }
 
+    /* service contract
+     *  export interface IHousingTypeListItem extends IListItem {
+     *      category: any;
+     *  }
+     *
+     *  export interface IListItem {
+     *      Text: string;
+     *      Value: any;
+     *      Description: string;
+     *  }
+     */
+
+    /**
+     * @return array
+     */
+    public function getHousingTypeList() {
+        $repository =  $this->getRepository('App\db\scym\ScymHousingType');
+        $types = $repository->findBy(array('active' => 1));
+        $result = array();
+        $categories = array(
+          0 => 'Charged for meals.',
+            1 => 'Dorm rate.',
+            2 => 'Cabin rate',
+            3 => 'Motel rate'
+        );
+        foreach ($types as $type) {
+            /**
+             * @var $type ScymHousingType
+             */
+            $item = new \stdClass();
+            $item->Text = $type->getHousingTypeDescription();
+            $item->Value = $type->getHousingTypeId();
+            $item->category = $type->getCategory();
+            $item->Description = $categories[$item->category];
+            array_push($result,$item);
+        }
+        return $result;
+    }
+
     /**
      * @param $id
      * @return ScymRegistration
@@ -249,5 +292,82 @@ class ScymRegistrationsManager extends TDbServiceManager
         foreach ($removed as $meal) {
             $em->remove($meal);
         }
+    }
+
+    /**
+     * @param $id
+     * @return ScymAttender
+     * @throws \Exception
+     */
+    public function getAttender($id) {
+        $repository =  $this->getRepository('App\db\scym\ScymAttender');
+        $result = $repository->find($id);
+        if ($result == null) {
+            throw new \Exception("Cannot find attender #$id");
+        }
+        return $result;
+    }
+
+    /**
+     * @return TLookupItem[]
+     *
+     * Used on attender form
+     */
+    public function getAffiliationCodeLookup()
+    {
+        $result = array();
+        $repository = $this->getRepository('App\db\scym\ScymMeeting');
+        $meetings = $repository->findBy(
+            array('active'=> '1'),
+            array('meetingname' => 'ASC')
+        );
+
+        foreach ($meetings as $meeting) {
+            /**
+             * @var $meeting ScymMeeting
+             */
+            TListItem::AddToArray($result,$meeting->getMeetingname(),$meeting->getAffiliationcode());
+        }
+        return $result;
+    }
+
+
+    /**
+     * @return array
+     *  Service contract:
+     *  export interface IListItem {
+     *      Text: string;
+     *      Value: any;
+     *      Description: string;
+     *  }
+     *
+     *  export interface IAgeGroup extends IListItem {
+     *      cutoffAge : any;
+     *  }
+     *
+     */
+    public function getAgeGroupList() {
+        $repository =  $this->getRepository('App\db\scym\ScymAgeGroup');
+        $ageGroups = $repository->findAll();
+        $result = array();
+        $priorAge = 0;
+        foreach ($ageGroups as $ageGroup) {
+            /**
+             * @var $ageGroup ScymAgeGroup
+             */
+            if ($ageGroup->getActive()) {
+                $item = new \stdClass();
+                $item->Text = $ageGroup->getGroupName();
+                $item->Value = $ageGroup->getAgeGroupId();
+                $item->cutoffAge = $ageGroup->getCutoffAge();
+                $startAge = $priorAge == 0 ? 'Infant ' : "Age ".($priorAge + 1);
+                $item->Description = "$startAge to $item->cutoffAge.";
+                $priorAge = $item->cutoffAge;
+
+                array_push($result,$item);
+            }
+        }
+
+        return $result;
     }
 }

@@ -50,6 +50,11 @@ class ScymDirectoryManager extends TDbServiceManager
         return $result;
     }
 
+    /**
+     * @return TNameValuePair[]
+     *
+     * Used on Meetings page.
+     */
     public function getAffiliationCodeList()
     {
         $result = array();

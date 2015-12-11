@@ -183,7 +183,7 @@ class AttenderDto implements IAttenderCostInfo
      * @return string
      */
     public function getOtherAffiliation() {
-        return isset($this->data->affiliationCode) ? $this->data->affiliationCode : 'NONE';
+        return isset($this->data->otherAffiliation) ? $this->data->otherAffiliation : 'NONE';
     }
 
     /**
@@ -241,7 +241,7 @@ class AttenderDto implements IAttenderCostInfo
     }
 
     public function getAttended() {
-        return isset($this->data->attended) ?   !empty($this->data->attended)  : false;
+        return isset($this->data->attended) ?   !empty($this->data->attended)  : null;
     }
 
     public static function CreateList(array $attenders)

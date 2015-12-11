@@ -9,8 +9,12 @@
                 <h3 data-bind="text:bodyText"></h3>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bind="click: confirmClick">OK</button>
-                <button type="button" class="btn btn-default"  data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" data-bind="click: confirmClick">
+                    <span data-bind="text:okLabel"></span>
+                </button>
+                <button type="button" class="btn btn-default"  data-dismiss="modal">
+                    <span data-bind="text:cancelLabel"></span>
+                </button>
             </div>
         </div>
     </div>

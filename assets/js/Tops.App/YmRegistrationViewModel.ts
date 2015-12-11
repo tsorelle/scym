@@ -97,6 +97,10 @@ module Tops {
         aidAmount:KnockoutObservable<any> = ko.observable('');
         aidAmountError = ko.observable('');
 
+        // for reset
+        financialAidAmount: any = '';
+        donations : IIndexedItem[] = [];
+
         // summary
         feesList = ko.observableArray<IListItem>();
         creditsList = ko.observableArray<IListItem>();
@@ -150,9 +154,17 @@ module Tops {
             var me = this;
             me.id(registration.registrationId);
             me.clearValidations();
+            me.financialAidAmount = registration.financialAidAmount;
             me.aidAmount(registration.financialAidAmount);
             me.fundContributions([]);
             me.isAssigned = true;
+        };
+
+        public reset = () => {
+            var me = this;
+            me.clearValidations();
+            me.aidAmount(me.financialAidAmount);
+            me.setDonations(me.donations);
         };
 
         private clearAccountSummary() {
@@ -167,7 +179,7 @@ module Tops {
             me.balanceDue(null);
             me.calculated(false);
             me.balance("Not calculated yet");
-            me.setDonations([]);
+            me.setDonations(me.donations);
         }
 
         private currencyValue(stringValue: string) {
@@ -213,6 +225,7 @@ module Tops {
             if (summary.funds && summary.funds.length > 0) {
                 me.funds = summary.funds;
             }
+            me.donations = summary.donations;
             me.setDonations(summary.donations);
         };
 
@@ -460,7 +473,6 @@ module Tops {
         registrationCode = ko.observable('');
         contactInfoForm = new contactInfoObservable();
         financeInfoForm = new financeInfoObservable();
-        confirmed = ko.observable(false);
         familyMembers = ko.observableArray<IFamilyAttender>();
 
         public clear() {
@@ -472,7 +484,6 @@ module Tops {
         public assign(registration:IRegistrationInfo) {
             var me = this;
             me.id(registration.registrationId);
-            me.confirmed(registration.confirmed == 0 ? false : true);
             me.registrationCode(registration.registrationCode);
             me.contactInfoForm.assign(registration);
             me.financeInfoForm.assign(registration);
@@ -1087,6 +1098,7 @@ module Tops {
         contactButton = new regButtonObservable("Contact");
         attendersButton = new regButtonObservable("Attenders");
         accountButton = new regButtonObservable("Account");
+        registrationLoadLocation = '';
 
         // Display text
         formTitle = ko.observable('Registration Summary');
@@ -1108,6 +1120,10 @@ module Tops {
             if (me.validateContactInfo()) {
                 me.registrationForm.contactInfoForm.view();
                 window.location.assign('#reg-header');
+                var id = me.registrationForm.id();
+                if (me.registrationForm.id()) {
+                    me.saveChanges();
+                }
             }
         };
 
@@ -1137,6 +1153,9 @@ module Tops {
         saveChanges = () => {
             var me = this;
             if (me.checkReadyToSave()) {
+                if (me.registrationForm.id()) {
+                    me.registrationLoadLocation = me.currentForm();
+                }
                 me.uploadChanges();
             }
         };
@@ -1231,8 +1250,10 @@ module Tops {
                 function () {
                     me.application.loadResources(['scym-registration.css', 'textParser.js'],
                         function () {
-                            me.attenderForm.initialize();
-                            me.getInitialInfo(successFunction);
+                            me.application.loadComponent('modal-confirm', function() {
+                                me.attenderForm.initialize();
+                                me.getInitialInfo(successFunction);
+                            });
                         }
                     );
                 }
@@ -1443,10 +1464,23 @@ module Tops {
             me.registrationForm.financeInfoForm.setViewState(response.registration.statusId == 1 ? 'edit' : 'view');
             me.registrationForm.contactInfoForm.setViewState(response.registration.statusId == 1 ? 'edit' : 'view');
             me.housingAssignmentList(response.housingAssignments);
-            me.accountButton.setStatus(response.registration.confirmed ? 'complete' : 'incomplete');
+            me.accountButton.setStatus(response.registration.statusId == 1 ?  'incomplete' : 'complete' );
             me.updatedAttenders = [];
             me.deletedAttenders = [];
-            me.showSummaryForm();
+            switch (me.registrationLoadLocation) {
+                case 'contact' :
+                    me.showContactForm();
+                    break;
+                case 'attenders' :
+                    me.showAttenderForm();
+                    break;
+                case 'accounts' :
+                    me.showAccountDetails();
+                    break;
+                default: me.showSummaryForm();
+                    break;
+            }
+            me.registrationLoadLocation = '';
         }
 
         public startRegistration() {
@@ -1580,7 +1614,7 @@ module Tops {
                 me.registrationForm.financeInfoForm.clear();
             }
             else {
-                me.registrationForm.financeInfoForm.assign(me.currentRegistration);
+                me.registrationForm.financeInfoForm.reset();
                 me.registrationForm.financeInfoForm.setViewState();
             }
         };
@@ -1601,7 +1635,10 @@ module Tops {
             var me = this;
             me.registrationForm.financeInfoForm.calculated(false);
             me.attenderForm.setViewState();
-            if (me.registrationStatus() == 1) {
+            if (me.registrationForm.id()) {
+                me.saveChanges();
+            }
+            else {
                 me.attendersButton.setComplete();
                 me.accountButton.setIncomplete();
                 me.registrationForm.financeInfoForm.edit();
@@ -1626,18 +1663,42 @@ module Tops {
         }
 
         cancelRegistration() {
-            var me = this;
-            //todo: implement cancelRegistration
-            me.registrationStatus(0);
-            me.contactButton.setStatus('inactive');
-            me.attendersButton.setStatus('inactive');
-            me.accountButton.setStatus('inactive');
+            jQuery("#confirm-cancel-modal").modal('show');
         }
+
+        doCancelRegistration = () => {
+            var me = this;
+            jQuery("#confirm-cancel-modal").modal('hide');
+
+            var request = me.registrationForm.id();
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Cancelling registration...');
+            me.peanut.executeService('registration.CancelRegistration', request, me.handleRegistrationCancel)
+                .always(function () {
+                    me.application.hideWaiter();
+                });
+        };
+
+        private handleRegistrationCancel = (serviceResponse:IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                me.registrationStatus(0);
+                me.contactButton.setStatus('inactive');
+                me.attendersButton.setStatus('inactive');
+                me.accountButton.setStatus('inactive');
+            }
+        };
+
 
         showAccountsForm = () => {
             var me = this;
             if ((!me.registrationForm.financeInfoForm.calculated()) || me.balanceInvalid()) {
                 me.updateCosts();
+            }
+            else if (me.registrationForm.id()){
+                if (me.currentForm() != 'accounts') {
+                    me.showAccountDetails();
+                }
             }
             else {
                 me.showFeesAndDonationsPage();
@@ -1647,6 +1708,7 @@ module Tops {
         showAccountDetails = () => {
             var me = this;
             me.registrationForm.financeInfoForm.setViewState();
+            me.currentForm('accounts');
         };
 
         public showFeesAndDonationsPage = () => {
@@ -1668,15 +1730,6 @@ module Tops {
             };
             me.application.hideServiceMessages();
             me.application.showWaiter('Calculating costs...');
-
-            // fakes
-            /*
-             var fakeData = me.getFakeAccountSummary();
-             var fakeResponse = new fakeServiceResponse(fakeData);
-             me.handleGetCostResponse(fakeResponse);
-             me.application.hideWaiter();
-             */
-            // todo: GetRegistrationCost service (in progress)
 
             me.peanut.executeService('registration.GetRegistrationCost', request, me.handleGetCostResponse)
                 .always(function () {
@@ -1749,6 +1802,11 @@ module Tops {
             return (me.registrationChanged() || me.attendersChanged());
         }
 
+        reloadPage() {
+            window.onbeforeunload = null;
+            window.location.reload(true);
+        };
+
         checkReadyToSave() {
             var me = this;
             if (me.registrationForm.financeInfoForm.viewState() == 'edit') {
@@ -1791,6 +1849,8 @@ module Tops {
 
         }
 
+
+
         editSelectedAttender = (item:IListItem) => {
             var me = this;
             var id = item.Value;
@@ -1812,6 +1872,9 @@ module Tops {
             me.updatedAttenders = updated;
             if (id > 0) {
                 me.deletedAttenders.push(id);
+            }
+            if (me.registrationForm.id()) {
+                me.saveChanges();
             }
         };
 
@@ -1901,30 +1964,19 @@ module Tops {
                 }
             }
 
+            var request:IGetAttenderRequest = {
+                id: attenderId,
+                includeLookups: me.attenderForm.lookupsAssigned ? 0 : 1
+            };
+
             me.application.hideServiceMessages();
             me.application.showWaiter('Getting attender data...');
 
-            var request:IGetAttenderRequest = {
-                id: attenderId,
-                includeLookups: me.attenderForm.lookupsAssigned ? 1 : 0
-            };
-
-            // todo: getAttender service
-            var fakeAttenderResponse = {
-                attender: me.getFakeAttender(attenderId),
-                lookups: me.getFakeLookups()
-            };
-            var fakeResponse = new fakeServiceResponse(fakeAttenderResponse);
-            me.application.hideWaiter();
-            me.handleGetAttenderResponse(fakeResponse);
-
-
-            /*
-            me.peanut.executeService('registration.getAttender',request, me.handleGetAttenderResponse)
+            me.peanut.executeService('registration.GetAttender',request, me.handleGetAttenderResponse)
                 .always(function() {
                     me.application.hideWaiter();
                 });
-                */
+
         }
 
         private handleGetAttenderResponse = (serviceResponse:IServiceResponse) => {
@@ -2018,7 +2070,9 @@ module Tops {
                     donations: me.registrationForm.financeInfoForm.getDonations()
                 };
                 if (me.registrationChanged() || registrationId < 1) {
-                    request.registration = <IRegistrationInfo>{};
+                    request.registration = <IRegistrationInfo>{
+                        year: me.sessionInfo.year
+                    };
                     me.registrationForm.updateRegistration(<IRegistrationInfo>request.registration);
                 }
                 return request;
@@ -2067,302 +2121,6 @@ module Tops {
             }
         };
 
-// FAKES
-
-        private fakeRegistrationService(isConfirmed = 1) {
-            var me = this;
-            var data = me.getFakeRegistration(isConfirmed);
-            var fakeResponse = new fakeServiceResponse(data);
-            me.handleRegistrationResponse(fakeResponse);
-            me.application.hideWaiter();
-        }
-
-        private getFakeRegistration(isConfirmed = 0) {
-            var me = this;
-            var accountSummary:IAccountSummary = me.getFakeAccountSummary();
-            var result:IRegistrationResponse = {
-                attenderList: [
-                    {
-                        Text: 'Terry SoRelle',
-                        Value: '1',
-                        Description: ''
-                    },
-                    {
-                        Text: 'Liz Yeats',
-                        Value: '2',
-                        Description: ''
-                    },
-                    {
-                        Text: 'Sam Schifman',
-                        Value: '3',
-                        Description: ''
-                    }
-                ],
-                registration: {
-                    registrationId: 1,
-                    confirmed: isConfirmed,
-                    active: 1,
-                    year: '2015',
-                    registrationCode: 'ABCD',
-                    statusId: 2,
-                    name: 'Terry SoRelle and Liz Yeats',
-                    address: '904 E. Meadowmere',
-                    city: 'Austin, TX 78758',
-                    phone: '532-029-0292',
-                    email: 'terry@mail.com  ',
-                    receivedDate: '10/1/2015',
-                    amountPaid: '0.00',
-                    notes: 'Notes here',
-                    feesReceivedDate: null,
-                    arrivalTime: '42',
-                    departureTime: '71',
-                    scymNotes: '',
-                    statusDate: '10/1/2015',
-                    // ymDonation: '',
-                    // simpleMealDonation: '',
-                    financialAidAmount: '',
-                },
-                accountSummary: accountSummary,
-                housingAssignments: [
-                    {
-                        Text: 'Liz, Terry',
-                        Value: 'Health House 10',
-                        Description: 'Friday night through Saturday night'
-                    },
-                    {
-                        Text: 'Sam',
-                        Value: 'Young Friends Dorm',
-                        Description: 'Thursday night through Saturday night'
-                    }
-                ]
-            };
-
-            return result;
-        }
-
-        private getFakeAccountSummary():IAccountSummary {
-            var result:IAccountSummary =
-            {
-                aidEligibility : '100.00',
-                payments: [],
-                funds: [
-                    {
-                        Key: 1,
-                        Text: 'Yearly Meeting Subsidy',
-                        Description: 'This fund is used to support yearly meeting expenses. Your contribution makes it possible to include youth and others who may not be able to affort the full fees.'
-                    },
-                    {
-                        Key: 2,
-                        Text: 'Simple meal',
-                        Description: 'A simple, picknic style, meal is served on Sunday. Your contribution goes to support a social concerns project or organization selected by the Yearly Meeting.'
-                    },
-                    {
-                        Key: 3,
-                        Text: 'Youth fund',
-                        Description: 'The youths just want to have fun. Your contribution helps the good times roll.'
-                    },
-                ],
-                donations: [
-                    {
-                        Key: 2,
-                        Text: 'Simple meal',
-                        Value: '$20.00',
-                        Description: ''
-                    },
-                    {
-                        Key: 3,
-                        Text: 'Youth',
-                        Value: '$30.00',
-                        Description: ''
-                    },
-                ],
-                fees: [
-                    {
-                        Text: 'Registration fee',
-                        Value: '$55.00',
-                        Description: 'Terry'
-                    },
-                    {
-                        Text: 'Registration fee',
-                        Value: '$55.00',
-                        Description: 'Liz'
-                    },
-                    {
-                        Text: 'Adult Lodging and meals three nights',
-                        Value: '$195.00',
-                        Description: 'Terry 3 nights'
-                    },
-                    {
-                        Text: 'Adult Lodging and meals three nights',
-                        Value: '$195.00',
-                        Description: 'Terry 3 nights'
-                    }
-                ],
-                credits: [
-                    {
-                        Text: 'Financial aid',
-                        Value: '$20.00',
-                        Description: ''
-                    }
-                ],
-                feeTotal: '$365.00',
-                creditTotal: '$150.00',
-                donationTotal: '$50',
-                balance: '265'
-            };
-
-            return result;
-        }
-
-        private getFakeAttender(attenderId:any) {
-            var me = this;
-            if (!attenderId) {
-                return null;
-            }
-
-            var attenderStub = _.find(me.attenderList(), function (item:IListItem) {
-                return item.Value == attenderId;
-            });
-
-            if (!attenderStub) {
-                return null;
-            }
-
-            var result:IAttender = {
-                attenderId: attenderStub.Text,
-                firstName: '',
-                lastName: attenderStub.Value,
-                middleName: '',
-                dateOfBirth: null,
-                affiliationCode: '',
-                otherAffiliation: '',
-                firstTimer: 0,
-                teacher: 0,
-                financialAidRequested: 0,
-                guest: 0,
-                notes: '',
-                linens: 0,
-                arrivalTime: '',
-                departureTime: '',
-                vegetarian: 0,
-                attended: 0,
-                singleOccupant: 0,
-                glutenFree: 0,
-                changed: false,
-                housingTypeId: null,
-                specialNeedsTypeId: null, // lookup: special needs
-                generationId: null, // lookup: generations
-                gradeLevel: '', // 'PS','K', 1 .. 13
-                ageGroupId: null, // lookup agegroups
-                creditTypeId: 0, // formerly: feeCredit, lookup: creditTypes
-                meals: []
-            };
-            return result;
-        }
-
-        private getFakeLookups():IAttenderLookups {
-            var attenderLists = {
-                housingTypes: [
-                    {Text: 'Day visitor - no housing', Value: '1', Description: '', category: '1'},
-                    {Text: 'Early Riser Dorm for Women', Value: '2', Description: '', category: '1'},
-                    {Text: 'Night Owl Dorm for Women', Value: '3', Description: '', category: '1'},
-                    {Text: 'Early Riser Dorm for Men', Value: '4', Description: '', category: '1'},
-                    {Text: 'Night Owl Dorm for Men', Value: '5', Description: '', category: '1'},
-                    {Text: 'Family Cabin', Value: '6', Description: '', category: '1'},
-                    {Text: 'Solo Parent Cabin (not used)', Value: '7', Description: '', category: '1'},
-                    {Text: 'Couples Cabin', Value: '8', Description: '', category: '1'},
-                    {Text: 'Camp Motel', Value: '9', Description: '', category: '3'},
-                    {Text: 'Health House (special needs)', Value: '10', Description: '', category: '3'},
-                    {Text: 'Tenting', Value: '11', Description: '', category: '1'},
-                    {Text: 'Adult Young Friends Dorm', Value: '12', Description: '', category: '1'},
-                    {Text: 'Female Young Frends Dorm', Value: '13', Description: '', category: '1'},
-                    {Text: 'Male Young Friends Dorm', Value: '14', Description: '', category: '1'},
-                    {Text: 'Jr. Young Friends Female', Value: '16', Description: '', category: '1'},
-                    {Text: 'Jr. Young Friends Male', Value: '17', Description: '', category: '1'},
-                    {Text: 'Mothers with Children Dorm', Value: '18', Description: '', category: '1'},
-                    {Text: 'Fathers with Children Dorm', Value: '19', Description: '', category: '1'}
-                ],
-                affiliationCodes: [
-                    {Text: 'Acadiana Friends Meeting', Value: 'ACDN', Description: ''},
-                    {Text: 'Alpine Friends Worship Group', Value: 'AL TX', Description: ''},
-                    {Text: 'Friends Meeting of Austin', Value: 'AU TX', Description: ''},
-                    {Text: 'Baton Rouge Friends Meeting', Value: 'BA LA', Description: ''},
-                    {Text: 'Caddo Four States Preparatory Meeting', Value: 'CADDO4', Description: ''},
-                    {Text: 'Coastal Bend Friends Meeting', Value: 'CC TX', Description: ''},
-                    {Text: 'College Station Friends Worship Group', Value: 'CS TX', Description: ''},
-                    {Text: 'Dallas Monthly Meeting of Friends', Value: 'DA TX', Description: ''},
-                    {Text: 'Fayetteville Friends', Value: 'FA AR', Description: ''},
-                    {Text: 'Fort Worth Monthly Meeting', Value: 'FW TX', Description: ''},
-                    {Text: 'Galveston Friends Meeting', Value: 'GA TX', Description: ''},
-                    {Text: 'Hill Country Friends Monthly Meeting', Value: 'HC TX', Description: ''},
-                    {Text: 'Houston Live Oak Friends Meeting', Value: 'HO TX', Description: ''},
-                    {Text: 'Little Rock Friends Meeting', Value: 'LR AR', Description: ''},
-                    {Text: 'Lubbock Monthly Meeting', Value: 'LU TX', Description: ''},
-                    {Text: 'Norman Friends Meeting', Value: 'NFS', Description: ''},
-                    {Text: 'Friends Meeting of New Orleans', Value: 'NO LA', Description: ''},
-                    {Text: 'No SCYM affiliation', Value: 'NONE', Description: ''},
-                    {Text: 'Oklahoma City Friends Meeting', Value: 'OKC', Description: ''},
-                    {Text: 'Rio Grande Valley Worship Group', Value: 'RIO', Description: ''},
-                    {Text: 'Friends Meeting of San Antonio', Value: 'SA TX', Description: ''},
-                    {Text: 'Stillwater Friends Meeting', Value: 'ST OK', Description: ''},
-                    {Text: 'Sunrise Friends Meeting', Value: 'SUN', Description: ''},
-                    {Text: 'Tulsa Green Country', Value: 'TU OK', Description: ''}
-                ],
-                ageGroups: [
-                    {Text: 'Little Friends', Value: '1', Description: ''},
-                    {Text: 'Lower Elementary', Value: '2', Description: ''},
-                    {Text: 'Upper Elementary', Value: '3', Description: ''},
-                    {Text: 'Junior High', Value: '4', Description: ''},
-                    {Text: 'High School', Value: '5', Description: ''}
-                ]
-            };
-
-            return <IAttenderLookups>attenderLists;
-        }
-
-        private getFakeInitResponse() {
-            var loggedIn =
-                // false;
-                true;
-
-
-            var fakeSessionInfo:IAnnualSessionInfo = {
-                year: '2015',
-                startDate: '2015-04-02',
-                endDate: '2015-05-05',
-                location: 'Greene Family Camp, Bruceville, Texas',
-                datesText: 'April 2nd to 5th, 2015'
-            };
-
-            return loggedIn ?
-                new fakeServiceResponse(
-                    {
-                        sessionInfo: fakeSessionInfo,
-                        registrationId: 1,
-                        user: {
-                            id: 1,
-                            name: 'Terry SoRelle',
-                            authenticated: true,
-                            authorized: 1,
-                            email: 'terry@mail.com'
-                        }
-                    }
-                )
-                :
-                new fakeServiceResponse(
-                    {
-                        sessionInfo: fakeSessionInfo,
-                        registrationId: 0,
-                        user: {
-                            id: 0,
-                            name: 'Guest',
-                            authenticated: false,
-                            authorized: 0,
-                            email: ''
-                        }
-                    }
-                );
-        }
     }
 }
 

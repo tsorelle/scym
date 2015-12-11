@@ -22,7 +22,7 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     }
 
     /**
-     * @OneToMany(targetEntity="ScymMeal", mappedBy="attender",fetch="EAGER", cascade={"persist", "remove"})
+     * @OneToMany(targetEntity="ScymMeal", mappedBy="attender",fetch="EXTRA_LAZY", cascade={"persist", "remove"})
      */
     protected $meals;
 
@@ -105,23 +105,23 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     /**
      * @var boolean
      *
-     * @Column(name="teacher", type="boolean", nullable=true)
+     * @Column(name="teacher", type="boolean", nullable=false)
      */
     private $teacher = '0';
 
     /**
      * @var boolean
      *
-     * @Column(name="financialAidRequested", type="boolean", nullable=true)
+     * @Column(name="guest", type="boolean", nullable=false)
      */
-    private $financialAidRequested = '0';
+    private $guest = '0';
 
     /**
      * @var boolean
      *
-     * @Column(name="guest", type="boolean", nullable=true)
+     * @Column(name="staffMember", type="boolean", nullable=false)
      */
-    private $guest = '0';
+    private $staffMember = '0';
 
     /**
      * @var string
@@ -429,29 +429,6 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     }
 
     /**
-     * Set financialaidrequested
-     *
-     * @param boolean $financialaidrequested
-     * @return ScymAttender
-     */
-    public function setFinancialAidRequested($financialaidrequested)
-    {
-        $this->financialAidRequested = $financialaidrequested;
-
-        return $this;
-    }
-
-    /**
-     * Get financialaidrequested
-     *
-     * @return boolean
-     */
-    public function getFinancialAidRequested()
-    {
-        return $this->financialAidRequested;
-    }
-
-    /**
      * Set guest
      *
      * @param boolean $guest
@@ -472,6 +449,29 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     public function getGuest()
     {
         return $this->guest;
+    }
+
+    /**
+     * Set staffMember
+     *
+     * @param boolean $staffMember
+     * @return ScymAttender
+     */
+    public function setStaffMember($staffMember)
+    {
+        $this->staffMember = $staffMember;
+
+        return $this;
+    }
+
+    /**
+     * Get staffMember
+     *
+     * @return boolean
+     */
+    public function getStaffMember()
+    {
+        return $this->staffMember;
     }
 
     /**
@@ -847,13 +847,28 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
         $this->departureTime         =  $dto->getDepartureTime();
         $this->housingTypeId         =  $dto->getHousingTypeId();
         $this->vegetarian            =  $dto->getVegetarian();
-        $this->attended              =  $dto->getAttended();
         $this->generationId          =  $dto->getGenerationId();
         $this->gradeLevel            =  $dto->getGradeLevel();
         $this->ageGroupId            =  $dto->getAgeGroupId();
         $this->creditTypeId          =  $dto->getCreditTypeId();
+        switch($this->creditTypeId) {
+            case 2:  // teacher credit
+                $this->setTeacher(true);
+                break;
+            case 3:
+                $this->setGuest(true);
+                break;
+            case 4:
+                $this->setStaffMember(true);
+                break;
+        }
+
         $this->singleOccupant        =  $dto->getSingleOccupant();
         $this->glutenFree            =  $dto->getGlutenFree();
+        $attended = $dto->getAttended();
+        if ($attended !== null) {
+            $this->attended = $attended;
+        }
 
         return true;
     }
@@ -870,8 +885,9 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
         $result->affiliationCode       =  $this->affiliationCode;
         $result->otherAffiliation      =  $this->otherAffiliation;
         $result->firstTimer            =  $this->firstTimer;
+        $result->creditTypeId          =  $this->creditTypeId;
         $result->teacher               =  $this->teacher;
-        $result->financialAidRequested =  $this->financialAidRequested;
+        $result->staffMember           =  $this->staffMember;
         $result->guest                 =  $this->guest;
         $result->notes                 =  $this->notes;
         $result->linens                =  $this->linens;
@@ -880,13 +896,12 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
         $result->departureTime         =  $this->departureTime;
         $result->housingTypeId         =  $this->housingTypeId;
         $result->vegetarian            =  $this->vegetarian;
-        $result->attended              =  $this->attended;
         $result->generationId          =  $this->generationId;
         $result->gradeLevel            =  $this->gradeLevel;
         $result->ageGroupId            =  $this->ageGroupId;
-        $result->creditTypeId          =  $this->creditTypeId;
         $result->singleOccupant        =  $this->singleOccupant;
         $result->glutenFree            =  $this->glutenFree;
+        $result->attended              =  $this->attended;
 
         return $result;
     }
@@ -918,9 +933,27 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
         }
     }
 
+    public function getMealList() {
+        $result = array();
+        $meals = $this->getMeals()->toArray();
+        foreach ($meals as $meal) {
+            /**
+             * @var $meal ScymMeal
+             */
+            array_push($result,$meal->getMealtime());
+        }
+        return $result;
+    }
 
+    /**
+     * @param array $mealtimes
+     * @return ScymMeal[]
+     *
+     * Warning, calling method must delete the removed meals using an EntityManager
+     *
+     */
     public function updateMeals(array $mealtimes) {
-        $meals = $this->meals->toArray();
+        $meals = $this->getMeals()->toArray();
         $currentMeals = array();
 
         $removed = array();

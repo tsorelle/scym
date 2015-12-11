@@ -214,7 +214,7 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         return $this->payments;
     }
 
-
+    /* ------ Fields ---- */
 
     /**
      * @var integer
@@ -306,52 +306,10 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     /**
      * @var string
      *
-     * @Column(name="amountPaid", type="decimal", precision=10, scale=2, nullable=true)
-     */
-    private $amountPaid;
-
-    /**
-     * @var string
-     *
      * @Column(name="notes", type="text", nullable=true)
      */
     private $notes;
 
-    /**
-     * @var \DateTime
-     *
-     * @Column(name="feesReceivedDate", type="date", nullable=true)
-     */
-    private $feesReceivedDate;
-
-    /**
-     * @var boolean
-     *
-     * @Column(name="contactRequested", type="boolean", nullable=true)
-     */
-    private $contactRequested = '0';
-
-    /**
-     * @var boolean
-     *
-     * @Column(name="confirmed", type="boolean", nullable=true)
-     */
-    private $confirmed = '0';
-
-
-    /**
-     * @var boolean
-     *
-     * @Column(name="arrivalTime", type="boolean", nullable=true)
-     */
-    private $arrivalTime;
-
-    /**
-     * @var boolean
-     *
-     * @Column(name="departureTime", type="boolean", nullable=true)
-     */
-    private $departureTime;
 
     /**
      * @var string
@@ -366,41 +324,6 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
      * @Column(name="statusDate", type="date", nullable=true)
      */
     private $statusDate;
-
-    /**
-     * @var string
-     *
-     * @Column(name="YMDonation", type="decimal", precision=12, scale=2, nullable=true)
-     */
-    private $YMDonation;
-
-    /**
-     * @var string
-     *
-     * @Column(name="simpleMealDonation", type="decimal", precision=12, scale=2, nullable=true)
-     */
-    private $simpleMealDonation;
-
-    /**
-     * @var boolean
-     *
-     * @Column(name="financialAidRequested", type="boolean", nullable=true)
-     */
-    private $financialAidRequested = '0';
-
-    /**
-     * @var string
-     *
-     * @Column(name="financialAidContribution", type="decimal", precision=12, scale=2, nullable=true)
-     */
-    private $financialAidContribution;
-
-    /**
-     * @var boolean
-     *
-     * @Column(name="attended", type="boolean", nullable=true)
-     */
-    private $attended = '0';
 
     /**
      * @var string
@@ -519,7 +442,7 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     }
 
     /**
-     * Set name
+     * Set username
      *
      * @param string $name
      * @return ScymRegistration
@@ -532,7 +455,7 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     }
 
     /**
-     * Get name
+     * Get username
      *
      * @return string
      */
@@ -680,29 +603,6 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     }
 
     /**
-     * Set amountPaid
-     *
-     * @param string $amountPaid
-     * @return ScymRegistration
-     */
-    public function setAmountPaid($amountPaid)
-    {
-        $this->amountPaid = $amountPaid;
-
-        return $this;
-    }
-
-    /**
-     * Get amountPaid
-     *
-     * @return string 
-     */
-    public function getAmountPaid()
-    {
-        return $this->amountPaid;
-    }
-
-    /**
      * Set notes
      *
      * @param string $notes
@@ -723,122 +623,6 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     public function getNotes()
     {
         return $this->notes;
-    }
-
-    /**
-     * Set feesReceivedDate
-     *
-     * @param \DateTime $feesReceivedDate
-     * @return ScymRegistration
-     */
-    public function setFeesReceivedDate($feesReceivedDate)
-    {
-        $this->feesReceivedDate = $feesReceivedDate;
-
-        return $this;
-    }
-
-    /**
-     * Get feesReceivedDate
-     *
-     * @return \DateTime 
-     */
-    public function getFeesReceivedDate()
-    {
-        return $this->feesReceivedDate;
-    }
-
-    /**
-     * Set contactRequested
-     *
-     * @param boolean $contactRequested
-     * @return ScymRegistration
-     */
-    public function setContactRequested($contactRequested)
-    {
-        $this->contactRequested = $contactRequested;
-
-        return $this;
-    }
-
-    /**
-     * Get contactRequested
-     *
-     * @return boolean 
-     */
-    public function getContactRequested()
-    {
-        return $this->contactRequested;
-    }
-
-    /**
-     * Set contactRequested
-     *
-     * @param boolean $contactRequested
-     * @return ScymRegistration
-     */
-    public function setConfirmed($confirmed)
-    {
-        $this->confirmed = $confirmed;
-
-        return $this;
-    }
-
-    /**
-     * Get confirmed
-     *
-     * @return boolean
-     */
-    public function getConfirmed()
-    {
-        return $this->confirmed;
-    }
-
-
-    /**
-     * Set arrivalTime
-     *
-     * @param boolean $arrivalTime
-     * @return ScymRegistration
-     */
-    public function setArrivalTime($arrivalTime)
-    {
-        $this->arrivalTime = $arrivalTime;
-
-        return $this;
-    }
-
-    /**
-     * Get arrivalTime
-     *
-     * @return boolean 
-     */
-    public function getArrivalTime()
-    {
-        return $this->arrivalTime;
-    }
-
-    /**
-     * Set departureTime
-     *
-     * @param boolean $departureTime
-     * @return ScymRegistration
-     */
-    public function setDepartureTime($departureTime)
-    {
-        $this->departureTime = $departureTime;
-
-        return $this;
-    }
-
-    /**
-     * Get departureTime
-     *
-     * @return boolean 
-     */
-    public function getDepartureTime()
-    {
-        return $this->departureTime;
     }
 
     /**
@@ -888,121 +672,6 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     }
 
     /**
-     * Set YMDonation
-     *
-     * @param string $YMDonation
-     * @return ScymRegistration
-     */
-    public function setYMDonation($YMDonation)
-    {
-        $this->YMDonation = $YMDonation;
-
-        return $this;
-    }
-
-    /**
-     * Get YMDonation
-     *
-     * @return string 
-     */
-    public function getYMDonation()
-    {
-        return $this->YMDonation;
-    }
-
-    /**
-     * Set simpleMealDonation
-     *
-     * @param string $simpleMealDonation
-     * @return ScymRegistration
-     */
-    public function setSimpleMealDonation($simpleMealDonation)
-    {
-        $this->simpleMealDonation = $simpleMealDonation;
-
-        return $this;
-    }
-
-    /**
-     * Get simpleMealDonation
-     *
-     * @return string 
-     */
-    public function getSimpleMealDonation()
-    {
-        return $this->simpleMealDonation;
-    }
-
-    /**
-     * Set financialAidRequested
-     *
-     * @param boolean $financialAidRequested
-     * @return ScymRegistration
-     */
-    public function setFinancialAidRequested($financialAidRequested)
-    {
-        $this->financialAidRequested = $financialAidRequested;
-
-        return $this;
-    }
-
-    /**
-     * Get financialAidRequested
-     *
-     * @return boolean 
-     */
-    public function getAidAmount()
-    {
-        return $this->financialAidRequested;
-    }
-
-    /**
-     * Set financialAidContribution
-     *
-     * @param string $financialAidContribution
-     * @return ScymRegistration
-     */
-    public function setFinancialAidContribution($financialAidContribution)
-    {
-        $this->financialAidContribution = $financialAidContribution;
-
-        return $this;
-    }
-
-    /**
-     * Get financialAidContribution
-     *
-     * @return string 
-     */
-    public function getFinancialAidContribution()
-    {
-        return $this->financialAidContribution;
-    }
-
-    /**
-     * Set attended
-     *
-     * @param boolean $attended
-     * @return ScymRegistration
-     */
-    public function setAttended($attended)
-    {
-        $this->attended = $attended;
-
-        return $this;
-    }
-
-    /**
-     * Get attended
-     *
-     * @return boolean 
-     */
-    public function getAttended()
-    {
-        return $this->attended;
-    }
-
-    /**
      * Set financialAidAmount
      *
      * @param string $financialAidAmount
@@ -1033,29 +702,27 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         $result->registrationId           = $this->registrationId;
         $result->registrationCode         = $this->registrationCode;
         $result->name                     = $this->name;
-        $result->address1                 = $this->address;
+        $result->address                  = $this->address;
         $result->city                     = $this->city  ;
         $result->phone                    = $this->phone ;
         $result->email                    = $this->email ;
         $result->receivedDate             = $this->formatDtoDate($this->receivedDate);
-        $result->amountPaid               = $this->amountPaid;
         $result->notes                    = $this->notes ;
-        $result->feesReceivedDate         = $this->formatDtoDate($this->feesReceivedDate);
-        $result->contactRequested         = $this->contactRequested;
-        $result->confirmed                = $this->confirmed;
-        $result->arrivalTime              = $this->arrivalTime;
-        $result->departureTime            = $this->departureTime;
         $result->scymNotes                = $this->scymNotes;
         $result->active                   = $this->active;
-        $result->YMDonation               = $this->YMDonation;
-        $result->simpleMealDonation       = $this->simpleMealDonation;
-        $result->financialAidRequested    = $this->financialAidRequested;
-        $result->financialAidContribution = $this->financialAidContribution;
-        $result->attended                 = $this->attended;
         $result->financialAidAmount       = $this->financialAidAmount;
         $result->statusDate               = $this->formatDtoDate($this->statusDate);
         $result->statusId                 = $this->statusId;
-        $result->priorStatus              = $this->statusId;
+
+        // may be obsolete
+        // $result->feesReceivedDate         = $this->formatDtoDate($this->feesReceivedDate);
+        // $result->financialAidContribution = $this->financialAidContribution;
+        // $result->confirmed                = $this->confirmed;
+        // $result->contactRequested         = $this->contactRequested;
+        // $result->attended                 = $this->attended;
+        // $result->amountPaid               = $this->amountPaid;
+        // $result->arrivalTime              = $this->arrivalTime;
+        // $result->departureTime            = $this->departureTime;
 
         return $result;
     }
@@ -1072,6 +739,12 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         if ($dto->getRegistrationId() < 1) {
             $this->registrationCode = $dto->getRegistrationCode();
         }
+
+        $year = $dto->getYear();
+        if (!empty($year)) {
+            $this->setYear($year);
+        }
+
         $this->setStatusId($dto->getStatusId());
 
         $this->name                     = $dto->getName();
@@ -1080,13 +753,15 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         $this->phone                    = $dto->getPhone();
         $this->email                    = $dto->getEmail();
         $this->notes                    = $dto->getNotes();
-        $this->contactRequested         = $dto->getContactRequested();
         $this->financialAidAmount       = $dto->getFinancialAidAmount();
+
+        // obsolete?
+        //         $this->contactRequested         = $dto->getContactRequested();
 
         if ($updateAdminFields) {
             $this->scymNotes = $dto->getScymNotes();
-            $this->feesReceivedDate = $dto->getFeesReceivedDate();
-            // $this->financialAidAmount = $dto->getFinancialAidAmount();
+            // obsolete?
+            // $this->feesReceivedDate = $dto->getFeesReceivedDate();
             // $this->amountPaid               = $dto->getAmountPaid();
             // $this->arrivalTime              = $dto->getArrivalTime();
             // $this->departureTime            = $dto->getDepartureTime();
@@ -1159,5 +834,6 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         }
 
     }
+
 
 }

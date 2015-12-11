@@ -13,11 +13,7 @@ declare module Tops {
         phone : string;
         email : string;
         receivedDate : any;
-        amountPaid : any;
         notes : string;
-        feesReceivedDate : any;
-        arrivalTime : string;
-        departureTime : string;
         scymNotes : string;
         statusDate : any;
         confirmed: number;
@@ -34,7 +30,6 @@ declare module Tops {
         otherAffiliation : string;
         firstTimer : number;
         teacher : number;
-        financialAidRequested : number;
         guest : number;
         notes : string;
         linens : number;

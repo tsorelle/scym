@@ -177,16 +177,6 @@ class RegistrationDto implements IRegistration
 
 
     /**
-     * Get amountPaid
-     *
-     * @return string
-     */
-    public function getAmountPaid()
-    {
-        return isset($this->data->amountPaid) ? $this->data->amountPaid : null;
-    }
-
-    /**
      * Get notes
      *
      * @return string
@@ -194,26 +184,6 @@ class RegistrationDto implements IRegistration
     public function getNotes()
     {
         return isset($this->data->notes) ? $this->data->notes : null;
-    }
-
-    /**
-     * Get feesReceivedDate
-     *
-     * @return \DateTime
-     */
-    public function getFeesReceivedDate()
-    {
-         $result = isset($this->data->feesReceivedDate) ? $this->getDateValue($this->data->feesReceivedDate) : null;
-     }
-
-    /**
-     * Get contactRequested
-     *
-     * @return boolean
-     */
-    public function getContactRequested()
-    {
-        return isset($this->data->contactRequested) ? !empty($this->data->contactRequested) : false;
     }
 
     /**
@@ -244,16 +214,6 @@ class RegistrationDto implements IRegistration
     {
     }
      */
-
-    /**
-     * Get attended
-     *
-     * @return boolean
-     */
-    public function getAttended()
-    {
-        return isset($this->data->attended) ? !empty($this->data->attended) : false;
-    }
 
     /**
      * Get financialAidAmount

@@ -88,39 +88,11 @@ interface IRegistration
     public function getReceivedDate();
 
     /**
-     * Get amountPaid
-     *
-     * @return string
-     */
-    public function getAmountPaid();
-
-    /**
      * Get notes
      *
      * @return string
      */
     public function getNotes();
-
-    /**
-     * Get feesReceivedDate
-     *
-     * @return \DateTime
-     */
-    public function getFeesReceivedDate();
-
-    /**
-     * Get contactRequested
-     *
-     * @return boolean
-     */
-    public function getContactRequested();
-
-    /**
-     * Get confirmed
-     *
-     * @return boolean
-     */
-    public function getConfirmed();
 
     /**
      * Get scymNotes
@@ -134,14 +106,6 @@ interface IRegistration
      *
      * @return string
      */
-   //  public function getFinancialAidContribution();
-
-    /**
-     * Get attended
-     *
-     * @return boolean
-     */
-    public function getAttended();
 
     /**
      * Get financialAidAmount

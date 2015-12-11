@@ -67,8 +67,6 @@ class RegistrationFakes
         $dto->phone = 'phone';
         $dto->email = 'e@mail.com';
         $dto->notes = 'notes';
-        $dto->arrivalTime = '43';
-        $dto->departureTime = '72';
         $dto->financialAidAmount = 0.00;
         return $dto;
     }

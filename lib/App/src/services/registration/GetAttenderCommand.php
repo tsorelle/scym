@@ -9,6 +9,8 @@
 namespace App\services\registration;
 
 
+use App\db\scym\ScymAttender;
+use App\db\ScymDirectoryManager;
 use App\db\ScymRegistrationsManager;
 use Tops\services\TServiceCommand;
 
@@ -59,13 +61,24 @@ class GetAttenderCommand extends TServiceCommand
             throw new \Exception('No request recieved for GetAttenderCommand.');
         }
         $attenderId = isset($request->id) ? $request->id : null;
-        if (!$attenderId) {
-            throw new \Exception('No attender id.');
-        }
         $includeLookups = isset($request->includeLookups) ? $request->includeLookups : false;
-
+        $response = new \stdClass();
         $manager = new ScymRegistrationsManager();
+        if ($attenderId) {
+            $attender = $manager->getAttender($attenderId);
+            $response->attender = $attender->getDataTransferObject();
+            $response->attender->meals = $attender->getMealList();
+        }
+        $response->lookups = $includeLookups ? $this->getAttenderLookups($manager) : null;
+        $this->setReturnValue($response);
+    }
 
-
+    private function getAttenderLookups(ScymRegistrationsManager $manager)
+    {
+        $lookups = new \stdClass();
+        $lookups->affiliationCodes = $manager->getAffiliationCodeLookup();
+        $lookups->ageGroups = $manager->getAgeGroupList();
+        $lookups->housingTypes = $manager->getHousingTypeList();
+        return $lookups;
     }
 }

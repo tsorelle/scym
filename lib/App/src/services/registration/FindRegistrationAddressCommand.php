@@ -61,6 +61,9 @@ class FindRegistrationAddressCommand extends TServiceCommand
     private function formatAddress(ScymAddress $address)
     {
         $result = $address->getAddress1();
+        if ($result == null) {
+            $result = '';
+        }
         $address2 = $address->getAddress2();
         if (!empty($address2)) {
             $result .= ", $address2";

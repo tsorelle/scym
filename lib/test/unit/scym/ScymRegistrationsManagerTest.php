@@ -83,6 +83,13 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($actual);
     }
 
+    public function testGetHousingTypeList() {
+        $manager = $this->getManager();
+        $actual = $manager->getHousingTypeList();
+        $this->assertNotNull($actual);
+        $this->assertNotEmpty($actual);
+    }
+
     public function testGetFundList() {
         $manager = $this->getManager();
         $actual = $manager->getFundList();
@@ -200,16 +207,14 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $dto->phone = 'phone';
         $dto->email = 'e@mail.com';
         $dto->notes = 'notes';
-        $dto->arrivalTime = '43';
-        $dto->departureTime = '72';
-        $dto->financialAidRequested  = 0.00;
+        $dto->financialAidAmount  = 0.00;
         return new RegistrationDto($dto);
     }
 
     private function getFakeAttender()
     {
         $attender = new \stdClass(); // fake
-        $attender->attenderId = 1;
+        $attender->attenderId = null; // 1;
         $attender->firstName = 'Terry';
         $attender->lastName = 'SoRelle';
         $attender->middleName = '';
@@ -261,6 +266,7 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
     public function testCreateResistrationWithAttender() {
         $manager = $this->getManager();
         $code = 'UNITTESTWO';
+        $this->deleteRegistration($code);
         $reg = $this->getFakeRegistrationDto($code);
         $registration = ScymRegistration::createNewRegistration($reg);
         $this->assertNotNull($registration);
@@ -270,6 +276,8 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $registration->addAttenders($attenderList);
 
         $manager->updateEntity($registration);
+
+
         $registration = $manager->getRegistrationByCode($code);
         $this->assertNotNull($registration);
 
@@ -292,9 +300,10 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected,$actual,'meal count wrong');
 
         $moreMeals = array(43,72,51,52, 53);
-        $removedMeals = $attender->updateMeals($moreMeals);
+        $removedMeals = $manager->updateMeals($attender,$moreMeals);
         $manager->updateEntity($registration);
-        $registration = $manager->getRegistrationByCode($code);
+
+       // $registration = $manager->getRegistrationByCode($code);
 
         $attenders = $registration->getAttenders()->toArray();
         $expected = 1;
@@ -308,14 +317,67 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $meals = $attender->getMeals()->toArray();
         $expected = count($moreMeals);
         $actual = count($meals);
-        $manager->deleteRegistration($registration);
-        $registration = $manager->getRegistrationByCode($code);
-        $this->assertNull($registration);
 
-
+       // $registration = $manager->getRegistrationByCode($code);
+        $this->assertNotNull($registration);
         $this->assertEquals($expected,$actual,'meal count wrong');
 
+        $this->deleteRegistration($code);
+    }
 
+    private function deleteRegistration($code) {
+        $manager = $this->getManager();
+        $registration = $manager->getRegistrationByCode($code);
+        if ($registration != null) {
+            $manager->deleteRegistration($registration);
+        }
+    }
+
+    private function createTestAttender($code, $persist=true) {
+        $registrationDto = $this->getFakeRegistrationDto($code);
+        $registration = new ScymRegistration();
+        $registration->setName('Test Registration');
+        $registration->setRegistrationCode($code);
+        // $registration = ScymRegistration::createNewRegistration($registrationDto);
+        // $attenderDto = new AttenderDto($this->getFakeAttender());
+        $attender = new ScymAttender();
+        $attender->setFirstName('Test');
+        $attender->setLastName('Attender');
+        $meal = new ScymMeal();
+        $meal->setMealtime(72);
+        $attender->addMeal($meal);
+        // $attender = ScymAttender::CreateAttender($attenderDto);
+        $registration->addAttender($attender);
+        if ($persist) {
+            $manager = $this->getManager();
+            $manager->updateEntity($registration);
+        }
+        return $attender;
+    }
+
+    public function testGetAttender() {
+        $code = 'UNITTEST_GETATTENDER';
+        $this->deleteRegistration($code);
+        /**
+         * @var $attender ScymAttender
+         */
+        $attender = $this->createTestAttender($code);
+        $attenderId = $attender->getAttenderId();
+        $attender = null;
+        $manager = $this->getManager();
+        $attender = $manager->getAttender($attenderId);
+
+        $actual = $attender->getAttenderId();
+        $this->assertEquals($attenderId,$actual);
+
+        $this->deleteRegistration($code);
+    }
+
+    public function testGetAgeGroupList() {
+        $manager = $this->getManager();
+        $list = $manager->getAgeGroupList();
+        $this->assertNotNull($list);
+        $this->assertNotEmpty($list);
     }
 
 }
