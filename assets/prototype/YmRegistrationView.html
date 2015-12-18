@@ -72,9 +72,11 @@
             <!-- welcome form -->
             <div id="welcome-form" data-bind="visible:currentForm() == 'welcome'">
                 <div id="welcome-authenticated"  data-bind="visible:user.authenticated">
-                    <p><span class="reg-instruction" >Welcome <span data-bind="text:user.name"></span></span>
-                        <br/>
-                        Not <span data-bind="text:user.name"></span>?  Please sign out.</span>
+                    <p class="reg-instruction" style="margin-bottom: 0">
+                        Welcome <span data-bind="text:user.name"></span>
+                    </p>
+                    <p>
+                        Not <span data-bind="text:user.name"></span>?  Please sign out.
                     </p>
                     <div class="button-stack">
                         <button type="button" class="btn btn-success btn-md"

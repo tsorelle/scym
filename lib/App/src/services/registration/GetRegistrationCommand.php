@@ -24,7 +24,17 @@ class GetRegistrationCommand extends TServiceCommand
      *          type: 'id' | 'code'
      *          value: int | string
      *      }
+     *
+     *  Response
+     *    export interface IRegistrationResponse {
+     *    	  registration: IRegistrationInfo;
+     *    	  accountSummary: IAccountSummary;
+     *    	  attenderList: IListItem[];
+     *    	  housingAssignments: IListItem[];
+     *    }
+     *
      */
+
 
     protected function run()
     {
@@ -34,42 +44,12 @@ class GetRegistrationCommand extends TServiceCommand
         }
 
         $manager = new ScymRegistrationsManager();
-        /**
-         * @var $registration ScymRegistration
-         */
-        $type =  isset($request->type) ? $request->type : 'not assigned';
-        switch($type) {
-            case 'id' :
-                $registration =  $manager->getRegistration($request->value);
-                break;
-            case 'code' :
-                $registration =  $manager->getRegistrationByCode($request->value);
-                break;
-            default:
-                $registration = null;
-                break;
-        }
-
-        if ($registration == null) {
+        $registrationService = new RegistrationService($manager);
+        $response = $registrationService->getRegistration($request);
+        if (empty($response)) {
             $this->addErrorMessage("Registration '$request->value' was not found.");
             return;
         }
-
-        // build account and summary
-        $accountManager = new ScymAccountManager($manager);
-        $account = $accountManager->getAccountFromRegistration($registration);
-
-        // build response
-        $accountService = new AccountService($manager);
-        $response = new \StdClass();
-        $response->accountSummary = $accountService->formatAccountSummary($account);
-        $getFundList = isset($request->getFundList) ? $request->getFundList : false;
-        $response->accountSummary->funds = $getFundList ? $manager->getFundList() : [];
-
-        $response->registration = $registration->getDataTransferObject();
-        $response->attenderList = $registration->getAttenderList();
-        // todo: retrieve and format housing assignments
-        $response->housingAssignments = array();
 
         $this->setReturnValue($response);
 

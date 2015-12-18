@@ -22,7 +22,7 @@ use Tops\sys\TUser;
 function scymtheme_status_messages($variables) {
     $vmPath = TViewModel::getVmPath();
     $result = bootstrap_status_messages($variables);
-    if ($vmPath !== null && $vmPath->messagesComponent) {
+    if ($vmPath !== null && isset($vmPath->messagesComponent) &&  $vmPath->messagesComponent) {
         $result = "$result\n<messages-component></messages-component>";
     }
     return $result;
@@ -217,20 +217,20 @@ function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     $manageDirectory = $currentUser->isAuthorized('administer directory');
     $isAdmin = $currentUser->isAdmin();
     if ($manageTasks) {
-        $items .= _scymtheme_menuLi('\tasks','Manage Web Site','Task List');
+        $items .= _scymtheme_menuLi('/tasks','Manage Web Site','Task List');
     }
     if ($mailboxManager) {
-        $items .= _scymtheme_menuLi('\Mailboxes','Manage Mailboxes','Mailboxes');
+        $items .= _scymtheme_menuLi('/Mailboxes','Manage Mailboxes','Mailboxes');
     }
     if ($registerDocuments) {
-        $items .= _scymtheme_menuLi('\RegisterDocument','Register Uploaded Document','Register Document');
+        $items .= _scymtheme_menuLi('/RegisterDocument','Register Uploaded Document','Register Document');
     }
     if ($manageDirectory) {
-        $items .= _scymtheme_menuLi('\management\EMailings','Manage mailing lists','Manage mailing lists');
-        $items .= _scymtheme_menuLi('\members\download','Directory downloads','Download directory lists');
+        $items .= _scymtheme_menuLi('/management/EMailings','Manage mailing lists','Manage mailing lists');
+        $items .= _scymtheme_menuLi('/members/download','Directory downloads','Download directory lists');
     }
     if ($isRegistrar) {
-        $items .= _scymtheme_menuLi('\RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');
+        $items .= _scymtheme_menuLi('/RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');
     }
     if ($isAdmin) {
         $items .= _scymtheme_menuLi('/admin/dashboard','Administrator Dashboard','Administrator Dashboard');

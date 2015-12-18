@@ -134,11 +134,23 @@ module Tops {
                 _.forEach(lines, function(line: string) {
                     if (line) {
                         var parts = line.split(',');
-                        if (parts.length == 2) {
-                            var correction = new EmailCorrection();
-                            correction.address = parts[0];
-                            correction.status = parts[1];
-                            me.corrections.push(correction);
+                        var partsCount = parts.length;
+                        if (partsCount > 1) {
+                           var correction = new EmailCorrection();
+                           correction.address = parts[0];
+                           if (parts[1] != 'mailable') {
+                               correction.status = parts[1];
+                               if (correction.status != 'bounced' && correction.status != 'unsubscribed' && partsCount > 3) {
+                                   correction.status = parts[2];
+                                   if (correction.status != 'unsubscribed') {
+                                       correction.status = parts[3];
+                                   }
+                               }
+                               if (correction.status == 'bounced' || correction.status == 'unsubscribed') {
+                                   me.corrections.push(correction);
+                               }
+                           }
+
                         }
                     }
                 },me);

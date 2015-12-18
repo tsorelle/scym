@@ -84,6 +84,7 @@ declare module Tops {
         sessionInfo : IAnnualSessionInfo;
         user : IRegistrationUser;
         registrationId : any;
+        selectedRegistration: IRegistrationResponse;
     }
 
 

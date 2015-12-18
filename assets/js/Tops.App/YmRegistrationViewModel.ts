@@ -1369,9 +1369,24 @@ module Tops {
             me.application.hideServiceMessages();
             me.application.showWaiter('Loading...');
 
-
             var request = null;
-            me.peanut.executeService('registration.registrationInit', request, me.handleInitializationResponse)
+            var regcode = HttpRequestVars.Get('code');
+            if (regcode) {
+                request = {
+                    type: 'code',
+                    value: regcode
+                }
+            }
+            else {
+                var id = HttpRequestVars.Get('id');
+                if (id) {
+                    request = {
+                        type: 'id',
+                        value: id
+                    }
+                }
+            }
+            me.peanut.executeService('registration.RegistrationInit', request, me.handleInitializationResponse)
                 .always(function () {
                     me.application.hideWaiter();
                     if (successFunction) {
@@ -1390,7 +1405,13 @@ module Tops {
                 me.sessionInfo.endDate = response.sessionInfo.endDate;
                 me.datesText(response.sessionInfo.datesText);
                 me.locationText(response.sessionInfo.location);
-                me.setWelcomeForm();
+
+                if (response.selectedRegistration) {
+                    me.loadRegistration(response.selectedRegistration);
+                }
+                else {
+                    me.setWelcomeForm();
+                }
                 jQuery('#application-container').show();
             }
         };

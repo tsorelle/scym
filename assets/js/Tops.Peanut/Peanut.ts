@@ -52,6 +52,40 @@ module Tops {
         Data: any;
     }
 
+    export class HttpRequestVars {
+        private static instance : HttpRequestVars;
+        private requestVars = [];
+
+        constructor() {
+            var me = this;
+            var href = window.location.href;
+            var params = href.slice(href.indexOf('?') + 1).split('&');
+            for (var i = 0; i < params.length;i++) {
+                var parts = params[i].split('=');
+                var key = parts[0];
+                me.requestVars.push(key);
+                me.requestVars[key] = parts[1];
+            }
+        }
+
+        public getValue(key: string) {
+            var me = this;
+            var value = me.requestVars[key];
+            if (value) {
+                return value;
+            }
+            return null;
+        }
+
+        public static Get(key : string, defaultValue : any = null) {
+            if (!HttpRequestVars.instance) {
+                HttpRequestVars.instance = new HttpRequestVars();
+            }
+            var result = HttpRequestVars.instance.getValue(key);
+            return (result === null) ? defaultValue : result;
+        }
+    }
+
 
     export class Peanut {
 

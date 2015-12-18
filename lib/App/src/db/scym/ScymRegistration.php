@@ -4,6 +4,7 @@
 namespace App\db\scym;
 
 use App\db\api\AttenderDto;
+use App\db\api\IRegistration;
 use App\db\api\RegistrationAccount;
 use App\db\api\RegistrationDto;
 use App\db\DateStampedEntity;

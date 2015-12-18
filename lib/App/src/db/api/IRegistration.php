@@ -5,7 +5,7 @@
  * Date: 12/3/2015
  * Time: 10:24 AM
  */
-namespace App\db\scym;
+namespace App\db\api;
 
 
 interface IRegistration

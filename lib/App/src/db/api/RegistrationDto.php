@@ -8,8 +8,6 @@
 
 namespace App\db\api;
 
-
-use App\db\scym\IRegistration;
 use Tops\sys\TDateTime;
 
 class RegistrationDto implements IRegistration

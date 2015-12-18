@@ -10,7 +10,6 @@ namespace App\db;
 
 use App\db\api\CreditTypeDto;
 use App\db\api\HousingTypeDto;
-use App\db\scym\api\IAttender;
 use App\db\scym\ScymAgeGroup;
 use App\db\scym\ScymAnnualSession;
 use App\db\scym\ScymAttender;
