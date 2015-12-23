@@ -191,7 +191,7 @@ class RegistrationDto implements IRegistration
      */
     public function getConfirmed()
     {
-        return isset($this->data->confirmed) ? !empty($this->data->confirmed) : false;
+        return isset($this->data->confirmed) ? !empty($this->data->confirmed) : null;
     }
 
     /**

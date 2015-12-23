@@ -1171,6 +1171,10 @@ module Tops {
             me.application.showWaiter('Saving changes...');
 
             me.peanut.executeService('registration.SaveRegistrationChanges',request, me.handleSaveChangesResponse)
+                .fail(function() {
+                    var errorInfo = me.peanut.errorInfo;
+
+                })
                 .always(function() {
                     me.application.hideWaiter();
                 });
@@ -1201,6 +1205,8 @@ module Tops {
          */
         init(applicationPath:string, successFunction?:() => void) {
             var me = this;
+            // overide default binding
+            successFunction = me.afterInit;
             // setup messaging and other application initializations
             // initialize date popus if used
             jQuery(function () {
@@ -1389,11 +1395,22 @@ module Tops {
             me.peanut.executeService('registration.RegistrationInit', request, me.handleInitializationResponse)
                 .always(function () {
                     me.application.hideWaiter();
+
                     if (successFunction) {
                         successFunction();
                     }
                 });
         }
+
+        private afterInit = () => {
+            var me = this;
+            me.application.bindSection('reg-header',me);
+            me.application.bindSection('nav-column',me);
+            me.application.bindSection('form-header',me);
+            me.application.bindSection('form-section',me);
+            me.application.bindSection('modals-section',me);
+            me.application.showDefaultSection();
+        };
 
         private handleInitializationResponse = (serviceResponse:IServiceResponse) => {
             var me = this;

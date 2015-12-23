@@ -204,9 +204,14 @@ class ScymRegistrationsManager extends TDbServiceManager
      * @param $registrationCode
      * @return ScymRegistration
      */
-    public function getRegistrationByCode($registrationCode) {
+    public function getRegistrationByCode($registrationCode,$year=null) {
         $repository =  $this->getRepository('App\db\scym\ScymRegistration');
-        $result = $repository->findOneBy(array('registrationCode' => $registrationCode));
+        if ($year) {
+            $result = $repository->findOneBy(array('registrationCode' => $registrationCode, 'year' => $year));
+        }
+        else {
+            $result = $repository->findOneBy(array('registrationCode' => $registrationCode));
+        }
         return $result;
     }
 
@@ -228,6 +233,19 @@ class ScymRegistrationsManager extends TDbServiceManager
              */
             $item = $type->toLookupItem();
             array_push($result, $item);
+        }
+        return $result;
+    }
+
+    public function getFundNames() {
+        $repository =  $this->getRepository('App\db\scym\ScymDonationType');
+        $types = $repository->findBy(array('registrationform' => 1));
+        $result = array();
+        foreach ($types as $type) {
+            /**
+             * @var $type ScymDonationType
+             */
+            $result[$type->getDonationtypeid()] = $type->getFundname();
         }
         return $result;
     }

@@ -138,6 +138,13 @@ class TopsModule {
         // TTracer::Trace('End TopsModule::Initialize');
     }
 
+    public static function PreprocessPage(&$variables) {
+        $variables['trace_messages'] = \Tops\sys\TTracer::RenderTraceMessages();
+        $vmPath = TViewModel::getVmPath();
+        $hasVm = ($vmPath !== null);
+        $variables['peanut_viewmodel'] = $hasVm;
+    }
+
     public static function PreprocessHtml(&$variables) {
         $vmPath = TViewModel::getVmPath();
         $hasVm = ($vmPath !== null);
@@ -145,7 +152,7 @@ class TopsModule {
         $variables['peanut_viewmodel_src'] = $vmPath ? $vmPath->path : '';
         // $variables['tops_js_debug'] =  \Tops\sys\TTracer::JsDebuggingOn();
         if ($hasVm) {
-            $initJs =  "ViewModel.init('/', function() {  ko.applyBindings(ViewModel); });";
+            $initJs =  "ViewModel.init('/', function() {  ViewModel.application.bindDefaultSection(); });";
             foreach ($vmPath->requires as $requirement) {
                 if ($requirement == 'maps.api') {
                     $mapKey = 'AIzaSyDPaIAgncWvvzfrsnw53PTxmLow3Tu4WEg';

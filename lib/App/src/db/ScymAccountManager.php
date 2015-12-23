@@ -70,7 +70,6 @@ class ScymAccountManager
     private $creditTypes;
     private $registrationId = 0;
 
-
     public function __construct(ScymRegistrationsManager $manager = null)
     {
         $this->registrationsManager = $manager != null ? $manager : new ScymRegistrationsManager();

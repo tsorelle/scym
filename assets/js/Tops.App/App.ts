@@ -237,34 +237,95 @@ module Tops {
             head.load(this.applicationPath + 'assets/css/' + name, successFunction);
         }
 
-        public loadComponent(name: string, successFunction?: () => void) {
+        public usingComponentLoader(afterLoad: () => void) {
             var me = this;
             if (me.componentLoader) {
-                me.componentLoader.load(name, successFunction);
+                afterLoad();
             }
             else
             {
-                head.load(this.applicationPath + 'assets/js/components/TkoComponentLoader.js', function() {
+                head.load(me.applicationPath + 'assets/js/components/TkoComponentLoader.js', function() {
                         me.componentLoader = new TkoComponentLoader(me.applicationPath);
-                        me.componentLoader.load(name, successFunction);
+                        afterLoad();
                     }
                 );
             }
+
         }
 
-        private registerComponent(name: string, vm: any, successFunction?: () => void) {
+        public componentIsLoaded(name : string) {
             var me = this;
+            me.usingComponentLoader(function() {
+                return me.componentLoader
+            });
 
-            me.getHtmlTemplate(name, function (htmlSource: string) {
-                ko.components.register(name, {
-                    viewModel: {instance: vm}, // testComponentVm,
-                    template: htmlSource
-                });
-                if (successFunction) {
-                    successFunction();
-                }
+        }
+        public loadComponent(name: string, successFunction?: () => void) {
+            var me = this;
+            me.usingComponentLoader(function() {
+                me.componentLoader.load(name, successFunction);
             });
         }
+
+        public loadComponentInstance(name: string,
+                                     vmInstance : any, // instance of VM or function returning the instance.
+                                     finalFunction?: () => void) {
+            var me = this;
+            me.usingComponentLoader(function() {
+                me.componentLoader.loadComponentInstance(name, vmInstance, finalFunction);
+            });
+        }
+
+        public bindNode(containerName: string, context : any) {
+            var me = this;
+            if (context == null) {
+                context = me.viewModel; // calling context
+            }
+            var container = document.getElementById(containerName); // messages-component-container
+            ko.applyBindingsToNode(container,null,context);
+        };
+
+
+        public bindSection(containerName: string, context : any) {
+            var me = this;
+            if (context == null) {
+                context = me.viewModel; // calling context
+            }
+            var container = document.getElementById(containerName); // messages-component-container
+            if (container==null) {
+                if (containerName) {
+                    alert("Error: Container element '" + containerName + "' for section binding not found.");
+                }
+                else {
+                    alert("Error: not container name for section binding.");
+                }
+                return;
+            }
+            ko.applyBindings(context,container);
+            // ko.applyBindingsToDescendants(context,container);
+            jQuery("#"+containerName).show();
+        };
+
+        public bindComponent = (name: string,
+                                vmInstance : any, // instance of VM or function returning the instance.
+                                finalFunction?: () => void) => {
+            var me = this;
+            me.usingComponentLoader(function() {
+                if (me.componentLoader.alreadyLoaded(name)) {
+                    if (finalFunction) {
+                        finalFunction();
+                    }
+                }
+                else {
+                    me.componentLoader.loadComponentInstance(name, vmInstance, function(vm: any) {
+                        me.bindSection(name + '-container', vm);
+                        if (finalFunction) {
+                            finalFunction();
+                        }
+                    });
+                }
+            });
+        };
 
         public loadWaitMessageTemplate(templateName: string, successFunction: () => void) {
             this.getHtmlTemplate(templateName, function (htmlSource: string) {
@@ -273,14 +334,52 @@ module Tops {
             });
         }
 
+        static defaultSectionId : string = 'tops-view-section';
+
+        public showDefaultSection() {
+            var container = document.getElementById(Tops.Application.defaultSectionId); // messages-component-container
+            jQuery("#"+Tops.Application.defaultSectionId).show();
+        }
+        public bindDefaultSection() {
+            var me = this;
+            me.bindSection(Tops.Application.defaultSectionId,me.viewModel);
+        }
+
+
+        public registerComponent(componentName: string, vm: any, finalFunction?: () => void) {
+            var me = this;
+            me.usingComponentLoader(function() {
+                me.componentLoader.registerComponent(componentName, vm,finalFunction);
+            });
+        }
+
+        /**
+         *
+         * @param componentName
+         * @param vm
+         * @param finalFunction
+         *
+         * Assumes vm source already loaded
+         */
+        public registerAndBindComponent(componentName: string, vm: any, finalFunction?: () => void) {
+            var me = this;
+            me.usingComponentLoader(function() {
+                me.componentLoader.registerComponent(componentName, vm,
+                    function () {
+                        me.bindSection(componentName+'-container', messageManager.instance);
+                        if (finalFunction) {
+                            finalFunction();
+                        }
+                    });
+            });
+        }
+
         public initialize(applicationPath: string, successFunction?: () => void) {
             var me = this;
             me.setApplicationPath(applicationPath);
-            me.serviceUrl = me.applicationPath +
-                me.serviceUrl;
-
+            me.serviceUrl = me.applicationPath +  me.serviceUrl;
             messageManager.instance = new messageManager();
-            me.registerComponent('messages-component', messageManager.instance, function () {
+            me.registerAndBindComponent('service-messages',messageManager.instance, function() {
                 me.loadWaitMessageTemplate('spin-waiter', function () {
                     me.loadWaitMessageTemplate('progress-waiter', function () {
                         if (successFunction) {

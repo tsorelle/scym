@@ -134,7 +134,7 @@ function tops_preprocess_html(&$variables)
  */
 function tops_preprocess_page(&$variables)
 {
-    $variables['trace_messages'] = \Tops\sys\TTracer::RenderTraceMessages();
+    \Drupal\tops\TopsModule::PreprocessPage($variables);
 }
 
 /**

@@ -28,11 +28,16 @@ class GetRegistrationCommandTest extends \PHPUnit_Framework_TestCase
         return $this->manager;
     }
 
+    private $year = null;
+
     public function setUp()
     {
         parent::setUp();
         \Tops\sys\TObjectContainer::Clear();
         \Tops\sys\TObjectContainer::Register('configManager', '\Tops\sys\TYmlConfigManager');
+
+        $session = $this->getManager()->getSession();
+        $this->year = $session->getYear();
     }
 
 
@@ -40,6 +45,7 @@ class GetRegistrationCommandTest extends \PHPUnit_Framework_TestCase
         $dto = RegistrationFakes::makeFakeIRegistration($code);
         $registration = new ScymRegistration();
         $registration->updateFromDataTransferObject(new RegistrationDto($dto));
+        $registration->setYear($this->year);
         return $registration;
     }
 
@@ -59,6 +65,7 @@ class GetRegistrationCommandTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+
     /**
      * @param $code
      * @param int $attenderCount
@@ -73,7 +80,7 @@ class GetRegistrationCommandTest extends \PHPUnit_Framework_TestCase
 
     private function deleteRegistration($code) {
         $manager = $this->getManager();
-        $reg = $manager->getRegistrationByCode($code);
+        $reg = $manager->getRegistrationByCode($code,$this->year);
         if ($reg) {
             $manager->deleteRegistration($reg);
         }

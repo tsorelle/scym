@@ -117,6 +117,8 @@ module Tops {
 
         securityToken: string = '';
 
+        errorInfo = '';
+
         readSecurityToken() {
             var cookie = document.cookie;
             if (cookie) {
@@ -135,8 +137,9 @@ module Tops {
             try {
                 // WCF returns a big whopping HTML page.  Could add code later to parse it but for now, just status info.
                 if (result.status) {
-                    if (result.status == '404')
+                    if (result.status == '404') {
                         return responseText + " The web service was not found.";
+                    }
                     else {
                         responseText = responseText + " Status: " + result.status;
                         if (result.statusText)
@@ -262,6 +265,8 @@ module Tops {
                        errorFunction?: (errorMessage: string) => void) : JQueryPromise<any> {
             var _peanut = this;
 
+            _peanut.errorInfo = '';
+
             // peanut controller requires parameter as a string.
             if (!parameters)
                 parameters = "";
@@ -291,8 +296,10 @@ module Tops {
                     .fail(
                     function(jqXHR, textStatus ) {
                         var errorMessage = _peanut.showExceptionMessage(jqXHR);
-                        if (errorFunction)
+                        _peanut.errorInfo = (jqXHR) ? jqXHR.responseText : '';
+                        if (errorFunction) {
                             errorFunction(errorMessage);
+                        }
                     });
 
 

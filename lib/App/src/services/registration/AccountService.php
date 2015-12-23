@@ -19,6 +19,7 @@ use Tops\sys\TDateTime;
 class AccountService
 {
     private $feeTypes;
+    private $fundNames;
 
     public function __construct(ScymRegistrationsManager $manager = null)
     {
@@ -26,6 +27,8 @@ class AccountService
             $manager = new ScymRegistrationsManager();
         }
         $this->feeTypes = $manager->getFeeDescriptions();
+        $this->fundNames = $manager->getFundNames();
+
     }
 
     /**
@@ -83,12 +86,19 @@ class AccountService
 
     }
 
-    private function getDonationType(ScymDonation $donation) {
+    private function getDonationTypeName(ScymDonation $donation) {
+        $id = $donation->getDonationtypeid();
+        if (array_key_exists($id,$this->fundNames)) {
+            return $this->fundNames[$id];
+        }
+        return 'Unknown fund.';
+        /*
         switch($donation->getDonationtypeid()) {
             case 2 : return 'SCYM Subsidy';
             case 3 : return 'Simple Meal';
             default: return '';
         }
+        */
     }
 
     private function makeDonationsList(array $donations) {
@@ -97,7 +107,8 @@ class AccountService
             /**
              * @var $donation ScymDonation
              */
-            $item = $this->makeLookupItem($donation,$this->getDonationType($donation));
+            $type = $this->getDonationTypeName($donation);
+            $item = $this->makeLookupItem($donation,$type);
             $item->Key = $donation->getDonationtypeid();
             array_push($result,$item);
         }

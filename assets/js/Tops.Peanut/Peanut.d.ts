@@ -14,10 +14,22 @@ declare module Tops {
         loadCSS(name: string, successFunction?: () => void);
         loadJS(names: any, successFunction?: () => void);
         loadResources(names: any, successFunction?: () => void);
+        loadComponentInstance(name: string, getVmInstance : () => any, finalFunction?: () => void);
+        bindComponent(name: string, getVmInstance : () => any, finalFunction?: () => void);
+        bindSection(containerName: string, context?: any);
+        bindNode(containerName: string, context?: any);
+        registerComponent(name: string, vm: any, successFunction?: () => void);
+        registerAndBindComponent(name: string, vm: any, successFunction?: () => void);
+        showDefaultSection();
+        bindDefaultSection();
         peanut: any; // Tops.Peanut;
         viewModel: any;
         serviceUrl: string;
         applicationPath: string;
+    }
+
+    export interface IViewModel {
+
     }
 
     export interface IMessageManager {

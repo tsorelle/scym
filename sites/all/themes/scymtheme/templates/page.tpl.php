@@ -198,7 +198,14 @@
       <?php if (!empty($action_links)): ?>
         <ul class="action-links"><?php print render($action_links); ?></ul>
       <?php endif; ?>
-      <?php print render($page['content']); ?>
+        <?php if (empty($peanut_viewmodel)): ?>
+            <?php print render($page['content']); ?>
+        <?php else: ?>
+            <div id="tops-view-section" style="display: none;">
+                <?php print render($page['content']); ?>
+            </div>
+        <?php endif; ?>
+
     </section>
 
     <?php if (!empty($page['sidebar_second'])): ?>

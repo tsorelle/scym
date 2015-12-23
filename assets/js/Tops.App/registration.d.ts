@@ -147,4 +147,53 @@ declare module Tops {
         housingAssignments: IListItem[];
     }
 
+    export interface IHousingUnit {
+        housingUnitId: any;
+        unitname: string;
+        description: string;
+        capacity: number;
+        occupants: number;
+        housingTypeCode: string;
+        housingTypeName: string;
+        active: any;
+    }
+    export interface IHousingType {
+        housingTypeId: any;
+        housingTypeCode: string;
+        housingTypeDescription: string;
+        category: number;
+        active: any;
+    }
+    export interface IHousingAssignment {
+        housingAssignmentId : any;
+        day: number;
+        dayName: string;
+        housingUnitId: number;
+        note: string;
+        confirmed: boolean;
+    }
+
+    export interface IAttenderHousingAssignment {
+        attenderId : number;
+        attenderName: string;
+        assignments: IHousingAssignment[];
+    }
+
+
+    export interface IGetHousingAssignmentsResponse {
+        registrationId: number;
+        registrationName: string;
+        arrivalDay: number;
+        departureDay: number;
+        assignments: IAttenderHousingAssignment[];
+        units: IHousingUnit[];
+    }
+
+    export interface IGetHousingAssignmentsRequest {
+        registrationId: number;
+        getUnits: boolean;
+    }
+
+
+
 }

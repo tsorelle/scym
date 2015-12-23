@@ -200,7 +200,7 @@ class TViewModel
 
     public static function RenderMessageElements() {
         if (self::getVmPath()) {
-            return '<messages-component></messages-component>';
+            return '<div id="service-messages-container"><service-messages></service-messages></div>';
         }
         return '';
     }

@@ -18,59 +18,106 @@ module Tops {
         }
 
 
-        public static addVM(name : string, vm : any) {
-            TkoComponentLoader.instance.components[name] = vm;
+        public static addVM(componentName : string, vm : any) {
+            TkoComponentLoader.instance.components[componentName] = vm;
         }
 
-        public  getVM(name : string) : any {
+        public  getVM(componentName : string) : any {
             var me = this;
-            return (name in me.components) ? me.components[name] : null;
+            return (componentName in me.components) ? me.components[componentName] : null;
         }
 
-        private nameToFileName(name: string) {
+        private nameToFileName(componentName: string) {
             var me = this;
-            var parts = name.split('-');
+            var parts = componentName.split('-');
             var fileName = parts[0];
             if (parts.length > 1) {
                 fileName += parts[1].charAt(0).toUpperCase() + parts[1].substring(1);
             }
-            fileName += 'Component';
+            // fileName += 'Component';
             return fileName;
         }
 
-        public load(name: string, successFunction : () => void ) {
+        public alreadyLoaded(componentName:string) : boolean {
             var me = this;
-            var fileName = me.nameToFileName(name);
+            return (componentName in me.components)
+        }
+
+        public load(componentName: string, finalFunction : () => void ) {
+            var me = this;
+            if (componentName in me.components) {
+                // don't double load.
+                if (finalFunction) {
+                    finalFunction();
+                }
+                return;
+            }
+            var fileName = me.nameToFileName(componentName);
             var htmlPath = me.applicationPath + me.htmlPath + '/' + fileName + '.html';
+
             jQuery.get(htmlPath, function (htmlSource:string) {
-                var src = me.applicationPath + me.vmPath + '/' + fileName + '.js';
+                var src = me.applicationPath + me.vmPath + '/' + fileName + 'Component.js';
                 head.load(src, function () {
-                    var vm = me.getVM(name);
+                    var vm = me.getVM(componentName);
                     if (vm) {
-                        ko.components.register(name, {
+                        ko.components.register(componentName, {
                             viewModel: vm, //  {instance: vm}, // testComponentVm,
                             template: htmlSource
                         });
                     }
-                    if (successFunction) {
-                        successFunction();
+                    if (finalFunction) {
+                        finalFunction();
                     }
                 });
             });
         }
 
-        public loadInstance(name: string, vmInstance: any, successFunction : () => void ) {
+        // assumes component source already losded
+        public registerComponent(
+                            componentName: string,
+                            vm : any,
+                            finalFunction : (vmInstance?:any) => void ) {
+
+            var me = this;
+            var fileName = me.nameToFileName(componentName);
+            var htmlPath = me.applicationPath + me.htmlPath + '/' + fileName + '.html';
+            jQuery.get(htmlPath, function (htmlSource:string) {
+                // vmInstance can be a function returning the instance or the instance itself
+                if (vm) {
+                    ko.components.register(componentName, {
+                        viewModel: {instance: vm},
+                        template: htmlSource
+                    });
+                }
+                if (finalFunction) {
+                    finalFunction(vm);
+                }
+            });
+        }
+
+        public loadComponentInstance(name: string,
+                            vmInstance : any, //  getVmInstance : () => any,
+                            finalFunction : (vmInstance?:any) => void ) {
             var me = this;
             var fileName = me.nameToFileName(name);
             var htmlPath = me.applicationPath + me.htmlPath + '/' + fileName + '.html';
+
             jQuery.get(htmlPath, function (htmlSource:string) {
-                ko.components.register(name, {
-                    viewModel: {instance: vmInstance},
-                    template: htmlSource
+                var src = me.applicationPath + me.vmPath + '/' + fileName + 'Component.js';
+                head.load(src, function () {
+                    // vmInstance can be a function returning the instance or the instance itself
+                    var vm = (jQuery.isFunction(vmInstance)) ? vmInstance() :  vmInstance;
+
+                    if (vm) {
+                        ko.components.register(name, {
+                            viewModel: {instance: vm},
+                            template: htmlSource
+                        });
+                    }
+                    if (finalFunction) {
+                        finalFunction(vm);
+                    }
                 });
-                if (successFunction) {
-                    successFunction();
-                }
             });
         }
     }

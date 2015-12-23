@@ -833,24 +833,23 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
 
     public function updateFromDataTransferObject(AttenderDto $dto)
     {
-        $this->attenderId            =  $dto->getAttenderId();
-        $this->firstName             =  $dto->getFirstName();
-        $this->lastName              =  $dto->getLastName();
-        $this->middleName            =  $dto->getMiddleName();
-        $this->affiliationCode       =  $dto->getAffiliationCode();
-        $this->otherAffiliation      =  $dto->getOtherAffiliation();
-        $this->firstTimer            =  $dto->getFirstTimer();
-        $this->notes                 =  $dto->getNotes();
-        $this->linens                =  $dto->getLinens();
-        $this->specialNeedsTypeId    =  $dto->getSpecialNeedsTypeId();
-        $this->arrivalTime           =  $dto->getArrivalTime();
-        $this->departureTime         =  $dto->getDepartureTime();
-        $this->housingTypeId         =  $dto->getHousingTypeId();
-        $this->vegetarian            =  $dto->getVegetarian();
-        $this->generationId          =  $dto->getGenerationId();
-        $this->gradeLevel            =  $dto->getGradeLevel();
-        $this->ageGroupId            =  $dto->getAgeGroupId();
-        $this->creditTypeId          =  $dto->getCreditTypeId();
+        $this->setFirstName($dto->getFirstName());
+        $this->setLastName($dto->getLastName());
+        $this->setMiddleName($dto->getMiddleName());
+        $this->setAffiliationCode($dto->getAffiliationCode());
+        $this->setOtherAffiliation($dto->getOtherAffiliation());
+        $this->setFirstTimer($dto->getFirstTimer());
+        $this->setNotes($dto->getNotes());
+        $this->setLinens($dto->getLinens());
+        $this->setSpecialNeedsTypeId($dto->getSpecialNeedsTypeId());
+        $this->setArrivalTime($dto->getArrivalTime());
+        $this->setDepartureTime($dto->getDepartureTime());
+        $this->setHousingTypeId($dto->getHousingTypeId());
+        $this->setVegetarian($dto->getVegetarian());
+        $this->setGenerationId($dto->getGenerationId());
+        $this->setGradeLevel($dto->getGradeLevel());
+        $this->setAgeGroupId($dto->getAgeGroupId());
+        $this->setCreditTypeId($dto->getCreditTypeId());
         switch($this->creditTypeId) {
             case 2:  // teacher credit
                 $this->setTeacher(true);
@@ -863,11 +862,11 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
                 break;
         }
 
-        $this->singleOccupant        =  $dto->getSingleOccupant();
-        $this->glutenFree            =  $dto->getGlutenFree();
+        $this->setSingleOccupant($dto->getSingleOccupant());
+        $this->setGlutenFree($dto->getGlutenFree());
         $attended = $dto->getAttended();
         if ($attended !== null) {
-            $this->attended = $attended;
+            $this->setAttended($attended);
         }
 
         return true;
@@ -876,32 +875,32 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     public function getDataTransferObject()
     {
         $result = new \stdClass();
-        $result->attenderId            =  $this->attenderId;
         $result->registrationId        =  $this->getRegistrationId();
-        $result->firstName             =  $this->firstName;
-        $result->lastName              =  $this->lastName;
-        $result->middleName            =  $this->middleName;
-        $result->dateOfBirth           =  $this->dateOfBirth;
-        $result->affiliationCode       =  $this->affiliationCode;
-        $result->otherAffiliation      =  $this->otherAffiliation;
-        $result->firstTimer            =  $this->firstTimer;
-        $result->creditTypeId          =  $this->creditTypeId;
-        $result->teacher               =  $this->teacher;
-        $result->staffMember           =  $this->staffMember;
-        $result->guest                 =  $this->guest;
-        $result->notes                 =  $this->notes;
-        $result->linens                =  $this->linens;
-        $result->specialNeedsTypeId    =  $this->specialNeedsTypeId;
-        $result->arrivalTime           =  $this->arrivalTime;
-        $result->departureTime         =  $this->departureTime;
-        $result->housingTypeId         =  $this->housingTypeId;
-        $result->vegetarian            =  $this->vegetarian;
-        $result->generationId          =  $this->generationId;
-        $result->gradeLevel            =  $this->gradeLevel;
-        $result->ageGroupId            =  $this->ageGroupId;
-        $result->singleOccupant        =  $this->singleOccupant;
-        $result->glutenFree            =  $this->glutenFree;
-        $result->attended              =  $this->attended;
+        $result->attenderId            =  $this->getAttenderId();
+        $result->firstName             =  $this->getFirstName();
+        $result->lastName              =  $this->getLastName();
+        $result->middleName            =  $this->getMiddleName();
+        $result->dateOfBirth           =  $this->getDateOfBirth();
+        $result->affiliationCode       =  $this->getAffiliationCode();
+        $result->otherAffiliation      =  $this->getOtherAffiliation();
+        $result->firstTimer            =  $this->getFirstTimer();
+        $result->creditTypeId          =  $this->getCreditTypeId();
+        $result->teacher               =  $this->getTeacher();
+        $result->staffMember           =  $this->getStaffMember();
+        $result->guest                 =  $this->getGuest();
+        $result->notes                 =  $this->getNotes();
+        $result->linens                =  $this->getLinens();
+        $result->specialNeedsTypeId    =  $this->getSpecialNeedsTypeId();
+        $result->arrivalTime           =  $this->getArrivalTime();
+        $result->departureTime         =  $this->getDepartureTime();
+        $result->housingTypeId         =  $this->getHousingTypeId();
+        $result->vegetarian            =  $this->getVegetarian();
+        $result->generationId          =  $this->getGenerationId();
+        $result->gradeLevel            =  $this->getGradeLevel();
+        $result->ageGroupId            =  $this->getAgeGroupId();
+        $result->singleOccupant        =  $this->getSingleOccupant();
+        $result->glutenFree            =  $this->getGlutenFree();
+        $result->attended              =  $this->getAttended();
 
         return $result;
     }

@@ -89,9 +89,13 @@ class SaveRegistrationChangesCommand extends TServiceCommand
             $registration->setStatusId(2);
         }
 
-
-        // save initial changes
-        $this->registrationsManager->updateEntity($registration);
+        try {
+            // save initial changes
+            $this->registrationsManager->updateEntity($registration);
+        }
+        catch (\Exception $ex) {
+            throw($ex);
+        }
 
 
         // build account and summary

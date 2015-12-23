@@ -234,6 +234,13 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     private $active = '1';
 
     /**
+     * @var boolean
+     *
+     * @Column(name="confirmed", type="boolean", nullable=false)
+     */
+    private $confirmed = '1';
+
+    /**
      * @var string
      *
      * @Column(name="year", type="string", length=4, nullable=true)
@@ -365,6 +372,29 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     public function getActive()
     {
         return $this->active;
+    }
+
+    /**
+     * Set confirmed
+     *
+     * @param boolean $confirmed
+     * @return ScymRegistration
+     */
+    public function setConfirmed($confirmed)
+    {
+        $this->confirmed = $confirmed;
+
+        return $this;
+    }
+
+    /**
+     * Get confirmed
+     *
+     * @return boolean
+     */
+    public function getConfirmed()
+    {
+        return $this->confirmed;
     }
 
     /**
@@ -700,25 +730,25 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
      */
     public function getDataTransferObject() {
         $result = new \stdClass();
-        $result->registrationId           = $this->registrationId;
-        $result->registrationCode         = $this->registrationCode;
-        $result->name                     = $this->name;
-        $result->address                  = $this->address;
-        $result->city                     = $this->city  ;
-        $result->phone                    = $this->phone ;
-        $result->email                    = $this->email ;
-        $result->receivedDate             = $this->formatDtoDate($this->receivedDate);
-        $result->notes                    = $this->notes ;
-        $result->scymNotes                = $this->scymNotes;
-        $result->active                   = $this->active;
-        $result->financialAidAmount       = $this->financialAidAmount;
-        $result->statusDate               = $this->formatDtoDate($this->statusDate);
-        $result->statusId                 = $this->statusId;
+        $result->registrationId           = $this->getRegistrationId();
+        $result->registrationCode         = $this->getRegistrationCode();
+        $result->name                     = $this->getName();
+        $result->address                  = $this->getAddress();
+        $result->city                     = $this->getCity  ();
+        $result->phone                    = $this->getPhone ();
+        $result->email                    = $this->getEmail ();
+        $result->notes                    = $this->getNotes ();
+        $result->scymNotes                = $this->getScymNotes();
+        $result->active                   = $this->getActive();
+        $result->financialAidAmount       = $this->getFinancialAidAmount();
+        $result->statusId                 = $this->getStatusId();
+        $result->confirmed                = $this->getConfirmed();
+        $result->statusDate               = $this->formatDtoDate($this->getStatusDate());
+        $result->receivedDate             = $this->formatDtoDate($this->getReceivedDate());
 
         // may be obsolete
         // $result->feesReceivedDate         = $this->formatDtoDate($this->feesReceivedDate);
         // $result->financialAidContribution = $this->financialAidContribution;
-        // $result->confirmed                = $this->confirmed;
         // $result->contactRequested         = $this->contactRequested;
         // $result->attended                 = $this->attended;
         // $result->amountPaid               = $this->amountPaid;
@@ -738,7 +768,7 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
     public function updateFromDataTransferObject(RegistrationDto $dto, $updateAdminFields = false)
     {
         if ($dto->getRegistrationId() < 1) {
-            $this->registrationCode = $dto->getRegistrationCode();
+            $this->setRegistrationCode($dto->getRegistrationCode());
         }
 
         $year = $dto->getYear();
@@ -747,14 +777,17 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         }
 
         $this->setStatusId($dto->getStatusId());
-
-        $this->name                     = $dto->getName();
-        $this->address                  = $dto->getAddress();
-        $this->city                     = $dto->getCity();
-        $this->phone                    = $dto->getPhone();
-        $this->email                    = $dto->getEmail();
-        $this->notes                    = $dto->getNotes();
-        $this->financialAidAmount       = $dto->getFinancialAidAmount();
+        $this->setName( $dto->getName());
+        $this->setAddress( $dto->getAddress());
+        $this->setCity( $dto->getCity());
+        $this->setPhone( $dto->getPhone());
+        $this->setEmail( $dto->getEmail());
+        $this->setNotes ( $dto->getNotes());
+        $this->setFinancialAidAmount( $dto->getFinancialAidAmount());
+        $confirmed = $dto->getConfirmed();
+        if ($confirmed !== null) {
+            $this->setConfirmed($confirmed);
+        }
 
         // obsolete?
         //         $this->contactRequested         = $dto->getContactRequested();

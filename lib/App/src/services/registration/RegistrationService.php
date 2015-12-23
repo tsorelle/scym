@@ -31,6 +31,7 @@ class RegistrationService
      *      {
      *          type: 'id' | 'code'
      *          value: int | string
+     *          year: 'nnnn' | optional / null
      *      }
      *
      *  Response
@@ -57,7 +58,12 @@ class RegistrationService
                 $registration =  $this->manager->getRegistration($request->value);
                 break;
             case 'code' :
-                $registration =  $this->manager->getRegistrationByCode($request->value);
+                $year = isset($request->year) ? $request->year : null;
+                if ($year == null) {
+                    $session = $this->manager->getSession();
+                    $year = $session->getYear();
+                }
+                $registration =  $this->manager->getRegistrationByCode($request->value,$year);
                 break;
             default:
                 $registration = null;
@@ -78,7 +84,6 @@ class RegistrationService
         $response->accountSummary = $accountService->formatAccountSummary($account);
         $getFundList = isset($request->getFundList) ? $request->getFundList : false;
         $response->accountSummary->funds = $getFundList ? $this->manager->getFundList() : [];
-
         $response->registration = $registration->getDataTransferObject();
         $response->attenderList = $registration->getAttenderList();
         // todo: retrieve and format housing assignments

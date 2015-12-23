@@ -20,10 +20,10 @@ use Tops\sys\TUser;
  * @return string|void
  */
 function scymtheme_status_messages($variables) {
-    $vmPath = TViewModel::getVmPath();
     $result = bootstrap_status_messages($variables);
+    $vmPath = TViewModel::getVmPath();
     if ($vmPath !== null && isset($vmPath->messagesComponent) &&  $vmPath->messagesComponent) {
-        $result = "$result\n<messages-component></messages-component>";
+        $result = "$result\n<div id='service-messages-container'><service-messages></service-messages></div>";
     }
     return $result;
 }

@@ -53,7 +53,7 @@ class DateStampedEntity {
             }
 
             if (empty($this->currentUserName)) {
-                $this->username = 'unknown';
+                $this->setUsername('unknown');
             }
         }
         return $this->currentUserName;
@@ -65,11 +65,11 @@ class DateStampedEntity {
         $now = new \DateTime();
         $username = $this->getCurrentUserName();
         if ($initial) {
-            $this->dateadded = $now;
-            $this->addedby = $username ;
+            $this->setDateAdded( $now);
+            $this->setAddedBy( $username );
         }
-        $this->dateupdated = $now;
-        $this->updatedby = $username;
+        $this->setDateUpdated($now);
+        $this->setUpdatedBy($username);
     }
 
     public function setUpdateStamp() {
