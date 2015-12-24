@@ -9,6 +9,8 @@ date_default_timezone_set('America/Chicago');
 require_once __DIR__."/TTestLoader.php";
 // autoload tops and drupal core
 $loader = require_once(__DIR__.'/../Tops/start/autoload.php');
+\Tops\sys\TClassPath::Add('\Fakes','test/unit/fakes');
+
 
 // autoload all extensions and set up drupal testing
 // require_once(__DIR__.'/../../core/tests/bootstrap.php');

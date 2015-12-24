@@ -153,6 +153,7 @@ class GetRegistrationCommandTest extends \PHPUnit_Framework_TestCase
         $this->deleteRegistration($code);
     }
 
+    /*
     public function testGetExistingRegistration() {
         $code = 'testreg1@test.com';
 
@@ -180,7 +181,7 @@ class GetRegistrationCommandTest extends \PHPUnit_Framework_TestCase
         $actual = isset($accountSummary->balance) ? substr($accountSummary->balance,1) : '';
         $this->assertGreaterThan(0.00,(float)$actual,'Wrong balsnce');
     }
-
+    */
 
     private function runCommand($type,$value) {
         $command = new GetRegistrationCommand();

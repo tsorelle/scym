@@ -27,6 +27,8 @@ require_once(__DIR__.'/../../App/start/init.php');
 \Tops\sys\TObjectContainer::Register('serviceHost','\Tops\services\TServiceHost','serviceFactory,tops.userfactory,exceptionHandler');
 // \Tops\sys\TObjectContainer::Register('mailboxManager','\App\test\TestMailboxManager');
 \Tops\sys\TObjectContainer::Register('postoffice','\Tops\sys\TPostOffice','mailer,mailboxManager');
+\Tops\sys\TObjectContainer::Register('contentManager','Drupal\tops\content\NodeManager');
+
 
 // Use with Drupal 7 for D8 emulation
 \Tops\sys\TObjectContainer::Register('path.alias_manager','Drupal\Core\Path\AliasManager');

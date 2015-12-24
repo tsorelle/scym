@@ -11,6 +11,9 @@ use App\db\scym\ScymRegistration;
 use App\db\ScymAccountManager;
 use App\db\ScymRegistrationsManager;
 use Tops\services\TServiceCommand;
+use Tops\sys\TContentManager;
+use Tops\sys\TPostOffice;
+use Tops\sys\TTextTemplate;
 use Tops\sys\TUser;
 
 class SaveRegistrationChangesCommand extends TServiceCommand
@@ -85,7 +88,8 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         $this->registrationsManager->updateDonations($request->getDonations(),$registration);
 
         $attenders = $registration->getAttenders()->toArray();
-        if ($registration->getStatusId() == 1 && count($attenders) ) {
+        $recieved = ($registration->getStatusId() == 1 && count($attenders));
+        if ($recieved) {
             $registration->setStatusId(2);
         }
 
@@ -111,6 +115,10 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         $response->attenderList = $registration->getAttenderList();
         // todo: retrieve and format housing assignments
         $response->housingAssignments = array();
+
+        if ($recieved) {
+            $this->sendConfirmationMessage($response);
+        }
 
         $this->setReturnValue($response);
 
@@ -151,6 +159,28 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         $registration->updateAttenders($attenders);
         $this->registrationsManager->clearAccountItems($registration);
         return $registration;
+    }
+
+    /**
+     * @param $response
+     */
+    protected function sendConfirmationMessage($response)
+    {
+        $session = $this->registrationsManager->getSession();
+        $tokens = array(
+            'name' => $response->registration->name,
+            'dates' => $session->getStart()->format('F NS') .
+                ' to ' . $session->getEnd()->format('F NS') . ', ' . $session->getYear(),
+            'code' => $response->registration->registrationCode,
+            'cost' => $response->accountSummary->balance
+        );
+        $template = TContentManager::GetText('templates/registration-response');
+        $messageText = TTextTemplate::Merge($tokens, $template);
+        $message = TPostOffice::CreateMessageFromUs('registrar', 'SCYM Registration', $messageText);
+        $message->setRecipient($response->registration->email);
+        $registrarAddress = TPostOffice::GetMailboxAddress('registrar');
+        $message->addCC($registrarAddress->getEmail(), $registrarAddress->getName());
+        TPostOffice::Send($message);
     }
 
 }

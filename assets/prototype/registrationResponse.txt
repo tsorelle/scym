@@ -1,0 +1,12 @@
+Dear {{name}},
+
+Thank you for your registration for South Central Yearly Meeting annual sessions on {{dates}}.
+
+Your registration fees amount to {{cost}}, payable on arrival by check or cash.
+
+You can make any changes or cancel your registration at the web site: http://www.scym.org/register?code={{code}}
+
+You will receive another email message from us shortly before yearly meeting providing you with the camp gate code, your housing assignments and any other late-breaking information.
+
+Meanwhile if you have any questions please contact the registrar at registrar@scym.org
+
