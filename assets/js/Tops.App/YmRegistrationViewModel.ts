@@ -1,17 +1,18 @@
 /**
  * Created by Terry on 11/01/2015.
  */
+/// <reference path="./App.ts" />
+/// <reference path="user.d.ts" />
+/// <reference path="registration.d.ts" />
 /// <reference path='../typings/knockout/knockout.d.ts' />
 /// <reference path='../typings/underscore/underscore.d.ts' />
 /// <reference path='../typings/bootstrap/bootstrap.d.ts' />
-/// <reference path="./App.ts" />
+/// <reference path='../typings/jqueryui/jqueryui.d.ts' />
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />
-/// <reference path="user.d.ts" />
-/// <reference path="registration.d.ts" />
-/// <reference path="formComponents.ts" />
+/// <reference path='../components/editPanel.ts' />
+/// <reference path='../components/searchListObservable.ts' />
 /// <reference path="../components/textParser.ts" />
-/// <reference path='../typings/jqueryui/jqueryui.d.ts' />
 
 module Tops {
 
@@ -1079,9 +1080,9 @@ module Tops {
         lookupForm = new lookupFormObservable();
         attenderForm = new attenderObservable();
         registrationForm = new registrationObservable();
-        familyMemberResults = new searchListObservable(2, 6);
         private familyMembers:IFamilyAttender[] = [];
-        addressSearchResults = new searchListObservable(2, 6);
+        familyMemberResults : searchListObservable;
+        addressSearchResults : searchListObservable;
         addressSearchValue = ko.observable('');
         addressSearchWarning = ko.observable('');
 
@@ -1254,8 +1255,10 @@ module Tops {
 
             me.application.initialize(applicationPath,
                 function () {
-                    me.application.loadResources(['scym-registration.css', 'textParser.js'],
+                    me.application.loadResources(['scym-registration.css', 'textParser.js','searchListObservable.js'],
                         function () {
+                            me.familyMemberResults = new searchListObservable(2, 6);
+                            me.addressSearchResults = new searchListObservable(2, 6);
                             me.application.loadComponent('modal-confirm', function() {
                                 me.attenderForm.initialize();
                                 me.getInitialInfo(successFunction);

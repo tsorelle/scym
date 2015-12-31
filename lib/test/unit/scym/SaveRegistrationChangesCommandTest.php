@@ -24,6 +24,14 @@ class SaveRegistrationChangesCommandTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
         \Tops\sys\TObjectContainer::Clear();
         \Tops\sys\TObjectContainer::Register('configManager', '\Tops\sys\TYmlConfigManager');
+
+        // required for notification handling
+        \Tops\sys\TObjectContainer::Register('contentManager','Fakes\FakeContentManager');
+        \Tops\sys\TObjectContainer::Register('mailer','\Tops\sys\TNullMailer');
+        \Tops\sys\TObjectContainer::register('mailboxManager','\App\db\TScymMailboxManager','configManager');
+        \Tops\sys\TObjectContainer::Register('postoffice','\Tops\sys\TPostOffice','mailer,mailboxManager');
+
+
     }
 
 

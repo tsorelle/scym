@@ -46,9 +46,9 @@ class ScymHousingUnit
     /**
      * @var string
      *
-     * @Column(name="housingTypeCode", type="string", length=20, nullable=true)
+     * @Column(name="housingTypeId", type="integer", nullable=true)
      */
-    private $housingTypeCode;
+    private $housingTypeId;
 
 
     /**
@@ -131,25 +131,25 @@ class ScymHousingUnit
     }
 
     /**
-     * Set housingTypeCode
+     * Set housingTypeId
      *
-     * @param string $housingTypeCode
+     * @param integer $housingTypeId
      * @return ScymHousingUnit
      */
-    public function setHousingTypeCode($housingTypeCode)
+    public function setHousingTypeId($housingTypeId)
     {
-        $this->housingTypeCode = $housingTypeCode;
+        $this->housingTypeId = $housingTypeId;
 
         return $this;
     }
 
     /**
-     * Get housingTypeCode
+     * Get housingTypeId
      *
      * @return string 
      */
-    public function getHousingTypeCode()
+    public function getHousingTypeId()
     {
-        return $this->housingTypeCode;
+        return $this->housingTypeId;
     }
 }

@@ -5,7 +5,7 @@
             <ul class="nav nav-tabs">
                 <li  data-bind="css: {active: currentForm() == 'assignments'}"><a href="#" data-bind="click:showAssignmentForm">Assignments</a></li>
                 <li  data-bind="css: {active: currentForm() == 'units'}"><a href="#" data-bind="click:showHousingUnitsForm">Housing units</a></li>
-                <li  data-bind="css: {active: currentForm() == 'types'}"><a href="#" data-bind="click:showHousingTypesForm">Housing type</a></li>
+                <li  data-bind="css: {active: currentForm() == 'types'}"><a href="#" data-bind="click:showHousingTypesForm">Housing types</a></li>
             </ul>
         </div>
     </div>
@@ -22,7 +22,6 @@
 
             <div id="housing-units-form" data-bind="visible:currentForm() == 'units'">
                 <div id="housing-units-container"><housing-units></housing-units></div>
-
             </div>
             <div id="housing-types-form"  data-bind="visible:currentForm() == 'types'">
                 <div id="housing-types-container"><housing-types></housing-types></div>

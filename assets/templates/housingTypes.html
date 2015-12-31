@@ -1,1 +1,67 @@
-<p>Housing types component</p>
+
+<div id="types-table">
+    <p>
+        [<a href="#" data-bind="click:showNewHousingTypeDialog">Create new housing type</a>]
+    </p>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Code</th><th>Description</th><th>Category</th><th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach:housingTypes">
+        <tr>
+            <td data-bind="text:housingTypeCode"></td>
+            <td data-bind="text:housingTypeDescription"></td>
+            <td data-bind="text:categoryName"></td>
+            <td>
+                [<a href="#" data-bind="click:$parent.deleteHousingType">Delete</a>]
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modals -->
+<div>
+
+<div class="modal" id="housingtype-update-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4>New Housing Type</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div data-bind="visible:housingTypeForm.errorMessage()">
+                        <span class="error" data-bind="text: housingTypeForm.errorMessage"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="typecode">Type code</label>
+                        <input type="text" class="form-control" id="typecode" data-bind="textInput: housingTypeForm.code" />
+                    </div>
+
+                    <div class="form-group" >
+                        <label class="control-label" for="description">Description</label>
+                        <input type="text" class="form-control" id="description" data-bind="textInput: housingTypeForm.description" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="category">Category</label>
+                        <select id="category" class="form-control"  data-bind="options: categories, optionsText: 'Name', value: housingTypeForm.selectedCategory, optionsCaption: '-- Select --'"></select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bind="click: updateHousingType">Save changes</button>
+                <button type="button" class="btn btn-default"  data-dismiss="modal">Cancel</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+    <modal-confirm params="id:'confirm-type-delete-modal',headerText: 'Please confirm', bodyText: 'Do you really want to delete this housing type?', confirmClick: doDelete, buttonSet: 'yesno'"></modal-confirm>
+</div>
+
+
+

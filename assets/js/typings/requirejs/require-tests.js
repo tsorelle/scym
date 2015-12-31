@@ -28,6 +28,5 @@ require(['main'], function (main, $, _, Backbone) {
     app.run();
 });
 var recOne = require.config({ baseUrl: 'js' });
-recOne(['core'], function (core) {
-});
+recOne(['core'], function (core) { });
 //# sourceMappingURL=require-tests.js.map

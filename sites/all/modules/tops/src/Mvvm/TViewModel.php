@@ -146,6 +146,12 @@ class TViewModel
         return '/assets/js/Tops.App';
     }
 
+    public static function getComponentsDirectory() {
+        // maybe replace with configuration some day
+        return '/assets/js/components';
+    }
+
+
     private static function getVMPathList() {
         if (self::$vmPaths === null) {
             self::$vmPaths = array();
@@ -153,6 +159,7 @@ class TViewModel
             $configFile = @fopen($configpath,'r');
             if ($configFile) {
                 $vmDirectory = self::getVmDirectory();
+                $componentsDirectory = self::getComponentsDirectory();
                 // $vmRootPath = \Tops\sys\TPath::FromRoot($vmDirectory);
                 while(!feof($configFile)) {
                     $item = new \stdClass();
@@ -162,7 +169,7 @@ class TViewModel
                     if ($partsCount > 1) {
                         $key = trim($parts[0]);
                         $value = trim($parts[1]);
-                        $item->path = $vmDirectory.'/'.$value.'.js';
+                        $item->path = $vmDirectory . '/' . $value . '.js';
                         $item->messagesComponent = true;
                         if ($partsCount > 2) {
                             for ($i = 2; $i < $partsCount; $i++) {

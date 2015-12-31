@@ -17,21 +17,23 @@
 /// <reference path='../typings/jqueryui/jqueryui.d.ts' />
 
 module Tops {
-    export class HousingAssignmentsViewModel implements IMainViewModel {
-        static instance: Tops.HousingAssignmentsViewModel;
+    export class HousingManagementViewModel implements IMainViewModel, IEventSubscriber {
+        static instance: Tops.HousingManagementViewModel;
         private application: Tops.IPeanutClient;
         private peanut: Tops.Peanut;
 
         currentForm = ko.observable('assignments');
 
+        private housingAssignmentsVM : IHousingViewModel;
         private housingTypesVm: any;
         private housingUnitsVm: any;
+        private housingLookupVm: any;
 
 
         // Constructor
         constructor() {
             var me = this;
-            Tops.HousingAssignmentsViewModel.instance = me;
+            Tops.HousingManagementViewModel.instance = me;
             me.application = new Tops.Application(me);
             me.peanut = me.application.peanut;
         }
@@ -58,28 +60,22 @@ module Tops {
         init(applicationPath: string = '/', successFunction?: () => void) {
             var me = this;
             successFunction = me.afterInit;
-            // setup messaging and other application initializations
-            // initialize date popus if used
-            /*
-             jQuery(function() {
-             jQuery( ".datepicker" ).datepicker();
-             });
-             */
-
-
             me.application.initialize(applicationPath,
                 function () {
-                    me.application.loadResources(['housingAssignmentComponent.js', 'housingLookupComponent.js'],
+                    me.application.loadResources(['housingAssignmentComponent.js', 'housingLookupComponent.js','searchListObservable.js'],
                         function () {
-                            me.application.registerAndBindComponent('housing-assignment',
-                                new housingAssignmentComponent(me.application),
-                                function () {
-                                    me.application.registerAndBindComponent('housing-lookup',
-                                        new housingLookupComponent(me.application,me.onRegistrationSelected),
+                            me.housingAssignmentsVM = new housingAssignmentComponent(me.application,me);
+                            me.application.registerComponent('housing-assignment',me.housingAssignmentsVM,function() {
+                                me.housingAssignmentsVM.initialize(function() {
+                                    me.housingLookupVm = new housingLookupComponent(me.application,me.onRegistrationSelected);
+                                    me.application.registerComponent('housing-lookup',me.housingLookupVm,
                                         function () {
-                                            successFunction();
+                                            me.application.loadComponent('modal-confirm', function() {
+                                                successFunction();
+                                            });
                                         });
                                 });
+                            });
                         });
                 });
         }
@@ -98,7 +94,7 @@ module Tops {
             var me = this;
 
             me.application.bindSection('tabs');
-            me.application.bindNode('assignments');
+            me.application.bindSection('assignments');
             me.application.bindNode('housing-units-form');
             me.application.bindNode('housing-types-form');
             me.application.showDefaultSection();
@@ -106,11 +102,19 @@ module Tops {
 
         onRegistrationSelected = (regId: number) => {
             var me = this;
+            if (regId) {
+                me.housingLookupVm.searchFormVisible(false);
+                me.housingAssignmentsVM.getAssignments(regId);
+            }
+            else {
+                me.housingAssignmentsVM.reset();
+            }
         };
 
         showAssignmentForm = () => {
             var me = this;
             me.currentForm('assignments');
+            me.housingAssignmentsVM.handleEvent('assignmentspageselected');
         };
 
 
@@ -122,15 +126,29 @@ module Tops {
             else {
                 me.application.bindComponent('housing-units',
                     function() {
-                        me.housingUnitsVm = new housingUnitsComponent(me.application);
+                        me.housingUnitsVm = new housingUnitsComponent(me.application,me);
                         return me.housingUnitsVm;
                     },
                     function() {
+                        me.housingUnitsVm.getUnits();
                         me.currentForm('units');
                     }
                 );
             }
         };
+
+        private housingTypesToLookupList(data: any) {
+            var result = [];
+            var types : IHousingType[] = _.sortBy(<IHousingType[]>data,'housingTypeDescription');
+            _.each(types,function(type: IHousingType) {
+                var item : ILookupItem = {
+                    Key: type.housingTypeId,
+                    Text: type.housingTypeDescription,
+                    Description: ''
+                };
+                result.push(item);
+            });
+        }
 
         showHousingTypesForm = () => {
             var me = this;
@@ -140,41 +158,41 @@ module Tops {
             else {
                 me.application.bindComponent('housing-types',
                     function() {
-                        me.housingTypesVm = new housingTypesComponent(me.application);
+                        me.housingTypesVm = new housingTypesComponent(me.application, me);
                         return me.housingTypesVm;
                     },
                     function() {
+                        me.housingTypesVm.getTypes();
                         me.currentForm('types');
                     }
                 );
             }
         };
 
-        public serviceCallTemplate() {
-            // todo: delete serviceCallTemplate when not needed
+        handleEvent = (eventName:string, data:any = null) => {
             var me = this;
-            var request = null; //
-
-            me.application.hideServiceMessages();
-            me.application.showWaiter('Message here...');
-            me.peanut.executeService('directory.ServiceName',request, me.handleServiceResponseTemplate)
-                .always(function() {
-                    me.application.hideWaiter();
-                });
-        }
-
-        private handleServiceResponseTemplate = (serviceResponse: IServiceResponse) => {
-            // todo: delete handleServiceResponseTemplate when not needed
-            var me = this;
-            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-
+            switch (eventName) {
+                case 'housingtypesupdated':
+                    var typesList = me.housingTypesToLookupList(data);
+                    if (me.housingUnitsVm) {
+                        me.housingUnitsVm.handleEvent(eventName,typesList);
+                    }
+                    if (me.housingTypesVm) {
+                        me.housingAssignmentsVM.handleEvent(eventName, typesList);
+                    }
+                    break;
+                case 'housingunitsupdated':
+                    me.housingAssignmentsVM.handleEvent(eventName,data);
+                    break;
+                case 'assignmentformclosed' :
+                    me.housingLookupVm.searchFormVisible(true);
+                    break;
             }
-        };
-
+        }
     }
 }
 
-(new Tops.HousingAssignmentsViewModel()).init();
+(new Tops.HousingManagementViewModel()).init();
 
 /*
 Tops.HousingAssignmentsViewModel.instance = new Tops.HousingAssignmentsViewModel();

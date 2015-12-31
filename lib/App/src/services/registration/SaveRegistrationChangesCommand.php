@@ -177,6 +177,9 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         $template = TContentManager::GetText('templates/registration-response');
         $messageText = TTextTemplate::Merge($tokens, $template);
         $message = TPostOffice::CreateMessageFromUs('registrar', 'SCYM Registration', $messageText);
+        if ($message == null) {
+            return; // in some unit test scenarios $message is not created. Ignore for these cases.
+        }
         $message->setRecipient($response->registration->email);
         $registrarAddress = TPostOffice::GetMailboxAddress('registrar');
         $message->addCC($registrarAddress->getEmail(), $registrarAddress->getName());

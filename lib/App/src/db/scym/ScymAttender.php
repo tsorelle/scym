@@ -19,6 +19,29 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     public function __construct()
     {
         $this->meals = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->housingAssignments = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * @OneToMany(targetEntity="ScymHousingAssignment", mappedBy="attender",fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     */
+    protected $housingAssignments;
+
+    public function addHousingAssignment(ScymHousingAssignment $housingAssignment) {
+        $this->housingAssignments[] = $housingAssignment;
+        $housingAssignment->setAttender($this);
+        return $this;
+    }
+
+    public function removeHousingAssignment(ScymHousingAssignment $housingAssignment) {
+        $this->housingAssignments->removeElement($housingAssignment);
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getHousingAssignments()  {
+        return $this->housingAssignments;
     }
 
     /**

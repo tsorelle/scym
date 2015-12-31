@@ -1,1 +1,77 @@
-<p>Housing assignment component</p>
+<div id="housing-assignments-panel" data-bind="visible: housingAssignments().length">
+    <div id="titleHeader" data-bind="visible:formTitle()" class="row">
+        <div class="col-md-12">
+        <h3 data-bind="text:formTitle"></h3>
+        </div>
+    </div>
+    <div id="assignments-header" class="row" data-bind="visible: !assignedByAttender()">
+        <div class="col-md-4 form-group">
+            <label class="control-label">
+                Housing preference
+            </label>
+            <select class="form-control"  data-bind="options: housingTypes, optionsText: 'Text', value: defaultHousingType, optionsCaption: '-- Show all --'"></select>
+        </div>
+        <div class="col-md-3 form-group">
+            <label class="control-label">
+                Housing assignment
+            </label>
+            <select class="form-control"  data-bind="options: housingUnits, optionsText: 'unitname', value: defaultHousingUnit, optionsCaption: '-- Not assigned --'"></select>
+        </div>
+
+        <div class="col-md-5" class="form-group" style="padding-top: 24px;padding-bottom: 8px">
+            <button class="btn btn-default" data-bind="click:showAssignmentDetail">Assign by attender</button>
+        </div>
+    </div>
+
+    <div data-bind="visible: assignedByAttender">
+        <div data-bind="foreach: {data: housingAssignments, as: 'attenderAssignment'}">
+            <h4>
+                Attender: <span data-bind="text: attenderAssignment.attender.attenderName"></span>
+            </h4>
+            <div data-bind="foreach: {data: assignments, as: 'assignment'}">
+                <!-- Note: $parents[1] refers to the 'grandparent' of the housing-selector component, housingAssignmentComponent.ts
+                    $parent would be housingAssignments and $root would be the base view model, e.g. HousingAssignmentsView.ts
+                -->
+                <housing-selector params="attender: attenderAssignment.attender, assignment: assignment, owner: $parents[1]"></housing-selector>
+            </div>
+        </div>
+    </div>
+
+    <div id="buttons">
+        <button class="btn btn-primary" data-bind="click: saveAssignments, visible: updatedAssignments().length > 0" style="margin-right: 10px">Save</button>
+        <button class="btn btn-primary" data-bind="click: getConfirmationText, visible: updatedAssignments().length == 0">Send confirmation</button>
+        <button class="btn btn-primary" data-bind="click: closeForm">Next <span class="glyphicon glyphicon-forward"></span></button>
+    </div>
+
+    <!-- Modals -->
+    <div id="modals-section">
+        <div class="modal fade" id="confirmation-message-modal" tabindex="-1" role="dialog" aria-labelledby="confirmation-header">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 id="confirmation-header" class="modal-title">Confirmation Message</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="confirmation-input" class="control-label">Confirmation message. Make any changes you like.</label>
+                                    <textarea rows="10" class="form-control" id="confirmation-input"
+                                              data-bind="value:confirmationText"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button data-bind="click:sendConfirmationMessage" class="btn btn-primary" type="button">
+                            Send <span class="glyphicon glyphicon-send"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<modal-confirm params="id:'confirm-reload-modal',headerText: 'Please confirm', bodyText: 'Lookup lists (Types or Units) were updated. Reload the page?', confirmClick: reloadPage, buttonSet: 'yesno'"></modal-confirm>

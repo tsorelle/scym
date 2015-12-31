@@ -58,7 +58,7 @@ declare module Tops {
 
     export interface INameValuePair {
         Name: string;
-        Value: string;
+        Value: any;
     }
 
     export interface IKeyValuePair {
@@ -89,5 +89,9 @@ declare module Tops {
 
     export interface IIndexedInput extends IInputItem {
         Key: any;
+    }
+
+    export interface IEventSubscriber {
+        handleEvent : (eventName: string, data?: any) => void;
     }
 }

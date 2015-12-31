@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * ScymHousingAssignment
  *
- * @Table(name="housingassignments", uniqueConstraints={@UniqueConstraint(name="personDay", columns={"attenderId", "day"})})
+ * @Table(name="housingassignments", uniqueConstraints={@UniqueConstraint(name="personDay", columns={"attenderID", "day"})}, indexes={@Index(name="housingassignments_attender_fk", columns={"attenderID"})})
  * @Entity
  */
 class ScymHousingAssignment
@@ -23,11 +23,42 @@ class ScymHousingAssignment
     private $housingAssignmentId;
 
     /**
-     * @var integer
+     * @var ScymAttender
      *
-     * @Column(name="attenderId", type="integer", nullable=true)
+     * @ManyToOne(targetEntity="ScymAttender",inversedBy="meals")
+     * @JoinColumn(name="attenderID", referencedColumnName="attenderID")
      */
-    private $attenderId;
+    protected $attender;
+
+    /**
+     * Set attender
+     *
+     * @param ScymAttender $attender
+     * @return ScymMeal
+     */
+    public function setAttender(ScymAttender $attender = null)
+    {
+        $this->attender = $attender;
+
+        return $this;
+    }
+
+    /**
+     * Get attender
+     *
+     * @return ScymAttender
+     */
+    public function getAttender()
+    {
+        return $this->attender;
+    }
+
+    public function getAttenderId()
+    {
+        return $this->attender ? $this->attender->getAttenderid() : null;
+    }
+
+
 
     /**
      * @var integer
@@ -35,13 +66,6 @@ class ScymHousingAssignment
      * @Column(name="day", type="integer", nullable=true)
      */
     private $day;
-
-    /**
-     * @var integer
-     *
-     * @Column(name="housingTypeId", type="integer", nullable=true)
-     */
-    private $housingTypeId;
 
     /**
      * @var integer
@@ -76,29 +100,6 @@ class ScymHousingAssignment
     }
 
     /**
-     * Set attenderId
-     *
-     * @param integer $attenderId
-     * @return ScymHousingAssignment
-     */
-    public function setAttenderId($attenderId)
-    {
-        $this->attenderId = $attenderId;
-
-        return $this;
-    }
-
-    /**
-     * Get attenderId
-     *
-     * @return integer 
-     */
-    public function getAttenderId()
-    {
-        return $this->attenderId;
-    }
-
-    /**
      * Set day
      *
      * @param integer $day
@@ -119,29 +120,6 @@ class ScymHousingAssignment
     public function getDay()
     {
         return $this->day;
-    }
-
-    /**
-     * Set housingTypeId
-     *
-     * @param integer $housingTypeId
-     * @return ScymHousingAssignment
-     */
-    public function setHousingTypeId($housingTypeId)
-    {
-        $this->housingTypeId = $housingTypeId;
-
-        return $this;
-    }
-
-    /**
-     * Get housingTypeId
-     *
-     * @return integer 
-     */
-    public function getHousingTypeId()
-    {
-        return $this->housingTypeId;
     }
 
     /**
@@ -211,5 +189,12 @@ class ScymHousingAssignment
     public function getConfirmed()
     {
         return $this->confirmed;
+    }
+
+    public static function CreateAssignment($day,$unitId) {
+        $result = new ScymHousingAssignment();
+        $result->setDay($day);
+        $result->setHousingUnitId($unitId);
+        return $result;
     }
 }

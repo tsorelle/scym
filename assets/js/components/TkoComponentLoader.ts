@@ -43,6 +43,7 @@ module Tops {
             return (componentName in me.components)
         }
 
+        // load component source and template, create instance and register
         public load(componentName: string, finalFunction : () => void ) {
             var me = this;
             if (componentName in me.components) {
@@ -72,7 +73,7 @@ module Tops {
             });
         }
 
-        // assumes component source already losded
+        // load template, create instance and register.  Assumes source already load.
         public registerComponent(
                             componentName: string,
                             vm : any,
@@ -95,6 +96,7 @@ module Tops {
             });
         }
 
+        // load template and register instance. Instance argumnet may be a function returning an instance or the instance itself.
         public loadComponentInstance(name: string,
                             vmInstance : any, //  getVmInstance : () => any,
                             finalFunction : (vmInstance?:any) => void ) {

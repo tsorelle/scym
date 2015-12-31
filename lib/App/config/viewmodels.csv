@@ -1,4 +1,4 @@
-members/directory,ScymDirectoryViewModel,formComponents
+members/directory,ScymDirectoryViewModel,component:editPanel,component:searchListObservable
 members/download,DownloadsViewModel
 mailboxes,MailboxesViewModel
 mailform,MailFormViewModel
@@ -9,4 +9,4 @@ helloworld,HelloWorldViewModel
 registerdocument,RegisterDocumentViewModel
 testpage,ComponentTestViewModel
 meetings/gmap,MeetingsMapViewModel,maps.api,url:http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js
-register,YmRegistrationViewModel,formComponents,no-messages
+register,YmRegistrationViewModel,component:editPanel,no-messages

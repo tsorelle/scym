@@ -163,7 +163,13 @@ class TopsModule {
                         $src = substr($requirement, 4);
                     }
                     else {
-                        $src = TViewModel::getVmDirectory() . '/' . $requirement . '.js' ;
+                        if (substr($requirement,0,10) == 'component:') {
+                            $requirement = substr($requirement,10);
+                            $src = TViewModel::getComponentsDirectory() . '/' . $requirement . '.js' ;
+                        }
+                        else {
+                            $src = TViewModel::getVmDirectory() . '/' . $requirement . '.js';
+                        }
                     }
 
                     drupal_add_js($src, array('group' => 'JS_THEME', 'scope' => 'footer'));

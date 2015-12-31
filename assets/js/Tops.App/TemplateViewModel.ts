@@ -61,20 +61,27 @@ module Tops {
         }
 
         public serviceCallTemplate() {
-            // todo: delete serviceCallTemplate when not needed
             var me = this;
-            var request = null; //
+            var request = null;
 
             me.application.hideServiceMessages();
             me.application.showWaiter('Message here...');
+
+
+            // fake
+            var response = null;
+            me.handleServiceResponseTemplate(response);
+            me.application.hideWaiter();
+
+            /*
             me.peanut.executeService('directory.ServiceName',request, me.handleServiceResponseTemplate)
                 .always(function() {
                     me.application.hideWaiter();
                 });
+           */
         }
 
         private handleServiceResponseTemplate = (serviceResponse: IServiceResponse) => {
-            // todo: delete handleServiceResponseTemplate when not needed
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
 

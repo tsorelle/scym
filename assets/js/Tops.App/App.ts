@@ -260,6 +260,14 @@ module Tops {
             });
 
         }
+
+        /**
+         * load component source and template and register.
+         * Use when multiple instances are reuqired.
+         *
+         * @param name
+         * @param successFunction
+         */
         public loadComponent(name: string, successFunction?: () => void) {
             var me = this;
             me.usingComponentLoader(function() {
@@ -267,6 +275,14 @@ module Tops {
             });
         }
 
+
+        /**
+         * load template and register instance. Instance argumnent may be a function returning an instance or the instance itself.
+         *
+         * @param name
+         * @param vmInstance
+         * @param finalFunction
+         */
         public loadComponentInstance(name: string,
                                      vmInstance : any, // instance of VM or function returning the instance.
                                      finalFunction?: () => void) {
@@ -276,6 +292,12 @@ module Tops {
             });
         }
 
+        /**
+         * KnockoutJS databinding against single element
+         *
+         * @param containerName
+         * @param context
+         */
         public bindNode(containerName: string, context : any) {
             var me = this;
             if (context == null) {
@@ -286,6 +308,12 @@ module Tops {
         };
 
 
+        /**
+         * KnockoutJS databind against a DIV or other element, including descendants.
+         *
+         * @param containerName
+         * @param context
+         */
         public bindSection(containerName: string, context : any) {
             var me = this;
             if (context == null) {
@@ -302,10 +330,17 @@ module Tops {
                 return;
             }
             ko.applyBindings(context,container);
-            // ko.applyBindingsToDescendants(context,container);
             jQuery("#"+containerName).show();
         };
 
+        /**
+         * load template and register instance. Instance argumnent may be a function returning an instance or the instance itself.
+         * Bind assuming outer div with id of "[component name]-container"
+         *
+         * @param name
+         * @param vmInstance
+         * @param finalFunction
+         */
         public bindComponent = (name: string,
                                 vmInstance : any, // instance of VM or function returning the instance.
                                 finalFunction?: () => void) => {
@@ -345,7 +380,13 @@ module Tops {
             me.bindSection(Tops.Application.defaultSectionId,me.viewModel);
         }
 
-
+        /**
+         * load template, create instance and register.  Assumes source already loaded.
+         *
+         * @param componentName
+         * @param vm
+         * @param finalFunction
+         */
         public registerComponent(componentName: string, vm: any, finalFunction?: () => void) {
             var me = this;
             me.usingComponentLoader(function() {
@@ -360,6 +401,8 @@ module Tops {
          * @param finalFunction
          *
          * Assumes vm source already loaded
+         * load template, create instance and register.  Assumes source already load.
+         * Bind assuming outer div with id of "[component name]-container"
          */
         public registerAndBindComponent(componentName: string, vm: any, finalFunction?: () => void) {
             var me = this;

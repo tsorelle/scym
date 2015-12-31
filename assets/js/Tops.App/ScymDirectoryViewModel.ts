@@ -8,7 +8,8 @@
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />
 /// <reference path='../typings/jqueryui/jqueryui.d.ts' />
-/// <reference path='formComponents.ts' />
+/// <reference path='../components/editPanel.ts' />
+/// <reference path='../components/searchListObservable.ts' />
 
 module Tops {
     /**

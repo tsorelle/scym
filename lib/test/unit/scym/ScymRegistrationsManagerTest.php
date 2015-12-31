@@ -12,6 +12,7 @@ namespace Tops\test\unit\scym;
 use App\db\api\AttenderDto;
 use App\db\api\RegistrationDto;
 use App\db\scym\ScymAttender;
+use App\db\scym\ScymHousingAssignment;
 use App\db\scym\ScymMeal;
 use App\db\scym\ScymRegistration;
 use App\db\ScymRegistrationsManager;
@@ -378,6 +379,48 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $list = $manager->getAgeGroupList();
         $this->assertNotNull($list);
         $this->assertNotEmpty($list);
+    }
+
+    public function testAttenderHousing() {
+        $code = 'UNITTEST_GETATTENDERHOUSING';
+        $this->deleteRegistration($code);
+        /**
+         * @var $attender ScymAttender
+         */
+        $attender = $this->createTestAttender($code);
+        $attenderId = $attender->getAttenderId();
+        $attender = null;
+        $manager = $this->getManager();
+        $attender = $manager->getAttender($attenderId);
+
+        $actual = $attender->getAttenderId();
+        $this->assertEquals($attenderId,$actual);
+
+        /*****  sample units
+        housingUnitId  unitname   housingTypeDescription        housingTypeCode
+        -------------  ---------  ----------------------------  -----------------
+        2  Cabin A2   Night Owl Dorm for Women      OWLW
+        4  Cabin B2   Family Cabin                  FAMILY
+        11  Cabin F1   Couples Cabin                 COUPLES
+        27  Cabin J1   Family Cabin                  FAMILY
+        53  Health 1   Health House (special needs)  HEALTH
+        54  Health 10  Health House (special needs)  HEALTH
+        55  Health 11  Health House (special needs)  HEALTH
+        67  Motel 1    Camp Motel                    MOTEL
+        87  Motel 6    Camp Motel                    MOTEL
+        96  Tenting    Tenting                       TENT
+        97  Avoden     Night Owl Dorm for Men        OWLM
+         **/
+
+        $assignment = ScymHousingAssignment::CreateAssignment(5,27);
+        $attender->addHousingAssignment($assignment);
+
+        $manager->updateEntity($attender);
+        $this->assertNotEmpty($attender->getHousingAssignments());
+
+
+        $this->deleteRegistration($code);
+
     }
 
 }

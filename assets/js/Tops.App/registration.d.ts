@@ -153,40 +153,65 @@ declare module Tops {
         description: string;
         capacity: number;
         occupants: number;
-        housingTypeCode: string;
+        housingTypeId: number;
         housingTypeName: string;
-        active: any;
     }
     export interface IHousingType {
         housingTypeId: any;
         housingTypeCode: string;
         housingTypeDescription: string;
         category: number;
-        active: any;
     }
+
     export interface IHousingAssignment {
-        housingAssignmentId : any;
+        // housingAssignmentId : any;
         day: number;
-        dayName: string;
         housingUnitId: number;
         note: string;
-        confirmed: boolean;
+    }
+
+    export interface IHousingPreference {
+        attenderId : number;
+        attenderName: string;
+        housingPreference: number;
     }
 
     export interface IAttenderHousingAssignment {
-        attenderId : number;
-        attenderName: string;
+        attender: IHousingPreference,
         assignments: IHousingAssignment[];
     }
 
+    export interface IHousingAssignmentUpdateRequest {
+        registrationId: any,
+        updates: IHousingAssignmentUpdate[];
+    }
+
+    export interface IHousingAssignmentUpdate {
+        attenderId: number;
+        assignments: IHousingAssignment[];
+    }
 
     export interface IGetHousingAssignmentsResponse {
         registrationId: number;
         registrationName: string;
-        arrivalDay: number;
-        departureDay: number;
         assignments: IAttenderHousingAssignment[];
         units: IHousingUnit[];
+        housingTypes : ILookupItem[];
+        // arrivalDay: number;
+        // departureDay: number;
+    }
+
+    export interface IGetHousingUnitsResponse {
+        units: IHousingUnit[];
+        housingTypes : ILookupItem[];
+    }
+
+    export interface IHousingUnitUpdateRequest {
+        unitId : any;
+        unitname: string;
+        description: string;
+        capacity: number;
+        housingTypeId: any;
     }
 
     export interface IGetHousingAssignmentsRequest {
@@ -194,6 +219,18 @@ declare module Tops {
         getUnits: boolean;
     }
 
-
+    export interface IViewModel {
+        application: IPeanutClient
+    }
+    export interface IHousingViewModel extends IEventSubscriber {
+        housingTypes : KnockoutObservableArray<ILookupItem>;
+        updateAssignment : (attenderId: number, assignment: IHousingAssignment) => void;
+        getHousingUnit : (id: number) => IHousingUnit;
+        getHousingType : (id: number) => ILookupItem;
+        getHousingUnitList : (typeId: number) => IHousingUnit[];
+        getAssignments : (registrationId: number) => void;
+        reset : () => void;
+        initialize : (finalFunction? : () => void) =>void;
+    }
 
 }
