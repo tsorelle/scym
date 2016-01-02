@@ -423,5 +423,22 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testGetPendingConfirmations() {
+        $manager = $this->getManager();
+        $actual = $manager->getRegistrationList('unconfirmed');
+        $this->assertNotNull($actual);
+    }
+
+    public function testGetIncompleteHousing() {
+        $manager = $this->getManager();
+        $actual = $manager->getRegistrationList('incomplete');
+        $this->assertNotNull($actual);
+    }
+    public function testAllHousing() {
+        $manager = $this->getManager();
+        $actual = $manager->getRegistrationList();
+        $this->assertNotNull($actual);
+    }
+
 }
 

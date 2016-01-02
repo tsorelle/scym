@@ -22,6 +22,7 @@ use App\db\scym\ScymRegistration;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Tops\db\TDbServiceManager;
+use Tops\db\TQueryManager;
 use Tops\sys\TListItem;
 use Tops\sys\TLookupItem;
 use Tops\sys\TNameValuePair;
@@ -387,4 +388,36 @@ class ScymRegistrationsManager extends TDbServiceManager
 
         return $result;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getRegistrationList($searchtype='allregistrations') {
+        $queryBuilder = TQueryManager::GetQueryBuilder();
+        $session = $this->getSession();
+        $year = $session->getYear();
+        $q = $queryBuilder
+            ->select('DISTINCT r.name as Name' ,'r.registrationId as Value')
+            ->where('year = ?')
+            ->setParameter(0,$year)
+            ->orderBy('r.name');
+
+        switch($searchtype) {
+            case 'incomplete' :
+                $q->from('HousingAssignmentCounts','r');
+                $q->andWhere('r.assignments < r.nights');
+                break;
+            case 'unconfirmed';
+                $q->from('HousingAssignmentCounts','r');
+                $q->andWhere('r.assignments >= r.nights AND r.confirmed = 0');
+                break;
+            case 'allregistrations' :
+                $q->from('registrations','r');
+                break;
+            default :
+                throw new \Exception("Invalid searchtype '$searchtype'");
+        }
+        return $q->execute()->fetchAll();
+    }
+
 }
