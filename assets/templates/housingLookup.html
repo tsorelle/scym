@@ -6,14 +6,14 @@
     <div class="row" id="search-form">
         <div class="col-md-12">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-9">
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="Search" data-bind="value: registrationsList.searchValue">
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <button class="btn btn-default" data-bind="click:findRegistrationsByName" >Search by name <span class="glyphicon glyphicon-search"></span> </button>
-                        <button class="btn btn-default" data-bind="click:findAllRegistrations">Show all unassigned <span class="glyphicon glyphicon-search"></span></button>
+                        <button class="btn btn-default" data-bind="click:findAllRegistrations">Show all <span class="glyphicon glyphicon-search"></span></button>
                     </div>
                 </div>
         </div>
@@ -58,4 +58,58 @@
             </div>
         </div> <!-- end found list -->
     </div> <!-- end found panel -->
+    <div id="confirmation-buttons" data-bind="visible:showMessagesButton">
+        <button class="btn btn-primary" data-bind="click:sendConfirmations" >Send confirmation messages <span class="glyphicon glyphicon-forward" aria-hidden="true"></span></button>
+    </div>
+
+    <div class="modal" id="search-all-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4>Search for . . .</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="padding-left: 10px">
+                        <div><input type="radio" name="searchTypeGroup" value="incomplete" data-bind="checked: searchType" /> Assignments not completed</div>
+                        <div><input type="radio" name="searchTypeGroup" value="unconfirmed" data-bind="checked: searchType" /> Assignments completed but not confirmed</div>
+                        <div><input type="radio" name="searchTypeGroub" value="allregistrations" data-bind="checked: searchType" /> All registrations</div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bind="click: searchAll">Search</button>
+                    <button type="button" class="btn btn-default"  data-dismiss="modal">Cancel</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal" id="confirm-send-all-confirmations">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Confirmation messages</h4>
+                </div>
+                <div class="modal-body">
+                    <h3>Send confirmation messages?</h3>
+                    <p>
+                        This will send <span data-bind="text:registrationsList.foundCount"></span> messages.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button data-bind="click:doSendConfirmations" class="btn btn-primary" type="button">
+                        Send <span class="glyphicon glyphicon-send"></span>
+                    </button>
+                    <button type="button" class="btn btn-default"  data-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 </div>

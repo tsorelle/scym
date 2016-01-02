@@ -29,7 +29,6 @@ module Tops {
         private housingUnitsVm: any;
         private housingLookupVm: any;
 
-
         // Constructor
         constructor() {
             var me = this;
@@ -67,7 +66,7 @@ module Tops {
                             me.housingAssignmentsVM = new housingAssignmentComponent(me.application,me);
                             me.application.registerComponent('housing-assignment',me.housingAssignmentsVM,function() {
                                 me.housingAssignmentsVM.initialize(function() {
-                                    me.housingLookupVm = new housingLookupComponent(me.application,me.onRegistrationSelected);
+                                    me.housingLookupVm = new housingLookupComponent(me.application,me); // .onRegistrationSelected);
                                     me.application.registerComponent('housing-lookup',me.housingLookupVm,
                                         function () {
                                             me.application.loadComponent('modal-confirm', function() {
@@ -100,7 +99,7 @@ module Tops {
             me.application.showDefaultSection();
         };
 
-        onRegistrationSelected = (regId: number) => {
+        onRegistrationSelected = (regId: any) => {
             var me = this;
             if (regId) {
                 me.housingLookupVm.searchFormVisible(false);
@@ -187,14 +186,14 @@ module Tops {
                 case 'assignmentformclosed' :
                     me.housingLookupVm.searchFormVisible(true);
                     break;
+                case 'registrationselected' :
+                    me.onRegistrationSelected(data);
+                    break;
             }
         }
     }
 }
 
-(new Tops.HousingManagementViewModel()).init();
-
-/*
-Tops.HousingAssignmentsViewModel.instance = new Tops.HousingAssignmentsViewModel();
-(<any>window).ViewModel = Tops.HousingAssignmentsViewModel.instance;
-*/
+// (new Tops.HousingManagementViewModel()).init();
+Tops.HousingManagementViewModel.instance = new Tops.HousingManagementViewModel();
+(<any>window).ViewModel = Tops.HousingManagementViewModel.instance;
