@@ -22,7 +22,7 @@ module Tops {
             me.application = application;
             me.peanut = application.peanut;
             me.owner = owner;
-            me.registrationsList = new searchListObservable(4,3);
+            me.registrationsList = new searchListObservable(3,4);
         }
 
         public getNext = () => {
@@ -88,7 +88,7 @@ module Tops {
             var me = this;
             jQuery("#search-all-modal").modal('hide');
             this.onSelected(0);
-            me.findRegistrations();
+            me.findRegistrations(me.searchType());
 
         };
 
@@ -98,41 +98,25 @@ module Tops {
             this.onSelected(0);
             var value = me.registrationsList.searchValue().trim();
             if (value) {
-                me.findRegistrations(value);
+                me.findRegistrations('name',value);
             }
         };
 
-        private findRegistrations = (searchValue : string = null) => {
+        private findRegistrations = (searchType : string = 'name', searchValue : string = null) => {
             var me = this;
             me.registrationsList.reset();
             me.application.hideServiceMessages();
             me.application.showWaiter('Searching...');
 
-            var request;
+            var request =  {
+                searchType: searchType,
+                searchValue: searchValue
+            };
 
-            if (searchValue) {
-                request = {
-                    type: 'name',
-                    value: searchValue
-                };
-            }
-            else {
-                request = {
-                    type: 'all',
-                    value: me.searchType()
-                };
-            }
-
-            // Fake -----------
-            me.handleFindRegistrationsResponse(me.getFakeSearchResult());
-            me.application.hideWaiter();
-
-            /*
             me.peanut.executeService('registration.FindRegistrations',request, me.handleFindRegistrationsResponse)
                 .always(function() {
                     me.application.hideWaiter();
                 });
-            */
         };
 
 

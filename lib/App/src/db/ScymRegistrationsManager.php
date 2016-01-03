@@ -29,6 +29,8 @@ use Tops\sys\TNameValuePair;
 
 class ScymRegistrationsManager extends TDbServiceManager
 {
+
+    private static $currentAnnualSession = null;
     /**
      * @param null $year
      * @return null|ScymAnnualSession
@@ -39,7 +41,15 @@ class ScymRegistrationsManager extends TDbServiceManager
          * @var $result ScymAnnualSession
          */
         $result=null;
-        if (empty($year)) {
+        $currentYear = date("Y"); // current year
+        if ($year == null) {
+            $year = $currentYear;
+        }
+        $isCurrent = ($year == $currentYear);
+        if ($isCurrent) {
+            if (self::$currentAnnualSession != null) {
+                return self::$currentAnnualSession;
+            }
             $year = date("Y"); // current year
             $result = $repository->find($year);
             if (empty($result)) {
@@ -58,6 +68,9 @@ class ScymRegistrationsManager extends TDbServiceManager
             if (empty($result)) {
                 throw new Exception("Yearly meeting year $year is not in the annualsessions table.");
             }
+        }
+        if ($isCurrent) {
+            self::$currentAnnualSession = $result;
         }
         return $result;
     }
@@ -217,9 +230,11 @@ class ScymRegistrationsManager extends TDbServiceManager
     }
 
     public function checkRegistationCodeExists($registrationCode) {
+        $session = $this->getSession();
         $em = $this->getEntityManager();
-        $q = $em->createQuery('select r.registrationCode from App\db\scym\ScymRegistration r where r.registrationCode = ?1');
+        $q = $em->createQuery('select r.registrationCode from App\db\scym\ScymRegistration r where r.registrationCode = ?1 and r.year = ?2');
         $q->setParameter(1,$registrationCode);
+        $q->setParameter(2,$session->getYear());
         $result = $q->getResult();
         return (!empty($result));
     }
@@ -392,14 +407,14 @@ class ScymRegistrationsManager extends TDbServiceManager
     /**
      * @return mixed
      */
-    public function getRegistrationList($searchtype='allregistrations') {
+    public function getRegistrationList($searchtype='allregistrations',$searchValue=null) {
         $queryBuilder = TQueryManager::GetQueryBuilder();
         $session = $this->getSession();
         $year = $session->getYear();
         $q = $queryBuilder
-            ->select('DISTINCT r.name as Name' ,'r.registrationId as Value')
-            ->where('year = ?')
-            ->setParameter(0,$year)
+            ->select('DISTINCT CONCAT(r.name," (",r.registrationCode,")") as Name' ,'r.registrationId as Value')
+            ->where('year = :year')
+            ->setParameter('year',$year)
             ->orderBy('r.name');
 
         switch($searchtype) {
@@ -414,10 +429,21 @@ class ScymRegistrationsManager extends TDbServiceManager
             case 'allregistrations' :
                 $q->from('registrations','r');
                 break;
+            case 'name' :
+                if ($searchValue == null) {
+                    throw new \Exception("No search value");
+                }
+                $q->from('registrations','r');
+                $q->innerJoin('r','attenders','a','a.registrationId = r.registrationId');
+                $q->andWhere("r.name LIKE :searchval OR r.registrationCode LIKE :searchval OR FormatName(a.firstName ,a.middleName,a.lastName) LIKE :searchval OR FormatName(a.firstName ,null,a.lastName) LIKE :searchval");
+                $q->setParameter('searchval',"%$searchValue%");
+                break;
+
             default :
                 throw new \Exception("Invalid searchtype '$searchtype'");
         }
-        return $q->execute()->fetchAll();
+        $statement = $q->execute();
+        return $statement->fetchAll();
     }
 
 }

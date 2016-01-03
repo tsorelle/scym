@@ -436,9 +436,14 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
     }
     public function testAllHousing() {
         $manager = $this->getManager();
-        $actual = $manager->getRegistrationList();
+        $actual = $manager->getRegistrationList('allregistrations');
         $this->assertNotNull($actual);
     }
 
+    public function testPersonHousing() {
+        $manager = $this->getManager();
+        $actual = $manager->getRegistrationList('name','Tony fish');
+        $this->assertNotNull($actual);
+    }
 }
 
