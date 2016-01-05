@@ -30,6 +30,7 @@ module Tops {
         defaultHousingUnitSubscription: any;
         assignedByAttender = ko.observable(false);
         confirmationText = ko.observable();
+        canClose = ko.observable(true);
 
         formTitle = ko.observable();
         showFormTitle = true;
@@ -52,6 +53,10 @@ module Tops {
                 }
             });
         }
+
+        public hideCloseButton = () => {
+            this.canClose(false);
+        };
 
         public getAssignments(registrationId:number) {
             // todo: getAssignments

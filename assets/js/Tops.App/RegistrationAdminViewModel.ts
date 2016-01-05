@@ -148,6 +148,7 @@ module Tops {
                 me.application.bindComponent('housing-assignment',
                     function () {
                         me.housingAssignmentsVM = new housingAssignmentComponent(me.application, me);
+                        me.housingAssignmentsVM.hideCloseButton();
                         return me.housingAssignmentsVM;
                     },
                     function () {
@@ -189,11 +190,22 @@ module Tops {
                     me.currentForm('finance');
                     break;
                 case 'registrationselected' :
-                    me.registrationDashboardVm.getRegistration(data);
+                    if (data) {
+                        me.registrationDashboardVm.getRegistration(data);
+                    }
+                    else {
+                        me.selectedRegistrationId(0);
+                        me.registrationLookupVm.hideResults();
+                    }
                     break;
                 case 'registrationdashboardloaded' :
                     me.selectedRegistrationId(data);
+                    me.registrationLookupVm.hideResults();
                     me.currentForm('registrations');
+                    break;
+                case 'dashboardclosed' :
+                    me.selectedRegistrationId(0);
+                    me.registrationLookupVm.showResults();
                     break;
             }
         };

@@ -12,7 +12,9 @@ module Tops {
         private peanut : Peanut;
 
         registrationsList : searchListObservable;
-        showMessagesButton = ko.observable(false);
+        // showMessagesButton = ko.observable(false);
+        resultsVisible = ko.observable(true);
+
         public searchFormVisible = ko.observable(true);
         searchType = ko.observable('');
         private owner : IEventSubscriber;
@@ -25,9 +27,17 @@ module Tops {
             me.registrationsList = new searchListObservable(3,4);
         }
 
+        public showResults = () => {
+            this.resultsVisible(true);
+        };
+
+        public hideResults = () => {
+            this.resultsVisible(false);
+        };
+
         public getNext = () => {
             this.onSelected(0);
-            this.onSelected(1);
+            // this.onSelected(1);
         };
 
         public onSelected = (regId: number) => {
@@ -37,6 +47,8 @@ module Tops {
             }
         };
 
+
+
         public getRegistration = (item : INameValuePair) => {
             var me = this;
             // me.registrationsList.reset();
@@ -45,17 +57,22 @@ module Tops {
 
         public findAllRegistrations = () => {
             var me = this;
+            me.findRegistrations('allregistrations');
+            /*
             me.searchType('incomplete');
             jQuery("#search-all-modal").modal('show');
+            */
         };
 
+        /*
         public searchAll = () => {
             var me = this;
-            jQuery("#search-all-modal").modal('hide');
+            // jQuery("#search-all-modal").modal('hide');
             this.onSelected(0);
             me.findRegistrations(me.searchType());
 
         };
+        */
 
         public findRegistrationsByName = () => {
             var me = this;
@@ -91,9 +108,7 @@ module Tops {
                 var list = <INameValuePair[]>serviceResponse.Value;
                 me.registrationsList.setList(list);
                 me.registrationsList.searchValue('');
-                me.showMessagesButton(
-                    me.searchType() == 'unconfirmed' &&
-                    me.registrationsList.foundCount() > 0);
+                me.showResults();
             }
         };
 

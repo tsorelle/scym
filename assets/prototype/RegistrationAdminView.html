@@ -16,14 +16,13 @@
                 <div id="registration-lookup-container">
                     <registration-lookup></registration-lookup>
                 </div>
-                <div id="registration-dashboard-container">
+                <div id="registration-dashboard-container" data-bind="visible:selectedRegistrationId">
                     <registration-dashboard></registration-dashboard>
                 </div>
             </div>
             <div id="registration-finance-form" data-bind="visible:currentForm() == 'finance'">
                 <div id="registration-finance-container"><registration-finance></registration-finance></div>
             </div>
-
             <div id="assignments-form"  data-bind="visible:currentForm() == 'housing-assignments'">
                 <div id="housing-assignment-container"><housing-assignment></housing-assignment></div>
             </div>

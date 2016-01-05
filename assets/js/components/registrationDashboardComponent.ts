@@ -51,10 +51,16 @@ module Tops {
 
         }
 
+        closeDashboard = () => {
+            var me = this;
+            me.owner.handleEvent('dashboardclosed');
+        };
+
         private handleGetRegistrationResponse = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = serviceResponse.Value;
+                me.registrationId(response.registrationId);
                 me.owner.handleEvent('registrationdashboardloaded',response.registrationId);
             }
         };
