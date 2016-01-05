@@ -10,7 +10,7 @@
 /// <reference path='../Tops.App/Registration.d.ts' />
 
 module Tops {
-    export class housingAssignmentComponent implements IHousingViewModel {
+    export class housingAssignmentComponent implements IHousingViewModel, IRegistrationComponent {
 
         private application:IPeanutClient;
         private peanut:Peanut;
@@ -18,7 +18,7 @@ module Tops {
 
         private refreshNeeded = false;
 
-        registrationId: any;
+        registrationId = ko.observable<any>();
         housingTypes = ko.observableArray<ILookupItem>();
         housingUnits = ko.observableArray<IHousingUnit>();
         housingUnitList:IHousingUnit[] = [];
@@ -81,7 +81,7 @@ module Tops {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = <IGetHousingAssignmentsResponse>serviceResponse.Value;
-                me.registrationId = response.registrationId;
+                me.registrationId(response.registrationId);
                 me.housingTypes(response.housingTypes);
                 me.housingUnitList = response.units;
                 me.housingUnits(me.housingUnitList);
@@ -89,6 +89,7 @@ module Tops {
                 if (me.showFormTitle) {
                     me.formTitle("Housing assignments for " + response.registrationName);
                 }
+                me.owner.handleEvent('houingassignmentsloaded',response.registrationId);
             }
         };
 
@@ -267,7 +268,7 @@ module Tops {
             // todo: saveAssignments
             var me = this;
             var request : IHousingAssignmentUpdateRequest = {
-                registrationId: me.registrationId,
+                registrationId: me.registrationId(),
                 updates: me.updatedAssignments()
             };
 

@@ -222,6 +222,11 @@ declare module Tops {
     export interface IViewModel {
         application: IPeanutClient
     }
+
+    export interface IRegistrationComponent {
+        registrationId : KnockoutObservable<any>;
+    }
+
     export interface IHousingViewModel extends IEventSubscriber {
         housingTypes : KnockoutObservableArray<ILookupItem>;
         updateAssignment : (attenderId: number, assignment: IHousingAssignment) => void;

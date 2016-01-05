@@ -136,19 +136,6 @@ module Tops {
             }
         };
 
-        private housingTypesToLookupList(data: any) {
-            var result = [];
-            var types : IHousingType[] = _.sortBy(<IHousingType[]>data,'housingTypeDescription');
-            _.each(types,function(type: IHousingType) {
-                var item : ILookupItem = {
-                    Key: type.housingTypeId,
-                    Text: type.housingTypeDescription,
-                    Description: ''
-                };
-                result.push(item);
-            });
-        }
-
         showHousingTypesForm = () => {
             var me = this;
             if (me.housingTypesVm) {
@@ -167,6 +154,20 @@ module Tops {
                 );
             }
         };
+
+        private housingTypesToLookupList(data: any) {
+            var result = [];
+            var types : IHousingType[] = _.sortBy(<IHousingType[]>data,'housingTypeDescription');
+            _.each(types,function(type: IHousingType) {
+                var item : ILookupItem = {
+                    Key: type.housingTypeId,
+                    Text: type.housingTypeDescription,
+                    Description: ''
+                };
+                result.push(item);
+            });
+        }
+
 
         handleEvent = (eventName:string, data:any = null) => {
             var me = this;
