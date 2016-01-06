@@ -1,19 +1,37 @@
 <!-- ******************  START FORM ****************************************************************************  -->
 <div id="view-container" class="view-model-container">
     <div class="row" id="tabs">
-        <div class="col-md-12">
-            <ul class="nav nav-tabs">
-                <li  data-bind="css: {active: currentForm() == 'registrations'}"><a href="#" data-bind="click:showRegistrationForm">Registrations</a></li>
-                <li  data-bind="css: {active: currentForm() == 'finance'},visible:selectedRegistrationId"><a href="#" data-bind="click:showFinanceForm">Finance</a></li>
-                <li  data-bind="css: {active: currentForm() == 'housing-assignments'}, visible:selectedRegistrationId"><a href="#" data-bind="click:showHousingAssignmentsForm">Housing assignments</a></li>
-                <li  data-bind="css: {active: currentForm() == 'reports'}"><a href="#" data-bind="click:showReportsForm">Reports</a></li>
-            </ul>
+
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-tabs">
+                    <li  data-bind="css: {active: currentForm() == 'registrations'}"><a href="#" data-bind="click:showRegistrationForm">Registrations</a></li>
+                    <li  data-bind="css: {active: currentForm() == 'finance'},visible:selectedRegistrationId"><a href="#" data-bind="click:showFinanceForm">Finance</a></li>
+                    <li  data-bind="css: {active: currentForm() == 'housing-assignments'}, visible:selectedRegistrationId"><a href="#" data-bind="click:showHousingAssignmentsForm">Housing assignments</a></li>
+                    <li  data-bind="css: {active: currentForm() == 'reports'}"><a href="#" data-bind="click:showReportsForm">Reports</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="counts-header" class="row" style="padding:0; padding-left: 15px; padding-right: 15px; margin-bottom: 5px; margin-top: 0px; margin-bottom: 10px">
+            <div class="col-md-12" style="font-size: small">
+                <div class="row">
+                    <div class="col-md-10">
+                        <label style="color: #858484;">Registrations received:</label>
+                        <span style="color:black; padding-right: 30px" data-bind="text:counts.registrations"></span>
+                        <label style="color: #858484;">Attenders:</label>
+                        <span style="color:black" data-bind="text:counts.attenders"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="#" data-bind="click:getCounts">Refresh counts</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
             <div id="registrations-form"  data-bind="visible:currentForm() == 'registrations'">
-                <div id="registration-lookup-container">
+                <div id="registration-lookup-container" data-bind="visible:selectedRegistrationId() == 0">
                     <registration-lookup></registration-lookup>
                 </div>
                 <div id="registration-dashboard-container" data-bind="visible:selectedRegistrationId">

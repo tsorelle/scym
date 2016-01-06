@@ -340,5 +340,34 @@ module Tops {
             return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email);
         }
 
+        public static validateCurrency(value:string): any {
+            if (!value) {
+                return false;
+            }
+            value = value.replace(/\s+/g, '');
+            value = value.replace(',', '');
+            value = value.replace('$', '');
+            if (!value) {
+                return false;
+            }
+            var parts = value.split('.');
+            if (parts.length > 2) {
+                return false;
+            }
+            if (!jQuery.isNumeric(parts[0])) {
+                return false;
+            }
+            if (parts.length == 1) {
+                return parts[0] + '.00';
+            }
+
+            if (!jQuery.isNumeric(parts[1])) {
+                return false;
+            }
+
+            return parts[0] + '.' + parts[1].substring(0, 2);
+        };
+
+
     }
 }

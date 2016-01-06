@@ -127,6 +127,18 @@ declare module Tops {
         payor : string;
     }
 
+    export interface IDataEntryForm {
+        clear : ()=> void;
+        validate: () => boolean;
+        getValues: () => any;
+        getErrorMessage: () => string;
+    }
+
+    export interface IPaymentForm extends IDataEntryForm {
+        setAmount: (amount: any) => void;
+        getPayment: () => any;
+    }
+
     export interface IAccountSummary {
         funds: ILookupItem[];
         fees : IListItem[];
@@ -138,6 +150,41 @@ declare module Tops {
         donationTotal: string;
         aidEligibility: string;
         balance: any;
+    }
+
+    export interface IHousingInfoItem {
+        day: string;
+        unit: string;
+    }
+
+    export interface IAttenderCheckListItem {
+        attenderId: any;
+        arrived: any;
+        name: string;
+        ageGroup: string;
+        dietPreference: string;
+        specialNeeds: string;
+        firstTimer: string,
+        meeting: string,
+        note: string;
+        linens: string,
+        housingAssignments : IHousingInfoItem[];
+    }
+
+    export interface IRegistrationDashboardResponse {
+        registrationId: any,
+        registrationCode: string,
+        name: string,
+        address: string,
+        city: string,
+        phone: string,
+        email: string,
+        notes: string,
+        status: number,
+        statusText: string,
+        balanceDue: any,
+        attenders: IAttenderCheckListItem[];
+        housingAssignment: string;
     }
 
     export interface IRegistrationResponse {

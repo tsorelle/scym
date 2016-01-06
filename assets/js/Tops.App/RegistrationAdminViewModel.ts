@@ -26,6 +26,10 @@ module Tops {
         private peanut: Tops.Peanut;
 
         currentForm = ko.observable('registrations');
+        counts = {
+            registrations: ko.observable(''),
+            attenders: ko.observable('')
+        };
         selectedRegistrationId = ko.observable(0);
 
         private registrationLookupVm: any;
@@ -33,6 +37,8 @@ module Tops {
         private registrationFinanceVm: any;
         private adminReportsVm: any;
         private housingAssignmentsVM : any; //IHousingViewModel;
+
+        private registrationChanged = false;
 
         // Constructor
         constructor() {
@@ -84,9 +90,13 @@ module Tops {
                                     me.registrationDashboardVm = new registrationDashboardComponent(me.application,me);
                                     me.application.registerComponent('registration-dashboard',me.registrationDashboardVm,
                                         function() {
-                                            me.application.loadComponent('modal-confirm', function () {
-                                                successFunction();
-                                            });
+                                            me.registrationDashboardVm.initialize(
+                                                function() {
+                                                    me.application.loadComponent('modal-confirm', function () {
+                                                        successFunction();
+                                                    });
+                                                }
+                                            );
                                         });
                                 });
                         });
@@ -101,10 +111,46 @@ module Tops {
             me.application.bindNode('assignments-form');
             me.application.bindNode('reports-form');
             me.application.showDefaultSection();
+            me.getCounts();
+
         };
+
+        getCounts = () => {
+            var me = this;
+            var request = null;
+
+            me.application.hideServiceMessages();
+
+
+            // fake
+            var response = new fakeServiceResponse(
+                {
+                    registrations: 89,
+                    attenders: 150
+                }
+            );
+            me.handleGetCountsResponse(response);
+
+            /*
+             me.peanut.executeService('directory.ServiceName',request, me.handleGetCountsResponse);
+             */
+        };
+
+        private handleGetCountsResponse = (serviceResponse: IServiceResponse) => {
+            var me = this;
+            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                me.counts.registrations(serviceResponse.Value.registrations);
+                me.counts.attenders(serviceResponse.Value.attenders);
+            }
+        };
+
 
         showRegistrationForm = () => {
             var me=this;
+            if (me.registrationChanged) {
+                me.registrationChanged = false;
+                me.registrationDashboardVm.refresh();
+            }
             me.currentForm('registrations');
         };
 
@@ -197,15 +243,18 @@ module Tops {
                         me.selectedRegistrationId(0);
                         me.registrationLookupVm.hideResults();
                     }
+                    me.registrationChanged = false;
                     break;
                 case 'registrationdashboardloaded' :
                     me.selectedRegistrationId(data);
-                    me.registrationLookupVm.hideResults();
                     me.currentForm('registrations');
                     break;
                 case 'dashboardclosed' :
                     me.selectedRegistrationId(0);
-                    me.registrationLookupVm.showResults();
+                    me.registrationChanged = false;
+                    break;
+                case 'registrationchanged' :
+                    me.registrationChanged = true;
                     break;
             }
         };
