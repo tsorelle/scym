@@ -27,7 +27,6 @@ class TQueryManager {
     private $connection;
 
     public function __construct($type='application') {
-
         $this->connection = self::GetConnection($type);
     }
 
@@ -98,6 +97,7 @@ class TQueryManager {
     {
         $connection = self::GetConnection($type);
         return $connection->createQueryBuilder();
+
     }
 
 

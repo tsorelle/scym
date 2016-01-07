@@ -20,6 +20,7 @@ use App\db\scym\ScymHousingType;
 use App\db\scym\ScymMeeting;
 use App\db\scym\ScymRegistration;
 use Doctrine\ORM\EntityRepository;
+use PDO;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Tops\db\TDbServiceManager;
 use Tops\db\TQueryManager;
@@ -402,6 +403,21 @@ class ScymRegistrationsManager extends TDbServiceManager
         }
 
         return $result;
+    }
+
+    public function getRegistrationCount() {
+        $qm = new  \Tops\db\TQueryManager();
+        $sql =
+            "SELECT COUNT(DISTINCT registrationId) AS registrations, COUNT(*) AS attenders FROM (".
+                "SELECT  r.registrationId,attenderID,r.year ".
+                "FROM registrations r ".
+                "JOIN attenders a ON r.registrationId = a.registrationId ".
+                "WHERE r.year = (SELECT MIN(d.year) FROM ymdates d WHERE d.end >=  DATE_ADD(CURRENT_DATE(),INTERVAL 30 DAY)) ) AS countview";
+
+        $counts = $qm->executeStatement($sql);
+        $result = $counts->fetch(PDO::FETCH_OBJ);
+        return $result;
+
     }
 
     /**

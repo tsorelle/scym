@@ -5,9 +5,27 @@
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />
 /// <reference path='../typings/underscore/underscore.d.ts' />
 module Tops {
-    // * Base class for observable container that handles search results.
-    export class searchListObservable {
+    export interface ISearchListObservable {
+        searchValue : KnockoutObservable<string>;
+        selectionCount : KnockoutObservable<number>;
+        hasMore : KnockoutObservable<boolean>;
+        hasPrevious : KnockoutObservable<boolean>;
+        selectionList : [];
+        columnCount : number;
+        maxInColumn : number;
+        itemsPerPage: number;
+        currentPage : number;
+        lastPage : number;
+        itemList: INameValuePair[];
+        foundCount : KnockoutObservable<number>;
+        reset : () => void;
+        setList : (list : Tops.INameValuePair[]) => void;
+        nextPage : ()=> void;
+        previousPage : ()=> void;
+    }
 
+    // * Base class for observable container that handles search results.
+    export class searchListObservable implements ISearchListObservable {
         searchValue = ko.observable('');
         selectionCount = ko.observable(0);
         hasMore = ko.observable(false);

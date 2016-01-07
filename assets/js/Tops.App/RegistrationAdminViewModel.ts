@@ -87,17 +87,19 @@ module Tops {
                             me.registrationLookupVm = new registrationLookupComponent(me.application, me);
                             me.application.registerComponent('registration-lookup', me.registrationLookupVm,
                                 function () {
-                                    me.registrationDashboardVm = new registrationDashboardComponent(me.application,me);
-                                    me.application.registerComponent('registration-dashboard',me.registrationDashboardVm,
-                                        function() {
-                                            me.registrationDashboardVm.initialize(
-                                                function() {
-                                                    me.application.loadComponent('modal-confirm', function () {
-                                                        successFunction();
-                                                    });
-                                                }
-                                            );
-                                        });
+                                    me.registrationLookupVm.initialize(function(){
+                                        me.registrationDashboardVm = new registrationDashboardComponent(me.application,me);
+                                        me.application.registerComponent('registration-dashboard',me.registrationDashboardVm,
+                                            function() {
+                                                me.registrationDashboardVm.initialize(
+                                                    function() {
+                                                        me.application.loadComponent('modal-confirm', function () {
+                                                            successFunction();
+                                                        });
+                                                    }
+                                                );
+                                            });
+                                    });
                                 });
                         });
                 });
@@ -121,19 +123,7 @@ module Tops {
 
             me.application.hideServiceMessages();
 
-
-            // fake
-            var response = new fakeServiceResponse(
-                {
-                    registrations: 89,
-                    attenders: 150
-                }
-            );
-            me.handleGetCountsResponse(response);
-
-            /*
-             me.peanut.executeService('directory.ServiceName',request, me.handleGetCountsResponse);
-             */
+             me.peanut.executeService('registration.GetRegistrationCount',request, me.handleGetCountsResponse);
         };
 
         private handleGetCountsResponse = (serviceResponse: IServiceResponse) => {

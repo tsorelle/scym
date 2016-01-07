@@ -445,5 +445,10 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $actual = $manager->getRegistrationList('name','Tony fish');
         $this->assertNotNull($actual);
     }
+    public function testRegistrationCounts() {
+        $manager = $this->getManager();
+        $actual = $manager->getRegistrationCount();
+        $this->assertNotNull($actual);
+    }
 }
 

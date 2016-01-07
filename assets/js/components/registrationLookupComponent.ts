@@ -11,7 +11,7 @@ module Tops {
         private application : IPeanutClient;
         private peanut : Peanut;
 
-        registrationsList : searchListObservable;
+        registrationsList : ISearchListObservable;
         // showMessagesButton = ko.observable(false);
         resultsVisible = ko.observable(true);
 
@@ -24,8 +24,18 @@ module Tops {
             me.application = application;
             me.peanut = application.peanut;
             me.owner = owner;
-            me.registrationsList = new searchListObservable(3,4);
         }
+
+        public initialize(finalFunction? : () => void) {
+            var me = this;
+            me.application.loadResources('searchListObservable.js',function() {
+                me.registrationsList = new searchListObservable(3,4);
+                if (finalFunction) {
+                    finalFunction();
+                }
+            });
+        }
+
 
         public showResults = () => {
             this.resultsVisible(true);
