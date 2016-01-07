@@ -45,10 +45,10 @@ class RegistrationService
 
     /**
      * @param \stdClass $request
-     * @return bool|\StdClass   (response)
+     * @return ScymRegistration
      * @throws \Exception
      */
-    public function getRegistration(\stdClass $request) {
+    public function getRegistrationEntity(\stdClass $request) {
         /**
          * @var $registration ScymRegistration
          */
@@ -70,6 +70,18 @@ class RegistrationService
                 break;
         }
 
+        return $registration;
+
+    }
+
+
+    /**
+     * @param \stdClass $request
+     * @return bool|\StdClass   (response)
+     * @throws \Exception
+     */
+    public function getRegistration(\stdClass $request) {
+        $registration = $this->getRegistrationEntity($request);
         if ($registration == null) {
             return false;
         }

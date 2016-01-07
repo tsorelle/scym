@@ -2,6 +2,7 @@
 namespace App\db\scym;
 use App\db\api\ICostItem;
 use App\db\DateStampedEntity;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -218,4 +219,62 @@ class ScymPayment extends DateStampedEntity implements ICostItem
         return $this->payor;
     }
 
+    /**
+     * @param $paymentDto
+     *     amount: number
+     *     payor: string;
+     *    checkNumber: string;
+     */
+    public static function CreatePayment($paymentDto,$paymentType=0)
+    {
+        $payment = new ScymPayment();
+        $payment->setAmount($paymentDto->amount);
+        $payment->setCheckNumber($paymentDto->checkNumber);
+        $payment->setPayor($paymentDto->payor);
+        $payment->setPaymentType($paymentType);
+        $payment->setDateReceived(new DateTime());
+        return $payment;
+    }
+
+    /**
+     * @param $paymentDto
+     *     amount: number
+     *    type: 'cash' or 'check;
+     *     payor: string;
+     *    checkNumber: string;
+     */
+    public static function validatePayment($paymentDto)
+    {
+        $result = new \stdClass();
+        $result->errorMessage = '';
+        $result->amount = isset($paymentDto->amount) ? $paymentDto->amount : null;
+        if (empty($result->amount)) {
+            $result->errorMessage = 'No amount';
+            return $result;
+        }
+        $result->payor = isset($paymentDto->payor) ? $paymentDto->payor : null;
+        if (empty($result->payor)) {
+            $result->errorMessage = 'No payor';
+            return $result;
+        }
+
+        $type = isset($paymentDto->type) ? $paymentDto->type : null;
+        $checkNumber = isset($paymentDto->checkNumber) ? $paymentDto->checkNumber : '';
+        if (empty($type) && !empty($checkNumber)) {
+            $type = 'check';
+        }
+
+        if (empty($type)) {
+            $result->errorMessage = 'No payment type';
+            return $result;
+        }
+
+        if ($type == 'check' and empty($checkNumber)) {
+            $result->errorMesssage = 'No check number';
+        }
+        else {
+            $checkNumber = 'cash';
+        }
+        return $result;
+    }
 }

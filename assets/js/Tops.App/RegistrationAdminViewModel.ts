@@ -14,8 +14,6 @@
 /// <reference path='../components/adminReportsComponent.ts' />
 /// <reference path='../components/registrationDashboardComponent.ts' />
 
-
-
 // reference to jqueryui required if date popups are used.
 /// <reference path='../typings/jqueryui/jqueryui.d.ts' />
 
@@ -246,34 +244,6 @@ module Tops {
                 case 'registrationchanged' :
                     me.registrationChanged = true;
                     break;
-            }
-        };
-
-
-        /*
-            var me = this;
-            var request = null;
-
-            me.application.hideServiceMessages();
-            me.application.showWaiter('Message here...');
-
-
-            // fake
-            var response = null;
-            me.handleServiceResponseTemplate(response);
-            me.application.hideWaiter();
-
-             me.peanut.executeService('directory.ServiceName',request, me.handleServiceResponseTemplate)
-             .always(function() {
-             me.application.hideWaiter();
-             });
-        */
-
-        private handleServiceResponseTemplate = (serviceResponse: IServiceResponse) => {
-            var me = this;
-            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-
-
             }
         };
 

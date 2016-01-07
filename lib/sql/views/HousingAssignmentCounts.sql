@@ -1,5 +1,5 @@
 CREATE VIEW HousingAssignmentCounts AS
-SELECT DISTINCT  r.year, a.registrationId, r.name, a.attenderId,
+SELECT DISTINCT  r.year, a.registrationId, r.registrationCode, r.name, a.attenderId,
   FormatName(a.firstName,a.middleName,a.lastName) AS attenderName,
   COUNT(DISTINCT ha.day) AS assignments,((departureTime DIV 10) - (arrivalTime DIV 10)) AS nights, r.confirmed
 FROM attenders a

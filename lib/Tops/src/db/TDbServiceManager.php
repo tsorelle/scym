@@ -28,7 +28,6 @@ class TDbServiceManager
         }
         return $this->entityManager;
     }
-
     /**
      * @param $className
      * @return EntityRepository

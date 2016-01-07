@@ -450,5 +450,17 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $actual = $manager->getRegistrationCount();
         $this->assertNotNull($actual);
     }
+
+    public function testAttendersView() {
+        $manager = $this->getManager();
+        $actual = $manager->getAttendersViewForRegistration(244);
+        $this->assertNotNull($actual);
+    }
+
+    public function testHousingView() {
+        $manager = $this->getManager();
+        $actual = $manager->getHousingAssignmentView(244);
+        $this->assertNotNull($actual);
+    }
 }
 

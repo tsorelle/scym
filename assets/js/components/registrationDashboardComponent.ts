@@ -80,7 +80,7 @@ module Tops {
         public refresh() {
             var me = this;
             me.isRefreshLoad = true;
-            me.getRegistration(me.registrationId);
+            me.getRegistration(me.registrationId());
         }
 
         public getRegistration(registrationId: any) {
@@ -89,22 +89,10 @@ module Tops {
             me.application.showWaiter('Getting the registration...');
 
             var request = registrationId;
-
-
-            // fake
-            var response = me.getFakeRegistrationResponse(registrationId);
-            me.handleGetRegistrationResponse(response);
-            me.application.hideWaiter();
-
-            /*
-             me.peanut.executeService('directory.ServiceName',request, me.handleGetRegistrationResponse)
+            me.peanut.executeService('registration.GetRegistrationDashboard',request, me.handleGetRegistrationResponse)
              .always(function() {
-
-
-             me.application.hideWaiter();
+                 me.application.hideWaiter();
              });
-             */
-
         }
 
         closeDashboard = () => {
@@ -165,7 +153,6 @@ module Tops {
                 me.registration.balanceDue(response.balanceDue);
                 me.registration.housingAssignment(response.housingAssignment);
 
-                me.attenders(response.attenders);
 
                 if (!response.balanceDue) {
                     me.registration.balance('Paid in full');
@@ -176,10 +163,13 @@ module Tops {
 
                 me.unCheckedCount = response.attenders.length;
                 _.each(response.attenders,function(attender: IAttenderCheckListItem) {
+                    attender.arrived = (attender.arrived == 'Yes' || attender.arrived == true);
                     if (attender.arrived) {
                         me.unCheckedCount =- 1;
                     }
                 });
+
+                me.attenders(response.attenders);
 
                 if (!me.isRefreshLoad) {
                     me.owner.handleEvent('registrationdashboardloaded', response.registrationId);
@@ -256,8 +246,15 @@ module Tops {
             if (closeModal) {
                 jQuery("#confirm-dashboard-save").modal('hide');
             }
+
+            var paymentValues = me.paymentForm.getValues();
+            if (paymentValues != null && paymentValues.amount < 1) {
+                paymentValues = null;
+            }
+
             var request = {
-                payment: me.paymentForm.getValues(),
+                registrationId : me.registrationId(),
+                payment : paymentValues,
                 attenders : []
             };
 
@@ -273,17 +270,10 @@ module Tops {
             me.application.hideServiceMessages();
             me.application.showWaiter('Checking in...');
 
-            // fake
-            var response = new fakeServiceResponse(null);
-            me.handleCheckInResponse(response);
-            me.application.hideWaiter();
-
-            /*
-             me.peanut.executeService('registration.CheckIn',request, me.handleServiceResponseTemplate)
-             .always(function() {
-             me.application.hideWaiter();
-             });
-             */
+             me.peanut.executeService('registration.CheckIn',request, me.handleCheckInResponse)
+                 .always(function() {
+                     me.application.hideWaiter();
+                 });
 
         };
 

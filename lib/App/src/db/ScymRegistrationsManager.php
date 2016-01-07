@@ -32,6 +32,7 @@ class ScymRegistrationsManager extends TDbServiceManager
 {
 
     private static $currentAnnualSession = null;
+
     /**
      * @param null $year
      * @return null|ScymAnnualSession
@@ -405,8 +406,15 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $result;
     }
 
+    /**
+     * @return TQueryManager
+     */
+    private static function getQueryMananger() {
+        return TQueryManager::getInstance();
+    }
+
     public function getRegistrationCount() {
-        $qm = new  \Tops\db\TQueryManager();
+        $qm = TQueryManager::getInstance();
         $sql =
             "SELECT COUNT(DISTINCT registrationId) AS registrations, COUNT(*) AS attenders FROM (".
                 "SELECT  r.registrationId,attenderID,r.year ".
@@ -418,6 +426,29 @@ class ScymRegistrationsManager extends TDbServiceManager
         $result = $counts->fetch(PDO::FETCH_OBJ);
         return $result;
 
+    }
+
+    public function getAttendersViewForRegistration($registrationId) {
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM attendersView WHERE registrationId = ?";
+        $statement = $qm->executeStatement($sql,$registrationId);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
+
+    public function getHousingAssignmentView($registrationId) {
+        $sql =
+            "SELECT a.attenderID AS attenderId, ha.housingUnitId,ha.day AS dayNumber, ".
+            "ScymNumberToWeekday(ha.day) AS day,IFNULL(hu.unitname,'Not assigned') AS  unit ".
+            "FROM housingassignments ha JOIN attenders a ON ha.attenderID = a.attenderID ".
+            "JOIN registrations r ON r.registrationId = a.registrationId ".
+            "RIGHT OUTER JOIN housingunits hu ON ha.housingUnitId = hu.housingUnitId ".
+            "WHERE r.registrationId = ?";
+
+        $qm = TQueryManager::getInstance();
+        $statement = $qm->executeStatement($sql,$registrationId);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
     }
 
     /**

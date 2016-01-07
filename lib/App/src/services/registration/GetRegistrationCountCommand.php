@@ -19,6 +19,7 @@ class GetRegistrationCountCommand extends TServiceCommand
     {
         $manager = new ScymRegistrationsManager();
         $counts = $manager->getRegistrationCount();
+        // $this->addInfoMessage('Updated');
         $this->setReturnValue($counts);
     }
 }

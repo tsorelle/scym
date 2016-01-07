@@ -30,6 +30,17 @@ class TQueryManager {
         $this->connection = self::GetConnection($type);
     }
 
+    private static $instances = array();
+    public static function getInstance($type='application')
+    {
+        if (array_key_exists($type, self::$instances)) {
+            return self::$instances[$type];
+        }
+        $instance = new TQueryManager($type);
+        self::$instances[$type] = $instance;
+        return $instance;
+    }
+
     /**
      * @param string $host
      * @return \Doctrine\DBAL\Connection
@@ -97,7 +108,6 @@ class TQueryManager {
     {
         $connection = self::GetConnection($type);
         return $connection->createQueryBuilder();
-
     }
 
 

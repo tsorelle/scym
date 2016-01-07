@@ -10,7 +10,7 @@ module Tops {
         selectionCount : KnockoutObservable<number>;
         hasMore : KnockoutObservable<boolean>;
         hasPrevious : KnockoutObservable<boolean>;
-        selectionList : [];
+        selectionList : any[];
         columnCount : number;
         maxInColumn : number;
         itemsPerPage: number;
