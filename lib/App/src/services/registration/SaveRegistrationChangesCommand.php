@@ -12,6 +12,7 @@ use App\db\ScymAccountManager;
 use App\db\ScymRegistrationsManager;
 use Tops\services\TServiceCommand;
 use Tops\sys\TContentManager;
+use Tops\sys\TDateTime;
 use Tops\sys\TPostOffice;
 use Tops\sys\TTextTemplate;
 use Tops\sys\TUser;
@@ -169,8 +170,7 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         $session = $this->registrationsManager->getSession();
         $tokens = array(
             'name' => $response->registration->name,
-            'dates' => $session->getStart()->format('F NS') .
-                ' to ' . $session->getEnd()->format('F NS') . ', ' . $session->getYear(),
+            'dates' => TDateTime::formatRange($session->getStart(),$session->getEnd()),
             'code' => $response->registration->registrationCode,
             'cost' => $response->accountSummary->balance
         );

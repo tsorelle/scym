@@ -7,3 +7,4 @@ lastName varchar(200)
   return concat(trim(firstName), if(middleName is null or middleName = '','',concat(' ',trim(middleName))),' ',lastName)
 
 
+

@@ -104,8 +104,15 @@ class TopsModule {
     }
     public static function checkContentAccess($node) {
 
+       // application_page
+
        if (self::userAnonymous() && $node !== null && isset($node->type)) {
-           $accessFieldName = 'field_' . $node->type . '_access';
+           if ($node->type = 'application_page') {
+               $accessFieldName = 'field_page_access';
+           }
+           else {
+               $accessFieldName = 'field_' . $node->type . '_access';
+           }
            if (property_exists($node,$accessFieldName)) {
                if (self::hasTaxonomyTerm($node, $accessFieldName, 'Private')) {
                    drupal_set_message(t('You must sign in to view this content.'), 'error');
