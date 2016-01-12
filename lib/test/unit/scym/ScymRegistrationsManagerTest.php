@@ -466,7 +466,8 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testYouth() {
         $manager = $this->getManager();
-        $registration = $manager->getRegistration(244);
+        $testId = 176; // 244;
+        $registration = $manager->getRegistration($testId);
         $this->assertNotNull($registration);
         $attenders = $registration->getAttenders();
         /**
@@ -478,7 +479,7 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
             $manager->deleteYouth($attender);
         }
         $manager->updateEntity($registration);
-        $registration = $manager->getRegistration(244);
+        $registration = $manager->getRegistration($testId);
         $this->assertNotNull($registration);
         $attenders = $registration->getAttenders();
         $attenderId = 0;
@@ -516,7 +517,7 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $youth->setGradeLevel('10');
         $manager->updateEntity($registration);
 
-        $registration = $manager->getRegistration(244);
+        $registration = $manager->getRegistration($testId); // 244);
         $this->assertNotNull($registration);
         $attenders = $registration->getAttenders();
         $actual = null;

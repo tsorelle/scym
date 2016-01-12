@@ -10,7 +10,7 @@ use App\db\scym\ScymAttender;
 /**
  * ScymYouth
  *
- * @Table(name="youths")
+ * @Table(name="youths", indexes={@Index(name="youth_attender_fk", columns={"attenderId"})})
  * @Entity @HasLifecycleCallbacks
  */
 class ScymYouth extends DateStampedEntity

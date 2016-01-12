@@ -11,7 +11,7 @@ use App\db\scym\ScymMeal;
 /**
  * ScymAttender
  *
- * @Table(name="attenders", indexes={@Index(name="attenders_registration_fk", columns={"registrationId"}), @Index(name="attender_youth_fk", columns={"youthId"})})
+ * @Table(name="attenders", indexes={@Index(name="attenders_registration_fk", columns={"registrationId"})})
  * @Entity @HasLifecycleCallbacks
  */
 class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
@@ -28,7 +28,7 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     protected $housingAssignments;
 
     /**
-     * @OneToOne(targetEntity="ScymYouth", inversedBy="attender",cascade={"persist"})
+     * @OneToOne(targetEntity="ScymYouth", inversedBy="attender",cascade={"persist", "remove"})
      * @JoinColumn(name="youthId", referencedColumnName="youthId")
      */
     protected $youth;
