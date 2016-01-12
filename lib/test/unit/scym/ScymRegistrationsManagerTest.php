@@ -15,6 +15,7 @@ use App\db\scym\ScymAttender;
 use App\db\scym\ScymHousingAssignment;
 use App\db\scym\ScymMeal;
 use App\db\scym\ScymRegistration;
+use App\db\scym\ScymYouth;
 use App\db\ScymRegistrationsManager;
 
 class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
@@ -461,6 +462,87 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $manager = $this->getManager();
         $actual = $manager->getHousingAssignmentView(244);
         $this->assertNotNull($actual);
+    }
+
+    public function testYouth() {
+        $manager = $this->getManager();
+        $registration = $manager->getRegistration(244);
+        $this->assertNotNull($registration);
+        $attenders = $registration->getAttenders();
+        /**
+         * @var $youth ScymYouth
+         */
+        $actualAttender = null;
+        $actualYouth = null;
+        foreach($attenders as $attender) {
+            $manager->deleteYouth($attender);
+        }
+        $manager->updateEntity($registration);
+        $registration = $manager->getRegistration(244);
+        $this->assertNotNull($registration);
+        $attenders = $registration->getAttenders();
+        $attenderId = 0;
+        foreach($attenders as $attender) {
+            /**
+             * @var $attender ScymAttender
+             */
+            if ($attender->getGenerationId() > 1) {
+                $youth = $attender->getYouth();
+                $this->assertNull($youth,'Youth was not deleted');
+                $attenderId = $attender->getAttenderId();
+                $youth = $attender->createYouth();
+                /*
+                $youth = new ScymYouth();
+                $youth->setGenerationId($attender->getGenerationId());
+                $youth->setAttender($attender);
+                $attender->setYouth($youth);
+                // $manager->updateEntity($attender);
+                */
+
+                // $manager->updateEntity($registration);
+
+                $this->assertNotNull($youth,'Youth was not created');
+                break;
+            }
+        }
+
+        $this->assertGreaterThan(0,$attenderId,'Youth not found');
+        $dob = new \DateTime('2000-01-01');
+        $youth->setDateofBirth($dob);
+        $expectedDob = $dob->format('Y-m-d');
+        $expectedFormsSubmitted = true;
+        $youth->setFormsSubmitted(true);
+        $expectedGradeLevel = '10';
+        $youth->setGradeLevel('10');
+        $manager->updateEntity($registration);
+
+        $registration = $manager->getRegistration(244);
+        $this->assertNotNull($registration);
+        $attenders = $registration->getAttenders();
+        $actual = null;
+        $found = false;
+        foreach($attenders as $attender) {
+            /**
+             * @var $attender ScymAttender
+             */
+            if ($attender->getAttenderId() == $attenderId) {
+                $found = true;
+                $actual = $attender->getYouth();
+                break;
+            }
+        }
+
+        $this->assertTrue($found,'Attender not found');
+        $this->assertNotNull($actual,'Youth not created.');
+        $actualDob = $actual->getDateofBirth();
+        $this->assertNotNull($actualDob,'DOB not saved.');
+        $this->assertEquals($expectedDob,$actualDob->format('Y-m-d'),'DOB not equal');
+        $this->assertEquals($expectedFormsSubmitted,$actual->getFormsSubmitted(),'Forms submitted not equal');
+        $this->assertEquals($expectedGradeLevel,$actual->getGradeLevel(),'Grade level not equal.');
+
+        $youthAttender = $youth->getAttender();
+        $this->assertNotNull($youthAttender);
+        $this->assertEquals($attenderId,$youthAttender->getAttenderId());
     }
 }
 

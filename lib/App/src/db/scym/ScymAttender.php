@@ -11,7 +11,7 @@ use App\db\scym\ScymMeal;
 /**
  * ScymAttender
  *
- * @Table(name="attenders", indexes={@Index(name="attenders_registration_fk", columns={"registrationId"})})
+ * @Table(name="attenders", indexes={@Index(name="attenders_registration_fk", columns={"registrationId"}), @Index(name="attender_youth_fk", columns={"youthId"})})
  * @Entity @HasLifecycleCallbacks
  */
 class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
@@ -26,6 +26,13 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
      * @OneToMany(targetEntity="ScymHousingAssignment", mappedBy="attender",fetch="EXTRA_LAZY", cascade={"persist", "remove"})
      */
     protected $housingAssignments;
+
+    /**
+     * @OneToOne(targetEntity="ScymYouth", inversedBy="attender",cascade={"persist"})
+     * @JoinColumn(name="youthId", referencedColumnName="youthId")
+     */
+    protected $youth;
+
 
     public function addHousingAssignment(ScymHousingAssignment $housingAssignment) {
         $this->housingAssignments[] = $housingAssignment;
@@ -1012,4 +1019,36 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
         return $result;
     }
 
+    public function setYouth($youth) {
+        $this->youth = $youth;
+    }
+
+    public function createYouth() {
+        $result = new ScymYouth();
+        $result->setGenerationId($this->getGenerationId());
+        $this->setYouth($result);
+        $result->setAttender($this);
+        return $result;
+    }
+
+    /**
+     * @return ScymYouth
+     */
+    public function getYouth() {
+        return $this->youth;
+    }
+
+    /**
+     * @return ScymYouth
+     *
+     * Calling method is responsible for deletion
+     */
+    public function removeYouth() {
+        $result = $this->getYouth();
+        if ($result != null) {
+            $result->setAttender(null);
+            $this->setYouth(null);
+        }
+        return $result;
+    }
 }

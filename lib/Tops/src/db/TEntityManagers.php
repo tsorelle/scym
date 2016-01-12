@@ -62,16 +62,23 @@ class TEntityManagers {
         $config = TDbConfiguration::GetConfiguration();
         $databaseId = $config->Value("type/$typeKey");
         // temporary workaround to force proxy generation on server
-        $isDevMode = true;
+        // $isDevMode = null;
 
         if ($isDevMode === null) {
-
             $isDevMode = TDbConfiguration::GetEnvironment()  === 'development';
         }
+
         $entityPath = $config->Value("models/$databaseId");
         $metaConfigPath = TPath::FromLib($entityPath);
         $connectionParams = $config->Value("connections/$databaseId");
         $metaConfig = Setup::createAnnotationMetadataConfiguration(array($metaConfigPath), $isDevMode);
+
+        $cachePath =  realpath(__DIR__.'/../../cache/doctrine2');
+        $cachingBackend = new \Doctrine\Common\Cache\FilesystemCache($cachePath);
+        $metaConfig->setMetadataCacheImpl($cachingBackend);
+        $metaConfig->setQueryCacheImpl($cachingBackend);
+        $metaConfig->setResultCacheImpl($cachingBackend);
+
         $entityManager = EntityManager::create($connectionParams,$metaConfig);
         self::$managers[$typeKey] = $entityManager;
         return $entityManager;

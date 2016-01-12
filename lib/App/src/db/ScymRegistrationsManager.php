@@ -19,6 +19,7 @@ use App\db\scym\ScymFee;
 use App\db\scym\ScymHousingType;
 use App\db\scym\ScymMeeting;
 use App\db\scym\ScymRegistration;
+use App\db\scym\ScymYouth;
 use Doctrine\ORM\EntityRepository;
 use PDO;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -492,5 +493,16 @@ class ScymRegistrationsManager extends TDbServiceManager
         $statement = $q->execute();
         return $statement->fetchAll();
     }
+
+    public function deleteYouth(ScymAttender $attender) {
+        if ($attender != null) {
+            $youth = $attender->removeYouth();
+            if ($youth != null) {
+                $em = $this->getEntityManager();
+                $em->remove($youth);
+            }
+        }
+    }
+
 
 }
