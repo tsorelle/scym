@@ -539,7 +539,7 @@ module Tops {
         affiliationCodes = ko.observableArray<IListItem>();
         creditTypes = ko.observableArray<IListItem>();
         gradeLevels = ko.observableArray<IListItem>();
-        ageGroups = ko.observableArray<IAgeGroup>();
+        // ageGroups = ko.observableArray<IAgeGroup>();
         timePeriods = ko.observableArray<IListItem>();
         lookupsAssigned = false;
 
@@ -641,7 +641,7 @@ module Tops {
             me.setLookupValue(me.generationTypes(), me.selectedGenerationType, 1);
             me.selectedAffiliationCode(null);
             me.setLookupValue(me.creditTypes(), me.selectedCreditType, 0);
-            me.selectedAgeGroup(null);
+            // me.selectedAgeGroup(null);
             me.selectedGradeLevel(null);
             me.setLookupValue(me.timePeriods(), me.selectedArrivalTime, 42);
             me.setLookupValue(me.timePeriods(), me.selectedDepartureTime, 72);
@@ -663,7 +663,7 @@ module Tops {
             me.lookupsAssigned = true;
             me.housingTypes(lists.housingTypes);
             me.affiliationCodes(lists.affiliationCodes);
-            me.ageGroups(lists.ageGroups);
+            // me.ageGroups(lists.ageGroups);
 
             var times = me.buildTimeLookup();
             me.timePeriods(times);
@@ -850,11 +850,10 @@ module Tops {
 
             me.setLookupValue(me.specialNeedsTypes(), me.selectedSpecialNeedsType, attender.specialNeedsTypeId);
             me.setLookupValue(me.generationTypes(), me.selectedGenerationType, attender.generationId);
-            me.setLookupValue(me.ageGroups(), me.selectedAgeGroup, attender.ageGroupId);
-            me.setLookupValue(me.generationTypes(), me.selectedGenerationType, attender.generationId);
+//            me.setLookupValue(me.ageGroups(), me.selectedAgeGroup, attender.ageGroupId);
+            me.setLookupValue(me.gradeLevels(), me.selectedGradeLevel, attender.gradeLevel);
             me.setLookupValue(me.creditTypes(), me.selectedCreditType, attender.creditTypeId);
             me.setLookupValue(me.housingTypes(), me.selectedHousingType, attender.housingTypeId);
-            me.setLookupValue(me.gradeLevels(), me.selectedGradeLevel, attender.gradeLevel);
             me.setLookupValue(me.timePeriods(), me.selectedArrivalTime, attender.arrivalTime);
             me.setLookupValue(me.timePeriods(), me.selectedDepartureTime, attender.departureTime);
             me.setLookupValue(me.affiliationCodes(), me.selectedAffiliationCode, attender.affiliationCode);
@@ -919,7 +918,7 @@ module Tops {
             attender.specialNeedsTypeId = me.getLookupValue(me.selectedSpecialNeedsType);
             attender.generationId = me.getLookupValue(me.selectedGenerationType);
             attender.gradeLevel = me.getLookupValue(me.selectedGradeLevel);
-            attender.ageGroupId = me.getLookupValue(me.selectedAgeGroup);
+            // attender.ageGroupId = me.getLookupValue(me.selectedAgeGroup);
             attender.affiliationCode = me.getLookupValue(me.selectedAffiliationCode);
             attender.creditTypeId = me.getLookupValue(me.selectedCreditType);
             attender.housingTypeId = me.getLookupValue(me.selectedHousingType);

@@ -157,7 +157,10 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         }
         $this->registrationsManager->deleteAttenders($registration, $request->getDeletedAttenders());
         $attenders = $request->getUpdatedAttenders();
-        $registration->updateAttenders($attenders);
+        $removeYouthList = $registration->updateAttenders($attenders);
+        foreach($removeYouthList as $updatedAttender) {
+            $this->registrationsManager->deleteYouth($updatedAttender);
+        }
         $this->registrationsManager->clearAccountItems($registration);
         return $registration;
     }
@@ -183,7 +186,10 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         $message->setRecipient($response->registration->email);
         $registrarAddress = TPostOffice::GetMailboxAddress('registrar');
         $message->addCC($registrarAddress->getEmail(), $registrarAddress->getName());
-        TPostOffice::Send($message);
+        $sendResult = TPostOffice::Send($message);
+        if ($sendResult === false) {
+            $this->addInfoMessage('The mail service failed, so your confirmation was not sent. You registration has been recieved anyway.');
+        }
     }
 
 }

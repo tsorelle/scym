@@ -77,7 +77,7 @@ class GetAttenderCommand extends TServiceCommand
     {
         $lookups = new \stdClass();
         $lookups->affiliationCodes = $manager->getAffiliationCodeLookup();
-        $lookups->ageGroups = $manager->getAgeGroupList();
+        // $lookups->ageGroups = $manager->getAgeGroupList();
         $lookups->housingTypes = $manager->getHousingTypeList();
         return $lookups;
     }

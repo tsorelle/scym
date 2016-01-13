@@ -1,10 +1,13 @@
+DROP VIEW IF EXISTS attendersView;
 CREATE VIEW attendersView AS
   SELECT
-    attenderID AS attenderId,
+    a.attenderID AS attenderId,
     r.registrationId,
     r.year,
     YesOrNo(attended) AS arrived,
     FormatName(a.firstName,a.middleName,a.lastName) AS 'name',
+    a.generationId,
+    g.generationName,
     IFNULL(ag.groupName,'') AS ageGroup,
     (CASE vegetarian
      WHEN 1 THEN
@@ -31,6 +34,8 @@ CREATE VIEW attendersView AS
     YesOrNo(a.linens) AS linens
   FROM attenders a
     JOIN registrations r ON a.registrationId = r.registrationId
-    LEFT OUTER JOIN agegroups ag ON a.ageGroupId = ag.ageGroupId
+    JOIN generations g ON a.generationId = g.generationId
     LEFT OUTER JOIN specialneedstypes sp ON a.specialNeedsTypeId = sp.specialNeedsTypeID
     LEFT OUTER JOIN affiliationcodes ac ON a.affiliationCode= ac.affiliationCode
+    LEFT OUTER JOIN youths yo ON yo.attenderId = a.attenderId
+    LEFT OUTER JOIN agegroups ag ON yo.ageGroupId = ag.ageGroupId;

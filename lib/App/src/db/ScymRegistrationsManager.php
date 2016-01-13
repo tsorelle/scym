@@ -504,5 +504,13 @@ class ScymRegistrationsManager extends TDbServiceManager
         }
     }
 
+    public function checkYouthRecord(ScymAttender $attender)
+    {
+        $generationId = $attender == null ? 0 : $attender->getGenerationId();
+        if ($generationId == 1) {
+            $this->deleteYouth($attender);
+        }
+    }
+
 
 }

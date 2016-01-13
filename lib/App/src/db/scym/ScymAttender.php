@@ -8,6 +8,8 @@ use App\db\api\IAttenderCostInfo;
 use App\db\DateStampedEntity;
 use Doctrine\ORM\Mapping as ORM;
 use App\db\scym\ScymMeal;
+use Tops\sys\TDateTime;
+
 /**
  * ScymAttender
  *
@@ -103,13 +105,6 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
      * @Column(name="middleName", type="string", length=50, nullable=true)
      */
     private $middleName;
-
-    /**
-     * @var \DateTime
-     *
-     * @Column(name="dateOfBirth", type="date", nullable=true)
-     */
-    private $dateOfBirth;
 
     /**
      * @var string
@@ -215,20 +210,6 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
      * @Column(name="generationId", type="integer", nullable=true)
      */
     private $generationId = '1'; // lookup: generations
-
-    /**
-     * @var string
-     *
-     * @Column(name="gradeLevel", type="string", length=2, nullable=true)
-     */
-    private $gradeLevel; // 'PS','K', 1 .. 13
-
-    /**
-     * @var integer
-     *
-     * @Column(name="ageGroupId", type="integer", nullable=true)
-     */
-    private $ageGroupId; // lookup agegroups
 
     /**
      * @var integer
@@ -341,29 +322,6 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     public function getMiddlename()
     {
         return $this->middleName;
-    }
-
-    /**
-     * Set dateofbirth
-     *
-     * @param \DateTime $dateofbirth
-     * @return ScymAttender
-     */
-    public function setDateofbirth($dateofbirth)
-    {
-        $this->dateOfBirth = $dateofbirth;
-
-        return $this;
-    }
-
-    /**
-     * Get dateofbirth
-     *
-     * @return \DateTime
-     */
-    public function getDateofbirth()
-    {
-        return $this->dateOfBirth;
     }
 
     /**
@@ -697,7 +655,6 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     public function setGenerationId($generationId)
     {
         $this->generationId = $generationId;
-
         return $this;
     }
 
@@ -719,8 +676,10 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
      */
     public function setGradeLevel($gradelevel)
     {
-        $this->gradeLevel = $gradelevel;
-
+        $youth = $this->getYouth();
+        if ($youth != null) {
+            $youth->setGradeLevel($gradelevel);
+        }
         return $this;
     }
 
@@ -731,7 +690,34 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
      */
     public function getGradeLevel()
     {
-        return $this->gradeLevel;
+        $youth = $this->getYouth();
+        return $youth == null ? null : $youth->getGradeLevel();
+    }
+
+    /**
+     * Get dateofbirth
+     *
+     * @return \DateTime
+     */
+    public function getDateofbirth()
+    {
+        $youth = $this->getYouth();
+        return $youth == null ? null : $youth->getDateofBirth();
+    }
+
+    /**
+     * Set dateofbirth
+     *
+     * @param \DateTime $dateofbirth
+     * @return ScymAttender
+     */
+    public function setDateofbirth($dateofbirth)
+    {
+        $youth = $this->getYouth();
+        if ($youth != null) {
+            $youth->setDateofBirth($dateofbirth);
+        }
+        return $this;
     }
 
     /**
@@ -742,8 +728,10 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
      */
     public function setAgeGroupId($agegroup)
     {
-        $this->ageGroupId = $agegroup;
-
+        $youth = $this->getYouth();
+        if ($youth != null) {
+            $youth->setAgeGroupId($agegroup);
+        }
         return $this;
     }
 
@@ -754,7 +742,8 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
      */
     public function getAgeGroupId()
     {
-        return $this->ageGroupId;
+        $youth = $this->getYouth();
+        return $youth == null ? null : $youth->getAgeGroupId();
     }
 
     /**
@@ -849,17 +838,6 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
         return $this->registration;
     }
 
-    private function assignDob($dateString) {
-        try {
-            $dateValue = empty($dateString) ? null : new \DateTime($dateString);
-            $this->dateOfBirth = $dateValue;
-        }
-        catch(\Exception $ex) {
-            return false;
-        }
-        return true;
-    }
-
 
     public function updateFromDataTransferObject(AttenderDto $dto)
     {
@@ -876,9 +854,20 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
         $this->setDepartureTime($dto->getDepartureTime());
         $this->setHousingTypeId($dto->getHousingTypeId());
         $this->setVegetarian($dto->getVegetarian());
-        $this->setGenerationId($dto->getGenerationId());
-        $this->setGradeLevel($dto->getGradeLevel());
-        $this->setAgeGroupId($dto->getAgeGroupId());
+
+        $generationId = $dto->getGenerationId();
+        $this->setGenerationId($generationId);
+
+        if ($generationId > 1) {
+            $youth = $this->getYouth();
+            if ($youth == null) {
+                $youth = $this->createYouth();
+            }
+            $youth->setGradeLevel($dto->getGradeLevel());
+            // $youth->setAgeGroupId($dto->getAgeGroupId());
+            $youth->setDateofBirth($dto->getDateofbirth());
+        }
+
         $this->setCreditTypeId($dto->getCreditTypeId());
         switch($this->creditTypeId) {
             case 2:  // teacher credit
@@ -910,7 +899,6 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
         $result->firstName             =  $this->getFirstName();
         $result->lastName              =  $this->getLastName();
         $result->middleName            =  $this->getMiddleName();
-        $result->dateOfBirth           =  $this->getDateOfBirth();
         $result->affiliationCode       =  $this->getAffiliationCode();
         $result->otherAffiliation      =  $this->getOtherAffiliation();
         $result->firstTimer            =  $this->getFirstTimer();
@@ -925,12 +913,23 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
         $result->departureTime         =  $this->getDepartureTime();
         $result->housingTypeId         =  $this->getHousingTypeId();
         $result->vegetarian            =  $this->getVegetarian();
-        $result->generationId          =  $this->getGenerationId();
-        $result->gradeLevel            =  $this->getGradeLevel();
-        $result->ageGroupId            =  $this->getAgeGroupId();
         $result->singleOccupant        =  $this->getSingleOccupant();
         $result->glutenFree            =  $this->getGlutenFree();
         $result->attended              =  $this->getAttended();
+
+        $result->generationId                  =  $this->getGenerationId();
+        $youth = $this->getYouth();
+        if ($youth != null) {
+            $dob = $youth->getDateofBirth();
+            $result->dateOfBirth           =  TDateTime::isEmpty($dob) ? null : $dob->format('m/d/Y');
+            $result->gradeLevel            =  $youth->getGradeLevel();
+            // $result->ageGroupId            =  $youth->getAgeGroupId();
+        }
+        else {
+            $result->dateOfBirth           =  null;
+            $result->gradeLevel            =  '';
+            // $result->ageGroupId            =  '';
+        }
 
         return $result;
     }
@@ -1019,13 +1018,18 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
         return $result;
     }
 
+    /**
+     * @param $youth
+     */
     public function setYouth($youth) {
         $this->youth = $youth;
     }
 
+    /**
+     * @return ScymYouth
+     */
     public function createYouth() {
         $result = new ScymYouth();
-        $result->setGenerationId($this->getGenerationId());
         $this->setYouth($result);
         $result->setAttender($this);
         return $result;

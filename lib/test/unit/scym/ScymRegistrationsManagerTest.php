@@ -236,7 +236,7 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $attender->specialNeedsTypeId = null;
         $attender->generationId = 1; // lookup: generations
         $attender->gradeLevel = null; // 'PS';'K'; 1 .. 13
-        $attender->ageGroupId = null; // lookup agegroups
+        // $attender->ageGroupId = null; // lookup agegroups
         $attender->creditTypeId = 0; // number; // formerly: feeCredit; lookup: creditTypes
         $attender->meals = array(
             51,
@@ -466,7 +466,7 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testYouth() {
         $manager = $this->getManager();
-        $testId = 176; // 244;
+        $testId = 244;
         $registration = $manager->getRegistration($testId);
         $this->assertNotNull($registration);
         $attenders = $registration->getAttenders();

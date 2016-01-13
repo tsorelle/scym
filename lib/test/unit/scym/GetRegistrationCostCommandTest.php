@@ -40,7 +40,7 @@ class RegistrationCommandTest extends \PHPUnit_Framework_TestCase
         $attender->specialNeedsTypeId = null;
         $attender->generationId = 1; // lookup: generations
         $attender->gradeLevel = null; // 'PS';'K'; 1 .. 13
-        $attender->ageGroupId = null; // lookup agegroups
+        // $attender->ageGroupId = null; // lookup agegroups
         $attender->creditTypeId = 0; // number; // formerly: feeCredit; lookup: creditTypes
         $attender->meals = array(
             43,

@@ -83,14 +83,14 @@ class GetAttenderCommandTest  extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedId,$actualAttender->getAttenderId());
         $lookups = isset($response->Value->lookups) ? $response->Value->lookups : null;
         $this->assertNotNull($lookups,'Lookups not returned');
-        $ageGroups = isset($lookups->ageGroups) ? $lookups->ageGroups : null;
-        $this->assertNotNull($ageGroups,'Agegroups not returned');
+        // $ageGroups = isset($lookups->ageGroups) ? $lookups->ageGroups : null;
+        // $this->assertNotNull($ageGroups,'Agegroups not returned');
         $affiliationCodes = isset($lookups->affiliationCodes) ? $lookups->affiliationCodes : null;
         $this->assertNotNull($affiliationCodes,'affiliationCodes not returned');
         $housingTypes = isset($lookups->housingTypes) ? $lookups->housingTypes : null;
         $this->assertNotNull($housingTypes,'housingTypes not returned');
         $this->assertNotEmpty($affiliationCodes,"affiliationCodes empty.");
-        $this->assertNotEmpty($ageGroups,"agegroups empty.");
+        // $this->assertNotEmpty($ageGroups,"agegroups empty.");
         $this->assertNotEmpty($housingTypes,"housingTypes empty.");
 
         $this->deleteRegistration($code);

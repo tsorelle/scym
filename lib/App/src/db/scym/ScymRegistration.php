@@ -835,6 +835,7 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
      * @param array $attenderUpdates  IAttender[]
      */
     public function updateAttenders(array $attenderUpdates) {
+        $updatedYouth = array();
         foreach ($attenderUpdates as $dto) {
             /**
              * @var $dto AttenderDto
@@ -849,13 +850,18 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
             }
             else {
                 $attender = $this->findAttender($id);
+                $removeYouth = ($attender->getGenerationId() > 1 && $dto->getGenerationId() == 1);
                 $attender->updateFromDataTransferObject($dto);
+                if ($removeYouth) {
+                    array_push($updatedYouth, $attender);
+                }
                 $mealtimes = $dto->getMeals();
                 if ($mealtimes != null) {
                     $attender->updateMeals($mealtimes);
                 }
             }
         }
+        return $updatedYouth;
     }
 
     public function addAttenders(array $newAttenders) {

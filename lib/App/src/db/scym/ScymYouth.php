@@ -32,25 +32,11 @@ class ScymYouth extends DateStampedEntity
     private $youthid;
 
     /**
-     * @var integer
-     *
-     * @Column(name="attenderId", type="integer", nullable=false)
-    private $attenderid;
-     */
-
-    /**
      * @var \DateTime
      *
      * @Column(name="dateOfBirth", type="date", nullable=true)
      */
     private $dateofbirth;
-
-    /**
-     * @var boolean
-     *
-     * @Column(name="generationId", type="boolean", nullable=true)
-     */
-    private $generationid;
 
     /**
      * @var string
@@ -122,26 +108,14 @@ class ScymYouth extends DateStampedEntity
     }
 
     /**
-     * Set generationid
-     *
-     * @param boolean $generationid
-     * @return ScymYouth
-     */
-    public function setGenerationId($generationid)
-    {
-        $this->generationid = $generationid;
-
-        return $this;
-    }
-
-    /**
      * Get generationid
      *
-     * @return boolean 
+     * @return integer
      */
     public function getGenerationId()
     {
-        return $this->generationid;
+        $attender = $this->getAttender();
+        return $attender == null ? 1 : $attender->getGenerationId();
     }
 
     /**
@@ -272,10 +246,6 @@ class ScymYouth extends DateStampedEntity
     public function getAttender()
     {
         return $this->attender;
-    }
-
-    public function setAttenderId($value) {
-        // $this->attenderid = $value;
     }
 
 

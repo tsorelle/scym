@@ -161,6 +161,7 @@ class AttenderDto implements IAttenderCostInfo
             if (TDateTime::isEmpty($result)) {
                 return null;
             }
+            return $result;
         }
         catch (\Exception $ex) {
             // return null if invalid date
@@ -223,21 +224,12 @@ class AttenderDto implements IAttenderCostInfo
     }
 
     /**
-     * Get agegroup
-     *
-     * @return integer
-     */
-    public function getAgeGroupId() {
-        return isset($this->data->ageGroupId) ? $this->data->ageGroupId : null;
-    }
-
-    /**
      * Get glutenfree
      *
      * @return boolean
      */
     public function getGlutenfree() {
-        return isset($this->data->ageGroupId) ? $this->data->ageGroupId : null;
+        return isset($this->data->glutenFree) ? $this->data->glutenFree : null;
     }
 
     public function getAttended() {
