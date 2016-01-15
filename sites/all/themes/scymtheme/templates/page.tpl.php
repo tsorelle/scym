@@ -113,6 +113,13 @@
           <?php endif; ?>
         </nav>
 
+          <ul class="nav navbar-nav navbar-left">
+              <li>
+                  <a href="/help" title="Help videos and articles" role="button" target="_blank">
+                      <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Help</a>
+              </li>
+          </ul>
+
           <?php if ($logged_in): ?>
               <ul class="nav navbar-nav navbar-right">
                   <?php if(!empty($userContentMenu)) : ?>

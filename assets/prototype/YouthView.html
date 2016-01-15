@@ -1,0 +1,28 @@
+<!-- ******************  START FORM ****************************************************************************  -->
+<div id="view-container" class="view-model-container">
+    <div class="row" id="tabs">
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-tabs">
+                    <li  data-bind="css: {active: currentForm() == 'youth-list'}"><a href="#" data-bind="click:showYouthList">Youth</a></li>
+                    <li  data-bind="css: {active: currentForm() == 'age-groups'}"><a href="#" data-bind="click:showAgeGroups">Age groups</a></li>
+                    <li  data-bind="css: {active: currentForm() == 'reports'}"><a href="#" data-bind="click:showReportsForm">Reports</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="youth-list-form" data-bind="visible:currentForm() == 'youthlist'">
+                <div id="youth-list-container"><youth-list></youth-list></div>
+            </div>
+            <div id="age-groups-form"  data-bind="visible:currentForm() == 'agegroups'">
+                <div id="age-groups-container"><age-groups></age-groups></div>
+            </div>
+            <div id="reports-form"  data-bind="visible:currentForm() == 'reports'">
+                <div id="youth-reports-container"><youth-reports></youth-reports></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ******************  END FORM ****************************************************************************  -->

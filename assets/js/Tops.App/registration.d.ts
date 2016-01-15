@@ -285,4 +285,30 @@ declare module Tops {
         initialize : (finalFunction? : () => void) =>void;
     }
 
+    export interface IYouthInfo {
+        year : number;
+        attenderId : number;
+        registrationId : number;
+        firstName : string;
+        lastName : string;
+        fullName : string;
+        generationId : number;
+        generationName : string;
+        arrivalTime : any;
+        departureTime : any;
+        arrivalTimeText : string;
+        departureTimeText : string;
+        dateOfBirth : string;
+        age : any;
+        gradeLevel : string;
+        registrationName : string;
+        sponsor : string;
+        specialNeeds : string;
+        ageGroup : string;
+        ageGroupCutoff: number;
+        dietPreference : string;
+        youthNotes : string;
+        attenderNotes : string;
+    }
+
 }
