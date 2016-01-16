@@ -181,7 +181,8 @@ module Tops {
 
         private applyFilter(list: IYouthInfo[], filterType: string) {
             var me = this;
-            if (filterType = 'all') {
+            me.currentFilter = filterType;
+            if (filterType == 'all') {
                 return list;
             }
             var parts = filterType.split(':');
