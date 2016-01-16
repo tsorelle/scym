@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Terry
- * Date: 1/15/2016
- * Time: 7:28 AM
+ * Date: 1/16/2016
+ * Time: 11:00 AM
  */
 
 namespace App\services\registration;
@@ -12,13 +12,15 @@ namespace App\services\registration;
 use App\db\ScymRegistrationsManager;
 use Tops\services\TServiceCommand;
 
-class GetYouthListCommand extends TServiceCommand
+class GetAgeGroupListCommand extends TServiceCommand
 {
 
     protected function run()
     {
+        $request = $this->getRequest();
+        $all = ($request == 'all');
         $manager = new ScymRegistrationsManager();
-        $list = $manager->getYouthList();
-        $this->setReturnValue($list);
+        $result = $manager->getAgeGroupList($all);
+        $this->setReturnValue($result);
     }
 }

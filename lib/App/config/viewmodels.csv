@@ -12,3 +12,4 @@ meetings/gmap,MeetingsMapViewModel,maps.api,url:http://google-maps-utility-libra
 register,YmRegistrationViewModel,component:editPanel,no-messages
 registration/housing,HousingManagementViewModel
 registration/admin,RegistrationAdminViewModel
+registration/youth,YouthViewModel

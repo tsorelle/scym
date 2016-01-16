@@ -344,6 +344,8 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $result;
     }
 
+
+
     /**
      * @return TLookupItem[]
      *
@@ -382,7 +384,7 @@ class ScymRegistrationsManager extends TDbServiceManager
      *  }
      *
      */
-    public function getAgeGroupList() {
+    public function getAgeGroupList($includeInactive = false) {
         $repository =  $this->getRepository('App\db\scym\ScymAgeGroup');
         $ageGroups = $repository->findAll();
         $result = array();
@@ -391,7 +393,7 @@ class ScymRegistrationsManager extends TDbServiceManager
             /**
              * @var $ageGroup ScymAgeGroup
              */
-            if ($ageGroup->getActive()) {
+            if ($includeInactive || $ageGroup->getActive()) {
                 $item = new \stdClass();
                 $item->Text = $ageGroup->getGroupName();
                 $item->Value = $ageGroup->getAgeGroupId();
@@ -512,5 +514,23 @@ class ScymRegistrationsManager extends TDbServiceManager
         }
     }
 
+    public function getYouthList() {
+        $session = $this->getSession();
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM youthView WHERE year = ? ORDER BY lastName, firstName";
+        $statement = $qm->executeStatement($sql,$session->getYear());
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
 
+    /**
+     * @param $id
+     * @return ScymYouth
+     * @throws \Exception
+     */
+    public function getYouth($youthId) {
+        $repository =  $this->getRepository('App\db\scym\ScymYouth');
+        $result = $repository->find($youthId);
+        return $result;
+    }
 }

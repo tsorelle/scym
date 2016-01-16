@@ -545,5 +545,12 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($youthAttender);
         $this->assertEquals($attenderId,$youthAttender->getAttenderId());
     }
+
+    public function testGetYouthList() {
+        $manager = $this->getManager();
+        $actual = $manager->getYouthList();
+        $this->assertNotNull($actual);
+
+    }
 }
 

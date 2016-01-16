@@ -288,6 +288,7 @@ declare module Tops {
     export interface IYouthInfo {
         year : number;
         attenderId : number;
+        youthId: number;
         registrationId : number;
         firstName : string;
         lastName : string;
@@ -305,10 +306,22 @@ declare module Tops {
         sponsor : string;
         specialNeeds : string;
         ageGroup : string;
-        ageGroupCutoff: number;
+        ageGroupId : number;
+        ageGroupCutoff: any;
         dietPreference : string;
         youthNotes : string;
         attenderNotes : string;
+        hasNotes: any;
+        formsSubmitted: any;
+        affiliationCode: string;
+        meeting: string;
     }
 
+    export interface IUpdateYouthRequest {
+        youthId : number;
+        sponsor : string;
+        ageGroupId : number;
+        youthNotes : string;
+        formsSubmitted: boolean;
+    }
 }

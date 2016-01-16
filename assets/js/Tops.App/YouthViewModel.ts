@@ -93,7 +93,7 @@ module Tops {
 
         showYouthList = () => {
             var me=this;
-            me.currentForm('youthList');
+            me.currentForm('youthlist');
         };
 
         showAgeGroups  = () => {
