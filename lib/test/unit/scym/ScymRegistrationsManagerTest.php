@@ -57,7 +57,7 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testgetUserRegistrationId() {
-        $year = 2015;
+        $year = 2016;
         $username = 'bimbo';
         $manager = $this->getManager();
         $actual = $manager->getUserRegistrationId($username,$year);
@@ -176,17 +176,17 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRegistraionByCode() {
         $manager = $this->getManager();
-        $code = 'tony';
+        $code = 'w.wilson-reiner@sbcglobal.net';
         $registration = $manager->getRegistrationByCode($code);
         $this->assertNotNull($registration);
-        $expected = 'Tony and Sherry Fish';
+        $expected = 'Warren Wilson-Reiner & Bill Reiner';
         $actual = $registration->getName();
         $this->assertEquals($expected,$actual);
     }
 
     public function testRegistrationCodeExists() {
         $manager = $this->getManager();
-        $code = 'tony';
+        $code = 'w.wilson-reiner@sbcglobal.net';
         $result = $manager->checkRegistationCodeExists($code);
         $this->assertTrue($result,'incorrect result for existing');;
         $code = 'nobody here';
@@ -466,7 +466,7 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testYouth() {
         $manager = $this->getManager();
-        $testId = 244;
+        $testId = 178;
         $registration = $manager->getRegistration($testId);
         $this->assertNotNull($registration);
         $attenders = $registration->getAttenders();
