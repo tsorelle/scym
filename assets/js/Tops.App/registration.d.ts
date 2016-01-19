@@ -68,6 +68,12 @@ declare module Tops {
         cutoffAge : any;
     }
 
+    export interface IAgeGroupEditItem extends IAgeGroup {
+        active : any;
+        errorMessage: string;
+        priorState: any;
+    }
+
     export interface IHousingTypeListItem extends IListItem {
         category: any;
     }

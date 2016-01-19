@@ -1382,7 +1382,8 @@ module Tops {
             if (regcode) {
                 request = {
                     type: 'code',
-                    value: regcode
+                    value: regcode,
+                    getFundList: true
                 }
             }
             else {
@@ -1390,7 +1391,8 @@ module Tops {
                 if (id) {
                     request = {
                         type: 'id',
-                        value: id
+                        value: id,
+                        getFundList: true
                     }
                 }
             }

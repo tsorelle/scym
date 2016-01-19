@@ -1,1 +1,99 @@
-<p>age groups</p>
+
+<div id="agegroups-table">
+    <p>
+        <button class="btn btn-primary btn-sm" data-bind="click:saveChanges">Save changes</button>
+        <button class="btn btn-default btn-sm" data-bind="click:showUpdateAssignmentsDialog">Update assignments</button>
+        <a href="#" data-bind="click:showNewAgeGroupDialog">Create new age group</a>
+    </p>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th><th>Description</th><th>Cutoff age</th><th>active</th><th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach:ageGroups">
+        <tr>
+            <td data-bind="text:Text"></td>
+            <td data-bind="text:Description"></td>
+            <td>
+                <input style="width: 50px" data-bind='value: cutoffAge'/>
+                <span style="color:red" data-bind="text:errorMessage"></span>
+            </td>
+            <td>
+                <input type="checkbox" data-bind="checked:active"/> Active
+            </td>
+            <td>
+                <a href="#" data-bind="visible:Value==0,click:$parent.removeGroup">Remove</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modals -->
+<div>
+    <div class="modal" id="new-agegroup-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4>New Age Group</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div id="errors" class="alert alert-danger" role="alert" data-bind="visible:ageGroupForm.hasErrors">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            <span class="sr-only">Error:</span>
+                            Please correct errors before saving.
+                        </div>
+                        <div class="form-group" data-bind="css:{'has-error': ageGroupForm.nameError}">
+                            <label class="control-label" for="name">Name <span data-bind="text:ageGroupForm.nameError"></span></label>
+                            <input type="text" class="form-control" id="name" data-bind="textInput: ageGroupForm.name" />
+                        </div>
+
+                        <div class="form-group"  data-bind="css:{'has-error': ageGroupForm.cutoffError}">
+                            <label class="control-label" for="cutoff">Cutoff age <span data-bind="text:ageGroupForm.cutoffError"></span></label>
+                            <input type="text" class="form-control" id="cutoff" data-bind="textInput: ageGroupForm.cutoffAge" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bind="click: addAgeGroup">Save changes</button>
+                    <button type="button" class="btn btn-default"  data-dismiss="modal">Cancel</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal" id="reassign-agegroup-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4>Reassign youth age group</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        If you continue, all youth attenders will be assigned age groups based on the age group list. Any previous assignments will be overwritten.
+
+                    </p>
+                    <p>
+                        The age group assigned is based on their age as of the "cut-off month" before the Yearly Meeting session.
+                    </p>
+                    <form>
+                        <month-lookup params="selected: cutoffMonth, month: 9, label: 'Cut-off Month'"></month-lookup>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bind="click: updateAssignments">Continue</button>
+                    <button type="button" class="btn btn-default"  data-dismiss="modal">Cancel</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+</div>
+
+
+

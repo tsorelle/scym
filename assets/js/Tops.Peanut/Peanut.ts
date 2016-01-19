@@ -58,8 +58,9 @@ module Tops {
 
         constructor() {
             var me = this;
-            var href = window.location.href;
-            var params = href.slice(href.indexOf('?') + 1).split('&');
+            // var href = window.location.href;
+            var queryString = window.location.search;
+            var params = queryString.slice(queryString.indexOf('?') + 1).split('&');
             for (var i = 0; i < params.length;i++) {
                 var parts = params[i].split('=');
                 var key = parts[0];
@@ -338,6 +339,66 @@ module Tops {
                 return false;
             }
             return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email);
+        }
+
+        public static validatePositiveWholeNumber(text: string,maxValue = null, emptyOk: boolean = true) {
+            return Peanut.validateWholeNumber(text,maxValue,0,emptyOk);
+        }
+
+        public static validateWholeNumber(numberText: string, maxValue = null, minValue = null, emptyOk: boolean = true) {
+            if (numberText == null) {
+                numberText = '';
+            }
+
+            numberText = numberText + ' '; // convert to string to ensure .trim() works.
+            var result = {
+                errorMessage: '',
+                text: numberText.trim(),
+                value: 0,
+            };
+
+            var parts = result.text.split('.');
+            if (parts.length > 1) {
+                var fraction = parseInt(parts[1].trim());
+                if (fraction != 0) {
+                    result.errorMessage = 'Must be a whole number.';
+                    return result;
+                }
+                else {
+                    result.text = parts[0].trim();
+                }
+            }
+
+            if (result.text == '') {
+                if (!emptyOk) {
+                    result.errorMessage = 'A number is required.'
+                }
+                return result;
+            }
+
+            result.value = parseInt(result.text);
+            if (isNaN(result.value)) {
+                result.errorMessage = 'Must be a valid whole number.';
+            }
+            else {
+                if (minValue != null && result.value < minValue) {
+                    if (minValue == 0) {
+                        result.errorMessage = 'Must be a positive number';
+                    }
+                    else {
+                        result.errorMessage =  'Must be greater than ' + minValue;
+                    }
+                }
+                if (maxValue != null && result.value > maxValue) {
+                    if (result.errorMessage) {
+                        result.errorMessage += ' and less than ' + maxValue;
+                    }
+                    else {
+                        result.errorMessage =  'Must be less than ' + maxValue;
+                    }
+                }
+            }
+            return result;
         }
 
         public static validateCurrency(value:string): any {

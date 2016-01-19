@@ -78,7 +78,9 @@ module Tops {
 
         handleEvent = (eventName:string, data?:any)=> {
             var me = this;
-            me.youthListVM.handleEvent(eventName,data);
+            if (me.youthListVM) {
+                me.youthListVM.handleEvent(eventName, data);
+            }
         };
 
         afterInit = () => {
@@ -94,6 +96,7 @@ module Tops {
         showYouthList = () => {
             var me=this;
             me.currentForm('youthlist');
+            me.handleEvent('youthlist-selected')
         };
 
         showAgeGroups  = () => {
@@ -102,18 +105,20 @@ module Tops {
                 me.currentForm('agegroups');
             }
             else {
-                me.application.bindComponent('age-groups',
-                    function () {
-                        me.ageGroupsVM = new ageGroupsComponent(me.application, me);
-                        return me.ageGroupsVM;
-                    },
-                    function () {
-                        // initialize
-                        me.ageGroupsVM.initialize(function() {
-                            me.currentForm('agegroups');
-                        });
-                    }
-                );
+                me.application.loadComponent('month-lookup',function() {
+                    me.application.bindComponent('age-groups',
+                        function () {
+                            me.ageGroupsVM = new ageGroupsComponent(me.application, me);
+                            return me.ageGroupsVM;
+                        },
+                        function () {
+                            // initialize
+                            me.ageGroupsVM.initialize(function() {
+                                me.currentForm('agegroups');
+                            });
+                        }
+                    );
+                });
             }
         };
 

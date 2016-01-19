@@ -153,7 +153,7 @@ class ScymAccountManager
         if ($housingType->category == self::HOUSINGFEE_TYPE_MOTEL) {
             $specialNeeds = $attender->getSpecialNeedsTypeId();
             if ($housingType->housingTypeCode != 'HEALTH' || empty($specialNeeds)) {
-                $this->addAttenderItem($attender, 'MOTEL_FEE',"Motel room fee $nights nights",$nights);
+                $this->addAttenderItem($attender, 'MOTEL_FEE',"Motel room");
                 if ($attender->getSingleOccupant()) {
                     $this->addAttenderItem($attender, 'PRIVATE_ROOM_'.$nights, $note);
                 }

@@ -14,7 +14,7 @@ module Tops {
 
         private application:IPeanutClient;
         private peanut:Peanut;
-        private refreshNeeded = true;
+        private refreshNeeded = 'agegroups';
         // private owner : IEventSubscriber;
 
         private youthData : IYouthInfo[] = [];
@@ -94,10 +94,28 @@ module Tops {
             var me = this;
             switch (eventName) {
                 case 'agegroupschanged' :
-                    me.refreshNeeded = true;
+                    if (me.refreshNeeded != 'all') {
+                        me.refreshNeeded = 'agegroups';
+                    }
+                    break;
+                case 'youthlistchanged' :
+                    me.refreshNeeded = 'all';
+                    break;
+                case 'youthlist-selected' :
+                    me.refresh();
                     break;
             }
 
+        };
+
+        refresh = ()  => {
+            var me = this;
+            var refreshNeeded = me.refreshNeeded;
+            me.refreshNeeded = 'agegroups';
+            jQuery("#youth-update-modal").modal('hide');
+            if (refreshNeeded == 'all') {
+                me.getList();
+            }
         };
 
         computePrintHeader = () => {
@@ -229,21 +247,26 @@ module Tops {
         private handleRefreshList = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                me.youthData = <IYouthInfo[]>serviceResponse.Value;
+                var list = me.applySort(me.youthData, me.currentSort);
+                var filterList:INameValuePair[] = me.createFilterList();
+                me.filterList(filterList);
+                if (me.currentFilter) {
+                    var filter = _.find(filterList, function (item:INameValuePair) {
+                        if (item.Value == me.currentFilter) {
+                            return true;
+                        }
+                    });
 
+                    if (filter != null) {
+                        list = me.applyFilter(list,me.currentFilter);
+                    }
+                }
+                me.youthList(list);
 
             }
+
         };
-
-        public refresh(finalFunction? : () => void) {
-            var me = this;
-            if (me.refreshNeeded) {
-                me.refreshNeeded = false;
-                // todo: refresh
-            }
-            if (finalFunction) {
-                finalFunction();
-            }
-        }
 
         saveChanges = () => {
             var me = this;
@@ -256,12 +279,14 @@ module Tops {
                 formsSubmitted: me.youthDetailForm.formsSubmitted()
             };
 
+
             me.application.hideServiceMessages();
             me.application.showWaiter('Updating...');
 
-            me.peanut.executeService('registration.UpdateYouthInfo',request, me.handleUpdateYouthResponse)
+            me.peanut.executeService('registration.UpdateYouthInfo',request, me.handleRefreshList)
              .always(function() {
                 me.application.hideWaiter();
+                jQuery("#youth-update-modal").modal('hide');
              });
 
         };
@@ -269,25 +294,8 @@ module Tops {
         private handleUpdateYouthResponse = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var ageGroup = me.selectedAgeGroup();
-                _.each(me.youthData, function(item : IYouthInfo) {
-                    if (item.youthId == me.youthDetailForm.youthId) {
-                        item.sponsor = me.youthDetailForm.sponsor();
-                        item.ageGroupId = ageGroup.Value;
-                        item.ageGroup = ageGroup.Text;
-                        item.ageGroupCutoff = ageGroup.cutoffAge;
-                        item.youthNotes = me.youthDetailForm.youthNotes();
-                        item.formsSubmitted = me.youthDetailForm.formsSubmitted();
-                    }
-                });
-
-                var list = me.applySort(me.youthData,me.currentSort);
-                if (me.currentFilter) {
-                    list = me.applyFilter(list,me.currentFilter);
-                }
-                me.youthList(list);
+                me.handleRefreshList(serviceResponse);
             }
-            jQuery("#youth-update-modal").modal('hide');
         };
 
 
@@ -319,8 +327,9 @@ module Tops {
         showDetailForm = (youth : IYouthInfo) => {
             var me = this;
             me.assignYouthForm(youth);
-            if (me.refreshNeeded) {
+            if (me.refreshNeeded == 'agegroups') {
                 me.getAgeGroupList();
+                me.refreshNeeded = '';
             }
             else {
                 me.showUpdateForm();
@@ -362,7 +371,6 @@ module Tops {
             var ageGroup = _.find(list,function(item : IAgeGroup) {
                 return item.Value == me.youthDetailForm.ageGroupId;
             });
-            me.refreshNeeded = false;
             me.selectedAgeGroup(ageGroup);
             jQuery("#youth-update-modal").modal('show');
         }

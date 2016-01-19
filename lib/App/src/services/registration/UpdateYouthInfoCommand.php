@@ -64,5 +64,8 @@ class UpdateYouthInfoCommand extends TServiceCommand
 
         $manager->updateEntity($youth);
 
+        $list = $manager->getYouthList();
+        $this->setReturnValue($list);
+
     }
 }

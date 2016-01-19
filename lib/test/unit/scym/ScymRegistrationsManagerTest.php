@@ -552,5 +552,18 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($actual);
 
     }
+
+    public function testReassignAgeGroups() {
+        $manager = $this->getManager();
+        $error = null;
+        try {
+            $updateCount = $manager->reassignYouthAgeGroups(9, true);
+        }
+        catch(\Exception $ex) {
+            $error = $ex->getMessage();
+        }
+        $this->assertNull($error,"Threw exception: ".$error);
+        $this->assertGreaterThan(-1,$updateCount);
+    }
 }
 

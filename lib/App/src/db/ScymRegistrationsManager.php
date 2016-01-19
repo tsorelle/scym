@@ -23,6 +23,7 @@ use App\db\scym\ScymYouth;
 use Doctrine\ORM\EntityRepository;
 use PDO;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Validator\Constraints\DateTime;
 use Tops\db\TDbServiceManager;
 use Tops\db\TQueryManager;
 use Tops\sys\TListItem;
@@ -386,22 +387,33 @@ class ScymRegistrationsManager extends TDbServiceManager
      */
     public function getAgeGroupList($includeInactive = false) {
         $repository =  $this->getRepository('App\db\scym\ScymAgeGroup');
-        $ageGroups = $repository->findAll();
+        // $ageGroups = $repository->findAll();
+
+        $ageGroups = $repository->findBy(array(), array('cutoffage' => 'ASC'));
+
         $result = array();
         $priorAge = 0;
         foreach ($ageGroups as $ageGroup) {
             /**
              * @var $ageGroup ScymAgeGroup
              */
-            if ($includeInactive || $ageGroup->getActive()) {
+            $active = $ageGroup->getActive();
+            if ($includeInactive || $active) {
                 $item = new \stdClass();
                 $item->Text = $ageGroup->getGroupName();
                 $item->Value = $ageGroup->getAgeGroupId();
                 $item->cutoffAge = $ageGroup->getCutoffAge();
-                $startAge = $priorAge == 0 ? 'Infant ' : "Age ".($priorAge + 1);
-                $item->Description = "$startAge to $item->cutoffAge.";
-                $priorAge = $item->cutoffAge;
-
+                if ($active) {
+                    $startAge = $priorAge == 0 ? 'Infant ' : "Age " . ($priorAge + 1);
+                    $item->Description = "$startAge to $item->cutoffAge";
+                    $priorAge = $item->cutoffAge;
+                }
+                else {
+                    $item->Description = '(not used)';
+                }
+                if ($includeInactive) {
+                    $item->active = $active;
+                }
                 array_push($result,$item);
             }
         }
@@ -532,5 +544,105 @@ class ScymRegistrationsManager extends TDbServiceManager
         $repository =  $this->getRepository('App\db\scym\ScymYouth');
         $result = $repository->find($youthId);
         return $result;
+    }
+
+    public function reassignYouthAgeGroups($cutoffMonth = 9,$test=false) {
+        $session = $this->getSession();
+        $year = $session->getYear();
+        $startMonth = $session->getStart()->format('m');;
+        if ($cutoffMonth >= $startMonth) {
+            $year--;
+        }
+
+
+       $baseDate = new \DateTime("$year-$cutoffMonth-1");
+       $cutDate = new \DateTime();
+
+        $ageGroupsRepository =  $this->getRepository('App\db\scym\ScymAgeGroup');
+        // $youthRepository = $this->getRepository('App\db\scym\ScymYouth');
+        $em = $this->getEntityManager();
+        $ageGroups = $ageGroupsRepository->findBy(array(), array('cutoffage' => 'ASC'));
+        $updateCount = 0;
+        foreach ($ageGroups as $ageGroup) {
+            /**
+             * @var $ageGroup ScymAgeGroup
+             */
+            if ($ageGroup->getActive()) {
+                $age = $ageGroup->getCutoffAge();
+                $endDate = clone($cutDate);
+                $cutDate = clone($baseDate);
+                $cutDate->modify("-$age year");
+
+                $testCut = $cutDate->format('Y-m-d');
+                $testEnd = $endDate->format('Y-m-d');
+                $testSql = "yo.dateOfBirth > '$testEnd' and yo.dateOfBirth <= '$testCut' ";
+                $dql =
+                    'SELECT y FROM App\db\scym\ScymYouth y '.
+                    'JOIN y.attender a '.
+                    'JOIN a.registration r '.
+                    'WHERE y.dateofbirth > ?1 and y.dateofbirth <= ?2 and r.year > ?3';
+
+
+                $testSql = "yo.dateOfBirth > '$testCut' and yo.dateOfBirth <= '$testEnd' ";
+
+                $query = $em->createQuery($dql);
+
+                $query->setParameter(1, $cutDate);
+                $query->setParameter(2, $endDate);
+                $query->setParameter(3, $year);
+/*
+
+                $query->setParameter(1, $cutDate);
+                $query->setParameter(2, $endDate);
+                $query->setParameter(3, 1);
+                    // $year);
+*/
+                $youths = $query->getResult();
+                foreach ($youths as $youth) {
+                    /**
+                     * @var $youth ScymYouth
+                     */
+                    $youth->setAgeGroupId($ageGroup->getAgeGroupId());
+                    if (!$test) {
+                        $this->persistEntity($youth);
+                    }
+                    $updateCount++;
+                }
+            }
+            if (!$test) {
+                $this->saveChanges();
+            }
+        }
+
+
+
+
+        return $updateCount;
+    }
+
+    public function updateAgeGroups(array $updates) {
+        $repository =  $this->getRepository('App\db\scym\ScymAgeGroup');
+        foreach($updates as $update) {
+            if (isset($update->id) && isset($update->cutoff) && isset($update->active)) {
+                if ($update->id) {
+                    $group = $repository->find($update->id);
+                }
+                else {
+                    if (!isset($update->name)) {
+                        return false;
+                    }
+                    $group = new ScymAgeGroup();
+                    $group->setGroupName($update->name);
+                }
+                $group->setActive($update->active);
+                $group->setCutoffAge($update->cutoff );
+                $this->persistEntity($group);
+            }
+            else {
+                return false;
+            }
+        }
+        $this->saveChanges();
+        return true;
     }
 }
