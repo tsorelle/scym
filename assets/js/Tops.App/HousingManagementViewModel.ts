@@ -18,6 +18,9 @@
 
 module Tops {
     export class HousingManagementViewModel implements IMainViewModel, IEventSubscriber {
+
+        // todo: housing reports page
+
         static instance: Tops.HousingManagementViewModel;
         private application: Tops.IPeanutClient;
         private peanut: Tops.Peanut;

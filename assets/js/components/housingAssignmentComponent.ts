@@ -501,22 +501,15 @@ module Tops {
         getConfirmationText = () => {
             // todo: getConfirmationText
             var me = this;
-            var request = null;
+            var request = me.registrationId();
 
             me.application.hideServiceMessages();
             me.application.showWaiter('Message here...');
 
-            // fake
-            var response = me.getFakeConfirmationText();
-            me.handleGetConfirmationTextResponse(response);
-            me.application.hideWaiter();
-
-            /*
-             me.peanut.executeService('directory.ServiceName',request, me.handleServiceResponseTemplate)
+             me.peanut.executeService('registration.GetHousingConfirmationText',request, me.handleGetConfirmationTextResponse)
              .always(function() {
-             me.application.hideWaiter();
+                me.application.hideWaiter();
              });
-             */
 
         };
 

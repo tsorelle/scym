@@ -189,6 +189,18 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $result;
     }
 
+    function getHousingAssignmentsText($registrationId) {
+
+        $qm = TQueryManager::getInstance();
+        $sql = 'SELECT * FROM housingAssignmentsTextView WHERE registrationId = ? ORDER BY firstName, day';
+        $statement = $qm->executeStatement($sql,$registrationId);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $result;
+
+
+    }
+
     public function getHousingUnitsList() {
         $qm = TQueryManager::getInstance();
         $sql = "SELECT u.*, u.unitname as description FROM housingUnitsView u";
