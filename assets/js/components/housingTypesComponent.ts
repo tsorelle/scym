@@ -60,7 +60,7 @@ module Tops {
             var response = me.getFakeResponse();
             me.handleGetTypesResponse(response);
             me.application.hideWaiter();
-
+            // TODO: GetHousingTypes service
             /*
             me.peanut.executeService('registration.GetHousingTypes',request, me.handleGetTypesResponse)
                 .always(function() {
@@ -129,14 +129,14 @@ module Tops {
             // fake
             me.handleGetTypesResponse(me.getFakeResponse());
             me.application.hideWaiter();
-
+            // todo: DeleteHousingType service
             /*
              me.peanut.executeService('registration.DeleteHousingType', request, me.handleGetHousingTypesResponse)
              .always(function () {
              me.application.hideWaiter();
              });
              */
-        }
+        };
 
         showNewHousingTypeDialog = () => {
             var me = this;
@@ -159,7 +159,7 @@ module Tops {
             // fake
             me.handleGetTypesResponse(me.getFakeResponse());
             me.application.hideWaiter();
-
+            // todo: updateHousingType service
             /*
              me.peanut.executeService('registration.UpdateHousingHousingType', request, me.handleGetHousingTypesResponse)
              .always(function () {

@@ -22,7 +22,9 @@ module Tops {
         housingTypes = ko.observableArray<ILookupItem>();
         housingUnits = ko.observableArray<IHousingUnit>();
         housingUnitList:IHousingUnit[] = [];
+        housingUnitsDaily: IHousingUnit[][];
         housingAssignments = ko.observableArray<IAttenderHousingAssignment>();
+        housingAvailatility : IHousingAvailabilityItem[];
 
         defaultHousingUnit = ko.observable<IHousingUnit>();
         defaultHousingType = ko.observable<ILookupItem>();
@@ -35,7 +37,7 @@ module Tops {
         formTitle = ko.observable();
         showFormTitle = true;
 
-        updatedAssignments = ko.observableArray<IHousingAssignmentUpdate>();
+        updatedAssignments = ko.observableArray<IHousingAssignmentsUpdate>();
 
         public constructor(application:IPeanutClient, owner: IEventSubscriber, showFormTitle = true) {
             var me = this;
@@ -47,6 +49,7 @@ module Tops {
 
         public initialize(finalFunction? : () => void) {
             var me = this;
+            me.assignedByAttender.subscribe(me.onShowAttenders);
             me.application.loadComponent('housing-selector',function() {
                 if (finalFunction) {
                     finalFunction();
@@ -59,7 +62,6 @@ module Tops {
         };
 
         public getAssignments(registrationId:number) {
-            // todo: getAssignments
             var me = this;
 
             me.housingAssignments([]);
@@ -67,19 +69,16 @@ module Tops {
             me.application.hideServiceMessages();
             me.application.showWaiter('Getting assignments...');
 
-            var request = registrationId;
+            var request =
+            {
+                registrationId: registrationId,
+                includeLookups: me.housingTypes().length == 0 || me.housingUnitList.length == 0
+            };
 
-            // fake
-            var response = me.getFakeResponse();
-            me.handleGetAssignmentsResponse(response);
-            me.application.hideWaiter();
-
-            /*
-             me.peanut.executeService('registration.GetAssignments',request, me.handleServiceResponseTemplate)
+             me.peanut.executeService('registration.GetHousingAssignments',request, me.handleGetAssignmentsResponse)
              .always(function() {
-             me.application.hideWaiter();
+                me.application.hideWaiter();
              });
-             */
         }
 
         private handleGetAssignmentsResponse = (serviceResponse:IServiceResponse) => {
@@ -87,9 +86,17 @@ module Tops {
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = <IGetHousingAssignmentsResponse>serviceResponse.Value;
                 me.registrationId(response.registrationId);
-                me.housingTypes(response.housingTypes);
-                me.housingUnitList = response.units;
-                me.housingUnits(me.housingUnitList);
+                if(response.housingTypes) {
+                    me.housingTypes(response.housingTypes);
+                }
+
+                if (response.units) {
+                    me.housingUnitsDaily = [];
+                    me.housingAvailatility = response.availability;
+                    me.housingUnitList = me.buildHousingUnitList(0, response.units);
+                    me.housingUnits(me.housingUnitList);
+                }
+
                 me.showAssignments(response.assignments);
                 if (me.showFormTitle) {
                     me.formTitle("Housing assignments for " + response.registrationName);
@@ -105,12 +112,84 @@ module Tops {
             me.assignedByAttender(false);
         };
 
+        buildHousingUnitList = (day: number = 0, sourceList : IHousingUnit[] = null) => {
+            var me = this;
+            var result = [];
+            var availablityList;
+            if (sourceList == null) {
+                sourceList = me.housingUnitList;
+            }
+            if (day == 0) {
+                availablityList = me.housingAvailatility;
+            }
+            else
+            {
+                availablityList = _.filter(me.housingAvailatility,function(item: IHousingAvailabilityItem){
+                   return item.day == day;
+                });
+            }
+            _.each(sourceList,function(unit: IHousingUnit){
 
-        getHousingUnit = (id:number) => {
+                var availability : IHousingAvailabilityItem;
+                var occupants = 0;
+                if (day == 0) {
+                    var items = _.filter(availablityList, function (a:IHousingAvailabilityItem) {
+                        return (a.housingUnitId == unit.housingUnitId);
+                    });
+
+                    if (items.length == 0) {
+                        availability = null;
+                    }
+                    else {
+                        availability = _.max(items, function (i:IHousingAvailabilityItem) {
+                            return i.occupants;
+                        });
+                    }
+                }
+                else {
+                    availability = _.find(availablityList,function(a : IHousingAvailabilityItem) {
+                        return (a.day == day && a.housingUnitId == unit.housingUnitId);
+                    });
+                }
+                
+                if (availability != null) {
+                    occupants = availability.occupants;
+                }
+                var description = unit.unitname + ' (';
+                if (occupants == unit.capacity) {
+                    description += 'Full';
+                }
+                else if (occupants > unit.capacity) {
+                    description += 'Overbooked';
+                }
+                else if (occupants == 0) {
+                    description += unit.capacity + ' available';
+                }
+                else {
+                    description += (unit.capacity - occupants) + ' left of ' + unit.capacity;
+                }
+                result.push({
+                    housingTypeId: unit.housingTypeId,
+                    housingUnitId: unit.housingUnitId,
+                    unitname: unit.unitname,
+                    housingTypeName: unit.housingTypeName,
+                    housingCategoryId: unit.housingCategoryId,
+                    categoryName: unit.housingTypeName,
+                    capacity: unit.capacity,
+                    description: description + ')'
+                });
+            });
+            return result;
+        };
+
+        getHousingUnit = (id:number, unitList : IHousingUnit[] = null) => {
             var me = this;
             var selected = null;
+            if (unitList == null) {
+                unitList = me.housingUnits();
+            }
             if (id > 0) {
-                selected = _.find(me.housingUnits(), function (unit:IHousingUnit) {
+                selected = _.find(unitList, function (unit:IHousingUnit) {
                     return unit.housingUnitId == id;
                 }, me);
             }
@@ -128,10 +207,14 @@ module Tops {
             return selected;
         };
 
-        getHousingUnitList = (typeId:number = 0) => {
+        getHousingUnitList = (typeId:number = 0, day: number = 0) => {
             var me = this;
+            var unitList = me.housingUnitList;
+            if (day > 0 && me.housingUnitsDaily.length > 0) {
+                unitList = me.housingUnitsDaily[day - 4];
+            }
             if (typeId) {
-                var filtered = _.filter(me.housingUnitList, function (unit:IHousingUnit) {
+                var filtered = _.filter(unitList, function (unit:IHousingUnit) {
                     return (
                         (unit && unit.housingTypeId == typeId)
                     );
@@ -139,7 +222,7 @@ module Tops {
                 return filtered;
             }
             else {
-                return me.housingUnitList;
+                return unitList;
             }
         };
 
@@ -158,7 +241,7 @@ module Tops {
             if (selected) {
                 housingUnitId = selected.housingUnitId;
             }
-            var wildcardAssignment:IHousingAssignmentUpdate = {
+            var wildcardAssignment:IHousingAssignmentsUpdate = {
                 attenderId: 0,
                 assignments: [
                     {
@@ -243,6 +326,15 @@ module Tops {
             me.assignedByAttender(showDetail);
         }
 
+        onShowAttenders = (visible: boolean) => {
+            var me = this;
+            if (visible && me.housingUnitsDaily.length == 0) {
+                for(var day = 4; day < 7; day += 1) {
+                    me.housingUnitsDaily[day - 4] = me.buildHousingUnitList(day,me.housingUnitList);
+                }
+            }
+        };
+
         findFirst(items:any[]) {
             var first = _.find(items, function (item:any) {
                 return true;
@@ -256,40 +348,70 @@ module Tops {
             me.assignedByAttender(true);
         };
 
-        updateAssignment = (attenderId:number, assignment:IHousingAssignment) => {
+        updateAssignment = (attenderId:number, assignment: IHousingAssignment) => {
             var me = this;
             var updates = me.updatedAssignments();
-            if (!(attenderId in updates)) {
-                updates[attenderId] = {
+            var update : IHousingAssignmentsUpdate = _.find(updates, function(item: IHousingAssignmentsUpdate) {
+                return item.attenderId == attenderId;
+            });
+
+            if (update == null) {
+                update = {
                     attenderId: attenderId,
-                    assignments: []
+                    assignments: [assignment]
+                };
+                updates.push(update);
+            }
+            else {
+                var existing = _.find(update.assignments,function(assignmentItem: IHousingAssignment){
+                    return assignmentItem.day == assignment.day;
+                });
+                if (existing != null) {
+                    existing.housingUnitId = assignment.housingUnitId;
+                    existing.note = assignment.note;
+                }
+                else {
+                    update.assignments.push(assignment);
                 }
             }
-            updates[attenderId].assignments[assignment.day] = assignment;
+
             me.updatedAssignments(updates);
         };
 
         saveAssignments = () => {
-            // todo: saveAssignments
             var me = this;
             var request : IHousingAssignmentUpdateRequest = {
                 registrationId: me.registrationId(),
-                updates: me.updatedAssignments()
+                updates: []
             };
+
+            if (me.assignedByAttender()) {
+                request.updates = me.updatedAssignments();
+            }
+            else {
+                var defaultUnitId = me.defaultHousingUnit().housingUnitId;
+                var assignments = me.housingAssignments();
+                _.each(assignments, function(attenderAssignment : IAttenderHousingAssignment) {
+                    // attenderAssignment.assignments = [];
+                    _.each(attenderAssignment.assignments, function($a : IHousingAssignment) {
+                        $a.housingUnitId = defaultUnitId;
+                    });
+                    request.updates.push(
+                        {
+                            attenderId: attenderAssignment.attender.attenderId,
+                            assignments: attenderAssignment.assignments
+                        }
+                    );
+                });
+            }
 
             if (request.updates.length > 0) {
                 me.application.hideServiceMessages();
                 me.application.showWaiter('Updating...');
-                // fake
-                me.handleSaveAssingmentsResponse(new fakeServiceResponse(null));
-                me.application.hideWaiter();
-
-                /*
                 me.peanut.executeService('registration.UpdateHousingAssignments', request, me.handleSaveAssingmentsResponse)
                     .always(function () {
                         me.application.hideWaiter();
                     });
-                */
             }
         };
 
@@ -309,6 +431,7 @@ module Tops {
         };
 
         reloadPage = () => {
+            var me = this;
             window.location.reload(true);
             // jQuery("#confirm-reload-modal").modal('hide');
         };
@@ -319,6 +442,7 @@ module Tops {
                 me.refreshNeeded = false;
                 if (me.housingTypes().length + me.housingUnitList.length > 0) {
                     jQuery("#confirm-reload-modal").modal('show');
+                    // me.refreshHousingUnits();
                 }
             }
         };
@@ -338,9 +462,8 @@ module Tops {
             }
         };
 
-
         refreshHousingUnits = () => {
-            // todo: refreshHousingUnits()
+            // not needed?
             var me = this;
             var request = null;
 
@@ -355,18 +478,23 @@ module Tops {
             /*
              me.peanut.executeService('directory.ServiceName',request, me.handleServiceResponseTemplate)
              .always(function() {
-             // me.application.hideWaiter();
+             me.application.hideWaiter();
              });
              */
+
         };
 
         private handleRefreshHousingUnits = (serviceResponse: IServiceResponse) => {
-            // todo: handleRefreshHousingUnits
+            // not needed?
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                me.housingUnitList = <IHousingUnit[]>serviceResponse.Value;
-
-
+                var response = <IRefreshHousingUnitsResponse>serviceResponse.Value;
+                me.housingUnitList = response.units;
+                me.housingAvailatility = response.availability;
+                me.housingUnitList = me.buildHousingUnitList(0, response.units);
+                me.housingUnits(me.housingUnitList);
+                me.housingUnitsDaily = [];
+                me.onShowAttenders(me.assignedByAttender());
             }
         };
 
@@ -436,107 +564,6 @@ module Tops {
 
 
         /********** Fakes ***************/
-        private getFakeResponse() {
-            var fakeHousingTypes : ILookupItem[] = [
-                {
-                    Key: 3,
-                    Text: 'Night Owl Dorm for Women',
-                    Description: '',
-                },
-                {
-                    Key: 6,
-                    Text: 'Family Cabin',
-                    Description: '',
-                },
-                {
-                    Key: 9,
-                    Text: 'Camp Motel',
-                    Description: '',
-                }
-
-            ];
-
-            var fakeUnits : IHousingUnit[] = [
-                {
-                    housingUnitId: 1,
-                    unitname: 'Cabin A1',
-                    description: '',
-                    capacity: 14,
-                    occupants: 2,
-                    housingTypeId: 3, // 'OWLW',
-                    housingTypeName: 'Night Owl Women',
-                },
-                {
-                    housingUnitId: 27,
-                    unitname: 'Cabin J1',
-                    description: '',
-                    capacity: 6,
-                    occupants: 0,
-                    housingTypeId: 6, // 'FAMILY',
-                    housingTypeName: 'Family Cabin',
-                },
-                {
-                    housingUnitId: 87,
-                    unitname: 'Motel 6',
-                    description: '',
-                    capacity: 2,
-                    occupants: 0,
-                    housingTypeId: 9,
-                    housingTypeName: 'Camp Motel'
-                }
-            ];
-            var fakeAssignments : IAttenderHousingAssignment[] = [
-                {
-                    attender : {
-                        attenderId : 1,
-                        attenderName: 'Terry SoRelle',
-                        housingPreference: 3
-                    },
-
-                    assignments: [
-                        {
-                            day: 5,
-                            housingUnitId: 1,
-                            note: '',
-                        },
-                        {
-                            day: 6,
-                            housingUnitId: 1,
-                            note: '',
-                        }
-                    ]
-                },
-                {
-                    attender: {
-                        attenderId: 2,
-                        attenderName: 'Liz Yeats',
-                        housingPreference: 3,
-                    },
-                    assignments: [
-                        {
-                            day: 5,
-                            housingUnitId: 1,
-                            note: '',
-                        },
-                        {
-                            day: 6,
-                            housingUnitId: 1,
-                            note: '',
-                        }
-                    ]
-                }
-
-            ] ;
-
-            var responseData : IGetHousingAssignmentsResponse = {
-                registrationId: 1,
-                registrationName: 'Terry and Liz',
-                units: fakeUnits,
-                assignments: fakeAssignments,
-                housingTypes: fakeHousingTypes
-            };
-            return new fakeServiceResponse(responseData);
-        }
 
         private getFakeConfirmationText() {
             var faketext =

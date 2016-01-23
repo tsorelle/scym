@@ -15,7 +15,7 @@
             <label class="control-label">
                 Housing assignment
             </label>
-            <select class="form-control"  data-bind="options: housingUnits, optionsText: 'unitname', value: defaultHousingUnit, optionsCaption: '-- Not assigned --'"></select>
+            <select class="form-control"  data-bind="options: housingUnits, optionsText: 'description', value: defaultHousingUnit, optionsCaption: '-- Not assigned --'"></select>
         </div>
 
         <div class="col-md-5" class="form-group" style="padding-top: 24px;padding-bottom: 8px">
@@ -75,3 +75,4 @@
     </div>
 </div>
 <modal-confirm params="id:'confirm-reload-modal',headerText: 'Please confirm', bodyText: 'Lookup lists (Types or Units) were updated. Reload the page?', confirmClick: reloadPage, buttonSet: 'yesno'"></modal-confirm>
+

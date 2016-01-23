@@ -42,6 +42,7 @@ module Tops {
             me.handleGetUnitsResponse(me.getFakeResponse());
             me.application.hideWaiter();
 
+            // todo: GetHouingUnitsService
             /*
             me.peanut.executeService('registration.GetHousingUnits', request, me.handleGetUnitsResponse)
                 .always(function () {
@@ -76,6 +77,8 @@ module Tops {
             // fake
             me.handleGetUnitsResponse(me.getFakeResponse());
             me.application.hideWaiter();
+
+            // todo:DeleteHousingUnit service
 
 
             /*
@@ -122,6 +125,7 @@ module Tops {
             me.handleGetUnitsResponse(me.getFakeResponse());
             me.application.hideWaiter();
 
+            // todo: updateHousingUnit service
             /*
              me.peanut.executeService('registration.UpdateHousingUnit', request, me.handleGetUnitsResponse)
              .always(function () {
@@ -235,38 +239,39 @@ module Tops {
                     unitname: 'Cabin A1',
                     description: '',
                     capacity: 14,
-                    occupants: 2,
                     housingTypeId: 3, // 'OWLW',
                     housingTypeName: 'Night Owl Women',
+                    housingCategoryId: 1,
+                    categoryName: ''
                 },
                 {
                     housingUnitId: 27,
                     unitname: 'Cabin J1',
                     description: '',
                     capacity: 6,
-                    occupants: 0,
                     housingTypeId: 6, // 'FAMILY',
                     housingTypeName: 'Family Cabin',
+                    housingCategoryId: 1,
+                    categoryName: ''
                 },
                 {
                     housingUnitId: 87,
                     unitname: 'Motel 6',
                     description: '',
                     capacity: 2,
-                    occupants: 0,
                     housingTypeId: 9,
-                    housingTypeName: 'Camp Motel'
+                    housingTypeName: 'Camp Motel',
+                    housingCategoryId: 1,
+                    categoryName: ''
                 }
             ];
 
-            var responseData:IGetHousingUnitsResponse = {
+            var responseData = {
                 units: fakeUnits,
                 housingTypes: fakeHousingTypes
             };
             return new fakeServiceResponse(responseData);
         }
-
-
     }
 
 }

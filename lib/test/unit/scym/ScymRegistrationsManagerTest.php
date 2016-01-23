@@ -555,15 +555,32 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testReassignAgeGroups() {
         $manager = $this->getManager();
-        $error = null;
-        try {
-            $updateCount = $manager->reassignYouthAgeGroups(9, true);
-        }
-        catch(\Exception $ex) {
-            $error = $ex->getMessage();
-        }
-        $this->assertNull($error,"Threw exception: ".$error);
+        $updateCount = $manager->reassignYouthAgeGroups(9, true);
         $this->assertGreaterThan(-1,$updateCount);
+    }
+
+    public function testGetRegistrationHousing() {
+        $manager = $this->getManager();
+        $testId = 192;
+        $registration = $manager->getRegistration($testId);
+        if ($registration == null) {
+            $this->markTestSkipped('Need new test registration');
+            return;
+        }
+        $actual = $manager->getRegistrationHousingAssignments($registration);
+        $this->assertNotNull($actual);
+    }
+
+    public function testGetHousingTypesLookup() {
+        $manager = $this->getManager();
+        $actual = $manager->getHousingTypesLookup();
+        $this->assertNotEmpty($actual,'No housing types returned.');
+    }
+
+    public function testGetHousingUnitsList() {
+        $manager = $this->getManager();
+        $actual = $manager->getHousingUnitsList();
+        $this->assertNotEmpty($actual,'No housing units returned.');
     }
 }
 

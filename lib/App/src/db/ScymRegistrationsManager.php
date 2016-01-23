@@ -16,6 +16,7 @@ use App\db\scym\ScymAttender;
 use App\db\scym\ScymCreditType;
 use App\db\scym\ScymDonationType;
 use App\db\scym\ScymFee;
+use App\db\scym\ScymHousingAssignment;
 use App\db\scym\ScymHousingType;
 use App\db\scym\ScymMeeting;
 use App\db\scym\ScymRegistration;
@@ -176,6 +177,94 @@ class ScymRegistrationsManager extends TDbServiceManager
      *      Description: string;
      *  }
      */
+
+    public function getHousingTypesLookup() {
+        $qm = TQueryManager::getInstance();
+        $sql =
+            "SELECT housingTypeID AS 'Key' , housingTypeDescription AS 'Text', CONCAT(housingTypeDescription,' (', ".
+            "(CASE category WHEN 1 THEN 'Dorm' WHEN 2 THEN 'Cabin' WHEN 3 THEN 'Motel' ELSE ''  END),')') AS 'Description' ".
+            "FROM housingtypes WHERE active = 1 ORDER BY housingTypeDescription";
+        $statement = $qm->executeStatement($sql);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
+
+    public function getHousingUnitsList() {
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT u.*, u.unitname as description FROM housingUnitsView u";
+        $statement = $qm->executeStatement($sql);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $result;
+    }
+
+    public function getHousingAvailability() {
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM housingAvailabilityView";
+        $statement = $qm->executeStatement($sql);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
+
+
+    /**
+     * @param ScymRegistration $registration
+     * @return array
+     *
+     *  Array elements match IAttenderHousingAssignment in assets/js/App/Tops.app/registration.d.ts
+     */
+    public function getRegistrationHousingAssignments(ScymRegistration $registration) {
+        $result = array();
+        $attenders = $registration->getAttenders()->toArray();
+        foreach($attenders as $attender) {
+            /**
+             * @var $attender ScymAttender
+             */
+            $assignment = new \stdClass(); // IAttenderHousingAssignment
+            $assignment->attender = new \stdClass(); // IHousingPreference
+
+            $assignment->attender->attenderId = $attender->getAttenderId();
+            $assignment->attender->attenderName = $attender->getFullName();
+            $assignment->attender->housingPreference = $attender->getHousingTypeId();
+
+            $assignment->assignments = array(); // IHousingAssignment[];
+            $attenderHousingAssignments = $attender->getHousingAssignments()->toArray();
+            $housingAssignments = array();
+            foreach($attenderHousingAssignments as $attenderHousingAssignment) {
+                /**
+                 * @var ScymHousingAssignment $attenderHousingAssignment
+                 */
+                $housingAssignments['day '.$attenderHousingAssignment->getDay()] =
+                    $attenderHousingAssignment;
+            }
+
+            $first = (int)($attender->getArrivalTime() / 10);
+            $last = (int)($attender->getDeparturetime() / 10);
+
+            for($day = $first; $day < $last; $day++) {
+
+                /**
+                 * @var $housingAssignment ScymHousingAssignment
+                 */
+                $housingAssignmentDto = new \stdClass(); // IHousingAssignment
+                $housingAssignmentDto->day = $day;
+
+                if (array_key_exists("day $day",$housingAssignments)) {
+                    $housingAssignment = $housingAssignments["day $day"];
+                    $housingAssignmentDto->housingUnitId = $housingAssignment->getHousingUnitId();
+                    $housingAssignmentDto->note = $housingAssignment->getNote();
+                }
+                else {
+                    $housingAssignmentDto->housingUnitId = 0;
+                    $housingAssignmentDto->note = '';
+                }
+
+                array_push($assignment->assignments,$housingAssignmentDto);
+            }
+            array_push($result,$assignment);
+        }
+        return $result;
+    }
 
     /**
      * @return array
@@ -613,9 +702,6 @@ class ScymRegistrationsManager extends TDbServiceManager
                 $this->saveChanges();
             }
         }
-
-
-
 
         return $updateCount;
     }

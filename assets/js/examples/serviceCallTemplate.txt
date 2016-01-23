@@ -10,6 +10,7 @@
             me.handleServiceResponseTemplate(response);
             me.application.hideWaiter();
 
+            // todo: ServiceName service
             /*
             me.peanut.executeService('directory.ServiceName',request, me.handleServiceResponseTemplate)
                 .always(function() {

@@ -17,6 +17,7 @@ module Tops {
         selectedType = ko.observable<ILookupItem>();
         owner: IHousingViewModel;
         dayName = ko.observable();
+        day : number;
         assignment : IHousingAssignment;
         attenderId = 0;
         note = ko.observable();
@@ -27,6 +28,7 @@ module Tops {
             var attender = params.attender;
             me.assignment = params.assignment;
             me.attenderId = attender.attenderId;
+            me.day = me.assignment.day;
             switch(me.assignment.day) {
                 case 4: me.dayName('Thursday'); break;
                 case 5 : me.dayName('Friday'); break;
@@ -36,8 +38,12 @@ module Tops {
             }
             me.note(me.assignment.note);
             me.housingTypes = me.owner.housingTypes;
-            var unit = me.owner.getHousingUnit(me.assignment.housingUnitId);
-            var typeId = unit.housingTypeId ? unit.housingTypeId : attender.housingPreference;
+            var housingUnitList =  me.owner.getHousingUnitList(0, me.day);
+            var unit = me.owner.getHousingUnit(me.assignment.housingUnitId, housingUnitList);
+            var typeId = attender.housingPreference;
+            if (unit != null && (unit.housingTypeId)) {
+                typeId = unit.housingTypeId;
+            }
             me.filterHousingUnitList(typeId);
             var type = me.owner.getHousingType(typeId);
             me.selectedType(type);
@@ -77,35 +83,10 @@ module Tops {
         private filterHousingUnitList(typeId: number) {
             var me = this;
 
-            var filtered = me.owner.getHousingUnitList(typeId);
+            var filtered =  me.owner.getHousingUnitList(typeId,me.day);
             me.housingUnits(filtered);
             me.selectedUnit(null);
         }
-
-        /*
-
-        private getHousingUnit(id: number) {
-            var me = this;
-            var selected = null;
-            if (id > 0) {
-                selected = _.find( me.housingUnitList, function (unit:IHousingUnit) {
-                    return unit.housingUnitId == id;
-                }, me);
-            }
-            return selected;
-        }
-
-        private getHousingType(id: number) {
-            var me = this;
-            var selected = null;
-            if (id > 0) {
-                selected = _.find( me.housingTypes(), function (item:ILookupItem) {
-                    return item.Key == id;
-                }, me);
-            }
-            return selected;
-        }
-         */
 
     }
 }

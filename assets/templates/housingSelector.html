@@ -9,13 +9,13 @@
         <select class="form-control"  data-bind="options: housingTypes, optionsText: 'Text', value: selectedType, optionsCaption: '-- Show all --'"></select>
 
     </div>
-    <div class="col-md-3 form-group">
+    <div class="col-md-4 form-group">
         <label class="control-label">
             Housing assignment
         </label>
-        <select class="form-control"  data-bind="options: housingUnits, optionsText: 'unitname', value: selectedUnit, optionsCaption: '-- Not assigned --'"></select>
+        <select class="form-control"  data-bind="options: housingUnits, optionsText: 'description', value: selectedUnit, optionsCaption: '-- Not assigned --'"></select>
     </div>
-    <div class="col-md-4 form-group">
+    <div class="col-md-3 form-group">
         <label class="control-label">Note</label>
         <input type="text" class="form-control" data-bind="value:note" />
     </div>

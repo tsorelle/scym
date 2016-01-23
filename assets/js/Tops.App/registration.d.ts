@@ -201,14 +201,24 @@ declare module Tops {
     }
 
     export interface IHousingUnit {
+        housingTypeId: number;
         housingUnitId: any;
         unitname: string;
-        description: string;
-        capacity: number;
-        occupants: number;
-        housingTypeId: number;
         housingTypeName: string;
+        housingCategoryId: number,
+        categoryName: string,
+        capacity: number;
+        description: string;
     }
+
+    export interface IHousingAvailabilityItem {
+        housingUnitId: number;
+        day: number;
+        capacity:number;
+        occupants: number;
+    }
+
+
     export interface IHousingType {
         housingTypeId: any;
         housingTypeCode: string;
@@ -236,10 +246,10 @@ declare module Tops {
 
     export interface IHousingAssignmentUpdateRequest {
         registrationId: any,
-        updates: IHousingAssignmentUpdate[];
+        updates: IHousingAssignmentsUpdate[];
     }
 
-    export interface IHousingAssignmentUpdate {
+    export interface IHousingAssignmentsUpdate {
         attenderId: number;
         assignments: IHousingAssignment[];
     }
@@ -250,12 +260,19 @@ declare module Tops {
         assignments: IAttenderHousingAssignment[];
         units: IHousingUnit[];
         housingTypes : ILookupItem[];
+        availability: IHousingAvailabilityItem[];
         // arrivalDay: number;
         // departureDay: number;
     }
 
     export interface IGetHousingUnitsResponse {
         units: IHousingUnit[];
+        housingTypes : ILookupItem[];
+    }
+
+    export interface IRefreshHousingUnitsResponse {
+        units: IHousingUnit[];
+        availability: IHousingAvailabilityItem[];
         housingTypes : ILookupItem[];
     }
 
@@ -266,6 +283,9 @@ declare module Tops {
         capacity: number;
         housingTypeId: any;
     }
+
+
+
 
     export interface IGetHousingAssignmentsRequest {
         registrationId: number;
@@ -283,9 +303,9 @@ declare module Tops {
     export interface IHousingViewModel extends IEventSubscriber {
         housingTypes : KnockoutObservableArray<ILookupItem>;
         updateAssignment : (attenderId: number, assignment: IHousingAssignment) => void;
-        getHousingUnit : (id: number) => IHousingUnit;
+        getHousingUnit : (id: number, unitList? : IHousingUnit[]) => IHousingUnit;
         getHousingType : (id: number) => ILookupItem;
-        getHousingUnitList : (typeId: number) => IHousingUnit[];
+        getHousingUnitList : (typeId: number, day?: number) => IHousingUnit[];
         getAssignments : (registrationId: number) => void;
         reset : () => void;
         initialize : (finalFunction? : () => void) =>void;
