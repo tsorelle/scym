@@ -499,7 +499,6 @@ module Tops {
         };
 
         getConfirmationText = () => {
-            // todo: getConfirmationText
             var me = this;
             var request = me.registrationId();
 
@@ -514,7 +513,6 @@ module Tops {
         };
 
         private handleGetConfirmationTextResponse = (serviceResponse: IServiceResponse) => {
-            // todo: handleGetConfirmation text
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 me.confirmationText(serviceResponse.Value);
@@ -524,73 +522,27 @@ module Tops {
         };
 
         sendConfirmationMessage = () => {
-            // todo: sendConfirmationMessage
             var me = this;
-            var request = null;
+            jQuery("#confirmation-message-modal").modal('hide');
+
+            var request = {
+                registrationId : me.registrationId(),
+                text: me.confirmationText()
+            };
 
             me.application.hideServiceMessages();
-            me.application.showWaiter('Sending message...');
+            me.application.showWaiter('Confirming registration ...');
 
-            // fake
-            var response = new fakeServiceResponse(null);
-            me.handleSendConfirmationResponse(response);
-            me.application.hideWaiter();
-
-            /*
-             me.peanut.executeService('directory.ServiceName',request, me.handleServiceResponseTemplate)
+             me.peanut.executeService('registration.ConfirmRegistration',request, function(serviceResponse: IServiceResponse){
+                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                         me.closeForm();
+                     }
+                 }
+             )
              .always(function() {
-             me.application.hideWaiter();
+                me.application.hideWaiter();
              });
-             */
-
         };
 
-        private handleSendConfirmationResponse = (serviceResponse: IServiceResponse) => {
-            // todo:handleSendConfirmationResponse
-            var me = this;
-            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                jQuery("#confirmation-message-modal").modal('hide');
-                me.closeForm();
-            }
-        };
-
-
-
-        /********** Fakes ***************/
-
-        private getFakeConfirmationText() {
-            var faketext =
-                "Dear Friend,\n" +
-                "\n" +
-                "Thank you for registering for SCYM.  We look forward to seeing you there.\n" +
-                "When you arrive at camp, enter this code to open the gate: #7296 (or, on a phone keypad it's #SCYM)\n" +
-                "At this time, your fee for the event is $0 Payment must be either check or cash as SCYM does not accept credit cards.\n" +
-                "\n" +
-                "Your room assignments are as follows:\n" +
-                "\n" +
-                "Rex:\n" +
-                "    Thursday: Motel 30 (Camp Motel)\n" +
-                "    Friday: Motel 30 (Camp Motel)\n" +
-                "    Saturday: Motel 30 (Camp Motel)\n" +
-                "\n" +
-                "Maggie:\n" +
-                "    Thursday: Motel 29 (Camp Motel)\n" +
-                "    Friday: Motel 29 (Camp Motel)\n" +
-                "    Saturday: Motel 29 (Camp Motel)\n" +
-                "\n" +
-                "Sisca:\n" +
-                "    Thursday: Motel 30 (Camp Motel)\n" +
-                "    Friday: Motel 30 (Camp Motel)\n" +
-                "    Saturday: Motel 30 (Camp Motel)\n" +
-                "\n" +
-                "Check in at registration in the Dining Hall when you get to Greene Family Camp to be sure nothing has changed and to complete your registration before you go to your lodging.\n" +
-                "\n" +
-                "If you have any questions, please contact me at registrar@scym.org. Starting thursday morning of Yearly Meeting, you may reach me at (512) 913-5434 if you have questions or concerns.\n" +
-                "\n" +
-                "Galia Harrington\n";
-            return new fakeServiceResponse(faketext);
-        }
-
-        /*******************************/
     }
 }
