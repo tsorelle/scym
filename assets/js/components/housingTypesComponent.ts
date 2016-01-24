@@ -54,19 +54,11 @@ module Tops {
 
             me.application.hideServiceMessages();
             me.application.showWaiter('Getting housing types...');
-
-
-            // fake
-            var response = me.getFakeResponse();
-            me.handleGetTypesResponse(response);
-            me.application.hideWaiter();
-            // TODO: GetHousingTypes service
-            /*
-            me.peanut.executeService('registration.GetHousingTypes',request, me.handleGetTypesResponse)
+            me.peanut.executeService('registration.GetHousingTypesEditList',request, me.handleGetTypesResponse)
                 .always(function() {
                     me.application.hideWaiter();
                 });
-            */
+
         }
 
         private handleGetTypesResponse = (serviceResponse:IServiceResponse) => {

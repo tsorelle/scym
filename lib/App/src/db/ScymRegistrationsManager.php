@@ -149,6 +149,16 @@ class ScymRegistrationsManager extends TDbServiceManager
 
     }
 
+    public function  getHousingTypesEditList() {
+        $qm = TQueryManager::getInstance();
+        $sql = 'SELECT housingTypeID AS housingTypeId, housingTypeCode, housingTypeDescription, category, active '.
+            'FROM housingTypes ORDER BY category,housingTypeDescription';
+        $statement = $qm->executeStatement($sql);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $result;
+    }
+
     /**
      * @return HousingTypeDto[]
      */
