@@ -151,8 +151,7 @@ class ScymRegistrationsManager extends TDbServiceManager
 
     public function  getHousingTypesEditList() {
         $qm = TQueryManager::getInstance();
-        $sql = 'SELECT housingTypeID AS housingTypeId, housingTypeCode, housingTypeDescription, category, active '.
-            'FROM housingTypes ORDER BY category,housingTypeDescription';
+        $sql = 'SELECT * FROM housingTypesView ORDER BY housingTypeDescription';
         $statement = $qm->executeStatement($sql);
         $result = $statement->fetchAll(PDO::FETCH_OBJ);
 
@@ -753,4 +752,48 @@ class ScymRegistrationsManager extends TDbServiceManager
         $this->saveChanges();
         return true;
     }
+
+
+
+    public function updateHousingTypes(array $updateValues, $newTypes) {
+        $repository =  $this->getRepository('App\db\scym\ScymHousingType');
+        $updateCount = 0;
+        foreach($updateValues as $updateValue) {
+            $id = isset($updateValue->id) ? $updateValue->id : null;
+            $active = isset($updateValue->active) ? $updateValue->active : null;
+            if ($id !== null && $active !== null) {
+                $housingType = $repository->find($id);
+                if ($housingType != null) {
+                    /**
+                     * @var ScymHousingType $housingType
+                     */
+                    $housingType->setActive($active);
+                    $this->persistEntity($housingType);
+                    $updateCount++;
+                }
+            }
+        }
+
+        foreach($newTypes as $newType) {
+            $housingTypeCode = isset($newType->housingTypeCode)  ? $newType->housingTypeCode : null;
+            $housingTypeDescription = isset($newType->housingTypeDescription)  ? $newType->housingTypeDescription : null;
+            $category = isset($newType->category)  ?  $newType->category : 0;
+            if (!(empty($housingTypeDescription) || empty($housingTypeCode))) {
+                $housingType = new ScymHousingType();
+                $housingType->setActive(true);
+                $housingType->setCategory($category);
+                $housingType->setHousingTypeCode($housingTypeCode);
+                $housingType->setHousingTypeDescription($housingTypeDescription);
+                $this->persistEntity($housingType);
+                $updateCount++;
+            }
+        }
+
+        if ($updateCount > 0) {
+            $this->saveChanges();
+        }
+
+        return $updateCount;
+    }
+
 }

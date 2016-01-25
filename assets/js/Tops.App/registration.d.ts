@@ -226,6 +226,11 @@ declare module Tops {
         category: number;
     }
 
+    export interface IHousingTypeDisplayItem extends  IHousingType {
+        active: any;
+        categoryName: string;
+    }
+
     export interface IHousingAssignment {
         // housingAssignmentId : any;
         day: number;

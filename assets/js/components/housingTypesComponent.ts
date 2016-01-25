@@ -10,8 +10,14 @@
 
 module Tops {
     export class housingTypesComponent {
-        housingTypes = ko.observableArray<IHousingType>();
+        housingTypes = ko.observableArray<IHousingTypeDisplayItem>();
         owner : IEventSubscriber;
+        changed = ko.observable(false);
+        updateRequest = {
+            updated : [],
+            added : []
+        };
+
         housingTypeForm = {
             id: ko.observable(),
             code: ko.observable<string>(),
@@ -64,31 +70,13 @@ module Tops {
         private handleGetTypesResponse = (serviceResponse:IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var response = <IHousingType[]>serviceResponse.Value;
+                var response = <IHousingTypeDisplayItem[]>serviceResponse.Value;
                 if (me.housingTypes().length > 0) {
                     me.notifyTypesUpdated(response);
                 }
-                var count = response.length;
-                for (var i=0; i < count; i += 1) {
-                    switch (response[i].category) {
-                        case 0 :
-                            (<any>response[i]).categoryName = 'None';
-                            break;
-                        case 1 :
-                            (<any>response[i]).categoryName = 'Dorm';
-                            break;
-                        case 2 :
-                            (<any>response[i]).categoryName = 'Cabin (lodge)';
-                            break;
-                        case 3 :
-                            (<any>response[i]).categoryName = 'Motel Room';
-                            break;
-                        default :
-                            (<any>response[i]).categoryName = '';
-                            break;
-                    }
-                }
-                
+                me.changed(false);
+                me.updateRequest.added = [];
+                me.updateRequest.updated = [];
                 me.housingTypes(response);
             }
         };
@@ -101,35 +89,6 @@ module Tops {
         };
         
         
-        //********* imported
-        deleteHousingType  = (housingType: IHousingType) => {
-            var me = this;
-            me.housingTypeForm.id(housingType.housingTypeId);
-            jQuery("#confirm-type-delete-modal").modal('show');
-        };
-
-        doDelete = () => {
-            var me = this;
-            jQuery("#confirm-type-delete-modal").modal('hide');
-
-            var request = me.housingTypeForm.id();
-
-            if (me.owner) {
-                me.owner.handleEvent('housingtypesupdated');
-            }
-
-            // fake
-            me.handleGetTypesResponse(me.getFakeResponse());
-            me.application.hideWaiter();
-            // todo: DeleteHousingType service
-            /*
-             me.peanut.executeService('registration.DeleteHousingType', request, me.handleGetHousingTypesResponse)
-             .always(function () {
-             me.application.hideWaiter();
-             });
-             */
-        };
-
         showNewHousingTypeDialog = () => {
             var me = this;
             me.housingTypeForm.id(0);
@@ -137,74 +96,110 @@ module Tops {
             me.housingTypeForm.description('');
             me.housingTypeForm.selectedCategory( null);
             me.housingTypeForm.errorMessage('');
-            me.showForm();
+            jQuery("#housingtype-update-modal").modal('show');
         };
 
-
-        updateHousingType = () => {
+        addHousingType = () => {
             var me = this;
-            var request = me.validateDialog();
-            if (request == null) {
+            var newType = me.validateDialog();
+            if (newType == null) {
                 return;
             }
 
-            // fake
-            me.handleGetTypesResponse(me.getFakeResponse());
-            me.application.hideWaiter();
-            // todo: updateHousingType service
-            /*
-             me.peanut.executeService('registration.UpdateHousingHousingType', request, me.handleGetHousingTypesResponse)
-             .always(function () {
-             me.application.hideWaiter();
-             });
-             */
+            me.updateRequest.added.push(
+                {
+                    housingTypeCode: newType.housingTypeCode,
+                    housingTypeDescription: newType.housingTypeDescription,
+                    category: newType.category,
+                }
+            );
+
+            (<any>newType).active = true;
+
+            var list = me.housingTypes();
+            list.push(newType);
+            me.housingTypes(_.sortBy(list, 'housingTypeDescription'));
+
+            me.changed(true);
         };
 
-        
-
-        showForm() {
+        toggleActive = (selelctedType : IHousingTypeDisplayItem) => {
             var me = this;
-            jQuery("#housingtype-update-modal").modal('show');
+            if (selelctedType != null) {
+               me.changed(true);
+                var existing = _.find(me.updateRequest.updated, function(item: any) {
+                    return item.id == selelctedType.housingTypeId;
+                });
+                if (existing == null) {
+                    me.updateRequest.updated.push(
+                        {
+                            id: selelctedType.housingTypeId,
+                            active: (selelctedType.active == 0)
+                        }
+                    );
+                }
+                else {
+                    existing.active =  (selelctedType.active == 0);
+                }
+            }
+            return true; // requied to keep click event from re-checking the checkbox
+        };
+
+        saveChanges() {
+            var me = this;
+            if (me.changed()) {
+                me.application.showWaiter('Updating...');
+                 me.peanut.executeService('registration.UpdateHousingTypes', me.updateRequest, me.handleGetTypesResponse)
+                    .always(function () {
+                    me.application.hideWaiter();
+                 });
+            }
         }
 
         validateDialog = () => {
 
             var me = this;
+            var selectedCategory = me.housingTypeForm.selectedCategory();
 
-            var request : IHousingType = {
+
+            var result : IHousingTypeDisplayItem = {
                 housingTypeId : me.housingTypeForm.id(),
-                housingTypeCode: me.housingTypeForm.code().trim(),
+                housingTypeCode: me.housingTypeForm.code(),
                 housingTypeDescription: me.housingTypeForm.description().trim(),
-                category: 0
+                active: 1,
+                category: 0,
+                categoryName: ''
             };
-            if (!request.housingTypeDescription) {
+
+            if (!result.housingTypeDescription) {
                 me.housingTypeForm.errorMessage('A description is required.');
                 return null;
             }
-            if (!request.housingTypeCode) {
+            if (!result.housingTypeCode) {
                 me.housingTypeForm.errorMessage('A code is required. It must be a unique one word identifier for the type.');
                 return null;
             }
 
             var selectedCategory = me.housingTypeForm.selectedCategory();
             if (selectedCategory) {
-                request.category = selectedCategory.Value;
+                result.category = selectedCategory.Value;
+                result.categoryName = selectedCategory.Name;
             }
             else {
                 me.housingTypeForm.errorMessage('Please select a category.');
                 return null;
             }
 
-            var parts = request.housingTypeCode.split(' ');
+            var parts = result.housingTypeCode.split(' ');
             if (parts.length > 1) {
                 me.housingTypeForm.errorMessage('A code cannot have spaces. It must be a unique one word identifier for the type.');
                 return null;
             }
 
-            request.housingTypeCode = request.housingTypeCode.toUpperCase();
+            result.housingTypeCode = result.housingTypeCode.toUpperCase();
 
             var duplicate = _.find(me.housingTypes(),function(item: IHousingType) {
-                return item.housingTypeCode == request.housingTypeCode;
+                return item.housingTypeCode == result.housingTypeCode;
             },me);
 
             if (duplicate) {
@@ -214,7 +209,7 @@ module Tops {
             }
 
             jQuery("#housingtype-update-modal").modal('hide');
-            return request;
+            return result;
         };
 
 
