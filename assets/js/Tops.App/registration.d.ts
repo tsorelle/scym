@@ -209,7 +209,9 @@ declare module Tops {
         categoryName: string,
         capacity: number;
         description: string;
+        active: boolean;
     }
+
 
     export interface IHousingAvailabilityItem {
         housingUnitId: number;
@@ -272,7 +274,7 @@ declare module Tops {
 
     export interface IGetHousingUnitsResponse {
         units: IHousingUnit[];
-        housingTypes : ILookupItem[];
+        types : ILookupItem[];
     }
 
     export interface IRefreshHousingUnitsResponse {
@@ -284,13 +286,9 @@ declare module Tops {
     export interface IHousingUnitUpdateRequest {
         unitId : any;
         unitname: string;
-        description: string;
         capacity: number;
         housingTypeId: any;
     }
-
-
-
 
     export interface IGetHousingAssignmentsRequest {
         registrationId: number;

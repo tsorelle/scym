@@ -18,6 +18,7 @@ use App\db\scym\ScymDonationType;
 use App\db\scym\ScymFee;
 use App\db\scym\ScymHousingAssignment;
 use App\db\scym\ScymHousingType;
+use App\db\scym\ScymHousingUnit;
 use App\db\scym\ScymMeeting;
 use App\db\scym\ScymRegistration;
 use App\db\scym\ScymYouth;
@@ -158,6 +159,7 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $result;
     }
 
+
     /**
      * @return HousingTypeDto[]
      */
@@ -187,16 +189,25 @@ class ScymRegistrationsManager extends TDbServiceManager
      *  }
      */
 
-    public function getHousingTypesLookup() {
+
+    public function getHousingTypesLookup($activeOnly = true) {
         $qm = TQueryManager::getInstance();
         $sql =
-            "SELECT housingTypeID AS 'Key' , housingTypeDescription AS 'Text', CONCAT(housingTypeDescription,' (', ".
-            "(CASE category WHEN 1 THEN 'Dorm' WHEN 2 THEN 'Cabin' WHEN 3 THEN 'Motel' ELSE ''  END),')') AS 'Description' ".
-            "FROM housingtypes WHERE active = 1 ORDER BY housingTypeDescription";
+            "SELECT housingTypeID AS 'Key', ".
+            ($activeOnly ? 'housingTypeDescription ' : "CONCAT(housingTypeDescription, IF(active=1,'',' [inactive]')) ")." AS 'Text', ".
+            'housingTypeDescription AS Description '.
+            'FROM housingTypes  '.
+            ($activeOnly ? ' WHERE active=1 ': ' ').
+            'ORDER BY housingTypeDescription';
+
         $statement = $qm->executeStatement($sql);
         $result = $statement->fetchAll(PDO::FETCH_OBJ);
+
         return $result;
     }
+
+
+
 
     function getHousingAssignmentsText($registrationId) {
 
@@ -211,13 +222,24 @@ class ScymRegistrationsManager extends TDbServiceManager
     }
 
     public function getHousingUnitsList() {
+        return $this->getHousingUnits(true);
+    }
+
+    public function getHousingUnits($activeOnly = false) {
         $qm = TQueryManager::getInstance();
-        $sql = "SELECT u.*, u.unitname as description FROM housingUnitsView u";
+        $sql = 'SELECT * FROM housingUnitsView '.
+            ($activeOnly ? 'WHERE active = 1 ' : '').
+                'ORDER BY unitname';
         $statement = $qm->executeStatement($sql);
         $result = $statement->fetchAll(PDO::FETCH_OBJ);
-
+        if ($result != null) {
+            foreach($result as $unit) {
+                $unit->active = ($unit->active != 0);
+            }
+        }
         return $result;
     }
+
 
     public function getHousingAvailability() {
         $qm = TQueryManager::getInstance();
@@ -793,6 +815,61 @@ class ScymRegistrationsManager extends TDbServiceManager
             $this->saveChanges();
         }
 
+        return $updateCount;
+    }
+
+    public function updateHousingUnits(array $updated, array $active) {
+        $repository =  $this->getRepository('App\db\scym\ScymHousingUnit');
+        $updateCount = 0;
+        /**
+         * @var ScymHousingUnit $unit
+         */
+        foreach($updated as $update) {
+            $unitId        = isset($update->unitId       	) ? $update->unitId        : null;
+            $unitname      = isset($update->unitname		) ? $update->unitname		: null;
+            $capacity      = isset($update->capacity		) ? $update->capacity		: null;
+            $housingTypeId = isset($update->housingTypeId	) ? $update->housingTypeId: null;
+            if ($capacity === null || $housingTypeId === null || $unitId === null) {
+                continue;
+            }
+            if($unitId == 0) {
+                if ($unitname === null) {
+                    continue;
+                }
+                $unit = new ScymHousingUnit();
+                $unit->setUnitName($unitname);
+                $unit->setActive(true);
+            }
+            else {
+                $unit = $repository->find($unitId);
+                if ($unit == null) {
+                    continue;
+                }
+            }
+            $unit->setCapacity($capacity);
+            $unit->setHousingTypeId($housingTypeId);
+
+            $this->persistEntity($unit);
+            $updateCount ++;
+        }
+        $this->saveChanges();
+
+        foreach($active as $item) {
+            $active = isset($item->active) ? $item->active : null;
+            $id = isset($item->id) ? $item->id : null;
+            if($active === null || $id === null) {
+                continue;
+            }
+            $unit = $repository->find($id);
+            if ($unit === null) {
+                continue;
+            }
+            $unit->setActive($active);
+            $this->persistEntity($unit);
+            $updateCount++;
+        }
+
+        $this->saveChanges();
         return $updateCount;
     }
 

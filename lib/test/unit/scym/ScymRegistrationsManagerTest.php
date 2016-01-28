@@ -575,6 +575,9 @@ class ScymRegistrationsManagerTest extends \PHPUnit_Framework_TestCase
         $manager = $this->getManager();
         $actual = $manager->getHousingTypesLookup();
         $this->assertNotEmpty($actual,'No housing types returned.');
+        $actual2 = $manager->getHousingTypesLookup(false);
+        $this->assertNotEmpty($actual2,'No housing types returned.');
+
     }
 
     public function testGetHousingUnitsList() {

@@ -124,6 +124,7 @@ module Tops {
             var me = this;
             if (me.housingUnitsVm) {
                 me.currentForm('units');
+                me.housingUnitsVm.handleEvent('unitspageselected');
             }
             else {
                 me.application.bindComponent('housing-units',
@@ -193,6 +194,7 @@ module Tops {
                 case 'registrationselected' :
                     me.onRegistrationSelected(data);
                     break;
+
             }
         }
     }

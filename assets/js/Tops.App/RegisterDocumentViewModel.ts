@@ -13,6 +13,7 @@ module Tops {
     export class RegisterDocumentRequest {
         public title: string;
         public filename: string;
+        public access: string;
     }
 
     export class RegisterDocumentViewModel implements IMainViewModel {
@@ -23,7 +24,7 @@ module Tops {
         // Observables
         docTitle = ko.observable('');
         filename = ko.observable('');
-
+        documentAccess = ko.observable('public');
 
         // Constructor
         constructor() {
@@ -65,6 +66,8 @@ module Tops {
 
             request.filename = me.filename();
             request.title = me.docTitle();
+            request.access = me.documentAccess();
+
             // me.application.showMessage("Submit " + request.filename +'/'+request.title);
 
             me.application.showWaiter('Register document. Please wait...');

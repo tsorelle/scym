@@ -11,21 +11,29 @@ module Tops {
     export class housingUnitsComponent implements IEventSubscriber {
         private application:IPeanutClient;
         private peanut:Peanut;
-        private owner: IEventSubscriber;
+        private owner:IEventSubscriber;
+        private refreshNeeded = false;
+
+        updateRequest = {
+            updated: [],
+            active: []
+        };
+
+        changed = ko.observable(false);
 
         housingUnits = ko.observableArray<IHousingUnit>();
         housingTypes = ko.observableArray<ILookupItem>();
         unitForm = {
-            heading : ko.observable(),
-            unitId : ko.observable(0),
+            heading: ko.observable(),
+            unitId: ko.observable(0),
             unitname: ko.observable<string>(),
-            description: ko.observable<string>(),
             capacity: ko.observable<string>(),
             selectedHousingType: ko.observable<ILookupItem>(),
             errorMessage: ko.observable<string>(),
+            active: ko.observable(true)
         };
 
-        public constructor(application:IPeanutClient, owner: IEventSubscriber = null) {
+        public constructor(application:IPeanutClient, owner:IEventSubscriber = null) {
             var me = this;
             me.application = application;
             me.peanut = application.peanut;
@@ -34,69 +42,113 @@ module Tops {
 
         public getUnits() {
             var me = this;
-            var request = null;
+            var request = {
+                units: 'all',
+                types: 'none'
+            };
+            if (me.housingTypes().length == 0) {
+                request.types = 'all';
+            }
             me.application.hideServiceMessages();
             me.application.showWaiter('Getting housing units...');
 
-            // fake
-            me.handleGetUnitsResponse(me.getFakeResponse());
-            me.application.hideWaiter();
+             me.peanut.executeService('registration.GetHousingUnits', request,
+                 function(serviceResponse:IServiceResponse) {
+                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                         var response = <IGetHousingUnitsResponse>serviceResponse.Value;
+                         me.updateRequest.active = [];
+                         me.updateRequest.updated = [];
+                         me.housingUnits(response.units);
+                         if (response.types) {
+                             me.housingTypes(response.types);
+                         }
+                     }
+                 }
+             )
+             .always(function () {
+                me.application.hideWaiter();
+             });
+        }
 
-            // todo: GetHouingUnitsService
-            /*
-            me.peanut.executeService('registration.GetHousingUnits', request, me.handleGetUnitsResponse)
+        public getTypes() {
+            var me = this;
+            var request = 'all';
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Getting housing types...');
+
+            me.peanut.executeService('registration.GetHousingTypes', request,
+                    function(serviceResponse:IServiceResponse) {
+                        if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                            var response = <ILookupItem[]>serviceResponse.Value;
+                            me.housingTypes(response);
+                        }
+                    }
+                )
                 .always(function () {
                     me.application.hideWaiter();
                 });
-               */
         }
-
         private handleGetUnitsResponse = (serviceResponse:IServiceResponse) => {
             var me = this;
-            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+            if (serviceResponse.Result == Peanut.serviceResultSuccess || serviceResponse.Result == Peanut.serviceResultWarnings) {
                 var response = <IGetHousingUnitsResponse>serviceResponse.Value;
                 if (me.housingUnits().length > 0) {
                     me.notifyUnitsUpdate(response.units);
                 }
-                me.housingTypes(response.housingTypes);
                 me.housingUnits(response.units);
+                if (response.types) {
+                    me.housingTypes(response.types);
+                }
+                me.refreshNeeded = false;
+                me.updateRequest.active = [];
+                me.updateRequest.updated = [];
+                me.changed(false);
             }
         };
 
-        deleteUnit  = (unit: IHousingUnit) => {
+        toggleActive = (selectedUnit:IHousingUnit) => {
             var me = this;
-            me.unitForm.unitId(unit.housingUnitId);
-            jQuery("#confirm-unit-delete-modal").modal('show');
+            if (selectedUnit != null) {
+                var newValue = (selectedUnit.active);
+                me.changed(true);
+                var existing = _.find(me.updateRequest.active, function (item:any) {
+                    return item.unitname == selectedUnit.unitname;
+                });
+                if (existing == null) {
+                    me.updateRequest.active.push(
+                        {
+                            id: selectedUnit.housingUnitId,
+                            active: newValue
+                        }
+                    );
+                }
+                else {
+                    existing.active = newValue;
+                }
+            }
+
+            return true; // required to keep click event from re-checking the checkbox
         };
 
-        doDeleteUnit = () => {
+
+        saveChanges = () => {
             var me = this;
-            jQuery("#confirm-unit-delete-modal").modal('hide');
-            var request = me.unitForm.unitId;
-
-            // fake
-            me.handleGetUnitsResponse(me.getFakeResponse());
-            me.application.hideWaiter();
-
-            // todo:DeleteHousingUnit service
-
-
-            /*
-             me.peanut.executeService('registration.DeleteHousingUnit', request, me.handleGetUnitsResponse)
-             .always(function () {
-             me.application.hideWaiter();
-             });
-             */
+            var request = me.updateRequest;
+            me.application.showWaiter('Saving changes...');
+            me.peanut.executeService('registration.UpdateHousingUnits', me.updateRequest, me.handleGetUnitsResponse)
+                .always(function () {
+                    me.application.hideWaiter();
+                });
         };
 
-        showEditUnitDialog = (unit: IHousingUnit) => {
+        showEditUnitDialog = (unit:IHousingUnit) => {
             var me = this;
             me.unitForm.heading('Update Housing Unit');
             me.unitForm.unitId(unit.housingUnitId);
             me.unitForm.unitname(unit.unitname);
-            me.unitForm.description(unit.description);
             me.unitForm.capacity(unit.capacity.toString());
             me.unitForm.selectedHousingType(me.getHousingType(unit.housingTypeId));
+            me.unitForm.active(unit.active);
             me.unitForm.errorMessage('');
             me.showForm();
         };
@@ -106,10 +158,10 @@ module Tops {
             me.unitForm.heading('New Housing Unit');
             me.unitForm.unitId(0);
             me.unitForm.unitname('');
-            me.unitForm.description('');
             me.unitForm.capacity('2');
             me.unitForm.selectedHousingType(null);
             me.unitForm.errorMessage('');
+            me.unitForm.active(true);
             me.showForm();
         };
 
@@ -120,19 +172,53 @@ module Tops {
             if (request == null) {
                 return;
             }
-
-            // fake
-            me.handleGetUnitsResponse(me.getFakeResponse());
-            me.application.hideWaiter();
-
-            // todo: updateHousingUnit service
-            /*
-             me.peanut.executeService('registration.UpdateHousingUnit', request, me.handleGetUnitsResponse)
-             .always(function () {
-             me.application.hideWaiter();
-             });
-             */
+            me.changed(true);
+            me.assignToUpdateList(me.updateRequest.updated,request);
+            me.updateDisplayList(request);
         };
+
+        private updateDisplayList(request: IHousingUnitUpdateRequest) {
+            var me = this;
+            var list = me.housingUnits();
+            var existing : IHousingUnit = _.find(list,function(unit: IHousingUnit){
+                return request.unitname == unit.unitname;
+            });
+            if (existing == null) {
+                existing = {
+                    active : me.unitForm.active(),
+                    capacity: request.capacity,
+                    categoryName: '',
+                    description: request.unitname,
+                    housingCategoryId: null,
+                    housingTypeId: request.housingTypeId,
+                    housingTypeName: me.unitForm.selectedHousingType().Text,
+                    housingUnitId: request.unitId,
+                    unitname: request.unitname
+                };
+                list.push(existing);
+            }
+            else {
+                existing.capacity = request.capacity;
+                existing.housingTypeId = request.housingTypeId;
+                existing.housingTypeName = me.unitForm.selectedHousingType().Text;
+            }
+            me.housingUnits([]);
+            me.housingUnits(_.sortBy(list,'unitname'));
+        }
+
+        private assignToUpdateList(list: IHousingUnitUpdateRequest[], item: IHousingUnitUpdateRequest) {
+            var me = this;
+            var existing = _.find(list, function(listItem: IHousingUnitUpdateRequest){
+                return listItem.unitname == item.unitname;
+            });
+            if (existing == null) {
+                list.push(item);
+            }
+            else {
+                existing.capacity = item.capacity;
+                existing.housingTypeId = item.housingTypeId;
+            }
+        }
 
         getHousingType = (id:number) => {
             var me = this;
@@ -145,18 +231,27 @@ module Tops {
             return selected;
         };
 
-        notifyUnitsUpdate = (data: any) => {
+        notifyUnitsUpdate = (data:any) => {
             var me = this;
             if (me.owner) {
-                me.owner.handleEvent('housingunitsupdated',data);
+                me.owner.handleEvent('housingunitsupdated', data);
             }
         };
 
         handleEvent = (eventName:string, data:any = null)=> {
             var me = this;
-            if (eventName == 'housingtypesupdated') {
-                me.housingTypes(data);
+            switch (eventName) {
+                case 'housingtypesupdated' :
+                    me.refreshNeeded = true;
+                    break;
+                case 'unitspageselected' :
+                    var changed = me.changed();
+                    if (me.refreshNeeded && !me.changed()) {
+                        me.getUnits();
+                    }
+                    break;
             }
+
         };
 
 
@@ -186,10 +281,9 @@ module Tops {
             if (selectedType) {
                 housingTypeId = selectedType.Key;
             }
-            var request : IHousingUnitUpdateRequest = {
-                unitId : me.unitForm.unitId(),
+            var request:IHousingUnitUpdateRequest = {
+                unitId: me.unitForm.unitId(),
                 unitname: me.unitForm.unitname().trim(),
-                description: me.unitForm.description(),
                 capacity: parseInt(me.unitForm.capacity()),
                 housingTypeId: housingTypeId
             };
@@ -209,69 +303,6 @@ module Tops {
             jQuery("#unit-update-modal").modal('hide');
             return request;
         };
-
-
-
-        //***************** FAKE ****************
-        private getFakeResponse() {
-            var fakeHousingTypes:ILookupItem[] = [
-                {
-                    Key: 3,
-                    Text: 'Night Owl Dorm for Women',
-                    Description: '',
-                },
-                {
-                    Key: 6,
-                    Text: 'Family Cabin',
-                    Description: '',
-                },
-                {
-                    Key: 9,
-                    Text: 'Camp Motel',
-                    Description: '',
-                }
-
-            ];
-
-            var fakeUnits:IHousingUnit[] = [
-                {
-                    housingUnitId: 1,
-                    unitname: 'Cabin A1',
-                    description: '',
-                    capacity: 14,
-                    housingTypeId: 3, // 'OWLW',
-                    housingTypeName: 'Night Owl Women',
-                    housingCategoryId: 1,
-                    categoryName: ''
-                },
-                {
-                    housingUnitId: 27,
-                    unitname: 'Cabin J1',
-                    description: '',
-                    capacity: 6,
-                    housingTypeId: 6, // 'FAMILY',
-                    housingTypeName: 'Family Cabin',
-                    housingCategoryId: 1,
-                    categoryName: ''
-                },
-                {
-                    housingUnitId: 87,
-                    unitname: 'Motel 6',
-                    description: '',
-                    capacity: 2,
-                    housingTypeId: 9,
-                    housingTypeName: 'Camp Motel',
-                    housingCategoryId: 1,
-                    categoryName: ''
-                }
-            ];
-
-            var responseData = {
-                units: fakeUnits,
-                housingTypes: fakeHousingTypes
-            };
-            return new fakeServiceResponse(responseData);
-        }
     }
 
 }

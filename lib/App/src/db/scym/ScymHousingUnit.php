@@ -25,16 +25,9 @@ class ScymHousingUnit
     /**
      * @var string
      *
-     * @Column(name="unitName", type="string", length=10, nullable=false)
+     * @Column(name="unitName", type="string", length=30, nullable=false)
      */
     private $unitName = '';
-
-    /**
-     * @var string
-     *
-     * @Column(name="description", type="string", length=100, nullable=true)
-     */
-    private $description;
 
     /**
      * @var integer
@@ -49,6 +42,14 @@ class ScymHousingUnit
      * @Column(name="housingTypeId", type="integer", nullable=true)
      */
     private $housingTypeId;
+
+    /**
+     * @var boolean
+     *
+     * @Column(name="active", type="boolean", nullable=false)
+     */
+    private $active = '1';
+
 
 
     /**
@@ -82,29 +83,6 @@ class ScymHousingUnit
     public function getUnitName()
     {
         return $this->unitName;
-    }
-
-    /**
-     * Set description
-     *
-     * @param string $description
-     * @return ScymHousingUnit
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * Get description
-     *
-     * @return string 
-     */
-    public function getDescription()
-    {
-        return $this->description;
     }
 
     /**
@@ -152,4 +130,29 @@ class ScymHousingUnit
     {
         return $this->housingTypeId;
     }
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     * @return ScymHousingUnit
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+
 }
