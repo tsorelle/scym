@@ -14,7 +14,9 @@ use Tops\services\TServiceCommand;
 
 class UpdateHousingUnitsCommand extends TServiceCommand
 {
-
+    public function __construct() {
+        $this->addAuthorization("administer housing");
+    }
     protected function run()
     {
         $request = $this->getRequest();

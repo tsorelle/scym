@@ -54,6 +54,9 @@ class GetRegistrationDashboardCommand extends TServiceCommand
      *    }
      */
 
+    public function __construct() {
+        $this->addAuthorization("administer registrations");
+    }
 
     protected function run()
     {

@@ -56,7 +56,15 @@ function scym_permission()
         'export directory' => array(
             'title' => 'Download member lists',
             'description' => 'Download directory lists as CSV files.'
-        )
+        ),
+        'administer housing' => array(
+            'title' => 'Administer housing',
+            'description' => 'Access registration housing system'
+        ),
+        'administer youth' => array(
+            'title' => 'Administer youth program',
+            'description' => 'Administer youth program.'
+        ),
     );
 
 }

@@ -14,6 +14,9 @@ use Tops\services\TServiceCommand;
 
 class GetYouthListCommand extends TServiceCommand
 {
+    public function __construct() {
+        $this->addAuthorization("administer youth");
+    }
 
     protected function run()
     {

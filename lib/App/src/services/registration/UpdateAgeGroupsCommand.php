@@ -26,6 +26,10 @@ use Tops\services\TServiceCommand;
 
 class UpdateAgeGroupsCommand extends TServiceCommand
 {
+    public function __construct() {
+        $this->addAuthorization("administer youth");
+    }
+
 
     protected function run()
     {

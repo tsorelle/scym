@@ -16,6 +16,10 @@ use Tops\services\TServiceCommand;
 
 class CheckInCommand extends TServiceCommand
 {
+    public function __construct() {
+        $this->addAuthorization("administer registrations");
+    }
+
 
     protected function run()
     {
