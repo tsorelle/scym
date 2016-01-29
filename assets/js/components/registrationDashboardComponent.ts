@@ -24,7 +24,7 @@ module Tops {
         private isRefreshLoad = false;
 
         registrationId = ko.observable();
-        
+
         registration = {
             name: ko.observable(''),
             address: ko.observable(''),

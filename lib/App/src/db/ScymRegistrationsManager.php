@@ -196,7 +196,7 @@ class ScymRegistrationsManager extends TDbServiceManager
             "SELECT housingTypeID AS 'Key', ".
             ($activeOnly ? 'housingTypeDescription ' : "CONCAT(housingTypeDescription, IF(active=1,'',' [inactive]')) ")." AS 'Text', ".
             'housingTypeDescription AS Description '.
-            'FROM housingTypes  '.
+            'FROM housingtypes  '.
             ($activeOnly ? ' WHERE active=1 ': ' ').
             'ORDER BY housingTypeDescription';
 

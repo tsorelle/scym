@@ -1,3 +1,4 @@
+DROP VIEW IF EXISTS HousingAssignmentCounts;
 CREATE VIEW HousingAssignmentCounts AS
 SELECT DISTINCT  r.year, a.registrationId, r.registrationCode, r.name, a.attenderId,
   FormatName(a.firstName,a.middleName,a.lastName) AS attenderName,

@@ -94,4 +94,5 @@ declare module Tops {
     export interface IEventSubscriber {
         handleEvent : (eventName: string, data?: any) => void;
     }
+
 }

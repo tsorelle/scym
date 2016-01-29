@@ -1,5 +1,6 @@
--- CREATE VIEW youthView AS
-ALTER VIEW youthView AS
+DROP VIEW IF EXISTS youthView;
+
+CREATE VIEW youthView AS
 SELECT
   r.year, yo.attenderId, yo.youthId, r.registrationId,
   a.firstName,a.lastName,
@@ -43,6 +44,6 @@ FROM youths yo
   JOIN registrations r ON a.registrationId = r.registrationId
   LEFT OUTER JOIN agegroups ag ON yo.ageGroupId = ag.ageGroupId
   LEFT OUTER JOIN specialneedstypes sp ON a.specialNeedsTypeId = sp.specialNeedsTypeID
-  LEFT OUTER JOIN affiliationcodes ac ON ac.affiliationCode = a.affiliationCode
+  LEFT OUTER JOIN affiliationcodes ac ON ac.affiliationCode = a.affiliationCode;
 
 

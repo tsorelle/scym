@@ -1,4 +1,5 @@
-DROP VIEW IF EXISTS attenderReport
+DROP VIEW IF EXISTS attenderReport;
+
 create view attenderReport as
 select
 attenderId, registrationId, affiliationId,

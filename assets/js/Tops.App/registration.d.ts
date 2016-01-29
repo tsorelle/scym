@@ -86,6 +86,11 @@ declare module Tops {
         location : string
     }
 
+    export interface IGetSessionInfoResponse {
+        user: IAdminUser;
+        session: IAnnualSessionInfo;
+    }
+
     export interface IRegistrationInitResponse {
         sessionInfo : IAnnualSessionInfo;
         user : IRegistrationUser;

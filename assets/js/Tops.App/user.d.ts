@@ -13,4 +13,10 @@ declare module Tops {
         isRegistrar : number;
         registrationId: any;
     }
+
+    export interface IAdminUser extends IUser {
+        isRegistrar: boolean;
+        isAdmin: boolean;
+        isYouthProgramStaff: boolean;
+    }
 }

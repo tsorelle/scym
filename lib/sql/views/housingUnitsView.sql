@@ -1,6 +1,5 @@
--- CREATE
-ALTER
-VIEW housingUnitsView AS
+DROP VIEW IF EXISTS housingUnitsView;
+CREATE VIEW housingUnitsView AS
 SELECT
   u.housingUnitId,
   u.unitname,
@@ -13,3 +12,5 @@ SELECT
       USING utf8) AS categoryName,
   u.capacity,
   u.active
+FROM  housingunits u
+JOIN  housingtypes ht  on u.housingTypeId = ht.housingTypeID;

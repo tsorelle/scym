@@ -1,6 +1,5 @@
-CREATE
--- ALTER
-VIEW housingTypesView AS
+DROP VIEW IF EXISTS  housingTypesView;
+CREATE VIEW housingTypesView AS
 SELECT
   housingTypeID AS housingTypeId,
   housingTypeCode,

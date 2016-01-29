@@ -437,3 +437,29 @@ function scymtheme_bootstrap_search_form_wrapper($variables) {
     $output .= '</div>';
     return $output;
 }
+
+/**
+ * Overrides theme_menu_local_tasks().
+ * Hide tabs if rendering an MVVM application.
+ */
+function scymtheme_menu_local_tasks(&$variables) {
+    $output = '';
+    $vm = TViewModel::getVmPath();
+    if ($vm == null) {
+        if (!empty($variables['primary'])) {
+            $variables['primary']['#prefix'] = '<h2 class="element-invisible">' . t('Primary tabs') . '</h2>';
+            $variables['primary']['#prefix'] .= '<ul class="tabs--primary nav nav-tabs">';
+            $variables['primary']['#suffix'] = '</ul>';
+            $output .= drupal_render($variables['primary']);
+        }
+
+        if (!empty($variables['secondary'])) {
+            $variables['secondary']['#prefix'] = '<h2 class="element-invisible">' . t('Secondary tabs') . '</h2>';
+            $variables['secondary']['#prefix'] .= '<ul class="tabs--secondary pagination pagination-sm">';
+            $variables['secondary']['#suffix'] = '</ul>';
+            $output .= drupal_render($variables['secondary']);
+        }
+    }
+
+    return $output;
+}
