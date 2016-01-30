@@ -12,6 +12,7 @@
 ///<reference path="../components/housingTypesComponent.ts"/>
 ///<reference path="../components/housingUnitsComponent.ts"/>
 ///<reference path="../components/housingLookupComponent.ts"/>
+///<reference path="../components/housingReportsComponent.ts"/>
 
 // reference to jqueryui required if date popups are used.
 /// <reference path='../typings/jqueryui/jqueryui.d.ts' />
@@ -31,6 +32,7 @@ module Tops {
         private housingTypesVm: any;
         private housingUnitsVm: any;
         private housingLookupVm: any;
+        private housingReportsVm: any;
 
         // Constructor
         constructor() {
@@ -154,6 +156,25 @@ module Tops {
                     function() {
                         me.housingTypesVm.getTypes();
                         me.currentForm('types');
+                    }
+                );
+            }
+        };
+
+        showHousingReportsForm = () => {
+            var me = this;
+            if (me.housingReportsVm) {
+                me.currentForm('reports');
+            }
+            else {
+                me.application.bindComponent('housing-reports',
+                    function() {
+                        me.housingReportsVm = new housingReportsComponent(me.application, me);
+                        return me.housingReportsVm;
+                    },
+                    function() {
+                        me.housingReportsVm.getReportData();
+                        me.currentForm('reports');
                     }
                 );
             }

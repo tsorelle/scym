@@ -119,7 +119,13 @@ abstract class TServiceCommand {
     public function isAuthorized() {
         if (empty($this->authorizations))
             return true;
+        /**
+         * @var IUser $user
+         */
         $user = $this->getUser();
+        if ($user->isAdmin()) {
+            return true;
+        }
         foreach($this->authorizations as $auth) {
             if ($user->isAuthorized($auth)) {
                 return true;

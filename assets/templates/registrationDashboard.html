@@ -45,7 +45,9 @@
             </div>
         </div>
         <div class="col-md-9">
-            <payment-form></payment-form>
+            <div data-bind="visible:checkinEnabled">
+                <payment-form></payment-form>
+            </div>
         </div>
     </div>
 
@@ -57,7 +59,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Arrived?</th>
+                            <th data-bind="visible:checkinEnabled">Arrived?</th>
                             <th>Name</th>
                             <th>Age group</th>
                             <th>First time?</th>
@@ -67,8 +69,8 @@
                     </thead>
                     <tbody data-bind="foreach:attenders">
                         <tr>
-                            <td>
-                                <input type="checkbox" data-bind="checked:arrived">
+                            <td data-bind="visible:$parent.checkinEnabled">
+                                <input type="checkbox" data-bind="checked:arrived, click: $parent.toggleCheckin">
                             </td>
                             <td data-bind="text:name"></td>
                             <td data-bind="text:ageGroup"></td>
@@ -98,7 +100,7 @@
             <a href="#" title="Click this if changes were made in another tab or browser." data-bind="click:refresh">Refresh data</a>
         </div>
         <div id="buttons-section" style="margin-top: 40px; ">
-            <button class="btn btn-primary" style="margin-right: 10px" data-bind="click:checkIn">Save and check-in
+            <button class="btn btn-primary" style="margin-right: 10px" data-bind="click:checkIn, visible:checkinEnabled">Save and check-in
             </button>
             <button class="btn btn-default" data-bind="click:closeDashboard">Close</button>
         </div>

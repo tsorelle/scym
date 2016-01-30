@@ -20,7 +20,7 @@ module Tops {
 
         private application:IPeanutClient;
         private peanut:Peanut;
-        private owner : IEventSubscriber;
+        private owner : IRegistrationHost;
         private isRefreshLoad = false;
 
         registrationId = ko.observable();
@@ -58,9 +58,13 @@ module Tops {
 
         dashboardCloseMessage = ko.observable('Closing?');
 
+        changed = ko.observable(false);
+
+        checkinEnabled = ko.observable(false);
+
         paymentForm : IDataEntryForm;
 
-        public constructor(application:IPeanutClient, owner: IEventSubscriber = null) {
+        public constructor(application:IPeanutClient, owner: IRegistrationHost = null) {
             var me = this;
             me.application = application;
             me.peanut = application.peanut;
@@ -97,35 +101,51 @@ module Tops {
 
         closeDashboard = () => {
             var me = this;
-            var errorMessage = '';
-            if (me.unCheckedCount > 0) {
-                errorMessage = 'Some attenders not checked in';
-            }
+            me.owner.getRegistrationContext(
+                function(context: IRegistrationContext) {
+                    var errorMessage = '';
+                    var today = new Date();
+                    // var today = new Date('2016-3-29');
+                    var ymStart = new Date(context.sessionInfo.startDate);
 
-            if (me.registration.balanceDue()) {
-                if (errorMessage) {
-                    errorMessage += ' and balance not paid. '
+                    if (today >= ymStart ) {
+                        me.checkinEnabled(true);
+
+                        if (me.unCheckedCount > 0) {
+                            errorMessage = 'Some attenders not checked in';
+                        }
+
+                        if (me.registration.balanceDue()) {
+                            if (errorMessage) {
+                                errorMessage += ' and balance not paid. '
+                            }
+                            else {
+                                errorMessage = 'Balance not paid. '
+                            }
+                        }
+                        else if (errorMessage) {
+                            errorMessage += '.';
+                        }
+
+                        if (errorMessage) {
+                            errorMessage += ' Leave anyway?'
+                        }
+                    }
+                    else {
+                        me.checkinEnabled(false);
+                    }
+
+                    if (errorMessage) {
+                        me.dashboardCloseMessage(errorMessage);
+                        jQuery("#confirm-dashboard-close").modal('show');
+                    }
+                    else {
+                        me.owner.handleEvent('dashboardclosed');
+                    }
                 }
-                else {
-                    errorMessage = 'Balance not paid. '
-                }
-            }
-            else if (errorMessage) {
-                errorMessage += '.';
-            }
-
-            if (errorMessage) {
-                errorMessage += ' Leave anyway?'
-            }
-
-            if (errorMessage) {
-                me.dashboardCloseMessage(errorMessage);
-                jQuery("#confirm-dashboard-close").modal('show');
-            }
-            else {
-                me.owner.handleEvent('dashboardclosed');
-            }
+            );
         };
+
 
         exitDashboard = () => {
             var me = this;
@@ -139,44 +159,55 @@ module Tops {
                 var response = <IRegistrationDashboardResponse>serviceResponse.Value;
                 var me = this;
                 var response = <IRegistrationDashboardResponse>serviceResponse.Value;
-                me.paymentForm.clear();
-                me.registrationId(response.registrationId);
-                me.registration.name(response.name);
-                me.registration.address(response.address);
-                me.registration.city(response.city);
-                me.registration.phone(response.phone);
-                me.registration.email(response.email);
-                me.registration.notes(response.notes);
-                me.registration.registrationCode(response.registrationCode);
-                me.registration.status(response.status);
-                me.registration.statusText(response.statusText);
-                me.registration.balanceDue(response.balanceDue);
-                me.registration.housingAssignment(response.housingAssignment);
-
-
-                if (!response.balanceDue) {
-                    me.registration.balance('Paid in full');
-                }
-                else {
-                    me.registration.balance('$' + response.balanceDue);
-                }
-
-                me.unCheckedCount = response.attenders.length;
-                _.each(response.attenders,function(attender: IAttenderCheckListItem) {
-                    attender.arrived = (attender.arrived == 'Yes' || attender.arrived == true);
-                    if (attender.arrived) {
-                        me.unCheckedCount =- 1;
-                    }
-                });
-
-                me.attenders(response.attenders);
-
-                if (!me.isRefreshLoad) {
-                    me.owner.handleEvent('registrationdashboardloaded', response.registrationId);
-                }
+                var isRefresh = me.isRefreshLoad;
                 me.isRefreshLoad = false;
+                me.owner.getRegistrationContext(
+                    function(context: IRegistrationContext) {
+                        var today = new Date();
+                        // for testing
+                        // today = new Date('2016-3-29');
+                        var ymStart = new Date(context.sessionInfo.startDate);
+                        me.checkinEnabled(today >= ymStart );
+                        me.paymentForm.clear();
+                        me.registrationId(response.registrationId);
+                        me.registration.name(response.name);
+                        me.registration.address(response.address);
+                        me.registration.city(response.city);
+                        me.registration.phone(response.phone);
+                        me.registration.email(response.email);
+                        me.registration.notes(response.notes);
+                        me.registration.registrationCode(response.registrationCode);
+                        me.registration.status(response.status);
+                        me.registration.statusText(response.statusText);
+                        me.registration.balanceDue(response.balanceDue);
+                        me.registration.housingAssignment(response.housingAssignment);
+
+                        if (!response.balanceDue) {
+                            me.registration.balance('Paid in full');
+                        }
+                        else {
+                            me.registration.balance('$' + response.balanceDue);
+                        }
+
+                        me.unCheckedCount = response.attenders.length;
+                        _.each(response.attenders, function (attender:IAttenderCheckListItem) {
+                            attender.arrived = (attender.arrived == 'Yes' || attender.arrived == true);
+                            if (attender.arrived) {
+                                me.unCheckedCount = -1;
+                            }
+                        });
+
+                        me.attenders(response.attenders);
+                        me.changed(false);
+                        if (!isRefresh) {
+                            me.owner.handleEvent('registrationdashboardloaded', response.registrationId);
+                        }
+                    }
+                );
             }
         };
+
+
 
         showAttenderDetails = (attender : IAttenderCheckListItem) => {
             var me = this;
@@ -280,68 +311,17 @@ module Tops {
         private handleCheckInResponse = (serviceResponse: IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                me.changed(false);
                 me.owner.handleEvent('dashboardclosed');
             }
         };
 
-        /*** fakes ***********/
-        private getFakeRegistrationResponse(registrationId: any) {
-            var response : IRegistrationDashboardResponse = {
-                registrationId: 1,
-                registrationCode: 'peanut.chew@gmail.com',
-                name: 'Test Reg',
-                address: '904 E. Meadowmere',
-                city: 'Austin, TX 78758',
-                phone: '512-098-9202',
-                email: 'registration@code.com',
-                notes: 'some notes',
-                status: 2,
-                statusText: 'Registered',
-                balanceDue: 125.00,
-                housingAssignment: 'Motel 6',
-                attenders:  [
-                    {
-                        attenderId: 1,
-                        name: 'Terry SoRelle',
-                        arrived: false,
-                        ageGroup: '',
-                        dietPreference: '',
-                        specialNeeds: '',
-                        note: '',
-                        meeting: 'Friends Meeting of Austin',
-                        firstTimer: '',
-                        linens: '',
-                        housingAssignments: [
-                            {day: 'Thursday', unit: 'Motel 6'},
-                            {day: 'Friday',unit: 'Motel 6'},
-                            {day: 'Saturday',unit: 'Motel 6'}
-                        ]
-                    },
-                    {
-                        attenderId: 2,
-                        name: 'Liz Yeats',
-                        arrived: true,
-                        ageGroup: 'Junior',
-                        dietPreference: 'Vegan',
-                        specialNeeds: 'Hearing impaird',
-                        note: '',
-                        meeting: 'Friends Meeting of Austin',
-                        firstTimer: '',
-                        linens: 'yes',
-                        housingAssignments: [
-                            {day: 'Thursday', unit: 'Cabin H2'},
-                            {day: 'Friday',unit: 'Motel 6'},
-                            {day: 'Saturday',unit: 'Motel 6'}
-                        ]
-                    }
-                ]
-            };
+        toggleCheckin = () => {
+            var me = this;
+            me.changed(true);
+            return true; // required to keep click event from re-checking the checkbox
+        };
 
-
-
-
-            return new fakeServiceResponse(response);
-        }
 
     }
 }

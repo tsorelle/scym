@@ -26,3 +26,15 @@
             }
         };
 
+
+// single statement example
+            me.peanut.executeService('directory.ServiceName',request,
+                    function(serviceResponse: IServiceResponse) {
+                        if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+
+
+                        }
+                    }
+                ).always(function() {
+                    me.application.hideWaiter();
+                });

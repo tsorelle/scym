@@ -18,10 +18,11 @@
 /// <reference path='../typings/jqueryui/jqueryui.d.ts' />
 
 module Tops {
-    export class RegistrationAdminViewModel implements IMainViewModel, IEventSubscriber {
+    export class RegistrationAdminViewModel implements IMainViewModel, IRegistrationHost {
         static instance: Tops.RegistrationAdminViewModel;
         private application: Tops.IPeanutClient;
         private peanut: Tops.Peanut;
+        private context : IRegistrationContext = null;
 
         currentForm = ko.observable('registrations');
         counts = {
@@ -244,6 +245,26 @@ module Tops {
                 case 'registrationchanged' :
                     me.registrationChanged = true;
                     break;
+            }
+        };
+
+        getRegistrationContext = (next:(context:Tops.IRegistrationContext)=>void)=> {
+            var me = this;
+            if (me.context) {
+                next(me.context);
+            }
+            else {
+                me.peanut.executeService('registration.GetSessionInfo',null,
+                    function(serviceResponse: IServiceResponse) {
+                        if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                            me.context = <IRegistrationContext>serviceResponse.Value;
+                            next(me.context);
+                        }
+                        else {
+                            next(null);
+                        }
+                    }
+                )
             }
         };
 

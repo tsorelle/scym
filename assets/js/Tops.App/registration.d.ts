@@ -86,9 +86,9 @@ declare module Tops {
         location : string
     }
 
-    export interface IGetSessionInfoResponse {
-        user: IAdminUser;
-        session: IAnnualSessionInfo;
+    export interface IRegistrationContext {
+        user: IApplicationUser;
+        sessionInfo: IAnnualSessionInfo;
     }
 
     export interface IRegistrationInitResponse {
@@ -146,7 +146,7 @@ declare module Tops {
     }
 
     export interface IPaymentForm extends IDataEntryForm {
-        setAmount: (amount: any) => void;
+        setAmount: (amount:any) => void;
         getPayment: () => any;
     }
 
@@ -233,7 +233,7 @@ declare module Tops {
         category: number;
     }
 
-    export interface IHousingTypeDisplayItem extends  IHousingType {
+    export interface IHousingTypeDisplayItem extends IHousingType {
         active: any;
         categoryName: string;
     }
@@ -310,13 +310,13 @@ declare module Tops {
 
     export interface IHousingViewModel extends IEventSubscriber {
         housingTypes : KnockoutObservableArray<ILookupItem>;
-        updateAssignment : (attenderId: number, assignment: IHousingAssignment) => void;
-        getHousingUnit : (id: number, unitList? : IHousingUnit[]) => IHousingUnit;
-        getHousingType : (id: number) => ILookupItem;
-        getHousingUnitList : (typeId: number, day?: number) => IHousingUnit[];
-        getAssignments : (registrationId: number) => void;
+        updateAssignment : (attenderId:number, assignment:IHousingAssignment) => void;
+        getHousingUnit : (id:number, unitList?:IHousingUnit[]) => IHousingUnit;
+        getHousingType : (id:number) => ILookupItem;
+        getHousingUnitList : (typeId:number, day?:number) => IHousingUnit[];
+        getAssignments : (registrationId:number) => void;
         reset : () => void;
-        initialize : (finalFunction? : () => void) =>void;
+        initialize : (finalFunction?:() => void) =>void;
     }
 
     export interface IYouthInfo {
@@ -357,5 +357,11 @@ declare module Tops {
         ageGroupId : number;
         youthNotes : string;
         formsSubmitted: boolean;
+    }
+
+    export interface IRegistrationHost extends IEventSubscriber {
+        getRegistrationContext : (
+            next: (context: IRegistrationContext) => void
+        ) => void;
     }
 }
