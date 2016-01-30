@@ -215,6 +215,8 @@ function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     $manageTasks = $currentUser->isAuthorized('manage web site tasks');
     $registerDocuments = $currentUser->isAuthorized('register documents');
     $manageDirectory = $currentUser->isAuthorized('administer directory');
+    $manageHousing = $currentUser->isAuthorized('administer housing');
+    $manageYouth = $currentUser->isAuthorized('administer youth');
     $isAdmin = $currentUser->isAdmin();
     if ($manageTasks) {
         $items .= _scymtheme_menuLi('/tasks','Manage Web Site','Task List');
@@ -225,12 +227,19 @@ function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     if ($registerDocuments) {
         $items .= _scymtheme_menuLi('/RegisterDocument','Register Uploaded Document','Register Document');
     }
-    if ($manageDirectory) {
+    if ($manageDirectory || $isAdmin) {
         $items .= _scymtheme_menuLi('/management/EMailings','Manage mailing lists','Manage mailing lists');
         $items .= _scymtheme_menuLi('/members/download','Directory downloads','Download directory lists');
     }
-    if ($isRegistrar) {
-        $items .= _scymtheme_menuLi('/RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');
+    if ($isRegistrar || $isAdmin) {
+        $items .= _scymtheme_menuLi('/registration/admin','Manage Yearly Meeting Registrations','Manage Registrations');
+    }
+    if ($manageHousing  || $isAdmin) {
+        $items .= _scymtheme_menuLi('/registration/housing','Manage Yearly Meeting Housing','Manage Housing');
+
+    }
+    if ($manageYouth || $isAdmin) {
+        $items .= _scymtheme_menuLi('/registration/youth','Manage Youth Program','Manage Youth Program');
     }
     if ($isAdmin) {
         $items .= _scymtheme_menuLi('/admin/dashboard','Administrator Dashboard','Administrator Dashboard');
