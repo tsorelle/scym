@@ -141,8 +141,23 @@
         </div>
     </div>
 
-    <div id="who-where-report" data-bind="visible:selectedReport()=='whoLivesWhere'">
+    <div id="who-where-report" data-bind="visible:selectedReport()=='occupants'">
         <h3>Assigned Housing</h3>
+        <div id="occupants" data-bind="foreach:occupants">
+            <h4 data-bind="text:day"></h4>
+            <table class="table">
+                <thead>
+                <tr><th>Unit</th><th>Name</th><th>Arrived</th></tr>
+                </thead>
+                <tbody data-bind="foreach:items">
+                <tr>
+                    <td data-bind="text:unitname"></td>
+                    <td data-bind="text:name"></td>
+                    <td data-bind="text:arrived"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
 

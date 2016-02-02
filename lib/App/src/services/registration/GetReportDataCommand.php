@@ -43,8 +43,8 @@ class GetReportDataCommand extends TServiceCommand
                 $results = $manager->getHousingRoster();
                 $this->setReturnValue($results);
                 break;
-            case 'housing.whoLivesWhere' :
-                $results = null;
+            case 'housing.occupants' :
+                $results = $manager->getOccupantsReport();
                 $this->setReturnValue($results);
                 break;
         }

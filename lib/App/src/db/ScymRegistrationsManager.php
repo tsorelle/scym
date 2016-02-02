@@ -693,6 +693,14 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $result;
     }
 
+    public function getOccupantsReport() {
+        $session = $this->getSession();
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM occupantsView WHERE year = ?";
+        $statement = $qm->executeStatement($sql,$session->getYear());
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
 
 
     /**

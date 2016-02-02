@@ -21,6 +21,7 @@ module Tops {
 
         requestCounts = ko.observableArray<IDayGroup>();
         assignmentCounts = ko.observableArray();
+        occupants = ko.observableArray<IDayGroup>();
         housingRoster = {
             daily: ko.observableArray<IDayGroup>(),
             unassigned: ko.observableArray(),
@@ -55,7 +56,11 @@ module Tops {
             me.selectedReport('housingRoster');
             me.getReportData();
         };
-        showWhoWhereReport = () => { var me = this; me.selectedReport('whoLivesWhere');};
+        showWhoWhereReport = () => {
+            var me = this;
+            me.selectedReport('occupants');
+            me.getReportData();
+        };
 
         refreshAll = () => {
             var me = this;
@@ -72,7 +77,10 @@ module Tops {
                     return me.assignmentCounts().length == 0;
                 case 'housingRoster' :
                     return me.housingRoster.daily().length + me.housingRoster.unassigned().length + me.housingRoster.visitors().length == 0;
+                case 'occupants' :
+                    return me.occupants().length == 0;
                 default:
+                    alert("Report not implemented");
                     return false;
             }
 
@@ -102,6 +110,10 @@ module Tops {
                                     break;
                                 case 'housingRoster' :
                                     me.setHousingRoster(serviceResponse.Value);
+                                    break;
+                                case 'occupants' :
+                                    DayGroupObservable.assign(me.occupants,
+                                        <IDayGroupReportItem[]>serviceResponse.Value);
                                     break;
                                 default:
                                     alert("Report not implemented");
