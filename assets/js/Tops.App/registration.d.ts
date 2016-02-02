@@ -364,4 +364,19 @@ declare module Tops {
             next: (context: IRegistrationContext) => void
         ) => void;
     }
+
+    export interface IDayGroupReportItem {
+        dayNumber : number;
+        day : string;
+    }
+    export interface IDayGroup {
+        items: KnockoutObservableArray<IDayGroupReportItem>;
+        day: string;
+    }
+    export interface IHousingRequestCountItem extends IDayGroupReportItem{
+        housingTypeId : number;
+        housingTypeDescription : string;
+        confirmed : number;
+        requested : number;
+    }
 }

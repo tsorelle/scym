@@ -666,6 +666,16 @@ class ScymRegistrationsManager extends TDbServiceManager
         $result = $statement->fetchAll(PDO::FETCH_OBJ);
         return $result;
     }
+// housingRequestCountsView
+    public function getHousingRequestCounts() {
+        $session = $this->getSession();
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM housingRequestCountsView WHERE year = ?";
+        $statement = $qm->executeStatement($sql,$session->getYear());
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
+
 
     /**
      * @param $id

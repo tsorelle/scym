@@ -173,7 +173,7 @@ module Tops {
                         return me.housingReportsVm;
                     },
                     function() {
-                        me.housingReportsVm.getReportData();
+                        me.housingReportsVm.initialize();
                         me.currentForm('reports');
                     }
                 );

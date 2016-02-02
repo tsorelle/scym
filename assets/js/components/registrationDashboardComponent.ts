@@ -16,7 +16,8 @@ module Tops {
 
 
     export class registrationDashboardComponent implements IRegistrationComponent {
-
+        // todo: set this false for production
+        private testing = true;
 
         private application:IPeanutClient;
         private peanut:Peanut;
@@ -104,8 +105,7 @@ module Tops {
             me.owner.getRegistrationContext(
                 function(context: IRegistrationContext) {
                     var errorMessage = '';
-                    var today = new Date();
-                    // var today = new Date('2016-3-29');
+                    var today = me.testing ? new Date('2016-3-29') : new Date();
                     var ymStart = new Date(context.sessionInfo.startDate);
 
                     if (today >= ymStart ) {
@@ -163,9 +163,7 @@ module Tops {
                 me.isRefreshLoad = false;
                 me.owner.getRegistrationContext(
                     function(context: IRegistrationContext) {
-                        var today = new Date();
-                        // for testing
-                        // today = new Date('2016-3-29');
+                        var today = me.testing ? today = new Date('2016-3-29') : new Date();
                         var ymStart = new Date(context.sessionInfo.startDate);
                         me.checkinEnabled(today >= ymStart );
                         me.paymentForm.clear();
