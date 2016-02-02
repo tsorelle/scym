@@ -666,7 +666,7 @@ class ScymRegistrationsManager extends TDbServiceManager
         $result = $statement->fetchAll(PDO::FETCH_OBJ);
         return $result;
     }
-// housingRequestCountsView
+
     public function getHousingRequestCounts() {
         $session = $this->getSession();
         $qm = TQueryManager::getInstance();
@@ -675,6 +675,24 @@ class ScymRegistrationsManager extends TDbServiceManager
         $result = $statement->fetchAll(PDO::FETCH_OBJ);
         return $result;
     }
+
+    public function getHousingAssignmentCounts() {
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM housingAssignmentCountsView";
+        $statement = $qm->executeStatement($sql);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
+
+    public function getHousingRoster() {
+        $session = $this->getSession();
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM housingRosterView WHERE year = ?";
+        $statement = $qm->executeStatement($sql,$session->getYear());
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
+
 
 
     /**

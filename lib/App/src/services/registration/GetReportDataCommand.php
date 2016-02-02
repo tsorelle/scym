@@ -36,11 +36,11 @@ class GetReportDataCommand extends TServiceCommand
                 $this->setReturnValue($results);
                 break;
             case 'housing.assignedCounts' :
-                $results = null;
+                $results = $manager->getHousingAssignmentCounts();
                 $this->setReturnValue($results);
                 break;
-            case 'housing.housingDetail' :
-                $results = null;
+            case 'housing.housingRoster' :
+                $results = $manager->getHousingRoster();
                 $this->setReturnValue($results);
                 break;
             case 'housing.whoLivesWhere' :

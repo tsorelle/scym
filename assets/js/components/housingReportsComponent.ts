@@ -20,6 +20,12 @@ module Tops {
         selectedReport = ko.observable('requestCounts');
 
         requestCounts = ko.observableArray<IDayGroup>();
+        assignmentCounts = ko.observableArray();
+        housingRoster = {
+            daily: ko.observableArray<IDayGroup>(),
+            unassigned: ko.observableArray(),
+            visitors: ko.observableArray()
+        };
 
         public constructor(application:IPeanutClient, owner: IEventSubscriber = null) {
             var me = this;
@@ -35,9 +41,20 @@ module Tops {
             });
         }
 
-        showHousingRequestCounts = () => { var me = this; me.selectedReport('requestCounts');};
-        showHousingAssignmentCounts = () => { var me = this; me.selectedReport('assignedCounts');};
-        showHousingDetails = () => { var me = this; me.selectedReport('housingDetail');};
+        showHousingRequestCounts = () => {
+            var me = this;
+            me.selectedReport('requestCounts');
+        };
+        showHousingAssignmentCounts = () => {
+            var me = this;
+            me.selectedReport('assignedCounts');
+            me.getReportData();
+        };
+        showHousingRoster = () => {
+            var me = this;
+            me.selectedReport('housingRoster');
+            me.getReportData();
+        };
         showWhoWhereReport = () => { var me = this; me.selectedReport('whoLivesWhere');};
 
         refreshAll = () => {
@@ -51,7 +68,10 @@ module Tops {
             switch (currentReport) {
                 case 'requestCounts' :
                     return me.requestCounts().length == 0;
-                    break;
+                case 'assignedCounts' :
+                    return me.assignmentCounts().length == 0;
+                case 'housingRoster' :
+                    return me.housingRoster.daily().length + me.housingRoster.unassigned().length + me.housingRoster.visitors().length == 0;
                 default:
                     return false;
             }
@@ -76,6 +96,13 @@ module Tops {
                                     DayGroupObservable.assign(me.requestCounts,
                                         <IDayGroupReportItem[]>serviceResponse.Value);
                                     break;
+                                case 'assignedCounts' :
+                                    me.assignmentCounts([]);
+                                    me.assignmentCounts(serviceResponse.Value);
+                                    break;
+                                case 'housingRoster' :
+                                    me.setHousingRoster(serviceResponse.Value);
+                                    break;
                                 default:
                                     alert("Report not implemented");
                             }
@@ -87,6 +114,22 @@ module Tops {
             }
         }
 
+        private setHousingRoster(data: IDayGroupReportItem[]) {
+            var me = this;
+            me.housingRoster.daily([]);
+            me.housingRoster.unassigned([]);
+            me.housingRoster.visitors([]);
+            DayGroupObservable.assign(me.housingRoster.daily,data);
+            var filtered = _.filter(data,function(item: any) {
+                 return item.assignedHousingType == 'NOT ASSIGNED';
+            });
+            me.housingRoster.unassigned(filtered);
+
+            filtered = _.filter(data,function(item: any) {
+                return item.assignedHousingType == 'DAY';
+            });
+            me.housingRoster.visitors(filtered);
+        }
     }
 }
 
