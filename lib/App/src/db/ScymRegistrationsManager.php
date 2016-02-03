@@ -678,7 +678,7 @@ class ScymRegistrationsManager extends TDbServiceManager
 
     public function getHousingAssignmentCounts() {
         $qm = TQueryManager::getInstance();
-        $sql = "SELECT * FROM housingAssignmentCountsView";
+        $sql = "SELECT * FROM housingAssignmentCountsReportView";
         $statement = $qm->executeStatement($sql);
         $result = $statement->fetchAll(PDO::FETCH_OBJ);
         return $result;

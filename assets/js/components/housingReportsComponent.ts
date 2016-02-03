@@ -11,7 +11,9 @@
 /// <reference path='DayGroupObservable.ts' />
 
 module Tops {
-    export class housingReportsComponent  {
+
+
+    export class housingReportsComponent implements IEventSubscriber {
 
         private application:IPeanutClient;
         private peanut:Peanut;
@@ -95,6 +97,7 @@ module Tops {
 
         }
 
+
         getReportData() {
             var me = this;
             var currentReport = me.selectedReport();
@@ -153,6 +156,15 @@ module Tops {
                 return item.assignedHousingType == 'DAY';
             });
             me.housingRoster.visitors(filtered);
+        }
+
+        changeAssignment = (item: any) => {
+            var me = this;
+            me.owner.handleEvent('assignmentchangerequest',item);
+        };
+
+        handleEvent(eventName:string, data = null) {
+
         }
     }
 }

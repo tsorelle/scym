@@ -10,3 +10,8 @@ CREATE VIEW housingAssignmentCountsView AS
     JOIN housingtypes t ON t.housingTypeId = u.housingTypeId
   ORDER BY u.unitname;
 
+DROP VIEW IF EXISTS housingAssignmentCountsReportView;
+CREATE VIEW housingAssignmentCountsReportView AS
+  SELECT v.*,
+    IF (v.`capacity` < v.`Thursday` OR v.`capacity` < v.`Friday` OR v.`capacity` < v.`Saturday`,'overbooked','') AS 'status'
+  FROM housingAssignmentCountsView v;

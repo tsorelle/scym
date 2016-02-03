@@ -101,6 +101,7 @@ module Tops {
             me.application.bindSection('assignments');
             me.application.bindNode('housing-units-form');
             me.application.bindNode('housing-types-form');
+            me.application.bindNode('housing-reports-form');
             me.application.showDefaultSection();
         };
 
@@ -193,7 +194,6 @@ module Tops {
             });
         }
 
-
         handleEvent = (eventName:string, data:any = null) => {
             var me = this;
             switch (eventName) {
@@ -214,6 +214,10 @@ module Tops {
                     break;
                 case 'registrationselected' :
                     me.onRegistrationSelected(data);
+                    break;
+                case 'assignmentchangerequest' :
+                    me.showAssignmentForm();
+                    me.onRegistrationSelected(data.registrationId);
                     break;
 
             }
