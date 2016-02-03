@@ -22,6 +22,9 @@ module Tops {
         requestCounts = ko.observableArray<IDayGroup>();
         assignmentCounts = ko.observableArray();
         occupants = ko.observableArray<IDayGroup>();
+        requestCountsFilter = ko.observable('All');
+        occupantsFilter = ko.observable('All');
+        rosterFilter  = ko.observable('All');
         housingRoster = {
             daily: ko.observableArray<IDayGroup>(),
             unassigned: ko.observableArray(),
@@ -45,6 +48,7 @@ module Tops {
         showHousingRequestCounts = () => {
             var me = this;
             me.selectedReport('requestCounts');
+            me.getReportData();
         };
         showHousingAssignmentCounts = () => {
             var me = this;
@@ -65,6 +69,11 @@ module Tops {
         refreshAll = () => {
             var me = this;
             me.requestCounts([]);
+            me.assignmentCounts([]);
+            me.housingRoster.daily([]);
+            me.housingRoster.unassigned([]);
+            me.housingRoster.visitors([]);
+            me.occupants([]);
             me.getReportData();
         };
 
@@ -101,6 +110,7 @@ module Tops {
                             switch (currentReport) {
                                 case 'requestCounts' :
                                     // me.displayRequestCounts(<IHousingRequestCountItem[]>serviceResponse.Value);
+                                    me.requestCountsFilter('All');
                                     DayGroupObservable.assign(me.requestCounts,
                                         <IDayGroupReportItem[]>serviceResponse.Value);
                                     break;
@@ -109,9 +119,11 @@ module Tops {
                                     me.assignmentCounts(serviceResponse.Value);
                                     break;
                                 case 'housingRoster' :
+                                    me.rosterFilter('All');
                                     me.setHousingRoster(serviceResponse.Value);
                                     break;
                                 case 'occupants' :
+                                    me.occupantsFilter('All');
                                     DayGroupObservable.assign(me.occupants,
                                         <IDayGroupReportItem[]>serviceResponse.Value);
                                     break;
