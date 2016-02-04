@@ -5,8 +5,8 @@ CREATE VIEW occupantsView AS
     ScymNumberToWeekday(ha.day) AS 'day',
             ha.day AS dayNumber, a.attenderId, hu.`unitname`, FormatName(a.firstName,a.middleName,a.lastName) AS 'name',
             hu.`unitname` AS unit, IF (a.attended = 1, 'Yes', 'No') AS arrived
-  FROM housingUnits hu
-    JOIN housingAssignments ha ON hu.`housingUnitId` = ha.housingUnitId
+  FROM housingunits hu
+    JOIN housingassignments ha ON hu.`housingUnitId` = ha.housingUnitId
     JOIN attenders a ON a.attenderId = ha.attenderId
     JOIN registrations r ON a.registrationId = r.registrationId
   ORDER BY r.year,ha.day,hu.unitname;

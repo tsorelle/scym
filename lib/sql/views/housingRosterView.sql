@@ -20,6 +20,6 @@ CREATE VIEW housingRosterView AS
     JOIN housingtypes ht ON ht.housingTypeId = a.`housingTypeId`
     JOIN registrations r ON a.`registrationId` = r.`registrationId`
     LEFT OUTER JOIN housingassignments ha ON ha.`attenderId` = a.`attenderID`
-    LEFT OUTER JOIN housingUnits hu ON ha.`housingUnitId` = hu.`housingUnitId`
+    LEFT OUTER JOIN housingunits hu ON ha.`housingUnitId` = hu.`housingUnitId`
     LEFT OUTER JOIN housingtypes hat ON hat.housingTypeId = hu.housingTypeId
   ORDER BY ha.day, a.lastName, a.firstName;
