@@ -21,10 +21,9 @@ module Tops {
 
         selectedReport = ko.observable('requestCounts');
 
-        requestCounts = ko.observableArray<IDayGroup>();
+        requestCounts = ko.observableArray();
         assignmentCounts = ko.observableArray();
         occupants = ko.observableArray<IDayGroup>();
-        requestCountsFilter = ko.observable('All');
         occupantsFilter = ko.observable('All');
         rosterFilter  = ko.observable('All');
         housingRoster = {
@@ -112,10 +111,7 @@ module Tops {
                         if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                             switch (currentReport) {
                                 case 'requestCounts' :
-                                    // me.displayRequestCounts(<IHousingRequestCountItem[]>serviceResponse.Value);
-                                    me.requestCountsFilter('All');
-                                    DayGroupObservable.assign(me.requestCounts,
-                                        <IDayGroupReportItem[]>serviceResponse.Value);
+                                    me.requestCounts(serviceResponse.Value);
                                     break;
                                 case 'assignedCounts' :
                                     me.assignmentCounts([]);

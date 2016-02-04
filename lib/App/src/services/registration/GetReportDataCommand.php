@@ -32,7 +32,7 @@ class GetReportDataCommand extends TServiceCommand
 
         switch($reportId) {
             case 'housing.requestCounts' :
-                $results = $manager->getHousingRequestCounts();
+                $results = $manager->getHousingRequestCountsReport();
                 $this->setReturnValue($results);
                 break;
             case 'housing.assignedCounts' :

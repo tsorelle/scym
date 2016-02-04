@@ -1,5 +1,5 @@
-
-ALTER VIEW currentHousingAssignments AS
+DROP VIEW IF EXISTS currentHousingAssignments;
+CREATE VIEW currentHousingAssignments AS
 SELECT ha.*,r.registrationId,a.FirstName,a.LastName
 FROM housingAssignments ha
   JOIN attenders a ON ha.`attenderId` = a.`attenderID`
