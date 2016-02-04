@@ -16,6 +16,7 @@ module Tops {
         private peanut:Peanut;
         private owner : IEventSubscriber;
 
+        selectedReport = ko.observable('landing');
 
         public constructor(application:IPeanutClient, owner: IEventSubscriber = null) {
             var me = this;
@@ -28,6 +29,24 @@ module Tops {
             var me = this;
         }
 
+        showReptMealCountsRequested		= () => {var me=this; me.selectedReport('mealCountsRequested');};
+        showReptMealCountsConfirmed     = () => {var me=this; me.selectedReport('mealCountsConfirmed');};
+        showReptMealRoster              = () => {var me=this; me.selectedReport('mealRoster');};
+        showReptRegistrationsReceived   = () => {var me=this; me.selectedReport('registrationsReceived');};
+        showReptRegisteredAttenders     = () => {var me=this; me.selectedReport('registeredAttenders');};
+        showReptAttendersByMeeting      = () => {var me=this; me.selectedReport('attendersByMeeting');};
+        showReptAttendersByArrival      = () => {var me=this; me.selectedReport('attendersByArrival');};
+        showReptNotCheckedIn            = () => {var me=this; me.selectedReport('notCheckedIn');};
+        showReptDropIns                 = () => {var me=this; me.selectedReport('dropIns');};
+        showReptIncompleteRegistrations = () => {var me=this; me.selectedReport('incompleteRegistrations');};
+        showReptPaymentsReceived        = () => {var me=this; me.selectedReport('paymentsReceived');};
+        showReptMiscCounts              = () => {var me=this; me.selectedReport('miscCounts');};
+        showReptFinancialAid            = () => {var me=this; me.selectedReport('financialAid');};
+        showReptLedger                  = () => {var me=this; me.selectedReport('ledger');};
+
+        refreshReports = () => {
+            var me = this;
+        }
     }
 }
 

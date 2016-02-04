@@ -1,1 +1,68 @@
-<p>admin reports</p>
+<div class="row" id="reports-menu">
+    <div class="col-md-12">
+        <ul class="nav nav-pills">
+            <li role="presentation" class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    Registrations and Attenders <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#" data-bind="click:showReptRegistrationsReceived">Registrations Recieved</a> </li>
+                    <li><a href="#" data-bind="click:showReptRegisteredAttenders" >Attenders</a> </li>
+                    <li><a href="#" data-bind="click:showReptAttendersByMeeting">Meetings</a> </li>
+                    <li><a href="#" data-bind="click:showReptAttendersByArrival">Arrivals</a> </li>
+                </ul>
+            </li>
+            <li role="presentation" class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    Meals <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#" data-bind="click:showReptMealCountsRequested">Counts - requested</a> </li>
+                    <li><a href="#" data-bind="click:showReptMealCountsConfirmed">Counts - confirmed</a> </li>
+                    <li><a href="#" data-bind="click:showReptMealRoster">Meal roster</a> </li>
+                </ul>
+            </li>
+            <li role="presentation" class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    Finance <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#"  data-bind="click:showReptPaymentsReceived">Payments</a></li>
+                    <li><a href="#"  data-bind="click:showReptMiscCounts">Misc Counts</a></li>
+                    <li><a href="#"  data-bind="click:showReptFinancialAid">Financial Aid</a></li>
+                    <li><a href="#"  data-bind="click:showReptLedger">Ledger</a></li>
+                </ul>
+            </li>
+            <li role="presentation" class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    Other <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#"  data-bind="click:showReptNotCheckedIn">Not checked in</a></li>
+                    <li><a href="#"  data-bind="click:showReptDropIns">Drop-in</a></li>
+                    <li><a href="#"  data-bind="click:showReptIncompleteRegistrations">Incomplete Registrations</a></li>
+                </ul>
+            </li>
+            <li role="presentation" >
+                <a href="#" data-bind="click:refreshReports"><span class="glyphicon glyphicon-refresh"></span> Refresh</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="row" data-bind="visible:selectedReport()=='landing'"><div class="col-md-12"> Select your report from the menu. </div></div>
+<div class="row" data-bind="visible:selectedReport()=='mealCountsRequested'"><div class="col-md-12">Work in progress, report:mealCountsRequested    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='mealCountsConfirmed'"><div class="col-md-12">Work in progress, report:mealCountsConfirmed    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='mealRoster'"><div class="col-md-12">Work in progress, report:mealRoster     </div></div>
+<div class="row" data-bind="visible:selectedReport()=='registrationsReceived'"><div class="col-md-12">Work in progress, report:registrationsReceived    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='registeredAttenders'"><div class="col-md-12">Work in progress, report:registeredAttenders    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='attendersByMeeting'"><div class="col-md-12">Work in progress, report:attendersByMeeting    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='attendersByArrival'"><div class="col-md-12">Work in progress, report:attendersByArrival    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='notCheckedIn'"><div class="col-md-12">Work in progress, report:notCheckedIn    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='dropIns'"><div class="col-md-12">Work in progress, report:dropIns    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='incompleteRegistrations'"><div class="col-md-12">Work in progress, report:incompleteRegistrations    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='paymentsReceived'"><div class="col-md-12">Work in progress, report:paymentsReceived    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='miscCounts'"><div class="col-md-12">Work in progress, report:miscCounts    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='financialAid'"><div class="col-md-12">Work in progress, report:financialAid    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='ledger'"><div class="col-md-12">Work in progress, report:ledger    </div></div>
+
+
