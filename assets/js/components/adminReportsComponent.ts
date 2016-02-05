@@ -1,3 +1,4 @@
+///<reference path="registrationsReportComponent.ts"/>
 /**
  * Created by Terry on 1/4/2016.
  */
@@ -10,11 +11,13 @@
 /// <reference path='../Tops.App/Registration.d.ts' />
 
 module Tops {
-    export class adminReportsComponent  {
 
+    export class adminReportsComponent implements IReportOwner  {
         private application:IPeanutClient;
         private peanut:Peanut;
         private owner : IEventSubscriber;
+
+        private reports : IReportVM[] = [];
 
         selectedReport = ko.observable('landing');
 
@@ -29,25 +32,134 @@ module Tops {
             var me = this;
         }
 
-        showReptMealCountsRequested		= () => {var me=this; me.selectedReport('mealCountsRequested');};
-        showReptMealCountsConfirmed     = () => {var me=this; me.selectedReport('mealCountsConfirmed');};
-        showReptMealRoster              = () => {var me=this; me.selectedReport('mealRoster');};
-        showReptRegistrationsReceived   = () => {var me=this; me.selectedReport('registrationsReceived');};
-        showReptRegisteredAttenders     = () => {var me=this; me.selectedReport('registeredAttenders');};
-        showReptAttendersByMeeting      = () => {var me=this; me.selectedReport('attendersByMeeting');};
-        showReptAttendersByArrival      = () => {var me=this; me.selectedReport('attendersByArrival');};
-        showReptNotCheckedIn            = () => {var me=this; me.selectedReport('notCheckedIn');};
-        showReptDropIns                 = () => {var me=this; me.selectedReport('dropIns');};
-        showReptIncompleteRegistrations = () => {var me=this; me.selectedReport('incompleteRegistrations');};
-        showReptPaymentsReceived        = () => {var me=this; me.selectedReport('paymentsReceived');};
-        showReptMiscCounts              = () => {var me=this; me.selectedReport('miscCounts');};
-        showReptFinancialAid            = () => {var me=this; me.selectedReport('financialAid');};
-        showReptLedger                  = () => {var me=this; me.selectedReport('ledger');};
+        private findReport(reportName: string) {
+            var me = this;
+            var report : IReportVM = _.find(me.reports, function(item: any) {
+                return item.name == reportName;
+            });
+            return report;
+        }
+
+        private loadReport(reportName: string, componentName: string, factory: (reportName: string) => any) {
+            var me=this;
+            if (componentName == 'not-implemented') {
+                me.selectedReport(reportName);
+                return;
+            }
+            var report = me.findReport(reportName);
+            if (report == null) {
+                report = {
+                    name: reportName,
+                    vm : null
+                };
+                me.application.bindComponent(componentName,
+                    function() {
+                        report.vm = factory(reportName);
+                        me.reports.push(report);
+                        return report.vm;
+                    },
+                    function() {
+                        me.getReportData(reportName,report.vm.initialize);
+                        me.selectedReport(reportName);
+                    }
+                );
+            }
+            else {
+                if (report.vm.select()) {
+                    me.getReportData(reportName,report.vm.display);
+                }
+                me.selectedReport(reportName);
+            }
+        };
+
+        getReportData(reportName: string, dataHandler: (data: any) => void) {
+            var me = this;
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Getting report data...');
+            me.peanut.executeService('registration.GetReportData', { id: 'admin.' + reportName },
+                function(serviceResponse: IServiceResponse) {
+                    if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                        dataHandler(serviceResponse.Value);
+                    }
+                }
+            ).always(function() {
+                me.application.hideWaiter();
+            });
+        }
+
+        showReptRegistrationsReceived   = () => {
+            var me=this;
+            me.loadReport('registrationsReceived','registrations-report', function(reportName: string) {
+                return new registrationsReportComponent(me.application, me, reportName);
+            });
+        };
+
+        showReptMealCountsRequested		= () => {
+            var me=this;
+            me.loadReport('mealCountsRequested','not-implemented',function() {return null;});
+        };
+        showReptMealCountsConfirmed     = () => {
+            var me=this;
+            me.loadReport('mealCountsConfirmed','not-implemented',function() {return null;});
+        };
+        showReptMealRoster              = () => {
+            var me=this;
+            me.loadReport('mealRoster','not-implemented',function() {return null;});
+        };
+        showReptRegisteredAttenders     = () => {
+            var me=this;
+            me.loadReport('registeredAttenders','not-implemented',function() {return null;});
+        };
+        showReptAttendersByMeeting      = () => {
+            var me=this;
+            me.loadReport('attendersByMeeting','not-implemented',function() {return null;});
+        };
+        showReptAttendersByArrival      = () => {
+            var me=this;
+            me.loadReport('attendersByArrival','not-implemented',function() {return null;});
+        };
+        showReptNotCheckedIn            = () => {
+            var me=this;
+            me.loadReport('notCheckedIn','not-implemented',function() {return null;});
+        };
+        showReptDropIns                 = () => {
+            var me=this;
+            me.loadReport('dropIns','not-implemented',function() {return null;});
+        };
+        showReptIncompleteRegistrations = () => {
+            var me=this;
+            me.loadReport('incompleteRegistrations','not-implemented',function() {return null;});
+        };
+        showReptPaymentsReceived        = () => {
+            var me=this;
+            me.loadReport('paymentsReceived','not-implemented',function() {return null;});
+        };
+        showReptMiscCounts              = () => {
+            var me=this;
+            me.loadReport('miscCounts','not-implemented',function() {return null;});
+        };
+        showReptFinancialAid            = () => {
+            var me=this;
+            me.loadReport('financialAid','not-implemented',function() {return null;});
+        };
+        showReptLedger                  = () => {
+            var me=this;
+            me.loadReport('ledger','not-implemented',function() {return null;});
+        };
 
         refreshReports = () => {
             var me = this;
-        }
+            var current = me.selectedReport();
+            _.each(me.reports, function(report : IReportVM) {
+                report.vm.handleEvent('refreshReport',current);
+            });
+        };
+
+        handleEvent = (eventName:string, data:any = null )=> {
+            var me = this;
+        };
     }
+
 }
 
 // Tops.TkoComponentLoader.addVM('component-name',Tops.adminReportsComponent);

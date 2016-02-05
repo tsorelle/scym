@@ -240,16 +240,6 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $result;
     }
 
-
-    public function getHousingAvailability() {
-        $qm = TQueryManager::getInstance();
-        $sql = "SELECT * FROM housingAvailabilityView";
-        $statement = $qm->executeStatement($sql);
-        $result = $statement->fetchAll(PDO::FETCH_OBJ);
-        return $result;
-    }
-
-
     /**
      * @param ScymRegistration $registration
      * @return array
@@ -658,49 +648,6 @@ class ScymRegistrationsManager extends TDbServiceManager
         }
     }
 
-    public function getYouthList() {
-        $session = $this->getSession();
-        $qm = TQueryManager::getInstance();
-        $sql = "SELECT * FROM youthView WHERE year = ? ORDER BY lastName, firstName";
-        $statement = $qm->executeStatement($sql,$session->getYear());
-        $result = $statement->fetchAll(PDO::FETCH_OBJ);
-        return $result;
-    }
-
-    public function getHousingRequestCountsReport() {
-        // $session = $this->getSession();
-        $qm = TQueryManager::getInstance();
-        $sql = "SELECT * FROM housingRequestCountsReportView";// " WHERE year = ?";
-        $statement = $qm->executeStatement($sql); // $session->getYear());
-        $result = $statement->fetchAll(PDO::FETCH_OBJ);
-        return $result;
-    }
-
-    public function getHousingAssignmentCounts() {
-        $qm = TQueryManager::getInstance();
-        $sql = "SELECT * FROM housingAssignmentCountsReportView";
-        $statement = $qm->executeStatement($sql);
-        $result = $statement->fetchAll(PDO::FETCH_OBJ);
-        return $result;
-    }
-
-    public function getHousingRoster() {
-        $session = $this->getSession();
-        $qm = TQueryManager::getInstance();
-        $sql = "SELECT * FROM housingRosterView WHERE year = ?";
-        $statement = $qm->executeStatement($sql,$session->getYear());
-        $result = $statement->fetchAll(PDO::FETCH_OBJ);
-        return $result;
-    }
-
-    public function getOccupantsReport() {
-        $session = $this->getSession();
-        $qm = TQueryManager::getInstance();
-        $sql = "SELECT * FROM occupantsView WHERE year = ?";
-        $statement = $qm->executeStatement($sql,$session->getYear());
-        $result = $statement->fetchAll(PDO::FETCH_OBJ);
-        return $result;
-    }
 
 
     /**
@@ -907,6 +854,101 @@ class ScymRegistrationsManager extends TDbServiceManager
 
         $this->saveChanges();
         return $updateCount;
+    }
+
+    public function getReportView($viewName, $currentYear = true) {
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM $viewName";
+        if ($currentYear) {
+            $sql .= " WHERE year = ?";
+            $session = $this->getSession();
+            $statement = $qm->executeStatement($sql,$session->getYear());
+        }
+        else {
+            $statement = $qm->executeStatement($sql);
+        }
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
+
+    public function getYouthList() {
+        return $this->getReportView('youthView');
+    }
+
+    public function getHousingRequestCountsReport() {
+        return $this->getReportView('housingRequestCountsReportView',false);
+    }
+
+    public function getHousingAssignmentCounts() {
+        return $this->getReportView('housingAssignmentCountsReportView',false);
+    }
+
+    public function getHousingRoster() {
+        return $this->getReportView('housingRosterView');
+    }
+
+    public function getOccupantsReport() {
+        return $this->getReportView('occupantsView');
+    }
+
+    public function getHousingAvailability() {
+        return $this->getReportView('housingAvailabilityView',false);
+    }
+
+    public function getRegistrationsReceivedReport(){
+        return $this->getReportView('registrationsReceivedReportView');
+    }
+
+    public function getMealCountsRequestedReport(){
+        /* todo: implement report views */
+        return $this->getReportView('mealCountsRequestedReportView',false);
+    }
+    public function getMealCountsConfirmedReport(){
+        /* todo: implement report views */
+        return $this->getReportView('mealCountsConfirmedReportView',false);}
+    public function getMealRosterReport(){
+        /* todo: implement report views */
+        return $this->getReportView('mealRosterReportView',false);
+    }
+    public function getRegisteredAttendersReport(){
+        /* todo: implement report views */
+        return $this->getReportView('registeredAttendersReportView',false);
+    }
+    public function getAttendersByMeetingReport(){
+        /* todo: implement report views */
+        return $this->getReportView('attendersByMeetingReportView',false);
+    }
+    public function getAttendersByArrivalReport(){
+        /* todo: implement report views */
+        return $this->getReportView('attendersByArrivalReportView',false);
+    }
+    public function getNotCheckedInReport(){
+        /* todo: implement report views */
+        return $this->getReportView('notCheckedInReportView',false);
+    }
+    public function getDropInsReport(){
+        /* todo: implement report views */
+        return $this->getReportView('dropInsReportView',false);
+    }
+    public function getIncompleteRegistrationsReport(){
+        /* todo: implement report views */
+        return $this->getReportView('incompleteRegistrationsReportView',false);
+    }
+    public function getPaymentsReceivedReport(){
+        /* todo: implement report views */
+        return $this->getReportView('paymentsReceivedReportView',false);
+    }
+    public function getMiscCountsReport(){
+        /* todo: implement report views */ return
+            $this->getReportView('miscCountsReportView',false);
+    }
+    public function getFinancialAidReport(){
+        /* todo: implement report views */
+        return $this->getReportView('financialAidReportView',false);
+    }
+    public function getLedgerReport(){
+        /* todo: implement report views */
+        return $this->getReportView('ledgerReportView',false);
     }
 
 }

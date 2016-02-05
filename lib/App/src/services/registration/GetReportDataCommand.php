@@ -17,6 +17,7 @@ class GetReportDataCommand extends TServiceCommand
 
     protected function run()
     {
+        $trapExceptions = true;
         $request = $this->getRequest();
         if ($request == null) {
             $this->addErrorMessage('ERROR: No request recieved.');
@@ -30,24 +31,75 @@ class GetReportDataCommand extends TServiceCommand
         $params = isset($request->params) ?  explode(';',$request->params) : array();
         $manager = new ScymRegistrationsManager();
 
-        switch($reportId) {
-            case 'housing.requestCounts' :
-                $results = $manager->getHousingRequestCountsReport();
-                $this->setReturnValue($results);
-                break;
-            case 'housing.assignedCounts' :
-                $results = $manager->getHousingAssignmentCounts();
-                $this->setReturnValue($results);
-                break;
-            case 'housing.housingRoster' :
-                $results = $manager->getHousingRoster();
-                $this->setReturnValue($results);
-                break;
-            case 'housing.occupants' :
-                $results = $manager->getOccupantsReport();
-                $this->setReturnValue($results);
-                break;
+        try {
+            switch ($reportId) {
+                case 'housing.requestCounts' :
+                    $results = $manager->getHousingRequestCountsReport();
+                    break;
+                case 'housing.assignedCounts' :
+                    $results = $manager->getHousingAssignmentCounts();
+                    break;
+                case 'housing.housingRoster' :
+                    $results = $manager->getHousingRoster();
+                    break;
+                case 'housing.occupants' :
+                    $results = $manager->getOccupantsReport();
+                    break;
+                case 'admin.mealCountsRequested' :
+                    $results = $manager->getMealCountsRequestedReport();
+                    break;
+                case 'admin.mealCountsConfirmed' :
+                    $results = $manager->getMealCountsConfirmedReport();
+                    break;
+                case 'admin.mealRoster' :
+                    $results = $manager->getMealRosterReport();
+                    break;
+                case 'admin.registrationsReceived' :
+                    $results = $manager->getRegistrationsReceivedReport();
+                    break;
+                case 'admin.registeredAttenders' :
+                    $results = $manager->getRegisteredAttendersReport();
+                    break;
+                case 'admin.attendersByMeeting' :
+                    $results = $manager->getAttendersByMeetingReport();
+                    break;
+                case 'admin.attendersByArrival' :
+                    $results = $manager->getAttendersByArrivalReport();
+                    break;
+                case 'admin.notCheckedIn' :
+                    $results = $manager->getNotCheckedInReport();
+                    break;
+                case 'admin.dropIns' :
+                    $results = $manager->getDropInsReport();
+                    break;
+                case 'admin.incompleteRegistrations' :
+                    $results = $manager->getIncompleteRegistrationsReport();
+                    break;
+                case 'admin.paymentsReceived' :
+                    $results = $manager->getPaymentsReceivedReport();
+                    break;
+                case 'admin.miscCounts' :
+                    $results = $manager->getMiscCountsReport();
+                    break;
+                case 'admin.financialAid' :
+                    $results = $manager->getFinancialAidReport();
+                    break;
+                case 'admin.ledger' :
+                    $results = $manager->getLedgerReport();
+                    break;
+                default :
+                    $this->addErrorMessage("ERROR: Invalid report id '$reportId'");
+                    $results = null;
+                    break;
+            }
         }
+        catch(\Exception $ex) {
+            if (!$trapExceptions) {
+                throw $ex;
+            }
+            $this->addErrorMessage("ERROR: ".$ex->getMessage());
+        }
+        $this->setReturnValue($results);
 
     }
 }

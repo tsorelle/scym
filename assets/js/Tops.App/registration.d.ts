@@ -379,4 +379,19 @@ declare module Tops {
         confirmed : number;
         requested : number;
     }
+
+    export interface IReportComponent extends IEventSubscriber {
+        initialize : (data : any) => void;
+        display : (data : any) => void;
+        select : () => void;
+    }
+
+    export interface IReportVM {
+        name: string;
+        vm : IReportComponent;
+    }
+
+    export interface IReportOwner extends IEventSubscriber {
+        getReportData: (reportName: string, dataHandler: (data: any) => void) => void;
+    }
 }
