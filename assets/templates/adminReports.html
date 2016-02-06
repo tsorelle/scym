@@ -17,8 +17,7 @@
                     Meals <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="#" data-bind="click:showReptMealCountsRequested">Counts - requested</a> </li>
-                    <li><a href="#" data-bind="click:showReptMealCountsConfirmed">Counts - confirmed</a> </li>
+                    <li><a href="#" data-bind="click:showReptMealCounts">Meal counts</a> </li>
                     <li><a href="#" data-bind="click:showReptMealRoster">Meal roster</a> </li>
                 </ul>
             </li>
@@ -50,15 +49,19 @@
     </div>
 </div>
 <div class="row" data-bind="visible:selectedReport()=='landing'"><div class="col-md-12"> Select your report from the menu. </div></div>
-<div class="row" data-bind="visible:selectedReport()=='mealCountsRequested'"><div class="col-md-12">Work in progress, report:mealCountsRequested    </div></div>
-<div class="row" data-bind="visible:selectedReport()=='mealCountsConfirmed'"><div class="col-md-12">Work in progress, report:mealCountsConfirmed    </div></div>
-<div class="row" data-bind="visible:selectedReport()=='mealRoster'"><div class="col-md-12">Work in progress, report:mealRoster     </div></div>
-
 <div class="row" data-bind="visible:selectedReport()=='registrationsReceived'">
     <div class="col-md-12">
         <div id="registrations-report-container"> <registrations-report></registrations-report> </div>
     </div>
 </div>
+<div class="row" data-bind="visible:selectedReport()=='mealCounts'">
+    <div class="col-md-12">
+        <div id="mealcounts-report-container"> <mealcounts-report></mealcounts-report> </div>
+    </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='mealRoster'"><div class="col-md-12">Work in progress, report:mealRoster     </div></div>
+
 <div class="row" data-bind="visible:selectedReport()=='registeredAttenders'"><div class="col-md-12">Work in progress, report:registeredAttenders    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='attendersByMeeting'"><div class="col-md-12">Work in progress, report:attendersByMeeting    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='attendersByArrival'"><div class="col-md-12">Work in progress, report:attendersByArrival    </div></div>

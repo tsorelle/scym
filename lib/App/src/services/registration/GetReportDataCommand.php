@@ -45,11 +45,8 @@ class GetReportDataCommand extends TServiceCommand
                 case 'housing.occupants' :
                     $results = $manager->getOccupantsReport();
                     break;
-                case 'admin.mealCountsRequested' :
-                    $results = $manager->getMealCountsRequestedReport();
-                    break;
-                case 'admin.mealCountsConfirmed' :
-                    $results = $manager->getMealCountsConfirmedReport();
+                case 'admin.mealCounts' :
+                    $results = $manager->getMealCountsReport();
                     break;
                 case 'admin.mealRoster' :
                     $results = $manager->getMealRosterReport();

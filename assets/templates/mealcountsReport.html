@@ -1,0 +1,70 @@
+<div class="row" id="reports-menu">
+    <div class="col-md-12">
+        <div id="options-header" data-bind="visible: attendedMeals().length" class="row hidden-print" style="margin-bottom: 10px">
+            <div class="col-md-8" style="padding-bottom:2px">
+                <label style="padding-right:8px;">Show counts for:</label>
+                <select  data-bind="value: selectedCountType">
+                    <option>Requested</option>
+                    <option>Attended</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Meal Counts: <span data-bind="text:selectedCountType"></span></h3>
+
+                <div id="requested-table" data-bind="visible: selectedCountType() == 'Requested'">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Meal</th>
+                                <th class="text-right">Vegetarian</th>
+                                <th class="text-right">Gluten free</th>
+                                <th class="text-right">Veg and Gluten free</th>
+                                <th class="text-right">Regular</th>
+                                <th class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach:registeredMeals">
+                            <tr>
+                                <td data-bind="text:meal"></td>
+                                <td  class="text-right" data-bind="text:vegetarian"></td>
+                                <td  class="text-right" data-bind="text:glutenFree"></td>
+                                <td  class="text-right" data-bind="text:both"></td>
+                                <td  class="text-right" data-bind="text:regular"></td>
+                                <td  class="text-right" data-bind="text:total"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="attended-table"  data-bind="visible: selectedCountType() == 'Attended'">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Meal</th>
+                            <th>Vegetarian</th>
+                            <th>Gluten free</th>
+                            <th>Veg and Gluten free</th>
+                            <th>Regular</th>
+                            <th>Total</th>
+                        </tr>
+                        </thead>
+                        <tbody data-bind="foreach:attendedMeals">
+                        <tr>
+                            <td data-bind="text:meal"></td>
+                            <td  class="text-right" data-bind="text:vegetarian"></td>
+                            <td  class="text-right" data-bind="text:glutenFree"></td>
+                            <td  class="text-right" data-bind="text:both"></td>
+                            <td  class="text-right" data-bind="text:regular"></td>
+                            <td  class="text-right" data-bind="text:total"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

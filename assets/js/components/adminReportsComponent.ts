@@ -1,4 +1,5 @@
 ///<reference path="registrationsReportComponent.ts"/>
+///<reference path="mealCountsReportComponent.ts"/>
 /**
  * Created by Terry on 1/4/2016.
  */
@@ -94,13 +95,11 @@ module Tops {
             });
         };
 
-        showReptMealCountsRequested		= () => {
+        showReptMealCounts     = () => {
             var me=this;
-            me.loadReport('mealCountsRequested','not-implemented',function() {return null;});
-        };
-        showReptMealCountsConfirmed     = () => {
-            var me=this;
-            me.loadReport('mealCountsConfirmed','not-implemented',function() {return null;});
+            me.loadReport('mealCounts','mealcounts-report',function(reportName: string) {
+                return new mealCountsReportComponent(me.application, me, reportName);
+            });
         };
         showReptMealRoster              = () => {
             var me=this;
