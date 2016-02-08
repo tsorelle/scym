@@ -908,29 +908,19 @@ class ScymRegistrationsManager extends TDbServiceManager
     }
 
     public function getRegisteredAttendersReport(){
-        /* todo: implement report views */
-        return $this->getReportView('registeredAttendersReportView',false);
+        return $this->getReportView('attendersReportView');
     }
-    public function getAttendersByMeetingReport(){
-        /* todo: implement report views */
-        return $this->getReportView('attendersByMeetingReportView',false);
-    }
+
     public function getAttendersByArrivalReport(){
         /* todo: implement report views */
         return $this->getReportView('attendersByArrivalReportView',false);
     }
-    public function getNotCheckedInReport(){
+
+    public function getAttenderNotesReport(){
         /* todo: implement report views */
-        return $this->getReportView('notCheckedInReportView',false);
+        return $this->getReportView('attenderNotesReportView',false);
     }
-    public function getDropInsReport(){
-        /* todo: implement report views */
-        return $this->getReportView('dropInsReportView',false);
-    }
-    public function getIncompleteRegistrationsReport(){
-        /* todo: implement report views */
-        return $this->getReportView('incompleteRegistrationsReportView',false);
-    }
+
     public function getPaymentsReceivedReport(){
         /* todo: implement report views */
         return $this->getReportView('paymentsReceivedReportView',false);

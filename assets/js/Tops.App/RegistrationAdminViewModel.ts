@@ -68,7 +68,7 @@ module Tops {
              jQuery( ".datepicker" ).datepicker();
              });
              */
-
+            jQuery('.page-header').addClass('hidden-print');
 
             // todo: refactor to load on tab click
             successFunction = me.afterInit;

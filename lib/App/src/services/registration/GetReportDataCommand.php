@@ -61,20 +61,11 @@ class GetReportDataCommand extends TServiceCommand
                 case 'admin.registeredAttenders' :
                     $results = $manager->getRegisteredAttendersReport();
                     break;
-                case 'admin.attendersByMeeting' :
-                    $results = $manager->getAttendersByMeetingReport();
-                    break;
                 case 'admin.attendersByArrival' :
                     $results = $manager->getAttendersByArrivalReport();
                     break;
-                case 'admin.notCheckedIn' :
-                    $results = $manager->getNotCheckedInReport();
-                    break;
-                case 'admin.dropIns' :
-                    $results = $manager->getDropInsReport();
-                    break;
-                case 'admin.incompleteRegistrations' :
-                    $results = $manager->getIncompleteRegistrationsReport();
+                case 'admin.attenderNotes' :
+                    $results = $manager->getAttenderNotesReport();
                     break;
                 case 'admin.paymentsReceived' :
                     $results = $manager->getPaymentsReceivedReport();

@@ -1056,7 +1056,7 @@ module Tops {
         static instance:Tops.YmRegistrationViewModel;
         private application:Tops.IPeanutClient;
         private peanut:Tops.Peanut;
-
+        private initialAttender : any = null;
         debugging = ko.observable(false);
 
         // state
@@ -1396,10 +1396,16 @@ module Tops {
                     }
                 }
             }
+
+            var selectAttender = me.peanut.getRequestParam('aid');
+            var initialAttender = (selectAttender) ? selectAttender : null;
+
             me.peanut.executeService('registration.RegistrationInit', request, me.handleInitializationResponse)
                 .always(function () {
                     me.application.hideWaiter();
-
+                    if (initialAttender && me.registrationForm.registrationCode()) {
+                        me.getAttender(initialAttender)
+                    }
                     if (successFunction) {
                         successFunction();
                     }
@@ -1474,11 +1480,13 @@ module Tops {
                     .always(function() {
                         me.application.hideWaiter();
                     });
+
             }
         }
 
         private handleRegistrationResponse = (serviceResponse:IServiceResponse) => {
             var me = this;
+            // me.application.hideWaiter();
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = <IRegistrationResponse>serviceResponse.Value;
                 me.loadRegistration(response);
@@ -2059,7 +2067,6 @@ module Tops {
         };
 
         showAttendersList = () => {
-            var me = this;
             var me = this;
             me.attenderForm.setViewState();
             me.formTitle('Attenders');

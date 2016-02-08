@@ -31,10 +31,16 @@ module Tops {
             me.selected(option);
         }
 
-        public getValue() {
+        public getValue(defaultValue: any = '') {
             var me = this;
             var selection = me.selected();
-            return selection ? selection.Value : '';
+            return selection ? selection.Value : defaultValue;
+        }
+
+        public getName(defaultName: string = '') {
+            var me = this;
+            var selection = me.selected();
+            return selection ? selection.Name : defaultName;
         }
 
         public unsubscribe() {

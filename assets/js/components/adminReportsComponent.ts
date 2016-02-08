@@ -8,6 +8,7 @@
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />
 /// <reference path='../Tops.App/Registration.d.ts' />
+///<reference path="attendersReportComponent.ts"/>
 
 /**
  * Created by Terry on 1/4/2016.
@@ -110,41 +111,59 @@ module Tops {
                 return new mealsReportComponent(me.application, me, reportName);
             });
         };
+
+
         showReptRegisteredAttenders     = () => {
             var me=this;
-            me.loadReport('registeredAttenders','not-implemented',function() {return null;});
+            me.loadReport('registeredAttenders','attenders-report',
+                function(reportName: string) {
+                    return new attendersReportComponent(me.application,me,reportName);
+                });
         };
+
+        showReptAttendersByArrival      = () => {
+            var me=this;
+            me.loadReport('attendersByArrival','not-implemented',function(reportName: string) {return null;});
+        };
+
+        showReptAttenderNotes      = () => {
+            var me=this;
+            me.loadReport('attenderNotes','not-implemented',function(reportName: string) {return null;});
+        };
+
+        /*
         showReptAttendersByMeeting      = () => {
             var me=this;
             me.loadReport('attendersByMeeting','not-implemented',function() {return null;});
         };
-        showReptAttendersByArrival      = () => {
-            var me=this;
-            me.loadReport('attendersByArrival','not-implemented',function() {return null;});
-        };
+         */
+
         showReptNotCheckedIn            = () => {
             var me=this;
             me.loadReport('notCheckedIn','not-implemented',function() {return null;});
         };
+
         showReptDropIns                 = () => {
             var me=this;
             me.loadReport('dropIns','not-implemented',function() {return null;});
         };
+
+
         showReptPaymentsReceived        = () => {
             var me=this;
-            me.loadReport('paymentsReceived','not-implemented',function() {return null;});
+            me.loadReport('paymentsReceived','not-implemented',function(reportName: string) {return null;});
         };
         showReptMiscCounts              = () => {
             var me=this;
-            me.loadReport('miscCounts','not-implemented',function() {return null;});
+            me.loadReport('miscCounts','not-implemented',function(reportName: string) {return null;});
         };
         showReptFinancialAid            = () => {
             var me=this;
-            me.loadReport('financialAid','not-implemented',function() {return null;});
+            me.loadReport('financialAid','not-implemented',function(reportName: string) {return null;});
         };
         showReptLedger                  = () => {
             var me=this;
-            me.loadReport('ledger','not-implemented',function() {return null;});
+            me.loadReport('ledger','not-implemented',function(reportName: string) {return null;});
         };
 
         refreshReports = () => {
