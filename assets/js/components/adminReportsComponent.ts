@@ -1,8 +1,6 @@
 ///<reference path="registrationsReportComponent.ts"/>
 ///<reference path="mealCountsReportComponent.ts"/>
-/**
- * Created by Terry on 1/4/2016.
- */
+///<reference path="mealsReportComponent.ts"/>
 /// <reference path='../typings/knockout/knockout.d.ts' />
 /// <reference path='../typings/underscore/underscore.d.ts' />
 /// <reference path='../typings/bootstrap/bootstrap.d.ts' />
@@ -10,6 +8,10 @@
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />
 /// <reference path='../Tops.App/Registration.d.ts' />
+
+/**
+ * Created by Terry on 1/4/2016.
+ */
 
 module Tops {
 
@@ -31,6 +33,7 @@ module Tops {
 
         public initialize(finalFunction? : () => void) {
             var me = this;
+            me.application.loadResources(['selectListObservable.js'],finalFunction);
         }
 
         private findReport(reportName: string) {
@@ -103,7 +106,9 @@ module Tops {
         };
         showReptMealRoster              = () => {
             var me=this;
-            me.loadReport('mealRoster','not-implemented',function() {return null;});
+            me.loadReport('mealRoster','meals-report',function(reportName: string) {
+                return new mealsReportComponent(me.application, me, reportName);
+            });
         };
         showReptRegisteredAttenders     = () => {
             var me=this;
@@ -124,10 +129,6 @@ module Tops {
         showReptDropIns                 = () => {
             var me=this;
             me.loadReport('dropIns','not-implemented',function() {return null;});
-        };
-        showReptIncompleteRegistrations = () => {
-            var me=this;
-            me.loadReport('incompleteRegistrations','not-implemented',function() {return null;});
         };
         showReptPaymentsReceived        = () => {
             var me=this;

@@ -49,7 +49,11 @@ class GetReportDataCommand extends TServiceCommand
                     $results = $manager->getMealCountsReport();
                     break;
                 case 'admin.mealRoster' :
-                    $results = $manager->getMealRosterReport();
+                    $results = new \stdClass();
+                    $session = $manager->getSession();
+                    $now = new \DateTime();
+                    $results->sessionStarted = ($session->getStart() <= $now);
+                    $results->attenders = $manager->getMealRosterReport();
                     break;
                 case 'admin.registrationsReceived' :
                     $results = $manager->getRegistrationsReceivedReport();

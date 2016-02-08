@@ -208,10 +208,11 @@ module Tops {
                     },
                     function () {
                         // initialize
-                        me.currentForm('reports');
+                        me.adminReportsVm.initialize(function() {
+                            me.currentForm('reports');
+                        });
                     }
                 );
-
             }
         };
 

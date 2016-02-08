@@ -39,7 +39,6 @@
                 <ul class="dropdown-menu">
                     <li><a href="#"  data-bind="click:showReptNotCheckedIn">Not checked in</a></li>
                     <li><a href="#"  data-bind="click:showReptDropIns">Drop-in</a></li>
-                    <li><a href="#"  data-bind="click:showReptIncompleteRegistrations">Incomplete Registrations</a></li>
                 </ul>
             </li>
             <li role="presentation" >
@@ -60,14 +59,18 @@
     </div>
 </div>
 
-<div class="row" data-bind="visible:selectedReport()=='mealRoster'"><div class="col-md-12">Work in progress, report:mealRoster     </div></div>
+
+<div class="row" data-bind="visible:selectedReport()=='mealRoster'">
+    <div class="col-md-12">
+        <div id="meals-report-container"> <meals-report></meals-report> </div>
+    </div>
+</div>
 
 <div class="row" data-bind="visible:selectedReport()=='registeredAttenders'"><div class="col-md-12">Work in progress, report:registeredAttenders    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='attendersByMeeting'"><div class="col-md-12">Work in progress, report:attendersByMeeting    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='attendersByArrival'"><div class="col-md-12">Work in progress, report:attendersByArrival    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='notCheckedIn'"><div class="col-md-12">Work in progress, report:notCheckedIn    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='dropIns'"><div class="col-md-12">Work in progress, report:dropIns    </div></div>
-<div class="row" data-bind="visible:selectedReport()=='incompleteRegistrations'"><div class="col-md-12">Work in progress, report:incompleteRegistrations    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='paymentsReceived'"><div class="col-md-12">Work in progress, report:paymentsReceived    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='miscCounts'"><div class="col-md-12">Work in progress, report:miscCounts    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='financialAid'"><div class="col-md-12">Work in progress, report:financialAid    </div></div>

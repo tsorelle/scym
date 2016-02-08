@@ -115,9 +115,6 @@ module Tops {
                     if (data == me.reportName) {
                         me.owner.getReportData(me.reportName,me.display);
                     }
-                    else {
-                        me.registrationsList([]);
-                    }
                     break;
             }
         };

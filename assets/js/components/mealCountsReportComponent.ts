@@ -123,10 +123,7 @@ module Tops {
             switch (eventName) {
                 case 'refreshReport' :
                     if (data == me.reportName) {
-                        // me.owner.getReportData(me.reportName,me.display);
-                    }
-                    else {
-
+                        me.owner.getReportData(me.reportName,me.display);
                     }
                     break;
             }

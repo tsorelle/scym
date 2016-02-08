@@ -1,4 +1,4 @@
-<div class="row" id="reports-menu">
+<div class="row" id="meal-counts-report">
     <div class="col-md-12">
         <div id="options-header" data-bind="visible: attendedMeals().length" class="row hidden-print" style="margin-bottom: 10px">
             <div class="col-md-8" style="padding-bottom:2px">
@@ -13,7 +13,7 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <h3>Meal Counts: <span data-bind="text:selectedCountType"></span></h3>
+                <h3>Meals Counts: <span data-bind="text:dietFilter.selected()."></span></h3>
 
                 <div id="requested-table" data-bind="visible: selectedCountType() == 'Requested'">
                     <table class="table">

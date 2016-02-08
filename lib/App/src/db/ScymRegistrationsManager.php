@@ -900,14 +900,13 @@ class ScymRegistrationsManager extends TDbServiceManager
     }
 
     public function getMealCountsReport(){
-        /* todo: implement report views */
         return $this->getReportView('mealCountsView',false);
     }
 
     public function getMealRosterReport(){
-        /* todo: implement report views */
-        return $this->getReportView('mealRosterReportView',false);
+        return $this->getReportView('mealRosterReportView');
     }
+
     public function getRegisteredAttendersReport(){
         /* todo: implement report views */
         return $this->getReportView('registeredAttendersReportView',false);
