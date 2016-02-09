@@ -121,31 +121,15 @@ module Tops {
                 });
         };
 
+
         showReptAttendersByArrival      = () => {
             var me=this;
             me.loadReport('attendersByArrival','not-implemented',function(reportName: string) {return null;});
         };
 
-        showReptAttenderNotes      = () => {
-            var me=this;
-            me.loadReport('attenderNotes','not-implemented',function(reportName: string) {return null;});
-        };
-
-        /*
-        showReptAttendersByMeeting      = () => {
-            var me=this;
-            me.loadReport('attendersByMeeting','not-implemented',function() {return null;});
-        };
-         */
-
         showReptNotCheckedIn            = () => {
             var me=this;
             me.loadReport('notCheckedIn','not-implemented',function() {return null;});
-        };
-
-        showReptDropIns                 = () => {
-            var me=this;
-            me.loadReport('dropIns','not-implemented',function() {return null;});
         };
 
 

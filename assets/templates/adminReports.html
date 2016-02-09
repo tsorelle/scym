@@ -1,15 +1,14 @@
-<div class="row" id="reports-menu">
-    <div class="col-md-12">
+<div class="row" id="reports-menu" class="hidden-print">
+    <div class="col-md-12" style="margin-bottom: 10px; border-bottom: 1px solid firebrick" >
         <ul class="nav nav-pills">
             <li role="presentation" class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                     Registrations and Attenders <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="#" data-bind="click:showReptRegistrationsReceived">Registrations Recieved</a> </li>
+                    <li><a href="#" data-bind="click:showReptRegistrationsReceived">Registrations</a> </li>
                     <li><a href="#" data-bind="click:showReptRegisteredAttenders" >Attenders</a> </li>
                     <li><a href="#" data-bind="click:showReptAttendersByArrival">Arrivals</a> </li>
-                    <li><a href="#" data-bind="click:showReptAttenderNotes">Attender notes</a> </li>
                 </ul>
             </li>
             <li role="presentation" class="dropdown">
@@ -30,15 +29,6 @@
                     <li><a href="#"  data-bind="click:showReptMiscCounts">Misc Counts</a></li>
                     <li><a href="#"  data-bind="click:showReptFinancialAid">Financial Aid</a></li>
                     <li><a href="#"  data-bind="click:showReptLedger">Ledger</a></li>
-                </ul>
-            </li>
-            <li role="presentation" class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                    Other <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a href="#"  data-bind="click:showReptNotCheckedIn">Not checked in</a></li>
-                    <li><a href="#"  data-bind="click:showReptDropIns">Drop-in</a></li>
                 </ul>
             </li>
             <li role="presentation" >
@@ -73,7 +63,6 @@
 </div>
 
 <div class="row" data-bind="visible:selectedReport()=='attendersByArrival'"><div class="col-md-12">Work in progress, report:attendersByArrival    </div></div>
-<div class="row" data-bind="visible:selectedReport()=='attenderNotes'"><div class="col-md-12">Work in progress, report:notCheckedIn    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='paymentsReceived'"><div class="col-md-12">Work in progress, report:paymentsReceived    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='miscCounts'"><div class="col-md-12">Work in progress, report:miscCounts    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='financialAid'"><div class="col-md-12">Work in progress, report:financialAid    </div></div>
