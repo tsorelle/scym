@@ -176,6 +176,8 @@ module Tops {
 
         handleEvent = (eventName:string, data:any = null )=> {
             var me = this;
+            // pass down to admim view model
+            me.owner.handleEvent(eventName,data);
         };
     }
 

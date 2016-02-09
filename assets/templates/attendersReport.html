@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <div id="attenders-options-header" class="row hidden-print" style="margin-bottom: 10px">
 
-            <div class="col-md-3" style="padding-bottom:2px">
+            <div class="col-md-2" style="padding-bottom:2px">
                 <!-- sort -->
                 <label style="width:50px">Sort: </label>
                 <select data-bind="options: sortOrder.options,
@@ -41,51 +41,245 @@
                 </div>
 
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <h3 data-bind="text:tableHeader">Attenders</h3>
-                <div id="attenders-table">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Generation</th>
-                            <th>Affiliation</th>
-                            <th>First time?</th>
-                            <th>Arrival</th>
-                            <th>Checked in?</th>
-                            <th>Role</th>
-                            <th>Housing</th>
-                            <th>Notes</th>
-                        </tr>
-                        </thead>
-                        <tbody data-bind="foreach:attenderList">
-                        <tr>
-                            <td >
-                                <span data-bind="text:AttenderName"></span>
-                                 <a class="btn btn-sm hidden-print" title="Open registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode + '&aid=' + attenderId}"><span class="glyphicon glyphicon-search"></span></a>
-                            </td>
-                            <td data-bind="text:Generation"></td>
-                            <td data-bind="text:Affiliation"></td>
-                            <td data-bind="text:FirstTimeAttender"></td>
-                            <td data-bind="text:Arrival"></td>
-                            <td data-bind="text:CheckedIn"></td>
-                            <td data-bind="text:Role"></td>
-                            <td data-bind="text:housing"></td>
-                            <td>
-                                <span data-bind="visible:notes">
-                                    <a href="#" data-bind="click:$parent.showAttenderNotes"><span class="glyphicon glyphicon-info-sign"></span> Notes</a>
-                                </span>
-                            </td>
+            <div class="col-md-2">
+                <!-- first timers -->
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" data-bind="checked:showNotes">  Show notes
+                    </label>
+                </div>
 
-                        </tr>
-                        </tbody>
-                    </table>
-                    <div>* Housing marked with * may be different after the first night. </div>
+            </div>
+        </div>
+
+        <div data-bind="visible:!showNotes()">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 data-bind="text:tableHeader">Attenders</h3>
+                </div>
+            </div>
+            <div id="attenders-table" class="row  hidden-xs hidden-print">
+                <div class="col-md-12">
+                    <div>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Generation</th>
+                                <th>Affiliation</th>
+                                <th>First time?</th>
+                                <th>Arrival</th>
+                                <th>Checked in?</th>
+                                <th>Role</th>
+                                <th colspan="2">Housing</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                            </thead>
+                            <tbody data-bind="foreach:attenderList">
+                            <tr>
+                                <td >
+                                    <span data-bind="text:AttenderName"></span>
+                                     <a class="btn btn-sm hidden-print" title="Open registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode + '&aid=' + attenderId}"><span class="glyphicon glyphicon-search"></span></a>
+                                </td>
+                                <td data-bind="text:Generation"></td>
+                                <td data-bind="text:Affiliation"></td>
+                                <td data-bind="text:FirstTimeAttender"></td>
+                                <td data-bind="text:Arrival"></td>
+                                <td data-bind="text:CheckedIn"></td>
+                                <td data-bind="text:Role"></td>
+                                <td>
+                                    <span data-bind="text:housing"></span>
+                                </td>
+                                <td>
+                                    <button data-bind="click:$parent.showHousingAssignments" title="Change housing assignments" class="btn btn-sm"><span class="glyphicon glyphicon-bed"></span></button>
+                                </td>
+                                <td style="white-space: nowrap">
+                                    <span data-bind="visible:notes">
+                                        <a href="#" data-bind="click:$parent.showAttenderNotes"><span class="glyphicon glyphicon-info-sign"></span> Notes</a>
+                                    </span>
+
+
+                                </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div>* Housing marked with * may be different after the first night. </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="attenders-print" class="row visible-print-block">
+                <div class="col-md-12">
+                    <div>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Generation</th>
+                                <th>Affiliation</th>
+                                <th>First time?</th>
+                                <th>Arrival</th>
+                                <th>Checked in?</th>
+                                <th>Role</th>
+                                <th>Housing</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                            </thead>
+                            <tbody data-bind="foreach:attenderList">
+                            <tr>
+                                <td >
+                                    <span data-bind="text:AttenderName"></span>
+                                </td>
+                                <td data-bind="text:Generation"></td>
+                                <td data-bind="text:Affiliation"></td>
+                                <td data-bind="text:FirstTimeAttender"></td>
+                                <td data-bind="text:Arrival"></td>
+                                <td data-bind="text:CheckedIn"></td>
+                                <td data-bind="text:Role"></td>
+                                <td>
+                                    <span data-bind="text:housing"></span>
+                                </td>
+                                <td style="white-space: nowrap">
+                                    <span data-bind="visible:notes">
+                                        Has notes
+                                    </span>
+                                </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div>* Housing marked with * may be different after the first night. </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="attenders-xs" class="hidden-md hidden-sm hidden-lg hidden-print">
+                <div class="row" data-bind="foreach:attenderList">
+                    <div class="col-md-12">
+                        <div class="row" style="margin-top:10px; padding-top: 5px; border-top:1px solid firebrick">
+                            <div class="col-xs-4">
+                                <label>Name</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:AttenderName"></span>
+                                <a class="btn btn-sm hidden-print" title="Open registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode + '&aid=' + attenderId}"><span class="glyphicon glyphicon-search"></span></a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <label>Generation</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:Generation"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <label>Meeting or affiliation: </label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:Affiliation"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <label>First time? </label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:FirstTimeAttender"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <label>Arrival</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:Arrival"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <label style="white-space: nowrap">Checked in?</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:CheckedIn"></span>
+                            </div>
+                        </div>
+                        <div class="row" data-bind="visible:Role">
+                            <div class="col-xs-4">
+                                <label>Role: </label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:Role"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <label>Housing: </label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:housing"></span>
+                                <button data-bind="click:$parent.showHousingAssignments" title="Change housing assignments" class="btn btn-sm"><span class="glyphicon glyphicon-bed"></span></button>
+                            </div>
+                        </div>
+                        <div class="row"  data-bind="visible:notes" >
+                            <div class="col-xs-4">
+                                <label>Notes: </label>
+                            </div>
+                            <div class="col-xs-8">
+                                <a href="#" data-bind="click:$parent.showAttenderNotes"><span class="glyphicon glyphicon-info-sign"></span>View notes</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <div data-bind="visible:showNotes">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 data-bind="text:notesHeader">Notes for attenders</h3>
+                </div>
+            </div>
+
+            <div class="row" data-bind="foreach:notesView">
+                <div class="col-md-12" style="margin-top:10px; padding-top: 5px; border-top:1px solid firebrick">
+                    <div class="row" >
+                        <div class="col-md-12">
+                            <label>Name:</label> <span data-bind="text:AttenderName"></span>
+                            <a class="btn btn-sm hidden-print" title="Open registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode + '&aid=' + attenderId}"><span class="glyphicon glyphicon-search"></span></a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>Meeting or affiliation: </label>
+                            <span data-bind="text:Affiliation"></span>
+                        </div>
+                    </div>
+                    <div class="row" data-bind="visible:Role">
+                        <div class="col-md-12">
+                            <label>Role: </label>
+                            <span data-bind="text:Role"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>Housing: </label>
+                            <span data-bind="text:housing"></span>
+                            <button data-bind="click:$parent.showHousingAssignments" title="Change housing assignments" class="btn btn-sm hidden-print"><span class="glyphicon glyphicon-bed"></span></button>
+                        </div>
+                    </div>
+                    <div class="row"  >
+                        <div class="col-md-12">
+                            <label>Notes: </label>
+                            <div data-bind="text:notes"></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
     <div class="modal" id="attender-report-notes-modal">
         <div class="modal-dialog">

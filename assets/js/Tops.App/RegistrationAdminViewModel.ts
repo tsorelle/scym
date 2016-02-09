@@ -246,6 +246,20 @@ module Tops {
                 case 'registrationchanged' :
                     me.registrationChanged = true;
                     break;
+                case 'housingassignmentsrequested' :
+                    if (me.selectedRegistrationId() == data) {
+                        me.currentForm('housing-assignments');
+                    }
+                    else {
+                        me.registrationDashboardVm.getRegistration(data, 'registrationhousingloaded');
+                        me.registrationChanged = false;
+                    }
+                    break;
+                case 'registrationhousingloaded' :
+                    me.registrationChanged = false;
+                    me.selectedRegistrationId(data);
+                    me.showHousingAssignmentsForm();
+                    break;
             }
         };
 

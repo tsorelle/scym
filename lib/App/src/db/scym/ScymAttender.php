@@ -116,7 +116,7 @@ class ScymAttender extends DateStampedEntity implements IAttenderCostInfo
     /**
      * @var string
      *
-     * @Column(name="otherAffiliation", type="string", length=30, nullable=true)
+     * @Column(name="otherAffiliation", type="string", length=150, nullable=true)
      */
     private $otherAffiliation;
 

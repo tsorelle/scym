@@ -88,14 +88,23 @@ module Tops {
             me.getRegistration(me.registrationId());
         }
 
-        public getRegistration(registrationId: any) {
+        public getRegistrationHousing(registrationId) {
+            var me = this;
+            me.getRegistration(registrationId,'registrationhousingloaded');
+        }
+
+
+        public getRegistration(registrationId: any, nextEvent: string = 'registrationdashboardloaded') {
             var me = this;
             me.application.hideServiceMessages();
             me.application.showWaiter('Getting the registration...');
 
-            var request = registrationId;
-            me.peanut.executeService('registration.GetRegistrationDashboard',request, me.handleGetRegistrationResponse)
-             .always(function() {
+            me.peanut.executeService('registration.GetRegistrationDashboard',registrationId,
+                function (serviceResponse:IServiceResponse) {
+                    if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                        me.loadRegistrationResponse(<IRegistrationDashboardResponse>serviceResponse.Value,nextEvent);
+                    }
+                }).always(function() {
                  me.application.hideWaiter();
              });
         }
@@ -153,59 +162,52 @@ module Tops {
             me.owner.handleEvent('dashboardclosed');
         };
 
-        private handleGetRegistrationResponse = (serviceResponse: IServiceResponse) => {
+        private loadRegistrationResponse(response : IRegistrationDashboardResponse, nextEvent: string) {
             var me = this;
-            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var response = <IRegistrationDashboardResponse>serviceResponse.Value;
-                var me = this;
-                var response = <IRegistrationDashboardResponse>serviceResponse.Value;
-                var isRefresh = me.isRefreshLoad;
-                me.isRefreshLoad = false;
-                me.owner.getRegistrationContext(
-                    function(context: IRegistrationContext) {
-                        var today = me.testing ? today = new Date('2016-3-29') : new Date();
-                        var ymStart = new Date(context.sessionInfo.startDate);
-                        me.checkinEnabled(today >= ymStart );
-                        me.paymentForm.clear();
-                        me.registrationId(response.registrationId);
-                        me.registration.name(response.name);
-                        me.registration.address(response.address);
-                        me.registration.city(response.city);
-                        me.registration.phone(response.phone);
-                        me.registration.email(response.email);
-                        me.registration.notes(response.notes);
-                        me.registration.registrationCode(response.registrationCode);
-                        me.registration.status(response.status);
-                        me.registration.statusText(response.statusText);
-                        me.registration.balanceDue(response.balanceDue);
-                        me.registration.housingAssignment(response.housingAssignment);
+            var isRefresh = me.isRefreshLoad;
+            me.isRefreshLoad = false;
+            me.owner.getRegistrationContext(
+                function(context: IRegistrationContext) {
+                    var today = me.testing ? today = new Date('2016-3-29') : new Date();
+                    var ymStart = new Date(context.sessionInfo.startDate);
+                    me.checkinEnabled(today >= ymStart );
+                    me.paymentForm.clear();
+                    me.registrationId(response.registrationId);
+                    me.registration.name(response.name);
+                    me.registration.address(response.address);
+                    me.registration.city(response.city);
+                    me.registration.phone(response.phone);
+                    me.registration.email(response.email);
+                    me.registration.notes(response.notes);
+                    me.registration.registrationCode(response.registrationCode);
+                    me.registration.status(response.status);
+                    me.registration.statusText(response.statusText);
+                    me.registration.balanceDue(response.balanceDue);
+                    me.registration.housingAssignment(response.housingAssignment);
 
-                        if (!response.balanceDue) {
-                            me.registration.balance('Paid in full');
-                        }
-                        else {
-                            me.registration.balance('$' + response.balanceDue);
-                        }
-
-                        me.unCheckedCount = response.attenders.length;
-                        _.each(response.attenders, function (attender:IAttenderCheckListItem) {
-                            attender.arrived = (attender.arrived == 'Yes' || attender.arrived == true);
-                            if (attender.arrived) {
-                                me.unCheckedCount = -1;
-                            }
-                        });
-
-                        me.attenders(response.attenders);
-                        me.changed(false);
-                        if (!isRefresh) {
-                            me.owner.handleEvent('registrationdashboardloaded', response.registrationId);
-                        }
+                    if (!response.balanceDue) {
+                        me.registration.balance('Paid in full');
                     }
-                );
-            }
-        };
+                    else {
+                        me.registration.balance('$' + response.balanceDue);
+                    }
 
+                    me.unCheckedCount = response.attenders.length;
+                    _.each(response.attenders, function (attender:IAttenderCheckListItem) {
+                        attender.arrived = (attender.arrived == 'Yes' || attender.arrived == true);
+                        if (attender.arrived) {
+                            me.unCheckedCount = -1;
+                        }
+                    });
 
+                    me.attenders(response.attenders);
+                    me.changed(false);
+                    if (!isRefresh) {
+                        me.owner.handleEvent(nextEvent, response.registrationId);
+                    }
+                }
+            );
+        }
 
         showAttenderDetails = (attender : IAttenderCheckListItem) => {
             var me = this;

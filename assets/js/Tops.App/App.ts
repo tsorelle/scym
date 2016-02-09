@@ -22,6 +22,7 @@ module Tops {
         private static waitDialog : any = null;
         private static waiterType : string = 'spin-waiter';
         private static templates = Array<string>();
+        private static visible = false;
 
         public static addTemplate(templateName: string, content: string) {
             waitMessage.templates[templateName] = content;
@@ -35,10 +36,16 @@ module Tops {
         }
 
         public static show(message: string = 'Please wait ...', waiterType : string = 'spin-waiter') {
-            var div = waitMessage.setWaiterType(waiterType);
-            var span =  div.find('#wait-message');
-            span.text(message);
-            div.modal();
+            if (waitMessage.visible) {
+                waitMessage.setMessage(message);
+            }
+            else   {
+                var div = waitMessage.setWaiterType(waiterType);
+                var span = div.find('#wait-message');
+                span.text(message);
+                div.modal();
+                waitMessage.visible = true;
+            }
         }
 
         public static setMessage(message: string) {
@@ -60,8 +67,9 @@ module Tops {
         }
 
         public static hide() {
-            if (waitMessage.waitDialog) {
+            if (waitMessage.visible && waitMessage.waitDialog) {
                 waitMessage.waitDialog.modal('hide');
+                waitMessage.visible = false;
             }
         }
     }

@@ -1,0 +1,1 @@
+ALTER TABLE attenders MODIFY COLUMN otherAffiliation VARCHAR(150) DEFAULT NULL

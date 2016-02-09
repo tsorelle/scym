@@ -47,8 +47,11 @@ module Tops {
         private reportData : IAttenderReportItem[] = [];
 
         attenderList = ko.observableArray<IAttenderReportItem>();
+        notesView = ko.observableArray<IAttenderReportItem>();
         tableHeader = ko.observable('Attenders');
+        notesHeader = ko.observable('Notes for attenders')
         firstTimersOnly = ko.observable(false);
+        showNotes = ko.observable(false);
         checkedInFilter : SelectListObservable;
         arrivalDayFilter: SelectListObservable;
         sortOrder: SelectListObservable;
@@ -107,7 +110,8 @@ module Tops {
             var anyTimers = !me.firstTimersOnly();
             var checkedInValue = me.checkedInFilter.getValue('any');
             var arrivalDayValue = me.arrivalDayFilter.getValue(0);
-
+            me.notesView([]);
+            me.attenderList([]);
             var list = [];
             if (arrivalDayValue != 0) {
                 list = _.sortBy(me.reportData,'arrivalTime');
@@ -122,7 +126,15 @@ module Tops {
                     (arrivalDayValue === 0 || (Math.floor(item.arrivalTime / 10) == arrivalDayValue)));
             });
             me.attenderList(list);
-            var header = me.firstTimersOnly() ? 'First time attenders' : 'Attenders';
+            list = _.filter(list,function(item: IAttenderReportItem) {
+                return item.notes != '';
+            });
+            me.notesView(list);
+
+
+            var headerPrefix = me.firstTimersOnly() ? 'First time attenders' : 'Attenders';
+            var headerNotesPrefix = me.firstTimersOnly() ? 'Notes for first time attenders' : 'Notes for attenders';
+            var header = ' ';
             if (arrivalDayValue != 0) {
                 header = header + ' arriving ' + me.arrivalDayFilter.getName();
             }
@@ -132,8 +144,14 @@ module Tops {
             else if (checkedInValue == 'No') {
                 header = header + ', not checked in';
             }
-            me.tableHeader(header);
+            me.tableHeader(headerPrefix + header);
+            me.notesHeader(headerNotesPrefix + header);
         }
+
+        showHousingAssignments = (item: IAttenderReportItem) => {
+            var me = this;
+            me.owner.handleEvent('housingassignmentsrequested',item.registrationId);
+        };
 
         showAttenderNotes = (item: IAttenderReportItem) => {
             var me = this;
