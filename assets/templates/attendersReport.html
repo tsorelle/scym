@@ -65,7 +65,7 @@
                             <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Generation</th>
+                                <th>Arrival</th>
                                 <th>Affiliation</th>
                                 <th>First time?</th>
                                 <th>Arrival</th>
@@ -79,7 +79,11 @@
                             <tr>
                                 <td >
                                     <span data-bind="text:AttenderName"></span>
-                                     <a class="btn btn-sm hidden-print" title="Open registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode + '&aid=' + attenderId}"><span class="glyphicon glyphicon-search"></span></a>
+                                    <span style="white-space: nowrap">
+                                    <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:$parent.lookupRegistration"><span class="glyphicon glyphicon-search"></span></a>
+                                    <a class="btn btn-sm hidden-print" title="Edit registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode + '&aid=' + attenderId}"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    </span>
+
                                 </td>
                                 <td data-bind="text:Generation"></td>
                                 <td data-bind="text:Affiliation"></td>
@@ -163,7 +167,10 @@
                             </div>
                             <div class="col-xs-8">
                                 <span data-bind="text:AttenderName"></span>
-                                <a class="btn btn-sm hidden-print" title="Open registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode + '&aid=' + attenderId}"><span class="glyphicon glyphicon-search"></span></a>
+                                    <span style="white-space: nowrap">
+                                    <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:$parent.lookupRegistration"><span class="glyphicon glyphicon-search"></span></a>
+                                    <a class="btn btn-sm hidden-print" title="Edit registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode + '&aid=' + attenderId}"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    </span>
                             </div>
                         </div>
                         <div class="row">
@@ -247,7 +254,10 @@
                     <div class="row" >
                         <div class="col-md-12">
                             <label>Name:</label> <span data-bind="text:AttenderName"></span>
-                            <a class="btn btn-sm hidden-print" title="Open registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode + '&aid=' + attenderId}"><span class="glyphicon glyphicon-search"></span></a>
+                                    <span style="white-space: nowrap">
+                                    <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:$parent.lookupRegistration"><span class="glyphicon glyphicon-search"></span></a>
+                                    <a class="btn btn-sm hidden-print" title="Edit registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode + '&aid=' + attenderId}"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    </span>
                         </div>
                     </div>
                     <div class="row">
@@ -279,7 +289,6 @@
                 </div>
             </div>
         </div>
-
     </div>
     <div class="modal" id="attender-report-notes-modal">
         <div class="modal-dialog">

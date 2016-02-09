@@ -48,7 +48,10 @@
                             <tr>
                                 <td>
                                     <span style="padding-right: 10px" data-bind="text:name"></span>
-                                    <a class="btn btn-sm hidden-print" title="Open registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode}"><span class="glyphicon glyphicon-search"></span></a>
+                                    <span style="white-space: nowrap">
+                                    <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:$parent.lookupRegistration"><span class="glyphicon glyphicon-search"></span></a>
+                                    <a class="btn btn-sm hidden-print" title="Edit registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode}"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    </span>
                                 </td>
                                 <td data-bind="text:attenders"></td>
                                 <td data-bind="text:confirmed"></td>
@@ -96,7 +99,10 @@
                             </div>
                             <div class="col-xs-8">
                                 <span data-bind="text:name"></span>
-                                <a class="btn btn-sm hidden-print" title="Open registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode}"><span class="glyphicon glyphicon-search"></span></a>
+                                    <span style="white-space: nowrap">
+                                    <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:$parent.lookupRegistration"><span class="glyphicon glyphicon-search"></span></a>
+                                    <a class="btn btn-sm hidden-print" title="Edit registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode}"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    </span>
                             </div>
                         </div>
                         <div class="row">

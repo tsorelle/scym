@@ -9,6 +9,7 @@
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />
 /// <reference path='../Tops.App/Registration.d.ts' />
 ///<reference path="attendersReportComponent.ts"/>
+///<reference path="arrivalsReportComponent.ts"/>
 
 /**
  * Created by Terry on 1/4/2016.
@@ -121,17 +122,13 @@ module Tops {
                 });
         };
 
-
         showReptAttendersByArrival      = () => {
             var me=this;
-            me.loadReport('attendersByArrival','not-implemented',function(reportName: string) {return null;});
+            me.loadReport('attendersByArrival','arrivals-report',
+                function(reportName: string) {
+                    return new arrivalsReportComponent(me.application,me,reportName);
+                });
         };
-
-        showReptNotCheckedIn            = () => {
-            var me=this;
-            me.loadReport('notCheckedIn','not-implemented',function() {return null;});
-        };
-
 
         showReptPaymentsReceived        = () => {
             var me=this;

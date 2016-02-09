@@ -84,6 +84,11 @@ module Tops {
             me.currentFilter = value;
         };
 
+        lookupRegistration = (item: any) => {
+            var me = this;
+            me.owner.handleEvent('registrationselected',item.registrationId);
+        };
+
         initialize = (data: any) => {
             var me = this;
 

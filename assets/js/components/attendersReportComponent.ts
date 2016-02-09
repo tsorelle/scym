@@ -88,6 +88,12 @@ module Tops {
             me.sortAndFilter();
         };
 
+        lookupRegistration =  (item: IAttenderReportItem) => {
+            var me = this;
+            me.owner.handleEvent('registrationselected', item.registrationId);
+        };
+
+
         onFirstTimersCheck = () => {
             var me = this;
             me.sortAndFilter();

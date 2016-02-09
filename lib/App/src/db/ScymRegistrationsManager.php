@@ -912,13 +912,7 @@ class ScymRegistrationsManager extends TDbServiceManager
     }
 
     public function getAttendersByArrivalReport(){
-        /* todo: implement report views */
-        return $this->getReportView('attendersByArrivalReportView',false);
-    }
-
-    public function getAttenderNotesReport(){
-        /* todo: implement report views */
-        return $this->getReportView('attenderNotesReportView',false);
+        return $this->getReportView('arrivalTimeSummaryView');
     }
 
     public function getPaymentsReceivedReport(){

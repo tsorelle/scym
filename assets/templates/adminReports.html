@@ -62,7 +62,12 @@
     </div>
 </div>
 
-<div class="row" data-bind="visible:selectedReport()=='attendersByArrival'"><div class="col-md-12">Work in progress, report:attendersByArrival    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='attendersByArrival'">
+    <div class="col-md-12">
+        <div id="arrivals-report-container"><arrivals-report></arrivals-report></div>
+    </div>
+</div>
+
 <div class="row" data-bind="visible:selectedReport()=='paymentsReceived'"><div class="col-md-12">Work in progress, report:paymentsReceived    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='miscCounts'"><div class="col-md-12">Work in progress, report:miscCounts    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='financialAid'"><div class="col-md-12">Work in progress, report:financialAid    </div></div>
