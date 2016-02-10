@@ -1,5 +1,5 @@
 ///<reference path="registrationsReportComponent.ts"/>
-///<reference path="mealCountsReportComponent.ts"/>
+///<reference path="mealcountsReportComponent.ts"/>
 ///<reference path="mealsReportComponent.ts"/>
 /// <reference path='../typings/knockout/knockout.d.ts' />
 /// <reference path='../typings/underscore/underscore.d.ts' />
@@ -103,7 +103,7 @@ module Tops {
         showReptMealCounts     = () => {
             var me=this;
             me.loadReport('mealCounts','mealcounts-report',function(reportName: string) {
-                return new mealCountsReportComponent(me.application, me, reportName);
+                return new mealcountsReportComponent(me.application, me, reportName);
             });
         };
         showReptMealRoster              = () => {

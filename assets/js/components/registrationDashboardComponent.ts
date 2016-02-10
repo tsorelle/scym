@@ -16,8 +16,9 @@ module Tops {
 
 
     export class registrationDashboardComponent implements IRegistrationComponent {
-        // todo: set this false for production
-        private testing = true;
+
+        // private testing = true; // todo: set this false for production
+        private testing = false;
 
         private application:IPeanutClient;
         private peanut:Peanut;

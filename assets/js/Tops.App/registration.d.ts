@@ -138,16 +138,75 @@ declare module Tops {
         payor : string;
     }
 
+    export interface IPaymentDisplayItem extends IPaymentItem {
+        amountFormatted: string;
+        dateAdded: any;
+        addedBy: string;
+    }
+
+    export interface IChargeItem  {
+        chargeId: any;
+        amount: number; // currency
+        registrationId: any;
+        feeTypeId: any;
+        basis: string;
+        notes: string;
+    }
+
+    export interface IChargeDisplayItem {
+        feeType : string; // lookup by feeTypeId
+        dateAdded: any;
+        addedBy: string;
+    }
+
+    export interface ICreditItem {
+        creditId: any;
+        registrationId: any;
+        description: any;
+        dateAdded: any;
+        amount: number;
+        creditTypeId: any;
+        notes: string;
+    }
+
+    export interface ICreditDisplayItem extends ICreditItem {
+        creditType : string; // lookup by creditTypeId
+        creditTypeDescription: string;
+        dateAdded: any;
+        addedBy: string;
+    }
+
+    export interface IDonationItem {
+        donationId: any;
+        registrationId: any;
+        donationTypeId: any;
+        amount: number; // currency
+        notes: string;
+    }
+    export interface IDonationDisplayItem extends IDonationItem {
+        donationType: string; // lookup of donationTypeId
+        dateAdded: any;
+        addedBy: string;
+    }
+
+    export interface IAccountLookupItem extends INameValuePair {
+        lookupType: string;
+    }
+    export interface IAccountDetails {
+        registrationId: any;
+        lookups: IAccountLookupItem[];
+        donations: IDonationDisplayItem[];
+        payments: IPaymentDisplayItem[];
+        charges: IChargeDisplayItem[];
+        credits: ICreditDisplayItem[];
+    }
+
     export interface IDataEntryForm {
         clear : ()=> void;
         validate: () => boolean;
         getValues: () => any;
+        setValues: (values: any) => void;
         getErrorMessage: () => string;
-    }
-
-    export interface IPaymentForm extends IDataEntryForm {
-        setAmount: (amount:any) => void;
-        getPayment: () => any;
     }
 
     export interface IAccountSummary {

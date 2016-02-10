@@ -31,6 +31,6 @@ CREATE VIEW attendersReportView AS
     LEFT OUTER JOIN meetings m ON (a.affiliationCode = m.affiliationCode)
     LEFT OUTER JOIN housingassignments ha ON a.attenderID = ha.attenderId
     LEFT OUTER JOIN housingunits hu ON ha.housingUnitId = hu.housingUnitId
-  GROUP BY ha.attenderId;
+  GROUP BY a.attenderId;
 
 -- SELECT * FROM attendersReportView;

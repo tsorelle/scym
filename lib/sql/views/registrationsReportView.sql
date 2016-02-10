@@ -1,6 +1,7 @@
 DROP VIEW IF EXISTS registrationsReportView;
 CREATE VIEW registrationsReportViews AS
   SELECT r.year,
+    r.registrationId,
     r.registrationCode,
     r.name,
     IF(r.confirmed = 1,'Yes','No') AS confirmed,

@@ -16,7 +16,18 @@ module Tops {
         private owner : IEventSubscriber;
 
         registrationId = ko.observable();
+        updating = ko.observable(false);
+        donations = ko.observableArray<IDonationDisplayItem>();
+        payments  = ko.observableArray<IPaymentDisplayItem>();
+        charges   = ko.observableArray<IChargeDisplayItem>();
+        credits   = ko.observableArray<ICreditDisplayItem>();
 
+        paymentForm : IDataEntryForm;
+        donationForm : IDataEntryForm;
+        chargeForm : IDataEntryForm;
+        creditForm : IDataEntryForm;
+
+        balance: any;
 
         public constructor(application:IPeanutClient, owner: IEventSubscriber = null) {
             var me = this;
@@ -25,54 +36,71 @@ module Tops {
             me.owner = owner;
         }
 
-        public initialize(finalFunction? : () => void) {
+        private prepareService(registrationId : any) {
             var me = this;
+            me.registrationId(0);
+            me.payments([]);
+            me.charges([]);
+            me.credits([]);
+            me.donations([]);
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Getting account details...');
+            return {
+                registrationId : registrationId,
+                includeLookups : false
+            };
+        }
+
+        public initialize(registrationId: any, finalFunction? : () => void) {
+            var me = this;
+            var request = me.prepareService(registrationId);
+            request.includeLookups = true;
+            me.peanut.executeService('registration.GetAccountDetails',request,function(serviceResponse: IServiceResponse) {
+                    if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                        var response = <IAccountDetails>serviceResponse.Value;
+                        me.assignAccountItems(response);
+                        me.application.loadResources([], function() {
+                           // todo: create instances and bind components
+                            if (finalFunction) {
+                                finalFunction();
+                            }
+                        });
+                    }
+                })
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+        }
+
+        private getLookup(lookups: IAccountLookupItem[], lookupType : string) {
+            return _.filter(lookups, function(item: IAccountLookupItem) {
+                return item.lookupType == lookupType;
+            });
         }
 
         getAccount(registrationId: any) {
             var me = this;
-            var request = null;
-
-            me.application.hideServiceMessages();
-            me.application.showWaiter('Message here...');
-
-
-            // fake
-            var response = me.getFakeRegistrationResponse(registrationId);
-            me.handleGetAccountResponse(response);
-            me.application.hideWaiter();
-
-            /*
-             me.peanut.executeService('directory.ServiceName',request, me.handleGetAccountResponse)
-             .always(function() {
-             me.application.hideWaiter();
-             });
-             */
-
+            var request = me.prepareService(registrationId);
+            me.peanut.executeService('registration.GetAccountDetails',request,function(serviceResponse: IServiceResponse) {
+                    if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                        var response = <IAccountDetails>serviceResponse.Value;
+                        me.assignAccountItems(response);
+                    }
+                })
+                .always(function() {
+                    me.application.hideWaiter();
+                });
         }
 
-        private handleGetAccountResponse = (serviceResponse: IServiceResponse) => {
+        assignAccountItems = (response: IAccountDetails) => {
             var me = this;
-            if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                var response = serviceResponse.Value;
-                me.registrationId(response.registrationId);
-                me.owner.handleEvent('accountloaded',response.registrationId);
-            }
+            me.registrationId(response.registrationId);
+            me.payments(response.payments);
+            me.charges(response.charges);
+            me.credits(response.credits);
+            me.donations(response.donations);
+            me.owner.handleEvent('accountloaded', response.registrationId);
         };
-
-
-        /*** fakes ***********/
-        private getFakeRegistrationResponse(registrationId: any) {
-            var response = {
-                registrationId: registrationId
-            };
-
-            return new fakeServiceResponse(response);
-        }
-
-
-
-
     }
 }
 

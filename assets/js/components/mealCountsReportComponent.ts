@@ -28,7 +28,7 @@ module Tops {
         count: any;
     }
 
-    export class mealCountsReportComponent implements IReportComponent {
+    export class mealcountsReportComponent implements IReportComponent {
         private application:IPeanutClient;
         private peanut:Peanut;
         private owner : IReportOwner;
@@ -36,7 +36,7 @@ module Tops {
 
         registeredMeals = ko.observableArray();
         attendedMeals = ko.observableArray();
-        selectedCountType = ko.observable('Requested');
+        selectedCountType = ko.observable();
 
         public constructor(application:IPeanutClient, owner: IReportOwner, name: string) {
             var me = this;
@@ -49,6 +49,7 @@ module Tops {
         initialize = (data: any) => {
             var me = this;
             me.display(data);
+            me.selectedCountType('Requested');
         };
 
 

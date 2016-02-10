@@ -1,4 +1,4 @@
-///<reference path="SelectListObservable.ts"/>
+///<reference path="selectListObservable.ts"/>
 /**
  * Created by Terry on 2/7/2016.
  */
@@ -28,8 +28,8 @@ module Tops {
 
         roster: IAttenderMealReportItem[] = [];
         attenderList = ko.observableArray();
-        dietFilter: SelectListObservable;
-        mealFilter: SelectListObservable;
+        dietFilter: selectListObservable;
+        mealFilter: selectListObservable;
         attendersOnly = ko.observable(false);
         tableHeader = ko.observable('Diners');
         dayHeader = ko.observable('Thursday dinner');
@@ -42,14 +42,14 @@ module Tops {
             me.peanut = application.peanut;
             me.owner = owner;
             me.reportName = name;
-            me.dietFilter = new SelectListObservable(
+            me.dietFilter = new selectListObservable(
                 me.onDietFilterSelected,
                 [
                     {Name: 'Vegetarian', Value: 'vegetarian'},
                     {Name: 'Gluten free', Value: 'glutenfree'}
                 ]
             );
-            me.mealFilter = new SelectListObservable(
+            me.mealFilter = new selectListObservable(
                 me.onMealFilterSelected,
                 [
                     {Name: 'Thursday dinner', Value: 43},

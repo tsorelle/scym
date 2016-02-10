@@ -30,6 +30,12 @@ module Tops {
         public initialize(finalFunction? : () => void) {
             var me = this;
         }
+
+        setValues = (values: any) => {
+            var me = this;
+            this.amount(values.amount);
+        };
+
         setAmount = (amount:any)=> {
             this.amount(amount);
         };

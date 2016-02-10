@@ -5,7 +5,7 @@
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path='../Tops.Peanut/Peanut.d.ts' />
 /// <reference path='../Tops.App/Registration.d.ts' />
-///<reference path="SelectListObservable.ts"/>
+///<reference path="selectListObservable.ts"/>
 /**
  * Created by Terry on 2/8/2016.
  */
@@ -52,9 +52,9 @@ module Tops {
         notesHeader = ko.observable('Notes for attenders')
         firstTimersOnly = ko.observable(false);
         showNotes = ko.observable(false);
-        checkedInFilter : SelectListObservable;
-        arrivalDayFilter: SelectListObservable;
-        sortOrder: SelectListObservable;
+        checkedInFilter : selectListObservable;
+        arrivalDayFilter: selectListObservable;
+        sortOrder: selectListObservable;
         attenderForm = {
             name: ko.observable(''),
             notes: ko.observable('')
@@ -67,16 +67,16 @@ module Tops {
             me.owner = owner;
             me.reportName = name;
 
-            me.checkedInFilter = new SelectListObservable(me.onCheckedInFilterSelected,[
+            me.checkedInFilter = new selectListObservable(me.onCheckedInFilterSelected,[
                 {Name: 'Checked in', Value: 'Yes'},
                 {Name: 'Not checked in', Value: 'No'}
             ]);
-            me.arrivalDayFilter = new SelectListObservable(me.onCheckedInFilterSelected,[
+            me.arrivalDayFilter = new selectListObservable(me.onCheckedInFilterSelected,[
                 {Name: 'Thursday', Value: 4},
                 {Name: 'Friday', Value: 5},
                 {Name: 'Saturday', Value: 6}
             ]);
-            me.sortOrder = new SelectListObservable(me.onCheckedInFilterSelected,[
+            me.sortOrder = new selectListObservable(me.onCheckedInFilterSelected,[
                 {Name: 'Name', Value: 'AttenderName'},
                 {Name: 'Meeting', Value: 'Affiliation'},
                 {Name: 'Arrival time', Value: 'arrivalTime'}

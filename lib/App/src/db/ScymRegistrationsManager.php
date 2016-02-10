@@ -871,6 +871,37 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $result;
     }
 
+    public function getRegistrationItems($registrationId,$viewName) {
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM $viewName WHERE registrationId = ?";
+        $statement = $qm->executeStatement($sql,$registrationId);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
+
+    public function getView($viewName) {
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM $viewName";
+        $statement = $qm->executeStatement($sql);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
+
+    public function getAccountDetails($registrationId, $includeLookups = true) {
+        $result = new \stdClass();
+        $result->registrationId = $registrationId;
+        if ($includeLookups) {
+            $result->lookups   = $this->getView('accountLookupsView');
+        }
+        else {
+            $result->lookups   = array();
+        }
+        $result->donations = $this->getRegistrationItems($registrationId,'donationsView');
+        $result->payments  = $this->getRegistrationItems($registrationId,'paymentsView');
+        $result->charges   = $this->getRegistrationItems($registrationId,'chargesView');
+        $result->credits   = $this->getRegistrationItems($registrationId,'creditsView');
+    }
+
     public function getYouthList() {
         return $this->getReportView('youthView');
     }

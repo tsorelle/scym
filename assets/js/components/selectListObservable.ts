@@ -6,7 +6,7 @@
 /// <reference path='../typings/underscore/underscore.d.ts' />
 ///<reference path="../Tops.App/registration.d.ts"/>
 module Tops {
-    export class SelectListObservable {
+    export class selectListObservable {
         private selectHandler : (selected: INameValuePair) => void;
         private subscription : any;
         options = ko.observableArray<INameValuePair>();
