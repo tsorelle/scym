@@ -77,7 +77,7 @@ module Tops {
                     me.application.loadResources([
                             'registrationLookupComponent.js',
                             'registrationDashboardComponent.js',
-
+                            'paymentFormComponent.js'
                             // 'housingAssignmentComponent.js',
                             // 'registrationFinanceComponent.js',
                             // 'adminReportsComponent.js'
@@ -161,8 +161,7 @@ module Tops {
                         return me.registrationFinanceVm;
                     },
                     function() {
-                        // initialize
-                        me.registrationFinanceVm.getAccount(me.selectedRegistrationId());
+                        me.registrationFinanceVm.initialize(me.selectedRegistrationId());
                     }
                 );
             }
@@ -269,6 +268,7 @@ module Tops {
                 next(me.context);
             }
             else {
+                me.application.hideServiceMessages();
                 me.peanut.executeService('registration.GetSessionInfo',null,
                     function(serviceResponse: IServiceResponse) {
                         if (serviceResponse.Result == Peanut.serviceResultSuccess) {
@@ -278,6 +278,10 @@ module Tops {
                         else {
                             next(null);
                         }
+                    }
+                ).fail(
+                    function() {
+                        me.application.hideWaiter();
                     }
                 )
             }

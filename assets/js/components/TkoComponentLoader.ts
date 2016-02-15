@@ -43,6 +43,21 @@ module Tops {
             return (componentName in me.components)
         }
 
+        // load component template, register to component name and vm instance
+        public loadComponentTemplate(componentName: string, htmlFileName: string, vmInstance: any, finalFunction : () => void ) {
+            var me = this;
+            var htmlPath = me.applicationPath + me.htmlPath + '/' + htmlFileName + '.html';
+            jQuery.get(htmlPath, function (htmlSource:string) {
+                ko.components.register(componentName, {
+                    viewModel: vmInstance,
+                    template: htmlSource
+                });
+                if (finalFunction) {
+                    finalFunction();
+                }
+            });
+        }
+
         // load component source and template, create instance and register
         public load(componentName: string, finalFunction : () => void ) {
             var me = this;
@@ -122,6 +137,8 @@ module Tops {
                 });
             });
         }
+
+
     }
 }
 

@@ -403,7 +403,7 @@ class ScymRegistrationsManager extends TDbServiceManager
     public function deleteAttender(ScymRegistration $registration, $attenderId) {
         $em = $this->getEntityManager();
         $attender = $registration->removeAttenderById($attenderId);
-        $em->remove($attenderId);
+        $em->remove($attender);
     }
 
     public function deleteRegistration(ScymRegistration $registration) {
@@ -550,6 +550,17 @@ class ScymRegistrationsManager extends TDbServiceManager
         return TQueryManager::getInstance();
     }
 
+
+    public function getRegistrationIdentity($registrationId) {
+        $qm = TQueryManager::getInstance();
+        $sql =
+            "SELECT registrationId, registrationCode, name AS registrationName, statusId ".
+            "FROM registrations r WHERE registrationId = ?";
+        $statement = $qm->executeStatement($sql,$registrationId);
+        $result = $statement->fetch(PDO::FETCH_OBJ);
+        return $result;
+    }
+
     public function getRegistrationCount() {
         $qm = TQueryManager::getInstance();
         $sql =
@@ -638,6 +649,11 @@ class ScymRegistrationsManager extends TDbServiceManager
                 $em->remove($youth);
             }
         }
+    }
+
+    public function removeEntity($entity) {
+        $em = $this->getEntityManager();
+        $em->remove($entity);
     }
 
     public function checkYouthRecord(ScymAttender $attender)
@@ -891,6 +907,9 @@ class ScymRegistrationsManager extends TDbServiceManager
         $result = new \stdClass();
         $result->registrationId = $registrationId;
         if ($includeLookups) {
+            $registration = $this->getRegistrationIdentity($registrationId);
+            $result->registrationName = $registration->registrationName;
+            $result->registrationCode = $registration->registrationCode;
             $result->lookups   = $this->getView('accountLookupsView');
         }
         else {
@@ -900,6 +919,7 @@ class ScymRegistrationsManager extends TDbServiceManager
         $result->payments  = $this->getRegistrationItems($registrationId,'paymentsView');
         $result->charges   = $this->getRegistrationItems($registrationId,'chargesView');
         $result->credits   = $this->getRegistrationItems($registrationId,'creditsView');
+        return $result;
     }
 
     public function getYouthList() {

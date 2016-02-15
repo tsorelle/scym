@@ -16,9 +16,8 @@ module Tops {
 
 
     export class registrationDashboardComponent implements IRegistrationComponent {
-
-        // private testing = true; // todo: set this false for production
-        private testing = false;
+        // todo: set this false for production
+        private testing = true;
 
         private application:IPeanutClient;
         private peanut:Peanut;
@@ -77,11 +76,10 @@ module Tops {
             var me = this;
             me.application.loadResources('paymentFormComponent.js',function() {
                 me.paymentForm = new paymentFormComponent();
+                // binding is done as part of general section
                 me.application.registerComponent('payment-form',me.paymentForm,finalFunction);
             });
         }
-
-
 
         public refresh() {
             var me = this;
@@ -105,7 +103,10 @@ module Tops {
                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                         me.loadRegistrationResponse(<IRegistrationDashboardResponse>serviceResponse.Value,nextEvent);
                     }
-                }).always(function() {
+                    else {
+                        me.application.hideWaiter();
+                    }
+                }).fail(function() {
                  me.application.hideWaiter();
              });
         }
@@ -203,6 +204,7 @@ module Tops {
 
                     me.attenders(response.attenders);
                     me.changed(false);
+                    me.application.hideWaiter();
                     if (!isRefresh) {
                         me.owner.handleEvent(nextEvent, response.registrationId);
                     }

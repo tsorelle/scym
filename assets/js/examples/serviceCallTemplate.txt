@@ -28,6 +28,8 @@
 
 
 // single statement example
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Message here...');
             me.peanut.executeService('directory.ServiceName',request,
                     function(serviceResponse: IServiceResponse) {
                         if (serviceResponse.Result == Peanut.serviceResultSuccess) {

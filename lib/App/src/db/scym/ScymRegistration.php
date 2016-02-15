@@ -48,6 +48,59 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         return null;
     }
 
+    public function findPayment($id) {
+        $payments = $this->getPayments();
+        foreach ($payments as $payment) {
+            /**
+             * @var $payment ScymPayment
+             */
+            if ($payment->getPaymentId() == $id) {
+                return $payment;
+            }
+        }
+        return null;
+    }
+
+    public function findCredit($id) {
+        $credits = $this->getCredits();
+        foreach ($credits as $credit) {
+            /**
+             * @var $attender ScymCredit
+             */
+            if ($credit->getCreditId() == $id) {
+                return $credit;
+            }
+        }
+        return null;
+    }
+
+    public function findCharge($id) {
+        $charges = $this->getCharges();
+        foreach ($charges as $charge) {
+            /**
+             * @var $charge ScymCharge
+             */
+            if ($charge->getChargeId() == $id) {
+                return $charge;
+            }
+        }
+        return null;
+    }
+
+    public function findDonation($id) {
+        $donations = $this->getDonations();
+        foreach ($donations as $donation) {
+            /**
+             * @var $donation ScymDonation
+             */
+            if ($donation->getDonationId() == $id) {
+                return $donation;
+            }
+        }
+        return null;
+    }
+
+
     public function removeAttenderById($id) {
         $attender = $this->findAttender($id);
         if ($attender) {
@@ -55,6 +108,38 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         }
         return $attender;
     }
+
+    public function removePaymentById($id) {
+        $payment = $this->findPayment($id);
+        if ($payment) {
+            $this->payments->removeElement($payment);
+        }
+        return $payment;
+    }
+
+    public function removeChargeById($id) {
+        $charge = $this->findCharge($id);
+        if ($charge) {
+            $this->charges->removeElement($charge);
+        }
+        return $charge;
+    }
+    public function removeCreditById($id) {
+        $credit = $this->findCredit($id);
+        if ($credit) {
+            $this->credits->removeElement($credit);
+        }
+        return $credit;
+    }
+
+    public function removeDonationById($id) {
+        $donation = $this->findDonation($id);
+        if ($donation) {
+            $this->donations->removeElement($donation);
+        }
+        return $donation;
+    }
+
 
     public function removeAccountItems() {
         $removed = array();

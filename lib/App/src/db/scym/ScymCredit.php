@@ -64,13 +64,6 @@ class ScymCredit extends DateStampedEntity implements ICostItem
     /**
      * @var string
      *
-     * @Column(name="description", type="string", length=50, nullable=true)
-     */
-    private $description;
-
-    /**
-     * @var string
-     *
      * @Column(name="amount", type="decimal", precision=10, scale=2, nullable=true)
      */
     private $amount;
@@ -78,9 +71,16 @@ class ScymCredit extends DateStampedEntity implements ICostItem
     /**
      * @var string
      *
-     * @Column(name="notes", type="string", length=100, nullable=true)
+     * @Column(name="notes", type="string", length=200, nullable=true)
      */
     private $notes;
+
+    /**
+     * @var string
+     *
+     * @Column(name="description", type="string", length=50, nullable=true)
+     */
+    private $description;
 
     /**
      * @var integer
@@ -98,29 +98,6 @@ class ScymCredit extends DateStampedEntity implements ICostItem
     public function getCreditid()
     {
         return $this->creditid;
-    }
-
-    /**
-     * Set description
-     *
-     * @param string $description
-     * @return ScymCredit
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * Get description
-     *
-     * @return string 
-     */
-    public function getDescription()
-    {
-        return $this->description;
     }
 
     /**
@@ -170,6 +147,29 @@ class ScymCredit extends DateStampedEntity implements ICostItem
     }
 
     /**
+     * Set description
+     *
+     * @param string $description
+     * @return ScymCredit
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * Get description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
      * Set credittypeid
      *
      * @param integer $credittypeid
@@ -194,20 +194,37 @@ class ScymCredit extends DateStampedEntity implements ICostItem
 
     /**
      * @param $amount
-     * @param $description
+     * @param $note
      * @param $creditTypeId
      * @return ScymCredit
      *
      * Create new credit instance.
      */
-    public static function newCredit($amount,$description,$creditTypeId,$note=null) {
+    public static function newCredit($amount,$description,$creditTypeId,$notes=null) {
         $result = new ScymCredit();
         $result->setAmount($amount);
         $result->setDescription($description);
         $result->setCredittypeid($creditTypeId);
-        if (!empty($note)) {
-            $result->setNotes($note);
+        if (!empty($notes)) {
+            $result->setNotes($notes);
         }
         return $result;
+    }
+    
+    public static function CreateCredit($dto) {
+        $amount = isset($dto->amount) ? $dto->amount : null;
+        if(empty($amount)) {
+            return null;
+        }
+        $creditTypeId = isset($dto->creditTypeId) ? $dto->creditTypeId : null;
+        if (empty($creditTypeId)) {
+            return null;
+        }
+        $description = isset($dto->description) ? $dto->description : null;
+        if (empty($description)) {
+            return null;
+        }
+        $notes = isset($dto->notes) ? $dto->notes : null;
+        return ScymCredit::newCredit($amount,$description,$creditTypeId,$notes);
     }
 }

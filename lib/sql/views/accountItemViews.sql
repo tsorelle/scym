@@ -1,7 +1,8 @@
 CREATE OR REPLACE VIEW chargesView AS
   SELECT
     c.registrationId,
-    c.chargeId,
+    c.chargeId AS id,
+    'charge' AS itemType,
     c.amount,
     c.feeTypeID AS feeTypeId,
     c.basis,
@@ -15,12 +16,14 @@ CREATE OR REPLACE VIEW chargesView AS
 CREATE OR REPLACE VIEW paymentsView AS
   SELECT
     p.registrationId,
-    p.paymentId,
+    p.paymentId AS id,
+    'payment' AS itemType,
     p.amount,
     FormatUSD(p.amount,'') AS amountFormatted,
     DisplayMediumDate(p.dateReceived,'') AS dateReceived,
     p.checkNumber,
     p.payor,
+    IFNULL(p.notes,'') AS notes,
     IFNULL(p.addedBy,'(unknown)') AS addedBy,
     DisplayMediumDate(p.dateAdded,'') AS dateAdded
   FROM payments p;
@@ -28,7 +31,8 @@ CREATE OR REPLACE VIEW paymentsView AS
 CREATE OR REPLACE VIEW creditsView AS
   SELECT
     c.registrationId,
-    c.creditId,
+    c.creditId AS id,
+    'credit' AS itemType,
     c.description,
     c.amount,
     c.creditTypeId,
@@ -43,11 +47,12 @@ CREATE OR REPLACE VIEW creditsView AS
 CREATE OR REPLACE VIEW donationsView AS
   SELECT
     d.registrationId,
-    d.donationId,
+    d.donationId AS id,
+    'donation' AS itemType,
     d.donationTypeId,
     d.amount,
     dt.fundName AS donationType,
-    IFNULL(d.note,'') AS notes,
+    IFNULL(d.notes,'') AS notes,
     FormatUSD(d.amount,'') AS amountFormatted,
     IFNULL(d.addedBy,'(unknown)') AS addedBy,
     DisplayMediumDate(d.dateAdded,'') AS dateAdded

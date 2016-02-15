@@ -78,9 +78,9 @@ class ScymDonation extends DateStampedEntity implements IDonationInfo
     /**
      * @var string
      *
-     * @Column(name="note", type="string", length=100, nullable=true)
+     * @Column(name="notes", type="string", length=200, nullable=true)
      */
-    private $note;
+    private $notes;
 
 
     /**
@@ -140,26 +140,26 @@ class ScymDonation extends DateStampedEntity implements IDonationInfo
     }
 
     /**
-     * Set note
+     * Set notes
      *
-     * @param string $note
+     * @param string $notes
      * @return ScymDonation
      */
-    public function setNote($note)
+    public function setNotes($notes)
     {
-        $this->note = $note;
+        $this->notes = $notes;
 
         return $this;
     }
 
     /**
-     * Get note
+     * Get notes
      *
      * @return string 
      */
-    public function getNote()
+    public function getNotes()
     {
-        return $this->note;
+        return $this->notes;
     }
 
     public static function createDonation($donationTypeId,$amount,$note = null)
@@ -167,9 +167,21 @@ class ScymDonation extends DateStampedEntity implements IDonationInfo
         $result = new ScymDonation();
         $result->setDonationtypeid($donationTypeId);
         $result->setAmount($amount);
-        if (!empty($note)) {
-            $result->setNote($note);
+        if (!empty($notes)) {
+            $result->setNotes($notes);
         }
         return $result;
+    }
+    public static function Create($dto) {
+        $amount = isset($dto->amount) ? $dto->amount : null;
+        if(empty($amount)) {
+            return null;
+        }
+        $donationTypeId = isset($dto->donationTypeId) ? $dto->donationTypeId : null;
+        if (empty($donationTypeId)) {
+            return null;
+        }
+        $note = isset($dto->notes) ? $dto->notes : null;
+        return self::createDonation($donationTypeId,$amount,$note);
     }
 }

@@ -85,7 +85,7 @@ class ScymCharge extends DateStampedEntity implements ICostItem
     /**
      * @var string
      *
-     * @Column(name="notes", type="string", length=100, nullable=true)
+     * @Column(name="notes", type="string", length=200, nullable=true)
      */
     private $notes;
 
@@ -200,12 +200,32 @@ class ScymCharge extends DateStampedEntity implements ICostItem
      *
      * Create new charge object
      */
-    public static function newCharge($amount,$basis,$feeTypeId)
+    public static function newCharge($amount,$basis,$feeTypeId,$notes = null)
     {
         $result = new ScymCharge();
         $result->setAmount($amount);
         $result->setBasis($basis);
         $result->setFeetypeid($feeTypeId);
+        $result->setNotes($notes);
         return $result;
+    }
+    
+    public static function CreateCharge($dto) {
+        $amount = isset($dto->amount) ? $dto->amount : null;
+        if(empty($amount)) {
+            return null;
+        }
+        $feeTypeId = isset($dto->feeTypeId) ? $dto->feeTypeId : null;
+        if (empty($feeTypeId)) {
+            return null;
+        }
+        $basis = isset($dto->basis) ? $dto->basis : null;
+        if (empty($basis)) {
+            return null;
+        }
+        $notes = isset($dto->notes) ? $dto->notes : null;
+
+        return ScymCharge::newCharge($amount,$basis,$feeTypeId,$notes);
+
     }
 }

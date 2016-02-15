@@ -1,0 +1,59 @@
+<div class="form-group" data-bind="visible:visible,css:{'has-error': errorMessage}"  style="margin-bottom: 6px">
+    <fieldset>
+        <legend>
+            New Credit
+        </legend>
+        <div class="row">
+            <div class="col-md-12">
+                <div data-bind="visible:errorMessage">
+                    <span class="error-label" data-bind="text:errorMessage"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="control-label">
+                        Type
+                    </label>
+                    <select  class="form-control" data-bind="options: creditTypes.options,
+                           optionsText: 'Name',
+                           value: creditTypes.selected,
+                           optionsCaption: '-- Select credit type --'"></select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="control-label">
+                            Description
+                    </label>
+                    <input class="form-control" data-bind="value:description"/>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label">
+                        Amount
+                    </label>
+                    <input class="form-control" data-bind="value:amount"/>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="control-label">
+                        Note
+                    </label>
+                    <input class="form-control" data-bind="value:notes"/>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-primary btn-sm" style="margin-right:5px" data-bind="click:save">Save</button>
+                <button class="btn btn-default btn-sm" data-bind="click:cancel">Cancel</button>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+

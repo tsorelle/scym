@@ -58,6 +58,14 @@ class ScymPayment extends DateStampedEntity implements ICostItem
     private $payor;
 
     /**
+     * @var string
+     *
+     * @Column(name="notes", type="string", length=200, nullable=true)
+     */
+    private $notes;
+
+
+    /**
      * @var ScymRegistration
      *
      * @ManyToOne(targetEntity="ScymRegistration",inversedBy="payments")
@@ -220,6 +228,31 @@ class ScymPayment extends DateStampedEntity implements ICostItem
     }
 
     /**
+     * Set notes
+     *
+     * @param string $notes
+     * @return ScymPayment
+     */
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
+
+        return $this;
+    }
+
+    /**
+     * Get notes
+     *
+     * @return string
+     */
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+
+
+    /**
      * @param $paymentDto
      *     amount: number
      *     payor: string;
@@ -233,6 +266,10 @@ class ScymPayment extends DateStampedEntity implements ICostItem
         $payment->setPayor($paymentDto->payor);
         $payment->setPaymentType($paymentType);
         $payment->setDateReceived(new DateTime());
+        if (isset($paymentDto->notes)){
+            $payment->setNotes($paymentDto->notes);
+        }
+
         return $payment;
     }
 
@@ -248,6 +285,9 @@ class ScymPayment extends DateStampedEntity implements ICostItem
         $result = new \stdClass();
         $result->errorMessage = '';
         $result->amount = isset($paymentDto->amount) ? $paymentDto->amount : null;
+        if (isset($paymentDto->notes)) {
+            $result->notes = $paymentDto->notes;
+        }
         if (empty($result->amount)) {
             $result->errorMessage = 'No amount';
             return $result;
@@ -275,6 +315,7 @@ class ScymPayment extends DateStampedEntity implements ICostItem
         else {
             $checkNumber = 'cash';
         }
+
         return $result;
     }
 }

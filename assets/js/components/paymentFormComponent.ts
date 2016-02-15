@@ -1,5 +1,5 @@
 /**
- * Created by Terry on 1/5/2016.
+ * Created by Terry on 2/13/2016.
  */
 /// <reference path='../typings/knockout/knockout.d.ts' />
 /// <reference path='../typings/underscore/underscore.d.ts' />
@@ -12,15 +12,15 @@
 module Tops {
     export class paymentFormComponent implements IDataEntryForm {
 
-        private owner : IEventSubscriber;
+        protected owner : IEventSubscriber;
 
         amount = ko.observable('');
+        notes = ko.observable('');
         paymentType = ko.observable('check');
         paymentTypes = ['check','cash'];
         checkNumber = ko.observable('');
         errorMessage = ko.observable('');
         payor = ko.observable('');
-
 
         public constructor(owner: IEventSubscriber = null) {
             var me = this;
@@ -30,6 +30,18 @@ module Tops {
         public initialize(finalFunction? : () => void) {
             var me = this;
         }
+
+        visible = ko.observable(false);
+        show = () => {
+            var me = this;
+            me.visible(true);
+        };
+
+        hide = () => {
+            var me = this;
+            me.visible(false);
+        };
+
 
         setValues = (values: any) => {
             var me = this;
@@ -43,12 +55,14 @@ module Tops {
         getValues = ()=> {
             var me = this;
             var type = me.paymentType();
-            return {
-                amount: me.amount(),
+            var result : IPaymentItem =  {
+                amount: Number(me.amount()),
                 type: type,
                 payor: me.payor(),
+                notes: me.notes(),
                 checkNumber: type == 'cash' ? 'cash' : me.checkNumber()
             };
+            return result;
         };
 
         clear = ()=> {
@@ -90,9 +104,21 @@ module Tops {
                 }
             }
 
-
-
             return true;
+        };
+        save = () => {
+            var me = this;
+            if ( me.validate() ) {
+                var payment = me.getValues();
+                me.owner.handleEvent('addpayment',payment);
+                me.hide();
+            }
+        };
+
+        cancel = () => {
+            var me = this;
+            me.clear();
+            me.owner.handleEvent('paymentformclosed');
         };
 
     }

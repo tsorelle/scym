@@ -1,4 +1,221 @@
-<p>registration finance
-    <br>
-    Selected id: <span data-bind="text:registrationId"></span>
-</p>
+<style>
+    #finance-view-container h4 {
+        color: black;
+    }
+    #finance-view-container h3 {
+        font-size: 22px;
+    }
+    #finance-view-container legend {
+        color: navy;
+        font-size: 20px;
+    }
+
+</style>
+<div id = "finance-view-container" class="row">
+    <div class="col-md-12">
+        <div>
+            <h3 class="visible-print-block">
+                South Central Yearly Meeting - Statement - <span data-bind="text:currentDate"></span>
+            </h3>
+            <div class="row">
+                <div class="col-md-8">
+                    <h3><span class="hidden-print">Account Status: </span><span data-bind="text:registrationName"></span> </h3>
+                </div>
+                <div class="col-md-4">
+                    <button data-bind="click:refreshAccount" class="hidden-print btn btn-default pull-right" style="margin-top: 20px"><span class="glyphicon glyphicon-refresh"></span> Refresh account</button>
+                </div>
+            </div>
+
+            <h4>
+                Costs: <span data-bind="text:totalDue"></span>
+                <br/>
+                <span data-bind="text:accountStatus"></span>
+            </h4>
+        </div>
+
+        <h3>Charges <span data-bind="text:chargeTotal"></span></h3>
+        <div class="hidden-print">
+            <div data-bind="visible:chargeFormHidden()">
+                <a href="#" data-bind="click:showChargeForm">Add new charge</a>
+            </div>
+            <div id="charge-form-container"><charge-form></charge-form></div>
+        </div>
+
+        <div id="charges-table" data-bind="visible:charges().length">
+            <table class="table">
+                <tbody data-bind="foreach:charges">
+                    <tr>
+                        <td data-bind="text:feeType"></td>
+                        <td data-bind="text:basis"></td>
+                        <td data-bind="text:amountFormatted"></td>
+                        <td style="white-space: nowrap">
+                            <span data-bind="visible:notes">
+                                <a href="#" class="hidden-print" data-bind="click:$parent.showNotes" title="Show note">
+                                    <span class="glyphicon glyphicon-info-sign"></span>
+                                </a>
+                            </span>
+                        </td>
+                        <td>
+                            <a href="#" data-bind="click:$parent.deleteItem" class="hidden-print">
+                                <span class="glyphicon glyphicon-remove" title="Delete charge"></span>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="no-charges" data-bind="visible:charges().length == 0">
+            No charges on this account
+        </div>
+
+        <h3>Credits <span data-bind="text:creditTotal"></span></h3>
+        <div class="hidden-print">
+            <div data-bind="visible:creditFormHidden()">
+                <a href="#" data-bind="click:showCreditForm">Add new credit</a>
+            </div>
+            <div id="credit-form-container"><credit-form></credit-form></div>
+        </div>
+        <div id="credits-table" data-bind="visible:credits().length">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Notes</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody data-bind="foreach:credits">
+                    <tr>
+                        <td data-bind="text:creditTypeDescription"></td>
+                        <td data-bind="text:description"></td>
+                        <td data-bind="text:amountFormatted"></td>
+                        <td style="white-space: nowrap">
+                                    <span data-bind="visible:notes">
+                                        <a href="#" class="hidden-print" data-bind="click:$parent.showNotes" title="Show note">
+                                            <span class="glyphicon glyphicon-info-sign"></span>
+                                        </a>
+                                    </span>
+                        </td>
+                        <td>
+                            <a href="#" data-bind="click:$parent.deleteItem" class="hidden-print">
+                                <span class="glyphicon glyphicon-remove" title="Delete credit"></span>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="no-credits" data-bind="visible:credits().length == 0">
+            No credits on this account
+        </div>
+
+        <h3>Donations <span data-bind="text:donationTotal"></span></h3>
+        <div class="hidden-print">
+            <div data-bind="visible:donationFormHidden()">
+                <a href="#" data-bind="click:showDonationForm">Add new donation</a>
+            </div>
+            <div id="donation-form-container"><donation-form></donation-form></div>
+        </div>
+        <div id="donations-table" data-bind="visible:donations().length">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Notes</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody data-bind="foreach:donations">
+                <tr>
+                    <td data-bind="text:donationType"></td>
+                    <td data-bind="text:amountFormatted"></td>
+                    <td style="white-space: nowrap">
+                                    <span data-bind="visible:notes">
+                                        <a href="#" class="hidden-print" data-bind="click:$parent.showNotes" title="Show note">
+                                            <span class="glyphicon glyphicon-info-sign"></span>
+                                        </a>
+                                    </span>
+                    </td>
+                    <td>
+                        <a href="#" data-bind="click:$parent.deleteItem" class="hidden-print">
+                            <span class="glyphicon glyphicon-remove" title="Delete donation"></span>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <div id="no-donations" data-bind="visible:donations().length == 0">
+            No donations on this account
+        </div>
+
+        <h3>Payments  <span data-bind="text:paymentTotal"></span></h3>
+        <div class="hidden-print">
+            <div data-bind="visible:paymentFormHidden">
+                <a href="#" data-bind="click:showPaymentForm">Add new payment</a>
+            </div>
+            <div id="newpayment-form-container"><newpayment-form></newpayment-form></div>
+        </div>
+        <div id="payments-table" data-bind="visible:payments().length">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Check# (or "cash")</th>
+                    <th>Payor</th>
+                    <th>Amount</th>
+                    <th>Notes</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody data-bind="foreach:payments">
+                <tr>
+                    <td data-bind="text:dateReceived"></td>
+                    <td data-bind="text:checkNumber"></td>
+                    <td data-bind="text:payor"></td>
+                    <td data-bind="text:amountFormatted"></td>
+                    <td style="white-space: nowrap">
+                                    <span data-bind="visible:notes">
+                                        <a href="#" class="hidden-print" data-bind="click:$parent.showNotes" title="Show note">
+                                            <span class="glyphicon glyphicon-info-sign hidden-print"></span>
+                                        </a>
+                                    </span>
+                    </td>
+                    <td>
+                        <a href="#" data-bind="click:$parent.deleteItem" class="hidden-print">
+                            <span class="glyphicon glyphicon-remove" title="Delete charge"></span>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="no-payments" data-bind="visible:payments().length == 0">
+            No payments on this account
+        </div>
+        
+    </div>
+    <div class="modal" id="finance-item-notes-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="modal-title">Notes</h3>
+                </div>
+                <div class="modal-body"  style="background-color: white">
+                    <div data-bind="text:notesView"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"  data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <modal-confirm params="id:'confirm-acount-item-delete-modal',headerText: 'Please confirm', bodyText: deleteMessage, confirmClick: removeItem, buttonSet: 'yesno'"></modal-confirm>
+
+</div>

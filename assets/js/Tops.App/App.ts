@@ -283,6 +283,22 @@ module Tops {
             });
         }
 
+        /**
+         * load component template, register to component name and vm instance
+         * overrides naming conventions.
+         *
+         * @param componentName
+         * @param htmlFileName
+         * @param vmInstance
+         * @param finalFunction
+         */
+        public loadComponentTemplate(componentName: string, htmlFileName: string, vmInstance: any, finalFunction: () => void  = null) {
+            var me = this;
+            me.usingComponentLoader(function() {
+                me.componentLoader.loadComponentTemplate(componentName, htmlFileName, vmInstance, finalFunction)
+            });
+        }
+
 
         /**
          * load template and register instance. Instance argumnent may be a function returning an instance or the instance itself.

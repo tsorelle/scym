@@ -130,63 +130,56 @@ declare module Tops {
         persons: IFamilyAttender[];
     }
 
-    export interface IPaymentItem {
-        paymentId : any;
-        dateReceived : any; // date
+    export interface IAccountItem {
         amount: number; // currency
-        checkNumber : string; // number or 'cash'
-        payor : string;
+        notes: string;
     }
 
-    export interface IPaymentDisplayItem extends IPaymentItem {
+    export interface IAccountDisplayItem {
+        id: any;
+        registrationId: any;
+        itemType: string;
         amountFormatted: string;
         dateAdded: any;
         addedBy: string;
     }
 
-    export interface IChargeItem  {
-        chargeId: any;
-        amount: number; // currency
-        registrationId: any;
+    export interface IPaymentItem extends IAccountItem {
+        checkNumber : string; // number or 'cash'
+        payor : string;
+        type: string; // 'cash' or 'check'
+    }
+
+    export interface IPaymentDisplayItem extends IPaymentItem, IAccountDisplayItem {
+        dateReceived : any; // date
+    }
+
+    export interface IChargeItem extends IAccountItem {
         feeTypeId: any;
         basis: string;
-        notes: string;
     }
 
-    export interface IChargeDisplayItem {
+    export interface IChargeDisplayItem extends IChargeItem, IAccountDisplayItem {
         feeType : string; // lookup by feeTypeId
-        dateAdded: any;
-        addedBy: string;
     }
 
-    export interface ICreditItem {
-        creditId: any;
-        registrationId: any;
+    export interface ICreditItem extends IAccountItem {
         description: any;
-        dateAdded: any;
-        amount: number;
         creditTypeId: any;
         notes: string;
     }
 
-    export interface ICreditDisplayItem extends ICreditItem {
+    export interface ICreditDisplayItem extends ICreditItem, IAccountDisplayItem {
         creditType : string; // lookup by creditTypeId
         creditTypeDescription: string;
-        dateAdded: any;
-        addedBy: string;
     }
 
-    export interface IDonationItem {
-        donationId: any;
-        registrationId: any;
+    export interface IDonationItem extends IAccountItem {
         donationTypeId: any;
-        amount: number; // currency
         notes: string;
     }
-    export interface IDonationDisplayItem extends IDonationItem {
+    export interface IDonationDisplayItem extends IDonationItem, IAccountDisplayItem {
         donationType: string; // lookup of donationTypeId
-        dateAdded: any;
-        addedBy: string;
     }
 
     export interface IAccountLookupItem extends INameValuePair {
@@ -194,6 +187,8 @@ declare module Tops {
     }
     export interface IAccountDetails {
         registrationId: any;
+        registrationName: string;
+        registrationCode: string;
         lookups: IAccountLookupItem[];
         donations: IDonationDisplayItem[];
         payments: IPaymentDisplayItem[];
@@ -207,6 +202,8 @@ declare module Tops {
         getValues: () => any;
         setValues: (values: any) => void;
         getErrorMessage: () => string;
+        show : ()=> void;
+        hide : ()=> void;
     }
 
     export interface IAccountSummary {
