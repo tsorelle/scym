@@ -1,3 +1,4 @@
+///<reference path="../components/USDollars.ts"/>
 /**
  * Created by Terry on 11/01/2015.
  */
@@ -203,7 +204,8 @@ module Tops {
             me.donationTotal(summary.donationTotal);
             me.updatedDonationTotal = me.validateCurrency(summary.donationTotal);
             me.aidEligibility(summary.aidEligibility);
-            var balanceDue = me.currencyValue(summary.balance);
+
+            var balanceDue = USDollars.toNumber(summary.balance);
             me.balanceDue(balanceDue);
 
             if (balanceDue === null) {
@@ -212,15 +214,8 @@ module Tops {
             }
             else {
                 me.calculated(true);
-                if (balanceDue == 0.00) {
-                    me.balance('Paid in full');
-                }
-                else if (balanceDue > 0) {
-                    me.balance(summary.balance);
-                }
-                else {
-                    me.balance('Credit: ' + Math.abs(balanceDue));
-                }
+                var message = USDollars.balanceMessage(balanceDue);
+                me.balance(message);
             }
 
             if (summary.funds && summary.funds.length > 0) {
@@ -1254,7 +1249,7 @@ module Tops {
 
             me.application.initialize(applicationPath,
                 function () {
-                    me.application.loadResources(['scym-registration.css', 'textParser.js','searchListObservable.js'],
+                    me.application.loadResources(['scym-registration.css', 'textParser.js','searchListObservable.js','USDollars.js','Dates.js'],
                         function () {
                             me.familyMemberResults = new searchListObservable(2, 6);
                             me.addressSearchResults = new searchListObservable(2, 6);

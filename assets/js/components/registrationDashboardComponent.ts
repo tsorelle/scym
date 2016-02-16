@@ -1,3 +1,4 @@
+///<reference path="USDollars.ts"/>
 /**
  * Created by Terry on 1/4/2016.
  */
@@ -15,7 +16,7 @@ module Tops {
 
 
 
-    export class registrationDashboardComponent implements IRegistrationComponent {
+    export class registrationDashboardComponent implements IRegistrationComponent, IEventSubscriber {
         // todo: set this false for production
         private testing = true;
 
@@ -164,6 +165,14 @@ module Tops {
             me.owner.handleEvent('dashboardclosed');
         };
 
+        private setBalance(amount: any) {
+            var me = this;
+            amount = USDollars.toNumber(amount);
+            me.registration.balanceDue(amount);
+            var message = USDollars.balanceMessage(amount);
+            me.registration.balance(message);
+        }
+
         private loadRegistrationResponse(response : IRegistrationDashboardResponse, nextEvent: string) {
             var me = this;
             var isRefresh = me.isRefreshLoad;
@@ -184,15 +193,9 @@ module Tops {
                     me.registration.registrationCode(response.registrationCode);
                     me.registration.status(response.status);
                     me.registration.statusText(response.statusText);
-                    me.registration.balanceDue(response.balanceDue);
                     me.registration.housingAssignment(response.housingAssignment);
 
-                    if (!response.balanceDue) {
-                        me.registration.balance('Paid in full');
-                    }
-                    else {
-                        me.registration.balance('$' + response.balanceDue);
-                    }
+                    me.setBalance(response.balanceDue);
 
                     me.unCheckedCount = response.attenders.length;
                     _.each(response.attenders, function (attender:IAttenderCheckListItem) {
@@ -323,6 +326,18 @@ module Tops {
             var me = this;
             me.changed(true);
             return true; // required to keep click event from re-checking the checkbox
+        };
+
+        handleEvent = (eventName:string, data?:any) => {
+            var me = this;
+            switch (eventName) {
+                case 'balancechanged' :
+                    if (data.registrationId == me.registrationId()) {
+                        me.setBalance(data.balance);
+                    }
+                    break;
+
+            }
         };
 
 

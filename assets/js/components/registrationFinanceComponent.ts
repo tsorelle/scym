@@ -2,6 +2,7 @@
 ///<reference path="donationFormComponent.ts"/>
 ///<reference path="creditFormComponent.ts"/>
 ///<reference path="chargeFormComponent.ts"/>
+///<reference path="USDollars.ts"/>
 /**
  * Created by Terry on 1/4/2016.
  */
@@ -273,7 +274,11 @@ module Tops {
                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                         var response = <IAccountDetails>serviceResponse.Value;
                         me.assignAccountItems(response);
-                    }
+                        var balanceChangeNotice = {
+                            registrationId: me.registrationId(),
+                            balance: me.balance()
+                        };
+                        me.owner.handleEvent('balancechanged',balanceChangeNotice);}
                 }
             ).always(function() {
                 me.application.hideWaiter();
@@ -285,12 +290,20 @@ module Tops {
             _.each(items,function (item: IAccountItem){
                 total += Number(item.amount);
             });
-            return total;
+            return USDollars.roundNumber(total);
         }
 
         private formatCost(value: number, observable: KnockoutObservable<string>) {
-            var text =  (value > 0.00) ? '(' + USDollars.format(value) +  ' total)' : '(none)';
+            var text =  (value > 0.00) ? '(' + USDollars.toUSD(value) +  ' total)' : '(none)';
             observable(text);
+        }
+
+        private setBalance(balance : any) {
+            var me = this;
+            balance = USDollars.roundNumber(balance);
+            me.balance(balance);
+            var balanceMessage = USDollars.balanceMessage(balance);
+            me.accountStatus(balanceMessage);
         }
 
         private calculateTotals(response: IAccountDetails) {
@@ -299,24 +312,11 @@ module Tops {
             var creditTotal = me.sumItems(response.credits);
             var chargeTotal = me.sumItems(response.charges);
             var donationTotal= me.sumItems(response.donations);
-            var totalDue = (chargeTotal + donationTotal) - creditTotal;
+            var totalDue =  USDollars.roundNumber((chargeTotal + donationTotal) - creditTotal);
             var balance = (chargeTotal + donationTotal) - (creditTotal + paymentTotal);
-            me.balance(balance);
 
-            me.totalDue(USDollars.format(totalDue,'(none)'));
-
-            if (balance < 0.00) {
-                var amount = (balance * -1);
-                me.accountStatus(
-                  'Refund due: ' +  USDollars.format(amount)
-                );
-            }
-            else if (balance > 0.00) {
-                me.accountStatus('Balance due: ' + USDollars.format(balance));
-            }
-            else {
-                me.accountStatus('Balance paid in full.')
-            }
+            me.setBalance(balance);
+            me.formatCost(totalDue,me.totalDue);
             me.formatCost(paymentTotal,me.paymentTotal);
             me.formatCost(creditTotal,me.creditTotal);
             me.formatCost(chargeTotal,me.chargeTotal);

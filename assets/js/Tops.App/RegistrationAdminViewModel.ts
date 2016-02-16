@@ -77,7 +77,8 @@ module Tops {
                     me.application.loadResources([
                             'registrationLookupComponent.js',
                             'registrationDashboardComponent.js',
-                            'paymentFormComponent.js'
+                            'paymentFormComponent.js',
+                            'USDollars.js'
                             // 'housingAssignmentComponent.js',
                             // 'registrationFinanceComponent.js',
                             // 'adminReportsComponent.js'
@@ -258,6 +259,9 @@ module Tops {
                     me.registrationChanged = false;
                     me.selectedRegistrationId(data);
                     me.showHousingAssignmentsForm();
+                    break;
+                case 'balancechanged' :
+                    me.registrationDashboardVm.handleEvent(eventName,data);
                     break;
             }
         };
