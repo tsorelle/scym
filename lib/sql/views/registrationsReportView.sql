@@ -1,5 +1,6 @@
 DROP VIEW IF EXISTS registrationsReportView;
-CREATE VIEW registrationsReportViews AS
+DROP VIEW IF EXISTS registrationsReportViews;
+CREATE OR REPLACE VIEW registrationsReceivedReportView AS
   SELECT r.year,
     r.registrationId,
     r.registrationCode,
@@ -10,6 +11,6 @@ CREATE VIEW registrationsReportViews AS
     IFNULL( r.phone, '') AS phone,
     COUNT(*) AS attenders
   FROM registrations r
-  JOIN attenders a ON r.registrationId = a.registrationId
+    JOIN attenders a ON r.registrationId = a.registrationId
   WHERE r.active = 1
   GROUP BY r.registrationId ;
