@@ -63,6 +63,7 @@ module Tops {
         changed = ko.observable(false);
 
         checkinEnabled = ko.observable(false);
+        printInvoiceOnCheckin = ko.observable(true);
 
         paymentForm : IDataEntryForm;
 
@@ -117,7 +118,7 @@ module Tops {
             me.owner.getRegistrationContext(
                 function(context: IRegistrationContext) {
                     var errorMessage = '';
-                    var today = me.testing ? new Date('2016-3-29') : new Date();
+                    var today = me.testing ? new Date('2016-03-29') : new Date();
                     var ymStart = new Date(context.sessionInfo.startDate);
 
                     if (today >= ymStart ) {
@@ -179,7 +180,7 @@ module Tops {
             me.isRefreshLoad = false;
             me.owner.getRegistrationContext(
                 function(context: IRegistrationContext) {
-                    var today = me.testing ? today = new Date('2016-3-29') : new Date();
+                    var today = me.testing ? today = new Date('2016-03-29') : new Date();
                     var ymStart = new Date(context.sessionInfo.startDate);
                     me.checkinEnabled(today >= ymStart );
                     me.paymentForm.clear();
@@ -318,7 +319,7 @@ module Tops {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 me.changed(false);
-                me.owner.handleEvent('dashboardclosed');
+                me.owner.handleEvent('dashboardclosed',me.printInvoiceOnCheckin());
             }
         };
 
@@ -326,6 +327,11 @@ module Tops {
             var me = this;
             me.changed(true);
             return true; // required to keep click event from re-checking the checkbox
+        };
+
+        printInvoice = () => {
+            var me = this;
+            me.owner.handleEvent('printinvoice');
         };
 
         handleEvent = (eventName:string, data?:any) => {

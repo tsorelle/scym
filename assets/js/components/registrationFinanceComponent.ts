@@ -175,12 +175,13 @@ module Tops {
                         me.assignAccountItems(response);
                         me.lookups = response.lookups;
                         jQuery('#finance-view-container').show();
+                        me.application.hideWaiter();
                         if (finalFunction) {
                             finalFunction();
                         }
                     }
                 })
-                .always(function () {
+                .fail(function () {
                     me.application.hideWaiter();
                 });
             });
@@ -198,7 +199,7 @@ module Tops {
             me.getAccount(me.registrationId());
         }
 
-        getAccount(registrationId:any) {
+        getAccount(registrationId:any, finalFunction? : () => void) {
             var me = this;
             var request = me.prepareService(registrationId);
             me.peanut.executeService('registration.GetAccountDetails', request, function (serviceResponse:IServiceResponse) {
@@ -206,6 +207,9 @@ module Tops {
                         var response = <IAccountDetails>serviceResponse.Value;
                         me.assignAccountItems(response);
                         me.show();
+                        if (finalFunction) {
+                            finalFunction();
+                        }
                     }
                 })
                 .always(function () {

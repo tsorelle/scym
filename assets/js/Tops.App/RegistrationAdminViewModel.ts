@@ -144,14 +144,30 @@ module Tops {
             me.currentForm('registrations');
         };
 
-        showFinanceForm      = () => {
+        showFinanceForm  =  (finalFunction? : () => void) => {
             var me=this;
 
+            // if called from click, finalFunction is replaced by the context object.
+            if(typeof finalFunction !== 'function') {
+                finalFunction = null;
+            }
+
             if (me.registrationFinanceVm) {
-                if (me.registrationFinanceVm.registrationId() != me.selectedRegistrationId()) {
-                    me.registrationFinanceVm.getAccount(me.selectedRegistrationId());
+                if (me.registrationFinanceVm.registrationId() != me.selectedRegistrationId() || (finalFunction))
+                {
+                    me.registrationFinanceVm.getAccount(me.selectedRegistrationId(),function() {
+                        me.currentForm('finance');
+                        if (finalFunction) {
+                            finalFunction();
+                        }
+                    });
                 }
-                me.currentForm('finance');
+                else {
+                    me.currentForm('finance');
+                    if (finalFunction) {
+                        finalFunction();
+                    }
+                }
             }
             else {
                 me.application.bindComponent('registration-finance',
@@ -160,7 +176,7 @@ module Tops {
                         return me.registrationFinanceVm;
                     },
                     function() {
-                        me.registrationFinanceVm.initialize(me.selectedRegistrationId());
+                        me.registrationFinanceVm.initialize(me.selectedRegistrationId(), finalFunction);
                     }
                 );
             }
@@ -214,6 +230,15 @@ module Tops {
             }
         };
 
+        private closeDashboard() {
+            var me = this;
+            me.selectedRegistrationId(0);
+            me.registrationChanged = false;
+            if (me.registrationFinanceVm) {
+                me.registrationFinanceVm.handleEvent('dashboardclosed');
+            }
+        }
+
         handleEvent = (eventName:string, data:any = null)=> {
             var me = this;
             switch(eventName) {
@@ -238,9 +263,16 @@ module Tops {
                     me.currentForm('registrations');
                     break;
                 case 'dashboardclosed' :
-                    me.selectedRegistrationId(0);
-                    me.registrationChanged = false;
-                    me.registrationFinanceVm.handleEvent(eventName);
+                    if (data) {
+                        me.showFinanceForm(function() {
+                            window.print();
+                            me.showRegistrationForm();
+                            me.closeDashboard();
+                        });
+                    }
+                    else {
+                        me.closeDashboard();
+                    }
                     break;
                 case 'registrationchanged' :
                     me.registrationChanged = true;
@@ -260,8 +292,12 @@ module Tops {
                     me.showHousingAssignmentsForm();
                     break;
                 case 'balancechanged' :
-                    me.registrationDashboardVm.handleEvent(eventName,data);
+                    me.registrationDashboardVm.handleEvent(eventName, data);
                     break;
+                case 'printinvoice' :
+                    me.showFinanceForm(function() {
+                        window.print();
+                    });
             }
         };
 
