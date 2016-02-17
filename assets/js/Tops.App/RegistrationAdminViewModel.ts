@@ -151,9 +151,7 @@ module Tops {
                 if (me.registrationFinanceVm.registrationId() != me.selectedRegistrationId()) {
                     me.registrationFinanceVm.getAccount(me.selectedRegistrationId());
                 }
-                else {
-                    me.currentForm('finance');
-                }
+                me.currentForm('finance');
             }
             else {
                 me.application.bindComponent('registration-finance',
@@ -242,6 +240,7 @@ module Tops {
                 case 'dashboardclosed' :
                     me.selectedRegistrationId(0);
                     me.registrationChanged = false;
+                    me.registrationFinanceVm.handleEvent(eventName);
                     break;
                 case 'registrationchanged' :
                     me.registrationChanged = true;

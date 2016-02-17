@@ -70,6 +70,7 @@ module Tops {
             me.amount('');
             me.paymentType('check');
             me.checkNumber('');
+            me.notes('');
             me.payor('');
         };
 

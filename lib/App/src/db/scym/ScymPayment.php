@@ -300,6 +300,7 @@ class ScymPayment extends DateStampedEntity implements ICostItem
 
         $type = isset($paymentDto->type) ? $paymentDto->type : null;
         $checkNumber = isset($paymentDto->checkNumber) ? $paymentDto->checkNumber : '';
+
         if (empty($type) && !empty($checkNumber)) {
             $type = 'check';
         }
@@ -309,12 +310,17 @@ class ScymPayment extends DateStampedEntity implements ICostItem
             return $result;
         }
 
-        if ($type == 'check' and empty($checkNumber)) {
-            $result->errorMesssage = 'No check number';
+        if ($type == 'check') {
+            if (empty($checkNumber)) {
+                $result->errorMesssage = 'No check number';
+            }
+            $result->checkNumber = $checkNumber;
         }
         else {
-            $checkNumber = 'cash';
+            $result->checkNumber = 'cash';
         }
+
+        $result->notes = isset($paymentDto->notes) ? $paymentDto->notes : '';
 
         return $result;
     }

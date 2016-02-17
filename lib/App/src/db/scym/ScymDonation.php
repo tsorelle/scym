@@ -162,7 +162,7 @@ class ScymDonation extends DateStampedEntity implements IDonationInfo
         return $this->notes;
     }
 
-    public static function createDonation($donationTypeId,$amount,$note = null)
+    public static function createDonation($donationTypeId,$amount,$notes = null)
     {
         $result = new ScymDonation();
         $result->setDonationtypeid($donationTypeId);

@@ -253,6 +253,9 @@ module Tops {
                 case 'chargeformclosed'  : me.hideForm(me.chargeForm , me.chargeFormHidden);   break;
                 case 'creditformclosed'  : me.hideForm(me.creditForm , me.creditFormHidden);   break;
                 case 'donationformclosed': me.hideForm(me.donationForm , me.donationFormHidden); break;
+                case 'dashboardclosed' :
+                    me.registrationId(0);
+                    break;
             }
         };
 
@@ -269,7 +272,7 @@ module Tops {
             me.application.showWaiter(
                 message + ' a '+itemType+'...'
             );
-            me.peanut.executeService('registration.updateAccount',request,
+            me.peanut.executeService('registration.UpdateAccount',request,
                 function(serviceResponse: IServiceResponse) {
                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                         var response = <IAccountDetails>serviceResponse.Value;
