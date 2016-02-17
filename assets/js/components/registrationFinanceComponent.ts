@@ -172,8 +172,6 @@ module Tops {
                 me.peanut.executeService('registration.GetAccountDetails', request, function (serviceResponse:IServiceResponse) {
                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                         var response = <IAccountDetails>serviceResponse.Value;
-                        me.registrationCode(response.registrationCode);
-                        me.registrationName(response.registrationName);
                         me.assignAccountItems(response);
                         me.lookups = response.lookups;
                         jQuery('#finance-view-container').show();
@@ -218,6 +216,8 @@ module Tops {
         assignAccountItems = (response:IAccountDetails) => {
             var me = this;
             me.registrationId(response.registrationId);
+            me.registrationCode(response.registrationCode);
+            me.registrationName(response.registrationName);
             me.payments(response.payments);
             me.charges(response.charges);
             me.credits(response.credits);

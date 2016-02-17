@@ -906,10 +906,10 @@ class ScymRegistrationsManager extends TDbServiceManager
     public function getAccountDetails($registrationId, $includeLookups = true) {
         $result = new \stdClass();
         $result->registrationId = $registrationId;
+        $registration = $this->getRegistrationIdentity($registrationId);
+        $result->registrationName = $registration->registrationName;
+        $result->registrationCode = $registration->registrationCode;
         if ($includeLookups) {
-            $registration = $this->getRegistrationIdentity($registrationId);
-            $result->registrationName = $registration->registrationName;
-            $result->registrationCode = $registration->registrationCode;
             $result->lookups   = $this->getView('accountLookupsView');
         }
         else {
