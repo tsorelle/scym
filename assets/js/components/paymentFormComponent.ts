@@ -10,7 +10,7 @@
 /// <reference path='../Tops.App/Registration.d.ts' />
 
 module Tops {
-    export class paymentFormComponent implements IDataEntryForm {
+    export class paymentFormComponent implements IDataEntryForm, IEventSubscriber {
 
         protected owner : IEventSubscriber;
 
@@ -122,6 +122,34 @@ module Tops {
             me.owner.handleEvent('paymentformclosed');
         };
 
+        fillBalance = () => {
+            var me = this;
+            me.owner.handleEvent('registrationdatarequest','balance');
+        };
+
+        fillPayor = () => {
+            var me = this;
+            me.owner.handleEvent('registrationdatarequest','name');
+        };
+
+
+        handleEvent = (eventName:string, data?:any)=> {
+            var me = this;
+            switch(eventName) {
+                case 'registrationdataresponse' :
+                    if (data && data.name && data.value) {
+                        switch (data.name) {
+                            case 'name' :
+                                me.payor(data.value);
+                                break;
+                            case 'balance' :
+                                me.amount(data.value);
+                                break;
+                        }
+                        break;
+                    }
+            }
+        };
     }
 }
 

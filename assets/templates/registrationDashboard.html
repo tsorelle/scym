@@ -106,7 +106,7 @@
                 <div class="form-group">
                     <button class="btn btn-primary" style="margin-right: 10px" data-bind="click:checkIn, visible:checkinEnabled">Save and check-in</button>
                 </div>
-                <div class="checkbox">
+                <div class="checkbox"  data-bind="visible:checkinEnabled">
                     <label><input type="checkbox" data-bind="checked:printInvoiceOnCheckin" />Print invoice</label>
                 </div>
             </div>

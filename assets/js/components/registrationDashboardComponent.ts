@@ -77,7 +77,7 @@ module Tops {
         public initialize(finalFunction? : () => void) {
             var me = this;
             me.application.loadResources('paymentFormComponent.js',function() {
-                me.paymentForm = new paymentFormComponent();
+                me.paymentForm = new paymentFormComponent(me);
                 // binding is done as part of general section
                 me.application.registerComponent('payment-form',me.paymentForm,finalFunction);
             });
@@ -342,7 +342,26 @@ module Tops {
                         me.setBalance(data.balance);
                     }
                     break;
-
+                case 'registrationdatarequest' :
+                    switch (data) {
+                        case 'name' :
+                            (<any>me.paymentForm).handleEvent('registrationdataresponse',
+                                {
+                                    name: 'name',
+                                    value: me.registration.name()
+                                }
+                            );
+                            break;
+                        case 'balance' :
+                            (<any>me.paymentForm).handleEvent('registrationdataresponse',
+                                {
+                                    name: 'balance',
+                                    value: me.registration.balanceDue()
+                                }
+                            );
+                            break;
+                    }
+                    break;
             }
         };
 

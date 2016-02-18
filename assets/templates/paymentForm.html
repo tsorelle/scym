@@ -22,7 +22,7 @@
             <div class="input-group">
 
                 <label class="control-label">
-                    Check #
+                    Check&nbsp;#
                 </label>
                 <input class="form-control" data-bind="value:checkNumber"/>
             </div>
@@ -40,7 +40,17 @@
                 <label class="control-label">
                     Amount
                 </label>
-                <input class="form-control" data-bind="value:amount"/>
+                <div class="input-group">
+                    <input class="form-control" data-bind="value:amount"/>
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false"> <span class="glyphicon glyphicon-edit" title="Fill form"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="#" data-bind="click:fillBalance">Fill balance</a></li>
+                                <li><a href="#" data-bind="click:fillPayor">Fill payor</a></li>
+                            </ul>
+                        </div><!-- /btn-group -->
+                    </div>
             </div>
         </div>
     </div>
