@@ -1,6 +1,6 @@
 <div id="registration-dashboard-panel">
     <div id="dashboard-header" class="row">
-        <div class="col-md-12">
+        <div class="col-md-10">
             <h3 data-bind="text:registration.name"></h3>
             <div class="form-group">
                 <label class="control-label">Lookup code:</label>
@@ -10,6 +10,9 @@
                 <label class="control-label">Housing:</label>
                 <span data-bind="text:registration.housingAssignment"></span>
             </div>
+        </div>
+        <div class="col-md-2">
+            <button data-bind="click:refresh" class="hidden-print btn btn-default pull-right" title="Click this if changes were made in another tab or browser." style="margin-top: 20px"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
         </div>
     </div>
 
@@ -46,13 +49,15 @@
         </div>
         <div class="col-md-9">
             <div data-bind="visible:checkinEnabled">
-                <payment-form></payment-form>
+                <div data-bind="visible: registration.balanceDue">
+                    <payment-form></payment-form>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div id="attender-check-list">
                 <h3>Attenders</h3>
                 <p>Check attenders who have arrived.</p>
@@ -82,11 +87,9 @@
                         </tr>
                     </tbody>
                 </table>
-
-
-            </div>
+         </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div data-bind="visible:registration.notes">
                 <h3>Notes:</h3>
                 <div class="form-group">
@@ -95,13 +98,7 @@
             </div>
         </div>
     </div>
-    <div class="row" style="padding: 10px;">
-        <div class="col-md-12">
-            <div>
-                <a href="#" title="Click this if changes were made in another tab or browser." data-bind="click:refresh">Refresh data</a>
-            </div>
-        </div>
-        <div class="row" id="buttons-section" style="margin-top: 40px; ">
+    <div class="row" style="padding: 10px;" id="buttons-section" >
             <div class="col-md-2">
                 <div class="form-group">
                     <button class="btn btn-primary" style="margin-right: 10px" data-bind="click:checkIn, visible:checkinEnabled">Save and check-in</button>
@@ -113,8 +110,6 @@
             <div class="col-md-10">
                 <button class="btn btn-default" data-bind="click:closeDashboard">Close</button>
             </div>
-        </div>
-
     </div>
 
 </div>

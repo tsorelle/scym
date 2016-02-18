@@ -172,6 +172,9 @@ module Tops {
             me.registration.balanceDue(amount);
             var message = USDollars.balanceMessage(amount);
             me.registration.balance(message);
+            if (amount < 0.01) {
+                me.paymentForm.clear();
+            }
         }
 
         private loadRegistrationResponse(response : IRegistrationDashboardResponse, nextEvent: string) {

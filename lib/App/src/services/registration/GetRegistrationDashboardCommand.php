@@ -114,7 +114,7 @@ class GetRegistrationDashboardCommand extends TServiceCommand
                 $result = $assignment->unit;
             }
             else {
-                if ($assignments->unit != $result) {
+                if ($assignment->unit != $result) {
                     return 'Varies, see attender.';
                 }
             }
