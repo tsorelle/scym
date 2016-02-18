@@ -6,16 +6,11 @@
                 <label class="control-label">Lookup code:</label>
                 <span data-bind="text:registration.registrationCode"></span> [<a target="_blank" data-bind="attr: {href: '/register?code=' + registration.registrationCode()}">Open registration.</a>]
             </div>
-            <div class="form-group">
-                <label class="control-label">Housing:</label>
-                <span data-bind="text:registration.housingAssignment"></span>
-            </div>
         </div>
         <div class="col-md-2">
-            <button data-bind="click:refresh" class="hidden-print btn btn-default pull-right" title="Click this if changes were made in another tab or browser." style="margin-top: 20px"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+            <button data-bind="click:refresh" class="hidden-print btn btn-default pull-right" title="Click this if changes were made in another browser window." style="margin-top: 20px"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
         </div>
     </div>
-
     <div id="registration-info" class="row">
         <div class="col-md-3">
             <div class="form-group">
@@ -40,14 +35,26 @@
         </div>
     </div>
 
-    <div id="payment-block" class="row">
-        <div class="col-md-3">
-            <div class="form-group">
-                <label class="control-label">Balance due:</label>
-                <div data-bind="text: registration.balance"></div>
-            </div>
+
+    <div class="row">
+        <div class="form-group col-md-12" >
+            <label class="control-label">Housing:</label>
+            <span data-bind="text:registration.housingAssignment, visible:registration.confirmed"></span>
+                    <span data-bind="visible:!registration.confirmed()" style="padding-left: 6px">
+                        <strong style="color:red" >Warning: housing not confirmed please check assignments.</strong>
+                    </span>
         </div>
-        <div class="col-md-9">
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-12">
+            <label class="control-label">Balance:</label>
+            <span data-bind="text: registration.balance"></span>
+        </div>
+    </div>
+
+    <div id="payment-block" class="row">
+        <div class="col-md-12">
             <div data-bind="visible:checkinEnabled">
                 <div data-bind="visible: registration.balanceDue">
                     <payment-form></payment-form>

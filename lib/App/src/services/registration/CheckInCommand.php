@@ -56,6 +56,7 @@ class CheckInCommand extends TServiceCommand
             $changed = true;
         }
 
+        $registration->setConfirmed(true);
         if ($attenders != null) {
             $attenderEntities = $registration->getAttenders();
             foreach($attenderEntities as $attenderEntity ) {

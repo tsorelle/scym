@@ -78,12 +78,13 @@ class GetRegistrationDashboardCommand extends TServiceCommand
         $responseDto->registrationId =  $registrationId;
         $responseDto->registrationCode =  $registration->getRegistrationCode();
         $responseDto->name =  $registration->getName();
-        $responseDto->address =  $registration->getNotes();
+        $responseDto->address =  $registration->getAddress();
         $responseDto->city =  $registration->getCity();
         $responseDto->phone =  $registration->getPhone();
         $responseDto->email =  $registration->getEmail();
         $responseDto->notes =  $registration->getNotes();
         $responseDto->status =  $registration->getStatusId();
+        $responseDto->confirmed = $registration->getConfirmed();
         switch($responseDto->status) {
             case 0 : $responseDto->statusText = 'Cancelled' ; break;
             case 1 : $responseDto->statusText = 'Incomplete'; break;
@@ -118,6 +119,7 @@ class GetRegistrationDashboardCommand extends TServiceCommand
                     return 'Varies, see attender.';
                 }
             }
+            // if ($assignment->unit)
         }
         return $result == null ? 'No assignments' : $result;
     }

@@ -37,10 +37,15 @@
         </div>
     </div>
 
+
+    <div>
+    </div>
     <div id="buttons">
-        <button class="btn btn-primary" data-bind="click: saveAssignments, visible: updatedAssignments().length > 0" style="margin-right: 10px">Save</button>
-        <button class="btn btn-primary" data-bind="click: getConfirmationText, visible: updatedAssignments().length == 0">Send confirmation</button>
+        <button class="btn btn-primary" data-bind="click: saveAssignments, visible: canSave" style="margin-right: 10px">Save</button>
+        <button class="btn btn-primary" data-bind="click: saveAssignments, visible: canConfirm" style="margin-right: 10px">Confirm</button>
+        <button class="btn btn-primary" data-bind="click: getConfirmationText, visible: canSend">Send confirmation</button>
         <button class="btn btn-primary" data-bind="click: closeForm, visible:canClose">Next <span class="glyphicon glyphicon-forward"></span></button>
+        <button class="btn btn-default" data-bind="click: cancelChanges, visible: canSave" style="margin-right: 10px">Cancel changes</button>
     </div>
 
     <!-- Modals -->

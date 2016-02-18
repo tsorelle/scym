@@ -33,17 +33,25 @@ module Tops {
         assignedByAttender = ko.observable(false);
         confirmationText = ko.observable();
         canClose = ko.observable(true);
-
+        canSave = ko.observable(false);
+        canConfirm = ko.observable(false);
+        canSend = ko.observable(false);
+        confirmOnSave = false;
         formTitle = ko.observable();
         showFormTitle = true;
 
         updatedAssignments = ko.observableArray<IHousingAssignmentsUpdate>();
+        unassignedCount = 0;
 
-        public constructor(application:IPeanutClient, owner: IEventSubscriber, showFormTitle = true) {
+        public constructor(application:IPeanutClient, owner: IEventSubscriber, confirmOnSave : boolean = false) {
             var me = this;
             me.application = application;
             me.peanut = application.peanut;
-            me.showFormTitle = showFormTitle;
+            me.showFormTitle = true;
+            me.canClose(!confirmOnSave);
+            me.canConfirm(false);
+            me.canSend(false);
+            me.confirmOnSave = confirmOnSave;
             me.owner = owner;
         }
 
@@ -57,13 +65,39 @@ module Tops {
             });
         }
 
+        private countUnassigned(assignments: IAttenderHousingAssignment[]) {
+            var me = this;
+            var unassignedCount = 0;
+            _.each(assignments, function(attender: IAttenderHousingAssignment) {
+                _.each(attender.assignments,function(assignment: IHousingAssignment) {
+                    if (assignment.housingUnitId == 0) {
+                        unassignedCount += 1;
+                    }
+                });
+            });
+            return unassignedCount;
+        }
+
+
+        public clearChanges() {
+            var me = this;
+            me.updatedAssignments([]);
+        }
         public hideCloseButton = () => {
             this.canClose(false);
+        };
+
+        cancelChanges = () => {
+            var me = this;
+            var id = me.registrationId();
+            me.reset();
+            me.getAssignments(id);
         };
 
         public getAssignments(registrationId:number) {
             var me = this;
 
+            me.registrationId(registrationId);
             me.housingAssignments([]);
             me.formTitle('');
             me.application.hideServiceMessages();
@@ -85,7 +119,24 @@ module Tops {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = <IGetHousingAssignmentsResponse>serviceResponse.Value;
-                me.registrationId(response.registrationId);
+                var confirmed = (response.confirmed) ? false : true;
+                me.unassignedCount = me.countUnassigned(response.assignments);
+                me.canConfirm(false);
+                me.canSend(false);
+
+                if (response.confirmed) {
+                    if (me.confirmOnSave) {
+                        me.canConfirm(me.unassignedCount == 0);
+                    }
+                    else {
+                        me.canSend(me.unassignedCount == 0);
+                    }
+                }
+
+                if (!me.canClose()) {
+                    var canConfirm = (response.confirmed) ? false : true;
+                    me.canConfirm(canConfirm);
+                }
                 if(response.housingTypes) {
                     me.housingTypes(response.housingTypes);
                 }
@@ -97,6 +148,7 @@ module Tops {
                     me.housingUnits(me.housingUnitList);
                 }
 
+                me.updatedAssignments([]);
                 me.showAssignments(response.assignments);
                 if (me.showFormTitle) {
                     me.formTitle("Housing assignments for " + response.registrationName);
@@ -252,7 +304,10 @@ module Tops {
                 ]
             };
             me.updatedAssignments([wildcardAssignment]);
-
+            me.canConfirm(false);
+            me.canSend(false);
+            me.canSave(true);
+            me.unassignedCount = 0;
         };
 
         private filterHousingUnitList = (typeId:number) => {
@@ -284,6 +339,8 @@ module Tops {
             var showDetail = false;
 
             me.disableDefaultSubscriptions();
+            // me.loadingAssignments(true);
+
 
             if (attenderAssignments.length) {
                 var first:IAttenderHousingAssignment = me.findFirst(attenderAssignments);
@@ -324,6 +381,7 @@ module Tops {
 
             me.housingAssignments(attenderAssignments);
             me.assignedByAttender(showDetail);
+            // me.loadingAssignments(false);
         }
 
         onShowAttenders = (visible: boolean) => {
@@ -350,6 +408,17 @@ module Tops {
 
         updateAssignment = (attenderId:number, assignment: IHousingAssignment) => {
             var me = this;
+
+            if (!assignment.housingUnitId) {
+                return;
+            }
+            me.canConfirm(false);
+            me.canSend(false);
+            me.canSave(true);
+            if (me.unassignedCount) {
+                me.unassignedCount -= 1;
+            }
+
             var updates = me.updatedAssignments();
             var update : IHousingAssignmentsUpdate = _.find(updates, function(item: IHousingAssignmentsUpdate) {
                 return item.attenderId == attenderId;
@@ -382,7 +451,8 @@ module Tops {
             var me = this;
             var request : IHousingAssignmentUpdateRequest = {
                 registrationId: me.registrationId(),
-                updates: []
+                updates: [],
+                confirm: me.confirmOnSave ? true : null
             };
 
             if (me.assignedByAttender()) {
@@ -419,6 +489,16 @@ module Tops {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 me.updatedAssignments([]);
+                me.canConfirm(false);
+                me.canSave(false);
+                me.canSend(false);
+                if (me.confirmOnSave) {
+                    me.canSend(false);
+                }
+                else {
+                    me.canSend(me.unassignedCount == 0);
+                }
+                me.owner.handleEvent('housingassignmentsupdated');
             }
         };
 

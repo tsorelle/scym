@@ -27,6 +27,14 @@ module Tops {
             var me = this;
             me.owner = owner;
             me.feeTypesList = new selectListObservable(null,feeTypes);
+            me.feeTypesList.selected.subscribe( function(item : INameValuePair) {
+                if ((!item) || item.Name == 'Other') {
+                    me.basis('');
+                }
+                else  {
+                    me.basis(item.Name);
+                }
+            });
         }
 
         public initialize(finalFunction? : () => void) {

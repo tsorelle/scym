@@ -65,12 +65,24 @@ CREATE OR REPLACE VIEW accountLookupsView AS
     dt.`donationTypeId` AS 'Value'
   FROM donationtypes dt
   UNION
+
   SELECT
     'fee' AS lookupType,
-    f.`description` AS 'Name',
+    IF(unitAmount = 0, f.`description`,
+       IF(f.feeCode = 'MEAL', CONCAT('Meal fee',' (',unitAmount,' ',basis,')') ,
+          CONCAT(f.`description`,' (',unitAmount,' ',basis,')'))) AS 'Name',
     f.`feeTypeID` AS 'Value'
   FROM feetypes f
-  WHERE f.`feeCode` IN ('LINEN','MEAL','OTHER')
+  -- WHERE f.`feeCode` <> 'OTHER'
+  WHERE f.`feeCode` IN ('LINEN','MEAL')
+  UNION
+  SELECT
+    'fee' AS lookupType,
+    f.description AS 'Name',
+    f.`feeTypeID` AS 'Value'
+  FROM feetypes f
+  WHERE f.`feeCode` = 'OTHER'
+
   UNION
   SELECT
     'credit' AS lookupType,

@@ -40,6 +40,7 @@ module Tops {
             balanceDue: ko.observable(0.00),
             balance: ko.observable(''),
             housingAssignment: ko.observable(''),
+            confirmed: ko.observable(false)
         };
 
         attenderForm = {
@@ -198,6 +199,7 @@ module Tops {
                     me.registration.status(response.status);
                     me.registration.statusText(response.statusText);
                     me.registration.housingAssignment(response.housingAssignment);
+                    me.registration.confirmed(response.confirmed);
 
                     me.setBalance(response.balanceDue);
 

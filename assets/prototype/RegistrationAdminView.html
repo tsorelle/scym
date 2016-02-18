@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-md-12">
                 <ul class="nav nav-tabs">
-                    <li  data-bind="css: {active: currentForm() == 'registrations'}"><a href="#" data-bind="click:showRegistrationForm">Registrations</a></li>
+                    <li  data-bind="css: {active: currentForm() == 'registrations'}"><a href="#" data-bind="click:showRegistrationForm"><span data-bind="text:mainTabLabel"></span> </a></li>
                     <li  data-bind="css: {active: currentForm() == 'finance'},visible:selectedRegistrationId"><a href="#" data-bind="click:showFinanceForm">Finance</a></li>
                     <li  data-bind="css: {active: currentForm() == 'housing-assignments'}, visible:selectedRegistrationId"><a href="#" data-bind="click:showHousingAssignmentsForm">Housing assignments</a></li>
                     <li  data-bind="css: {active: currentForm() == 'reports'}"><a href="#" data-bind="click:showReportsForm">Reports</a></li>

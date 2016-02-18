@@ -24,6 +24,7 @@ module Tops {
         private peanut: Tops.Peanut;
         private context : IRegistrationContext = null;
 
+        mainTabLabel : KnockoutComputed<string>;
         currentForm = ko.observable('registrations');
         counts = {
             registrations: ko.observable(''),
@@ -45,6 +46,12 @@ module Tops {
             Tops.RegistrationAdminViewModel.instance = me;
             me.application = new Tops.Application(me);
             me.peanut = me.application.peanut;
+            me.mainTabLabel = ko.computed(function() {
+                if (me.selectedRegistrationId()) {
+                    return 'Check in';
+                }
+                return 'Registrations';
+            });
         }
 
 
@@ -196,8 +203,7 @@ module Tops {
             else {
                 me.application.bindComponent('housing-assignment',
                     function () {
-                        me.housingAssignmentsVM = new housingAssignmentComponent(me.application, me);
-                        me.housingAssignmentsVM.hideCloseButton();
+                        me.housingAssignmentsVM = new housingAssignmentComponent(me.application, me, true);
                         return me.housingAssignmentsVM;
                     },
                     function () {

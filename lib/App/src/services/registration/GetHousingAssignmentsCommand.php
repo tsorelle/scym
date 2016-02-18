@@ -97,6 +97,7 @@ class GetHousingAssignmentsCommand extends TServiceCommand
             return;
         }
 
+        $responseData->confirmed = $registration->getConfirmed();
         $responseData->registrationName = $registration->getName();
         $responseData->assignments = $manager->getRegistrationHousingAssignments($registration);
         if ($includeLookups) {

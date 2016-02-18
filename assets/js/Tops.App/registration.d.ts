@@ -241,6 +241,7 @@ declare module Tops {
     export interface IRegistrationDashboardResponse {
         registrationId: any,
         registrationCode: string,
+        confirmed: any;
         name: string,
         address: string,
         city: string,
@@ -315,6 +316,7 @@ declare module Tops {
     export interface IHousingAssignmentUpdateRequest {
         registrationId: any,
         updates: IHousingAssignmentsUpdate[];
+        confirm: boolean;
     }
 
     export interface IHousingAssignmentsUpdate {
@@ -325,6 +327,7 @@ declare module Tops {
     export interface IGetHousingAssignmentsResponse {
         registrationId: number;
         registrationName: string;
+        confirmed: any;
         assignments: IAttenderHousingAssignment[];
         units: IHousingUnit[];
         housingTypes : ILookupItem[];

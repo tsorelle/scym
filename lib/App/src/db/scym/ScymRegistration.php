@@ -869,13 +869,6 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
         $this->setEmail( $dto->getEmail());
         $this->setNotes ( $dto->getNotes());
         $this->setFinancialAidAmount( $dto->getFinancialAidAmount());
-        $confirmed = $dto->getConfirmed();
-        if ($confirmed !== null) {
-            $this->setConfirmed($confirmed);
-        }
-
-        // obsolete?
-        //         $this->contactRequested         = $dto->getContactRequested();
 
         if ($updateAdminFields) {
             $this->scymNotes = $dto->getScymNotes();

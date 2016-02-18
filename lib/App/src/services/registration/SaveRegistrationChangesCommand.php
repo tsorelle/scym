@@ -133,6 +133,7 @@ class SaveRegistrationChangesCommand extends TServiceCommand
     {
         $regInfo = $request->getRegistrationInfo();
         $registration = ScymRegistration::createNewRegistration($regInfo);
+        $registration->setConfirmed(false);
         $registration->addAttenders($request->getUpdatedAttenders());
         $user = TUser::getCurrent();
         if ($user->isAuthenticated()) {
