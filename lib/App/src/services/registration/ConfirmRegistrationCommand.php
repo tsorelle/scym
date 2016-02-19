@@ -35,12 +35,6 @@ class ConfirmRegistrationCommand extends TServiceCommand
             $this->addErrorMessage('ERROR: No registration id.');
             return;
         }
-        $messageText = isset($request->text) ? $request->text : null;
-        if (empty($messageText)) {
-            $this->addErrorMessage('ERROR: No message text in request.');
-            return;
-        }
-
         $manager = new ScymRegistrationsManager();
         $registration = $manager->getRegistration($registrationId);
         if ($registration == null) {
@@ -48,28 +42,40 @@ class ConfirmRegistrationCommand extends TServiceCommand
             return;
         }
 
-        $email = $registration->getEmail();
-        if (empty($email)) {
-            $this->addErrorMessage('ERROR: No email found for registration.');
-        }
-        else if ($emailEnabled){
-            /**
-             * @var $message TEMailMessage
-             */
-            $message = TPostOffice::CreateMessageFromUs('registrar', 'SCYM Registration confirmed', $messageText);
-            if ($message == null) {
-                return; // in some unit test scenarios $message is not created. Ignore for these cases.
+
+        $sendMessage = isset($request->text);
+
+        if ($sendMessage) {
+            if (empty($request->text)) {
+                $this->addErrorMessage('No message text received.');
+                return;
             }
-            $message->addRecipient($email, $registration->getName());
-            $message->addCC('registrations@scym.org');
+
+            $email = $registration->getEmail();
+            if (empty($email)) {
+                $this->addErrorMessage('ERROR: No email found for registration.');
+            } else if ($emailEnabled) {
+                /**
+                 * @var $message TEMailMessage
+                 */
+                $message = TPostOffice::CreateMessageFromUs('registrar', 'SCYM Registration confirmed', $request->text);
+                if ($message == null) {
+                    return; // in some unit test scenarios $message is not created. Ignore for these cases.
+                }
+                $message->addRecipient($email, $registration->getName());
+                $message->addCC('registrations@scym.org');
 
 
-            $sendResult = TPostOffice::Send($message);
-            if ($sendResult === false) {
-                $this->addInfoMessage('The mail service failed, so your confirmation was not sent.');
+                $sendResult = TPostOffice::Send($message);
+                if ($sendResult === false) {
+                    $this->addInfoMessage('The mail service failed, so your confirmation was not sent.');
+                }
             }
         }
         $registration->setConfirmed(true);
         $manager->updateEntity($registration);
+        if (!$sendMessage) {
+            $this->addInfoMessage('Housing assignments confirmed.');
+        }
     }
 }

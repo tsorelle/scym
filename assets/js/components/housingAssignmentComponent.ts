@@ -628,6 +628,28 @@ module Tops {
             }
         };
 
+        confirmAssignments = () => {
+            var me = this;
+            jQuery("#confirmation-message-modal").modal('hide');
+
+            var request = {
+                registrationId : me.registrationId(),
+            };
+
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Confirming registration ...');
+
+            me.peanut.executeService('registration.ConfirmRegistration',request, function(serviceResponse: IServiceResponse){
+                    if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                        me.canConfirm(false);
+                    }
+                }
+                )
+                .always(function() {
+                    me.application.hideWaiter();
+                });
+        };
+
         sendConfirmationMessage = () => {
             var me = this;
             jQuery("#confirmation-message-modal").modal('hide');

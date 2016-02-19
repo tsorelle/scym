@@ -386,13 +386,18 @@ module Tops {
             return result;
         }
 
-        public static validateCurrency(value:string): any {
+        public static validateCurrency(value:any): any {
             if (!value) {
                 return false;
             }
-            value = value.replace(/\s+/g, '');
-            value = value.replace(',', '');
-            value = value.replace('$', '');
+            if (typeof value == 'string') {
+                value = value.replace(/\s+/g, '');
+                value = value.replace(',', '');
+                value = value.replace('$', '');
+            }
+            else {
+                value = value.toString();
+            }
             if (!value) {
                 return false;
             }
@@ -411,9 +416,11 @@ module Tops {
                 return false;
             }
 
-            return parts[0] + '.' + parts[1].substring(0, 2);
+            var result = Number(parts[0] + '.' + parts[1].substring(0, 2));
+            if (isNaN(result)) {
+                return false;
+            }
         };
-
 
     }
 }

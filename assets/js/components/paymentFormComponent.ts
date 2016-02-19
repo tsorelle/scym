@@ -81,8 +81,15 @@ module Tops {
         validate = (requireAmount = false) => {
             var me = this;
             me.errorMessage('');
-            if (requireAmount || me.amount().trim()) {
-                var amount = Peanut.validateCurrency(me.amount());
+            var hasAmount = true;
+            var value = me.amount();
+            if (typeof value == 'string') {
+                value = value.trim();
+                hasAmount = value.trim() ? true : false;
+            }
+
+            if (requireAmount || hasAmount) {
+                var amount = Peanut.validateCurrency(value);
                 if (amount === false) {
                     me.errorMessage('Please enter a valid payment amount.');
                     return false;
