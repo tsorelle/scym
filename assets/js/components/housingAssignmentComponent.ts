@@ -447,6 +447,15 @@ module Tops {
             me.updatedAssignments(updates);
         };
 
+        iterateAssignments = (assignments : IAttenderHousingAssignment[], defaultUnitId : any, opFunction : (assignment: IAttenderHousingAssignment) => void) => {
+            _.each(assignments,
+                function(attenderAssignment : IAttenderHousingAssignment) {
+                    _.each(attenderAssignment.assignments, function($a : IHousingAssignment) {
+                        opFunction(attenderAssignment);
+                    });
+                });
+        };
+
         saveAssignments = () => {
             var me = this;
             var request : IHousingAssignmentUpdateRequest = {
@@ -461,6 +470,7 @@ module Tops {
             else {
                 var defaultUnitId = me.defaultHousingUnit().housingUnitId;
                 var assignments = me.housingAssignments();
+                me.housingAssignments([]);
                 _.each(assignments, function(attenderAssignment : IAttenderHousingAssignment) {
                     // attenderAssignment.assignments = [];
                     _.each(attenderAssignment.assignments, function($a : IHousingAssignment) {
@@ -473,6 +483,7 @@ module Tops {
                         }
                     );
                 });
+                me.housingAssignments(assignments);
             }
 
             if (request.updates.length > 0) {

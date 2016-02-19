@@ -280,6 +280,7 @@ module Tops {
                         me.closeDashboard();
                     }
                     break;
+                case 'housingassignmentsupdated' : // fall through
                 case 'registrationchanged' :
                     me.registrationChanged = true;
                     break;

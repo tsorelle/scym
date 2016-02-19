@@ -100,7 +100,6 @@ module Tops {
             var me = this;
             me.application.hideServiceMessages();
             me.application.showWaiter('Getting the registration...');
-
             me.peanut.executeService('registration.GetRegistrationDashboard',registrationId,
                 function (serviceResponse:IServiceResponse) {
                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
