@@ -32,16 +32,18 @@ module Tops {
         defaultHousingUnitSubscription: any;
         assignedByAttender = ko.observable(false);
         confirmationText = ko.observable();
-        canClose = ko.observable(true);
+        canClose = ko.observable(false);
         canSave = ko.observable(false);
         canConfirm = ko.observable(false);
         canSend = ko.observable(false);
+        showConfirmed = ko.observable(false);
         confirmOnSave = false;
         formTitle = ko.observable();
         showFormTitle = true;
 
         updatedAssignments = ko.observableArray<IHousingAssignmentsUpdate>();
         unassignedCount = 0;
+        assingnmentCount = 0;
 
         public constructor(application:IPeanutClient, owner: IEventSubscriber, confirmOnSave : boolean = false) {
             var me = this;
@@ -65,17 +67,23 @@ module Tops {
             });
         }
 
-        private countUnassigned(assignments: IAttenderHousingAssignment[]) {
+        private getAssignmentCounts(assignments: IAttenderHousingAssignment[]) {
             var me = this;
-            var unassignedCount = 0;
+            var counts = {
+                assigned: 0,
+                unassigned: 0
+            };
             _.each(assignments, function(attender: IAttenderHousingAssignment) {
                 _.each(attender.assignments,function(assignment: IHousingAssignment) {
                     if (assignment.housingUnitId == 0) {
-                        unassignedCount += 1;
+                        counts.unassigned += 1;
+                    }
+                    else {
+                        counts.assigned += 1;
                     }
                 });
             });
-            return unassignedCount;
+            return counts;
         }
 
 
@@ -83,15 +91,18 @@ module Tops {
             var me = this;
             me.updatedAssignments([]);
         }
-        public hideCloseButton = () => {
-            this.canClose(false);
-        };
 
         cancelChanges = () => {
             var me = this;
-            var id = me.registrationId();
-            me.reset();
-            me.getAssignments(id);
+            me.updatedAssignments([]);
+            if (me.confirmOnSave) {
+                var id = me.registrationId();
+                me.reset();
+                me.getAssignments(id);
+            }
+            else {
+                me.closeForm();
+            }
         };
 
         public getAssignments(registrationId:number) {
@@ -119,24 +130,31 @@ module Tops {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = <IGetHousingAssignmentsResponse>serviceResponse.Value;
-                var confirmed = (response.confirmed) ? false : true;
-                me.unassignedCount = me.countUnassigned(response.assignments);
+                var confirmed = (response.confirmed) ? true : false;
+                var counts = me.getAssignmentCounts(response.assignments);
+                me.unassignedCount = counts.unassigned;
                 me.canConfirm(false);
                 me.canSend(false);
+                me.canClose(false);
+                me.canSave(false);
+                me.updatedAssignments([]);
 
-                if (response.confirmed) {
-                    if (me.confirmOnSave) {
-                        me.canConfirm(me.unassignedCount == 0);
+                if (me.confirmOnSave) {
+                    if (confirmed) {
+                        me.showConfirmed(true);
                     }
                     else {
-                        me.canSend(me.unassignedCount == 0);
+                        me.canConfirm(counts.assigned > 0);
                     }
+
+                }
+                else {
+                    var canSend = (counts.assigned > 0);
+                    me.canSend(canSend);
+                    me.showConfirmed(canSend && confirmed);
+                    me.canClose(true);
                 }
 
-                if (!me.canClose()) {
-                    var canConfirm = (response.confirmed) ? false : true;
-                    me.canConfirm(canConfirm);
-                }
                 if(response.housingTypes) {
                     me.housingTypes(response.housingTypes);
                 }
@@ -287,6 +305,15 @@ module Tops {
             me.filterHousingUnitList(id);
         };
 
+        private setChangedState() {
+            var me = this;
+            me.canConfirm(false);
+            me.canSend(false);
+            me.canSave(true);
+            me.canClose(false);
+            me.showConfirmed(false);
+        }
+
         onDefaultUnitChange = (selected: IHousingUnit) => {
             var me = this;
             var housingUnitId = 0;
@@ -304,9 +331,7 @@ module Tops {
                 ]
             };
             me.updatedAssignments([wildcardAssignment]);
-            me.canConfirm(false);
-            me.canSend(false);
-            me.canSave(true);
+            me.setChangedState();
             me.unassignedCount = 0;
         };
 
@@ -412,9 +437,8 @@ module Tops {
             if (!assignment.housingUnitId) {
                 return;
             }
-            me.canConfirm(false);
-            me.canSend(false);
-            me.canSave(true);
+            me.setChangedState();
+
             if (me.unassignedCount) {
                 me.unassignedCount -= 1;
             }
@@ -445,15 +469,6 @@ module Tops {
             }
 
             me.updatedAssignments(updates);
-        };
-
-        iterateAssignments = (assignments : IAttenderHousingAssignment[], defaultUnitId : any, opFunction : (assignment: IAttenderHousingAssignment) => void) => {
-            _.each(assignments,
-                function(attenderAssignment : IAttenderHousingAssignment) {
-                    _.each(attenderAssignment.assignments, function($a : IHousingAssignment) {
-                        opFunction(attenderAssignment);
-                    });
-                });
         };
 
         saveAssignments = () => {
@@ -500,13 +515,14 @@ module Tops {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 me.updatedAssignments([]);
+                me.showConfirmed(false);
                 me.canConfirm(false);
                 me.canSave(false);
-                me.canSend(false);
                 if (me.confirmOnSave) {
                     me.canSend(false);
                 }
                 else {
+                    me.canClose(true);
                     me.canSend(me.unassignedCount == 0);
                 }
                 me.owner.handleEvent('housingassignmentsupdated');
