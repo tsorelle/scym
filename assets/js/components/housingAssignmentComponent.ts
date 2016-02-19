@@ -642,6 +642,7 @@ module Tops {
             me.peanut.executeService('registration.ConfirmRegistration',request, function(serviceResponse: IServiceResponse){
                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                         me.canConfirm(false);
+                        me.owner.handleEvent('housingassignmentsupdated');
                     }
                 }
                 )
