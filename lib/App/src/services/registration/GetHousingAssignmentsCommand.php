@@ -74,7 +74,6 @@ class GetHousingAssignmentsCommand extends TServiceCommand
 
     protected function run()
     {
-
         $request = $this->getRequest();
         if ($request == null) {
             $this->addErrorMessage('ERROR: No service request.');
@@ -105,6 +104,9 @@ class GetHousingAssignmentsCommand extends TServiceCommand
             $responseData->housingTypes = $manager->getHousingTypesLookup();
             $responseData->units = $manager->getHousingUnitsList();
         }
+
+        // $this->addInfoMessage($responseData->confirmed ? 'Confirmed' : 'NOT confirmed');
+
         $this->setReturnValue($responseData);
     }
 

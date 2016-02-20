@@ -293,6 +293,7 @@
 
                                     <div class="form-group" data-bind="css:{'has-error': registrationForm.contactInfoForm.nameError}" >
                                         <label for="addressname-input" class="control-label">Name <span data-bind="text:registrationForm.contactInfoForm.nameError"></span></label>
+                                        <div><em>Please enter a name to identify your registration, such as "John Smith", "John and Jane Smith" or  "The Smith Family" </em></div>
                                         <input class="form-control" id="addressname-input" data-bind="value:registrationForm.contactInfoForm.name"/>
                                     </div>
 
@@ -346,6 +347,9 @@
                                         <label for="notes-input" class="control-label">Notes</label>
                                         <span>(Please add any questions or comments for the reqistrar.)</span>
                                         <textarea class="form-control" id="notes-input" data-bind="value:registrationForm.contactInfoForm.notes"></textarea>
+                                    </div>
+                                    <div data-bind="visible: attenderList().length == 0">
+                                       <strong>Attenders:</strong> <em>Please add attender information for <strong>yourself</strong> and any others who will come with you.</em>
                                     </div>
                                     <div id="registration-edit-buttons">
                                         <button class="btn btn-primary" data-bind="visible: attenderList().length == 0,click:addAttenders">Add attenders</button>
