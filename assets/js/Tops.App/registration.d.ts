@@ -54,6 +54,7 @@ declare module Tops {
         updatedAttenders : IAttender[];
         deletedAttenders : any[];
         donations: IKeyValuePair[];
+        sendConfirmation: boolean;
     }
 
     export interface ICostUpdateRequest {

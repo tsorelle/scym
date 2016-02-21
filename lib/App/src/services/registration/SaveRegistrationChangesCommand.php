@@ -117,7 +117,8 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         // todo: retrieve and format housing assignments
         $response->housingAssignments = array();
 
-        if ($recieved) {
+        $sendConfirmation = $request->getSendConfirmation();
+        if ($recieved && $sendConfirmation) {
             $this->sendConfirmationMessage($response);
         }
 

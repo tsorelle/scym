@@ -1079,6 +1079,8 @@ module Tops {
         addressSearchResults : searchListObservable;
         addressSearchValue = ko.observable('');
         addressSearchWarning = ko.observable('');
+        showConfirmationCheckbox = ko.observable(false);
+        sendConfirmation = ko.observable(true);
 
         // attenders
         attenderList:KnockoutObservableArray<IListItem> = ko.observableArray([]);
@@ -1425,6 +1427,13 @@ module Tops {
                 me.sessionInfo.year = response.sessionInfo.year;
                 me.sessionInfo.startDate = response.sessionInfo.startDate;
                 me.sessionInfo.endDate = response.sessionInfo.endDate;
+
+                var start = new Date(response.sessionInfo.startDate);
+                var today = new Date();
+                var preYM = today < start;
+                me.sendConfirmation(preYM);
+                me.showConfirmationCheckbox((response.user.isRegistrar) && preYM);
+
                 me.datesText(response.sessionInfo.datesText);
                 me.locationText(response.sessionInfo.location);
 
@@ -2111,7 +2120,8 @@ module Tops {
                     registration: <IRegistrationInfo>{registrationId: registrationId},
                     updatedAttenders: me.updatedAttenders,
                     deletedAttenders: me.deletedAttenders,
-                    donations: me.registrationForm.financeInfoForm.getDonations()
+                    donations: me.registrationForm.financeInfoForm.getDonations(),
+                    sendConfirmation: me.sendConfirmation()
                 };
                 if (me.registrationChanged() || registrationId < 1) {
                     request.registration = <IRegistrationInfo>{

@@ -121,6 +121,7 @@ class RegistrationUpdateRequest
             $request->statusId = 2;
         }
         $this->regInfo = new RegistrationDto($request->registration);
+
     }
 
     public function getRegistrationId() {
@@ -150,5 +151,9 @@ class RegistrationUpdateRequest
     }
     public function getStatusId() {
         return $this->regInfo->getStatusId();
+    }
+
+    public function getSendConfirmation() {
+        return isset($this->request->sendConfirmation) ? $this->request->sendConfirmation : true;
     }
 }
