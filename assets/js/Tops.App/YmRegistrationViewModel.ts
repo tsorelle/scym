@@ -1126,6 +1126,11 @@ module Tops {
                 if (me.registrationForm.id()) {
                     me.saveChanges();
                 }
+                else {
+                    me.accountButton.setIncomplete();
+                    me.registrationForm.financeInfoForm.edit();
+                    me.showAccountsForm();
+                }
             }
         };
 
@@ -1424,6 +1429,14 @@ module Tops {
             me.application.showDefaultSection();
         };
 
+        showContactFormHelp = () => {
+            jQuery("#contact-form-help").modal('show');
+        };
+
+        showAttenderNavHelp = () => {
+            jQuery("#attender-nav-help").modal('show');
+        };
+
         private handleInitializationResponse = (serviceResponse:IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
@@ -1437,7 +1450,7 @@ module Tops {
                 var today = new Date();
                 var preYM = today < start;
                 var isRegistrar = response.user.isRegistrar ? true : false;
-                var showMessageCheck = isRegistrar;
+                var showMessageCheck = isRegistrar || (!preYM);
 
                 // for debugging
                 // preYM = false;
@@ -1646,6 +1659,24 @@ module Tops {
             return true;
         }
 
+        saveContactInfoAndDone = () => {
+            var me = this;
+            var ready = me.endContactEdit();
+            if (!ready) {
+                return;
+            }
+            me.contactButton.setStatus('complete');
+            if (me.registrationForm.id()) {
+                me.saveChanges();
+            }
+            else {
+                me.attendersButton.setComplete();
+                me.accountButton.setIncomplete();
+                me.registrationForm.financeInfoForm.edit();
+                me.showAccountsForm();
+            }
+        };
+
         addAttenders() {
             var me = this;
             var ready = me.endContactEdit();
@@ -1713,6 +1744,14 @@ module Tops {
                 me.accountButton.setIncomplete();
                 me.registrationForm.financeInfoForm.edit();
                 me.showAccountsForm();
+            }
+        };
+
+
+        saveAttenderAndShowList = () => {
+            var me = this;
+            if (me.saveAttender()) {
+                me.showAttendersList();
             }
         };
 

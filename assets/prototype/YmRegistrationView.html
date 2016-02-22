@@ -290,6 +290,9 @@
                         <div id="contact-edit-panel" data-bind="visible:registrationForm.contactInfoForm.viewState() == 'edit'">
                             <div class="row">
                                 <div class="col-md-12">
+                                    <div class="whats-this" style="padding-bottom: 4px">
+                                        <a href="#" data-bind="click:showContactFormHelp"><span class="glyphicon glyphicon-question-sign"></span> Help: How do I fill this out?</a>
+                                    </div>
                                     <div id="contact-errors" class="alert alert-danger" role="alert" data-bind="visible:registrationForm.contactInfoForm.hasErrors">
                                         <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                                         <span class="sr-only">Error:</span>
@@ -357,7 +360,9 @@
                                        <strong>Attenders:</strong> <em>Please add attender information for <strong>yourself</strong> and any others who will come with you.</em>
                                     </div>
                                     <div id="registration-edit-buttons">
-                                        <button class="btn btn-primary" data-bind="visible: attenderList().length == 0,click:addAttenders">Add attenders</button>
+                                        <button class="btn btn-primary" data-bind="visible:!registrationForm.id(), click:addAttenders">
+                                            Add <span data-bind="visible: attenderList().length > 0"> additional </span> attenders
+                                        </button>
                                         <button class="btn btn-primary" data-bind="visible: attenderList().length > 0,click:saveContactInfo">
                                             <span data-bind="visible:registrationForm.id()">
                                                 Save
@@ -366,7 +371,9 @@
                                                 Done
                                             </span>
                                         </button>
-                                        <button class="btn btn-default" data-bind="visible:registrationForm.id,click:cancelContactChanges">Cancel</button>
+
+                                        <button class="btn btn-default" data-bind="visible:registrationForm.id,click:cancelContactChanges">
+                                            Cancel</button>
                                     </div>
                                 </div>
                             </div>
@@ -581,7 +588,7 @@
                                             </span>
                                         </div>
                                         <div style="margin-bottom: 5px">
-                                            <a href="#" data-toggle="modal" data-target="#housing-info">More housing information...</a>
+                                            <a href="#" data-toggle="modal" data-target="#housing-info"><span class="glyphicon glyphicon-question-sign"></span> More housing information...</a>
                                         </div>
                                     </div>
                                 </div>
@@ -681,6 +688,9 @@
                                 <button class="btn btn-primary" data-bind="visible: !registrationForm.id(),click:saveAttenderAndDone">Done</button>
                                 <button class="btn btn-primary" data-bind="visible: registrationForm.id(),click:saveAttenderAndDone">Save</button>
                                 <button class="btn btn-default" data-bind="click:cancelAttenderEdit">Cancel</button>
+                            </div>
+                            <div class="whats-this" style="padding-top: 5px">
+                                <a href="#" data-bind="click:showAttenderNavHelp"><span class="glyphicon glyphicon-question-sign"></span> Help: What do these buttons do?</a>
                             </div>
                         </div>
                     </div>
@@ -1001,6 +1011,106 @@
                             Send <span class="glyphicon glyphicon-send"></span>
                         </button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="attender-nav-help" tabindex="-1" role="dialog" aria-labelledby="housingInfoLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Help: Attender navigation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Moving on...</h4>
+                        <dl class="indented-list">
+                            <dt data-bind="visible: !registrationForm.id()">Add another attender</dt>
+                            <dd data-bind="visible: !registrationForm.id()">Save your changes and start another attender form.</dd>
+
+                            <dt data-bind="visible: !registrationForm.id()">Done</dt>
+                            <dd data-bind="visible: !registrationForm.id()">Save this attender and proceed to submit your registration.
+                            </dd>
+
+                            <dt data-bind="visible: registrationForm.id()">Save</dt>
+                            <dd data-bind="visible: registrationForm.id()">Save this attender and return to the attender list.</dd>
+
+                            <dt>Cancel</dt>
+                            <dd>Cancel changes for this attender and go to the attender list. </dd>
+                        </dl>
+                        <div data-bind="visible: !registrationForm.id()">
+                            <h4>Going back...</h4>
+                            <p>
+                                If you need to change previous information first click 'Done' or 'Cancel'. Then . . .
+                            </p>
+                            <dl class="indented-list">
+                                <dt>To change your contact information.</dt>
+                                <dd>
+                                    Click the 'Contact' button on your left.
+                                </dd>
+                                <dt>To change a previously added attender.</dt>
+                                <dd>
+                                    Click the 'Attenders' button on your left find the attender you want to change and click the '[Edit]' or '[Remove]' link.
+                                </dd>
+                            </dl>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="contact-form-help" tabindex="-1" role="dialog" aria-labelledby="housingInfoLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Help: The contact form</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Attender action buttons</h4>
+                        <dl class="indented-list">
+                            <dt>Name</dt>
+                            <dd>This is a name to identify the registrations. It can be your full name or something like "John and Mary Smith" or "The Smith Family."<br><br>
+                                <em><strong>Note:</strong> Although you may enter your own name you will still need to enter attender information for yourself and add an
+                                attender for any others who are coming.</em><br>
+                            </dd>
+
+                            <dt>E-mail</dt>
+                            <dd>E-mail is optional if you give a phone or a street address and city.</dd>
+
+                            <dt>Phone</dt>
+                            <dd>A phone number is optional if you give an e-mail address or a street address and city.</dd>
+
+                            <dt>E-mail</dt>
+                            <dd>E-mail address is optional if you give a phone or an address.</dd>
+
+                            <dt data-bind="visible:attenderList().length > 0 && registrationForm.id()">'Save' button</dt>
+                            <dd data-bind="visible:attenderList().length > 0 && registrationForm.id()">Save your changes.</dd>
+
+                            <dt data-bind="visible: !registrationForm.id()">
+                                'Add <span data-bind="visible: attenderList().length > 0"> additional </span> attenders' button</dt>
+                            <dd data-bind="visible: !registrationForm.id()">
+                                Save changes and proceed to add attenders.  Remember to add yourself as an attender.
+                            </dd>
+
+                            <dt data-bind="visible:attenderList().length > 0 && !registrationForm.id()">'Done' button</dt>
+                            <dd data-bind="visible:attenderList().length > 0 && !registrationForm.id()">
+                                Save your changes and proceed to sumbit your registration.</dd>
+
+
+                            <dt data-bind="visible:registrationForm.id">'Cancel' button</dt>
+                            <dd data-bind="visible:registrationForm.id">
+                                Cancel your changes.
+                            </dd>
+
+
+                        </dl>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
