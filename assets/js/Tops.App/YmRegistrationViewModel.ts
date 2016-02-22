@@ -1068,6 +1068,12 @@ module Tops {
         // simple forms
         lookupCode = ko.observable('');
         modalInput = ko.observable('');
+        addressSearchValue = ko.observable('');
+        addressSearchWarning = ko.observable('');
+        showConfirmationCheckbox = ko.observable(false);
+        sendConfirmation = ko.observable(true);
+        deleteAttenderMessage = ko.observable('');
+        selectedAttender : IListItem = null;
 
         // complex forms
         startupForm = new startupFormObservable();
@@ -1077,10 +1083,7 @@ module Tops {
         private familyMembers:IFamilyAttender[] = [];
         familyMemberResults : searchListObservable;
         addressSearchResults : searchListObservable;
-        addressSearchValue = ko.observable('');
-        addressSearchWarning = ko.observable('');
-        showConfirmationCheckbox = ko.observable(false);
-        sendConfirmation = ko.observable(true);
+
 
         // attenders
         attenderList:KnockoutObservableArray<IListItem> = ko.observableArray([]);
@@ -1913,22 +1916,34 @@ module Tops {
 
         removeSelectedAttender = (item:IListItem) => {
             var me = this;
-            me.attendersChanged(true);
-            var id = item.Value;
-            var attenderList = me.attenderList();
-            attenderList = _.filter(attenderList, function (attenderItem:IListItem) {
-                return attenderItem.Value != id;
-            });
-            me.attenderList(attenderList);
-            var updated = _.filter(me.updatedAttenders, function (attender:IAttender) {
-                return attender.attenderId != id;
-            });
-            me.updatedAttenders = updated;
-            if (id > 0) {
-                me.deletedAttenders.push(id);
-            }
-            if (me.registrationForm.id()) {
-                me.saveChanges();
+            me.selectedAttender = item;
+            me.deleteAttenderMessage("Remove attender '"+item.Text+"'?")
+            jQuery("#confirm-attender-delete-modal").modal('show');
+        };
+
+
+        deleteSelectedAttender = () => {
+            var me = this;
+            jQuery("#confirm-attender-delete-modal").modal('hide');
+            if (me.selectedAttender) {
+                me.attendersChanged(true);
+                var id = me.selectedAttender.Value;
+                var attenderList = me.attenderList();
+                attenderList = _.filter(attenderList, function (attenderItem:IListItem) {
+                    return attenderItem.Value != id;
+                });
+                me.attenderList(attenderList);
+                var updated = _.filter(me.updatedAttenders, function (attender:IAttender) {
+                    return attender.attenderId != id;
+                });
+                me.updatedAttenders = updated;
+                if (id > 0) {
+                    me.deletedAttenders.push(id);
+                }
+                if (me.registrationForm.id()) {
+                    me.saveChanges();
+                }
+                me.selectedAttender = null;
             }
         };
 
