@@ -1059,6 +1059,7 @@ module Tops {
         attendersChanged = ko.observable(false);
         balanceInvalid:KnockoutComputed<boolean>; // used on accounts form
 
+
         private currentRegistration:IRegistrationInfo;
         private currentDonationsTotal : string = '';
         sessionInfo = new AnnualSessionInfo();
@@ -1074,6 +1075,7 @@ module Tops {
         sendConfirmation = ko.observable(true);
         deleteAttenderMessage = ko.observable('');
         selectedAttender : IListItem = null;
+        previousBalance : any = null;
 
         // complex forms
         startupForm = new startupFormObservable();
@@ -1434,8 +1436,16 @@ module Tops {
                 var start = new Date(response.sessionInfo.startDate);
                 var today = new Date();
                 var preYM = today < start;
-                me.sendConfirmation(preYM);
-                me.showConfirmationCheckbox((response.user.isRegistrar) && preYM);
+                var isRegistrar = response.user.isRegistrar ? true : false;
+                var showMessageCheck = isRegistrar;
+
+                // for debugging
+                // preYM = false;
+                // isRegistrar = false;
+                // showMessageCheck = true;
+
+                me.sendConfirmation(preYM || (!isRegistrar));
+                me.showConfirmationCheckbox(showMessageCheck);
 
                 me.datesText(response.sessionInfo.datesText);
                 me.locationText(response.sessionInfo.location);
@@ -1497,6 +1507,7 @@ module Tops {
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = <IRegistrationResponse>serviceResponse.Value;
                 me.loadRegistration(response);
+
             }
             else {
                 me.lookupForm.validationError('Sorry, cannot locate this registration.')
@@ -1509,6 +1520,7 @@ module Tops {
             me.registrationStatus(response.registration.statusId);
             me.currentRegistration = response.registration;
             me.currentDonationsTotal = response.accountSummary.donationTotal;
+            me.previousBalance = USDollars.toNumber(response.accountSummary.balance);
             me.registrationForm.assign(response.registration);
             me.attenderList(response.attenderList);
             me.registrationForm.financeInfoForm.assignAccountSummary(response.accountSummary);
@@ -1576,6 +1588,7 @@ module Tops {
             me.registrationForm.clear();
             me.attenderList([]);
             var code = me.lookupForm.getLookupCode();
+            me.previousBalance = null;
             if (code) {
                 me.verifyLookupCode(code);
             }
@@ -2136,7 +2149,8 @@ module Tops {
                     updatedAttenders: me.updatedAttenders,
                     deletedAttenders: me.deletedAttenders,
                     donations: me.registrationForm.financeInfoForm.getDonations(),
-                    sendConfirmation: me.sendConfirmation()
+                    sendConfirmation: me.sendConfirmation(),
+                    previousBalance: me.previousBalance
                 };
                 if (me.registrationChanged() || registrationId < 1) {
                     request.registration = <IRegistrationInfo>{

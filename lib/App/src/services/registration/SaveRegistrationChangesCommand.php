@@ -76,7 +76,7 @@ class SaveRegistrationChangesCommand extends TServiceCommand
      * @var ScymRegistrationsManager
      */
     private $registrationsManager;
-    
+
     protected function run()
     {
         $request =  new RegistrationUpdateRequest( $this->getRequest());
@@ -89,7 +89,9 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         $this->registrationsManager->updateDonations($request->getDonations(),$registration);
 
         $attenders = $registration->getAttenders()->toArray();
-        $recieved = ($registration->getStatusId() == 1 && count($attenders));
+        $statusId = $registration->getStatusId();
+        $recieved = ($statusId == 1 && count($attenders));
+
         if ($recieved) {
             $registration->setStatusId(2);
         }
@@ -101,7 +103,6 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         catch (\Exception $ex) {
             throw($ex);
         }
-
 
         // build account and summary
         $accountManager = new ScymAccountManager($this->registrationsManager);
@@ -117,14 +118,21 @@ class SaveRegistrationChangesCommand extends TServiceCommand
         // todo: retrieve and format housing assignments
         $response->housingAssignments = array();
 
-        $sendConfirmation = $request->getSendConfirmation();
-        if ($recieved && $sendConfirmation) {
+        $sendConfirmation = $recieved ? true : $request->getSendConfirmation();
+        $previousBalance = $request->getPreviousBalance();
+        if ($sendConfirmation && $previousBalance !== null) {
+            $sendConfirmation = $previousBalance != $account->getBalance();
+        }
+
+        if ($sendConfirmation) {
             $this->sendConfirmationMessage($response);
         }
 
         $this->setReturnValue($response);
 
     }
+
+
 
     /**
      * @param $request RegistrationUpdateRequest

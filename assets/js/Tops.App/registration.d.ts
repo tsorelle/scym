@@ -55,6 +55,7 @@ declare module Tops {
         deletedAttenders : any[];
         donations: IKeyValuePair[];
         sendConfirmation: boolean;
+        previousBalance : any;
     }
 
     export interface ICostUpdateRequest {

@@ -861,7 +861,7 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
             $this->setYear($year);
         }
 
-        $this->setStatusId($dto->getStatusId());
+        // $this->setStatusId($dto->getStatusId());
         $this->setName( $dto->getName());
         $this->setAddress( $dto->getAddress());
         $this->setCity( $dto->getCity());

@@ -63,6 +63,11 @@
 				</span>
             </div>
 
+            <div class="reg-nav-tab" style="margin-top: 10ex; font-size: 13px;">
+                <div data-bind="visible:showConfirmationCheckbox" class="checkbox">
+                    <label><input type="checkbox" data-bind="checked:sendConfirmation" />Send confirmation message</label>
+                </div>
+            </div>
 
         </div>
         <!-- forms -->
@@ -750,9 +755,6 @@
                                 <span data-bind="visible:registrationStatus() == 1">Save and submit your registration</span>
                             </button>
                             <button class="btn btn-default" data-bind="click:cancelFinanceChanges">Cancel</button>
-                        </div>
-                        <div data-bind="visible:showConfirmationCheckbox" class="checkbox">
-                            <label><input type="checkbox" data-bind="checked:sendConfirmation" />Send confirmation message</label>
                         </div>
                     </div>
                     <div id="finance-view-panel" data-bind="visible:registrationForm.financeInfoForm.viewState() == 'view'">

@@ -156,4 +156,8 @@ class RegistrationUpdateRequest
     public function getSendConfirmation() {
         return isset($this->request->sendConfirmation) ? $this->request->sendConfirmation : true;
     }
+
+    public function getPreviousBalance() {
+        return isset($this->request->previousBalance) ? $this->request->previousBalance : null;
+    }
 }
