@@ -371,18 +371,22 @@ module Tops {
                 var first:IAttenderHousingAssignment = me.findFirst(attenderAssignments);
                 if (first) {
                     defaultType = first.attender.housingPreference;
+
                     defaultAssignment = me.findFirst(first.assignments);
                     if (defaultAssignment) {
                         var nonMatchAttender = _.find(attenderAssignments,
                             function (attenderAssignment:IAttenderHousingAssignment) {
+                                if (attenderAssignment.attender.housingPreference != defaultType) {
+                                    return true;
+                                }
                                 var nonMatch = _.find(attenderAssignment.assignments,
-                                    function (assignment:IHousingAssignment) {
-                                        return assignment.housingUnitId != defaultAssignment.housingUnitId;
-                                    }
-                                );
+                                        function (assignment:IHousingAssignment) {
+                                            return assignment.housingUnitId != defaultAssignment.housingUnitId;
+                                        }
+                                    );
                                 return nonMatch != null;
-                            }
-                        );
+                            });
+
                         if (nonMatchAttender) {
                             defaultAssignment = null;
                             showDetail = true;
