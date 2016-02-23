@@ -393,13 +393,15 @@ module Tops {
 
             if (!showDetail) {
                 var housingType = me.getHousingType(defaultType);
+                var unitList = me.getHousingUnitList(housingType.Key);
+                me.housingUnits(unitList);
                 me.defaultHousingType(housingType);
+
                 var unit = null;
                 if (defaultAssignment) {
                     unit = me.getHousingUnit(defaultAssignment.housingUnitId);
                 }
                 me.defaultHousingUnit(unit);
-
                 me.defaultHousingTypeSubscription = me.defaultHousingType.subscribe(me.onTypeChange);
                 me.defaultHousingUnitSubscription = me.defaultHousingUnit.subscribe(me.onDefaultUnitChange);
             }
