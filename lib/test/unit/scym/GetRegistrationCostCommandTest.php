@@ -201,7 +201,7 @@ class RegistrationCommandTest extends \PHPUnit_Framework_TestCase
         $command = new GetRegistrationCostCommand();
         $actual = $command->runTest($request);
         $this->assertNotNull($actual);
-        $expected = '$310.00';
+        $expected = '$280.00';
         $this->assertEquals($expected, $actual->balance);
     }
 
@@ -231,7 +231,7 @@ class RegistrationCommandTest extends \PHPUnit_Framework_TestCase
         $command = new GetRegistrationCostCommand();
         $actual = $command->runTest($request);
         $this->assertNotNull($actual);
-        $expected = '$350.00';
+        $expected = '$320.00';
         $this->assertEquals($expected, $actual->balance);
         $expected = '$265.00';
         $this->assertEquals($expected, $actual->aidEligibility);

@@ -13,7 +13,7 @@ connections:
     driver: pdo_mysql
     user: scymuser
     password: woolman
-    dbname: scymmodel
+    dbname: scym_model
   fma_model:
     driver: pdo_mysql
     user: austinqu_website
