@@ -10,6 +10,7 @@
 /// <reference path='../Tops.App/Registration.d.ts' />
 ///<reference path="attendersReportComponent.ts"/>
 ///<reference path="arrivalsReportComponent.ts"/>
+///<reference path="ledgerReportComponent.ts"/>
 
 /**
  * Created by Terry on 1/4/2016.
@@ -130,6 +131,15 @@ module Tops {
                 });
         };
 
+        showReptLedger                  = () => {
+            var me=this;
+            me.loadReport('ledger','ledger-report',
+                function(reportName: string) {
+                    return new ledgerReportComponent(me.application,me,reportName);
+                });
+        };
+
+
         showReptPaymentsReceived        = () => {
             var me=this;
             me.loadReport('paymentsReceived','not-implemented',function(reportName: string) {return null;});
@@ -141,10 +151,6 @@ module Tops {
         showReptFinancialAid            = () => {
             var me=this;
             me.loadReport('financialAid','not-implemented',function(reportName: string) {return null;});
-        };
-        showReptLedger                  = () => {
-            var me=this;
-            me.loadReport('ledger','not-implemented',function(reportName: string) {return null;});
         };
 
         refreshReports = () => {

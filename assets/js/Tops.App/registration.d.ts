@@ -439,6 +439,9 @@ declare module Tops {
         housingTypeDescription : string;
         confirmed : number;
         requested : number;
+        amount: number;
+        value: string;
+
     }
 
     export interface IReportComponent extends IEventSubscriber {
@@ -454,5 +457,36 @@ declare module Tops {
 
     export interface IReportOwner extends IEventSubscriber {
         getReportData: (reportName: string, dataHandler: (data: any) => void) => void;
+    }
+
+    export interface ILedgerReportItem {
+        registrationId : any;
+        registrationCode : string;
+        name: string;
+        attendedCount: number;
+        EntryType : string,
+        TransactionType : string;
+        ItemGroup : number;
+        Type: string;
+        ItemTypeId: number;
+        value: number;
+        Amount: string;
+    }
+
+    export interface IBalanceSheetItem {
+        registrationId: any;
+        registrationCode : string;
+        name: string;
+        attended: any;
+        Fees: string;
+        Donations: string;
+        Credits: string;
+        Payments: string;
+        Balance: string;
+    }
+
+    export interface ILedgerReport {
+        ledger: ILedgerReportItem[];
+        balanceSheet: IBalanceSheetItem[];
     }
 }

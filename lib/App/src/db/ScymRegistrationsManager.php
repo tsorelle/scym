@@ -979,8 +979,10 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $this->getReportView('financialAidReportView',false);
     }
     public function getLedgerReport(){
-        /* todo: implement report views */
-        return $this->getReportView('ledgerReportView',false);
+        $result = new \stdClass();
+        $result->ledger = $this->getReportView('ledgerDetailView');
+        $result->balanceSheet = $this->getReportView('balancesView');
+        return $result;
     }
 
 }
