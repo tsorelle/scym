@@ -1,4 +1,15 @@
 <div class="row" id="ledger-report-view">
+    <style>
+        .balanceWarning {
+            font-weight: bold;
+            background-color: yellow;
+            color: red;
+        }
+        .refundWarning {
+            background-color: lightgreen;
+            font-weight: bold;
+        }
+    </style>
     <div class="col-md-12">
         <div id="ledger-options-header" class="row hidden-print" style="margin-bottom: 10px">
             <div class="col-md-6" style="padding-bottom:2px">
@@ -76,7 +87,7 @@
                         <td data-bind="text:Donations" class="text-right"></td>
                         <td data-bind="text:Credits" class="text-right"></td>
                         <td data-bind="text:Payments" class="text-right"></td>
-                        <td data-bind="text:Balance" class="text-right"></td>
+                        <td  data-bind="css: { balanceWarning: balanceAmount > 0, refundWarning: balanceAmount < 0 }" class="text-right"><span data-bind="text:Balance"></span> </td>
                     </tr>
                     </tbody>
                 </table>
