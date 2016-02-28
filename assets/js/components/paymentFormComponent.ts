@@ -54,13 +54,13 @@ module Tops {
 
         getValues = ()=> {
             var me = this;
-            var type = me.paymentType();
+            var paymentType = me.paymentType();
             var result : IPaymentItem =  {
                 amount: Number(me.amount()),
-                type: type,
+                type: paymentType,
                 payor: me.payor(),
                 notes: me.notes(),
-                checkNumber: type == 'cash' ? 'cash' : me.checkNumber()
+                checkNumber: paymentType == 'cash' ? 'cash' : me.checkNumber()
             };
             return result;
         };

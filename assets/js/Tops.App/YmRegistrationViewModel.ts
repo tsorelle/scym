@@ -230,13 +230,14 @@ module Tops {
             var result:IKeyValuePair[] = [];
             var donations = me.fundContributions();
             _.each(donations, function (donation:IIndexedInput) {
-                if (donation.Value) {
+                // if (donation.Value) {
+
                     var item:IKeyValuePair = {
                         Key: donation.Key,
-                        Value: donation.Value
+                        Value: donation.Value ? donation.Value : 0
                     };
                     result.push(item);
-                }
+                // }
             }, me);
 
             return result;

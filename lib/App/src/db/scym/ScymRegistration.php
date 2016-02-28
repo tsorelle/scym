@@ -183,8 +183,10 @@ class ScymRegistration extends DateStampedEntity implements IRegistration
             /**
              * @var $donationItem TKeyValuePair
              */
-            $newDonation = ScymDonation::createDonation($donationItem->Key,$donationItem->Value);
-            $this->addDonation($newDonation);
+            if ((!empty($donationItem->Value) && $donationItem->Value > 0.00)) {
+                $newDonation = ScymDonation::createDonation($donationItem->Key, $donationItem->Value);
+                $this->addDonation($newDonation);
+            }
         }
 
         return $removed;

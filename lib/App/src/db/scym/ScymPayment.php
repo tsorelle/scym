@@ -258,12 +258,19 @@ class ScymPayment extends DateStampedEntity implements ICostItem
      *     payor: string;
      *    checkNumber: string;
      */
-    public static function CreatePayment($paymentDto,$paymentType=0)
+    public static function CreatePayment($paymentDto,$paymentType='check')
     {
         $payment = new ScymPayment();
         $payment->setAmount($paymentDto->amount);
         $payment->setCheckNumber($paymentDto->checkNumber);
         $payment->setPayor($paymentDto->payor);
+        switch($paymentType) {
+            case 'cash' : $paymentType = 1;
+                break;
+            case 'check' : $paymentType = 2;
+                break;
+            default : $paymentType = 0;
+        }
         $payment->setPaymentType($paymentType);
         $payment->setDateReceived(new DateTime());
         if (isset($paymentDto->notes)){

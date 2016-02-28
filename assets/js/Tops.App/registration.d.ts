@@ -150,6 +150,7 @@ declare module Tops {
         checkNumber : string; // number or 'cash'
         payor : string;
         type: string; // 'cash' or 'check'
+        paymentType: number;
     }
 
     export interface IPaymentDisplayItem extends IPaymentItem, IAccountDisplayItem {
