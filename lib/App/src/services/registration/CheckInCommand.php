@@ -47,11 +47,12 @@ class CheckInCommand extends TServiceCommand
 
         if ($payment != null && !empty($payment->amount)) {
             $validPayment = ScymPayment::validatePayment($payment);
-            if (!empty($validPayment->errorMessage)) {
-                $this->addErrorMessage("Invalid payment: $validPayment->errorMessage");
+            if ($validPayment !== true) {
+                $this->addErrorMessage("Invalid payment: $validPayment");
                 return;
             }
-            $paymentEntity = ScymPayment::CreatePayment($validPayment);
+
+            $paymentEntity = ScymPayment::CreatePayment($payment);
             $registration->addPayment($paymentEntity);
             $changed = true;
         }

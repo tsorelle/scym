@@ -11,6 +11,7 @@
 ///<reference path="attendersReportComponent.ts"/>
 ///<reference path="arrivalsReportComponent.ts"/>
 ///<reference path="ledgerReportComponent.ts"/>
+///<reference path="incomeReportComponent.ts"/>
 
 /**
  * Created by Terry on 1/4/2016.
@@ -142,8 +143,13 @@ module Tops {
 
         showReptPaymentsReceived        = () => {
             var me=this;
-            me.loadReport('paymentsReceived','not-implemented',function(reportName: string) {return null;});
+            me.loadReport('paymentsReceived','income-report',
+                function(reportName: string) {
+                    return new incomeReportComponent(me.application,me,reportName);
+                });
         };
+
+
         showReptMiscCounts              = () => {
             var me=this;
             me.loadReport('miscCounts','not-implemented',function(reportName: string) {return null;});

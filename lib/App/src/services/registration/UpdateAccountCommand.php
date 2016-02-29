@@ -93,11 +93,11 @@ class UpdateAccountCommand extends TServiceCommand
         switch($itemType) {
             case 'payment' :
                 $validPayment = ScymPayment::validatePayment($dto);
-                if (!empty($validPayment->errorMessage)) {
-                    $this->addErrorMessage("Invalid payment: $validPayment->errorMessage");
+                if ($validPayment !== true) {
+                    $this->addErrorMessage("Invalid payment: $validPayment");
                     return false;
                 }
-                $payment = ScymPayment::CreatePayment($validPayment);
+                $payment = ScymPayment::CreatePayment($dto);
                 $registration->addPayment($payment);
                 break;
             case 'credit' :

@@ -60,7 +60,8 @@ module Tops {
                 type: paymentType,
                 payor: me.payor(),
                 notes: me.notes(),
-                checkNumber: paymentType == 'cash' ? 'cash' : me.checkNumber()
+                checkNumber: paymentType == 'cash' ? 'cash' : me.checkNumber(),
+                paymentType: paymentType == 'cash' ? 1 : 2
             };
             return result;
         };

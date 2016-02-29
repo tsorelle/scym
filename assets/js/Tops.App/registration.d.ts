@@ -157,6 +157,11 @@ declare module Tops {
         dateReceived : any; // date
     }
 
+    export interface IIncomeReportItem extends IPaymentDisplayItem {
+        registrationName: string;
+        paymentType: number;
+    }
+
     export interface IChargeItem extends IAccountItem {
         feeTypeId: any;
         basis: string;

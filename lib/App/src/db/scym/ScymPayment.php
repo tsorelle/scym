@@ -258,20 +258,25 @@ class ScymPayment extends DateStampedEntity implements ICostItem
      *     payor: string;
      *    checkNumber: string;
      */
-    public static function CreatePayment($paymentDto,$paymentType='check')
+    public static function CreatePayment($paymentDto,$paymentType=2)
     {
         $payment = new ScymPayment();
         $payment->setAmount($paymentDto->amount);
-        $payment->setCheckNumber($paymentDto->checkNumber);
         $payment->setPayor($paymentDto->payor);
-        switch($paymentType) {
-            case 'cash' : $paymentType = 1;
-                break;
-            case 'check' : $paymentType = 2;
-                break;
-            default : $paymentType = 0;
+        if (isset($paymentDto->paymentType)) {
+            $paymentType = $paymentDto->paymentType;
+        }
+        else if(isset($paymentDto->type)) {
+            switch($paymentDto->type) {
+                case 'cash' : $paymentType = 1;
+                    break;
+                default :
+                    $paymentType = 2;
+                    break;
+            }
         }
         $payment->setPaymentType($paymentType);
+        $payment->setCheckNumber($paymentType == 1 ? 'cash' : $paymentDto->checkNumber);
         $payment->setDateReceived(new DateTime());
         if (isset($paymentDto->notes)){
             $payment->setNotes($paymentDto->notes);
@@ -289,46 +294,23 @@ class ScymPayment extends DateStampedEntity implements ICostItem
      */
     public static function validatePayment($paymentDto)
     {
-        $result = new \stdClass();
-        $result->errorMessage = '';
-        $result->amount = isset($paymentDto->amount) ? $paymentDto->amount : null;
-        if (isset($paymentDto->notes)) {
-            $result->notes = $paymentDto->notes;
-        }
-        if (empty($result->amount)) {
-            $result->errorMessage = 'No amount';
-            return $result;
-        }
-        $result->payor = isset($paymentDto->payor) ? $paymentDto->payor : null;
-        if (empty($result->payor)) {
-            $result->errorMessage = 'No payor';
-            return $result;
+        if (empty($paymentDto->amount)) {
+            return "Empty amount.";
         }
 
-        $type = isset($paymentDto->type) ? $paymentDto->type : null;
-        $checkNumber = isset($paymentDto->checkNumber) ? $paymentDto->checkNumber : '';
-
-        if (empty($type) && !empty($checkNumber)) {
-            $type = 'check';
+        if (empty($paymentDto->payor)) {
+            return 'No payor';
         }
 
-        if (empty($type)) {
-            $result->errorMessage = 'No payment type';
-            return $result;
+        $paymentType = isset($paymentDto->paymentType) ? $paymentDto->paymentType : null;
+        if (empty($paymentType)) {
+            return 'No payment type';
         }
 
-        if ($type == 'check') {
-            if (empty($checkNumber)) {
-                $result->errorMesssage = 'No check number';
-            }
-            $result->checkNumber = $checkNumber;
-        }
-        else {
-            $result->checkNumber = 'cash';
+        if ($paymentType == 2 && (empty($paymentDto->checkNumber) || $paymentDto->checkNumber == 'cash')) {
+            return 'No check number';
         }
 
-        $result->notes = isset($paymentDto->notes) ? $paymentDto->notes : '';
-
-        return $result;
+        return true;
     }
 }

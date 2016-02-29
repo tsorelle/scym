@@ -967,9 +967,16 @@ class ScymRegistrationsManager extends TDbServiceManager
     }
 
     public function getPaymentsReceivedReport(){
-        /* todo: implement report views */
-        return $this->getReportView('paymentsReceivedReportView',false);
+        return $this->getReportView('incomeView');
     }
+
+    public function getLedgerReport(){
+        $result = new \stdClass();
+        $result->ledger = $this->getReportView('ledgerDetailView');
+        $result->balanceSheet = $this->getReportView('balancesView');
+        return $result;
+    }
+
     public function getMiscCountsReport(){
         /* todo: implement report views */ return
             $this->getReportView('miscCountsReportView',false);
@@ -978,11 +985,6 @@ class ScymRegistrationsManager extends TDbServiceManager
         /* todo: implement report views */
         return $this->getReportView('financialAidReportView',false);
     }
-    public function getLedgerReport(){
-        $result = new \stdClass();
-        $result->ledger = $this->getReportView('ledgerDetailView');
-        $result->balanceSheet = $this->getReportView('balancesView');
-        return $result;
-    }
+
 
 }

@@ -73,8 +73,12 @@
     </div>
 </div>
 
+<div class="row" data-bind="visible:selectedReport()=='paymentsReceived'">
+    <div class="col-md-12">
+        <div id="income-report-container"><income-report></income-report></div>
+    </div>
+</div>
 
-<div class="row" data-bind="visible:selectedReport()=='paymentsReceived'"><div class="col-md-12">Work in progress, report:paymentsReceived    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='miscCounts'"><div class="col-md-12">Work in progress, report:miscCounts    </div></div>
 <div class="row" data-bind="visible:selectedReport()=='financialAid'"><div class="col-md-12">Work in progress, report:financialAid    </div></div>
 
