@@ -70,12 +70,19 @@ class GetReportDataCommand extends TServiceCommand
                 case 'admin.miscCounts' :
                     $results = $manager->getMiscCountsReport();
                     break;
-                case 'admin.financialAid' :
-                    $results = $manager->getFinancialAidReport();
-                    break;
                 case 'admin.ledger' :
                     $results = $manager->getLedgerReport();
                     break;
+                case 'admin.financialAid' :
+                    $results = $manager->getFinancialAidReport();
+                    break;
+                case 'admin.credits' :
+                    $results = $manager->getCreditsReport();
+                    break;
+                case 'admin.subsidies' :
+                    $results = $manager->getSubsidiesReport();
+                    break;
+
                 default :
                     $this->addErrorMessage("ERROR: Invalid report id '$reportId'");
                     $results = null;

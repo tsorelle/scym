@@ -27,8 +27,10 @@
                 </a>
                 <ul class="dropdown-menu">
                     <li><a href="#"  data-bind="click:showReptPaymentsReceived">Payments</a></li>
-                    <li><a href="#"  data-bind="click:showReptFinancialAid">Financial Aid</a></li>
                     <li><a href="#"  data-bind="click:showReptLedger">Ledger</a></li>
+                    <li><a href="#"  data-bind="click:showReptFinancialAid">Financial Aid</a></li>
+                    <li><a href="#"  data-bind="click:showReptCredits">Credits</a></li>
+                    <li><a href="#"  data-bind="click:showReptSubsidies">Subsidies</a></li>
                 </ul>
             </li>
             <li role="presentation" >
@@ -84,6 +86,22 @@
         <div id="registrars-report-container"><registrars-report></registrars-report></div>
     </div>
 </div>
-<div class="row" data-bind="visible:selectedReport()=='financialAid'"><div class="col-md-12">Work in progress, report:financialAid    </div></div>
 
+<div class="row" data-bind="visible:selectedReport()=='financialAid'">
+    <div class="col-md-12">
+        <div id="financialaid-report-container"><financialaid-report></financialaid-report></div>
+    </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='credits'">
+    <div class="col-md-12">
+        <div id="credits-report-container"><credits-report></credits-report></div>
+    </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='subsidies'">
+    <div class="col-md-12">
+        <div id="subsidies-report-container"><subsidies-report></subsidies-report></div>
+    </div>
+</div>
 

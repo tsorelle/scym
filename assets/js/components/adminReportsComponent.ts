@@ -13,6 +13,9 @@
 ///<reference path="ledgerReportComponent.ts"/>
 ///<reference path="incomeReportComponent.ts"/>
 ///<reference path="registrarsReportComponent.ts"/>
+///<reference path="financialaidReportComponent.ts"/>
+///<reference path="creditsReportComponent.ts"/>
+///<reference path="subsidiesReportComponent.ts"/>
 
 /**
  * Created by Terry on 1/4/2016.
@@ -161,17 +164,24 @@ module Tops {
 
         showReptFinancialAid            = () => {
             var me=this;
-            me.loadReport('financialAid','not-implemented',function(reportName: string) {return null;});
+            me.loadReport('financialAid','financialaid-report',
+                function(reportName: string) {
+                    return new financialAidReportComponent(me.application,me,reportName);
+                });
         };
 
         showReptCredits            = () => {
             var me=this;
-            me.loadReport('credits','not-implemented',function(reportName: string) {return null;});
+            me.loadReport('credits','credits-report',function(reportName: string){
+                return new creditsReportComponent(me.application,me,reportName);
+            });
         };
 
         showReptSubsidies            = () => {
             var me=this;
-            me.loadReport('subsidies','not-implemented',function(reportName: string) {return null;});
+            me.loadReport('subsidies','subsidies-repor',function(reportName: string){
+                return new subsidiesReportComponent(me.application,me,reportName);
+            });
         };
 
 

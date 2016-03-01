@@ -1,0 +1,52 @@
+<div id="credits-report" class="row">
+    <div class="col-md-12">
+        <h2>Credits ReportE</h2>
+        <div id="no-records" data-bind="visible:dataList().length == 0">
+            No records.
+        </div>
+        <div data-bind="visible:dataList().length">
+
+            <div id="options-header" class="row hidden-print" style="margin-bottom: 10px">
+                <!--
+
+                <div class="col-md-4" style="padding-bottom:2px">
+                    <label style="width:50px">Sort:</label>
+                    <select data-bind="options: sortOrderList,
+                               optionsText: 'Name',
+                               value: selectedSortOrder">
+                    </select>
+                </div>
+                <div class="col-md-4" style="padding-bottom:5px">
+                    <label style="width:50px">Filter:</label>
+                    <select data-bind="options: filterList,
+                               optionsText: 'Name',
+                               value: selectedFilter"></select>
+                </div>
+                <div class="col-md-4">
+                </div>
+                -->
+            </div>
+            <div id="print-header" class="row visible-print-block" style="margin-bottom: 10px">
+                <h4 data-bind="visible:!showAttendersOnly()">All registrations</h4>
+                <h4 data-bind="visible:showAttendersOnly">Attended only</h4>
+            </div>
+
+            <div id="report-name-table" class="row">
+                <div class="col-md-12">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                        </tr>
+                        </thead>
+                        <tbody data-bind="foreach:dataList">
+                        <tr>
+                            <td data-bind="text:"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

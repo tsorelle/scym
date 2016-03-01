@@ -501,4 +501,12 @@ declare module Tops {
         registered: number;
         attended: number;
     }
+
+    export interface IFinancialAidReportItem {
+        registrationId: any;
+        registrationName: string;
+        amount: number;
+        amountFormatted: string;
+        attended: string;
+    }
 }
