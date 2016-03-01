@@ -1,3 +1,4 @@
+///<reference path="USDollars.ts"/>
 /**
  * Created by Terry on 3/1/2016.
  */
@@ -19,6 +20,10 @@ module Tops {
         data : IFinancialAidReportItem[];
         dataList = ko.observableArray();
         showAttendedOnly = ko.observable(false);
+        totalAid = ko.observable('');
+
+        totalAidCalculated : string;
+        totalAttendedAidCalculated : string;
 
         public constructor(application:IPeanutClient, owner: IReportOwner, name: string) {
             var me = this;
@@ -36,6 +41,17 @@ module Tops {
         display = (data:any)=> {
             var me = this;
             me.data = data;
+            var totalAidCalculated = 0.00;
+            var totalAttendedAidCalculated = 0.00;
+            _.each(data, function(item: IFinancialAidReportItem) {
+                totalAidCalculated += Number(item.amount);
+                if (item.attended == 'Yes') {
+                    totalAttendedAidCalculated += Number(item.amount);
+                }
+            });
+
+            me.totalAidCalculated = USDollars.format(totalAidCalculated,'(none)');
+            me.totalAttendedAidCalculated = USDollars.format(totalAttendedAidCalculated,'(none)');
             me.filter();
         };
 
@@ -46,9 +62,12 @@ module Tops {
                     return  (item.attended == 'Yes');
                 });
                 me.dataList(filtered);
+                me.totalAid(me.totalAttendedAidCalculated);
+
             }
             else {
                 me.dataList(me.data);
+                me.totalAid(me.totalAidCalculated);
             }
             return true;
         };

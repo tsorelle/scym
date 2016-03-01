@@ -1,3 +1,5 @@
+///<reference path="selectListObservable.ts"/>
+///<reference path="USDollars.ts"/>
 /**
  * Created by Terry on 3/1/2016.
  */
@@ -16,7 +18,13 @@ module Tops {
         private owner : IReportOwner;
         private reportName;
 
+        data : ICreditsReportItem[] = [];
         dataList = ko.observableArray();
+        showAttendedOnly = ko.observable(false);
+        filter : selectListObservable;
+        headerTitle = ko.observable('');
+        // printHeader = ko.observable('');
+        creditsTotal = ko.observable('');
 
         public constructor(application:IPeanutClient, owner: IReportOwner, name: string) {
             var me = this;
@@ -24,16 +32,68 @@ module Tops {
             me.peanut = application.peanut;
             me.owner = owner;
             me.reportName = name;
+            me.filter = new selectListObservable(me.onFilterSelected);
         }
+
+        onFilterSelected = (selection: INameValuePair) => {
+            var me = this;
+            me.applyFilter();
+        };
+
+        private getCreditsTotal() {
+            var me = this;
+            var list = me.dataList();
+            var total = 0.00;
+            _.each(list,function(item: ICreditsReportItem) {
+                total += Number(item.amount);
+            });
+            var amount = USDollars.format(total,'(none)');
+            me.creditsTotal(amount);
+        }
+
+        applyFilter = () => {
+            var me = this;
+            me.headerTitle(me.filter.getName(''));
+            var selected = me.filter.getValue(0);
+            var showAll = !me.showAttendedOnly();
+            if (selected) {
+                let filtered = _.filter(me.data,function(item: ICreditsReportItem) {
+                    return item.creditTypeId == selected && (showAll || item.attended == 'Yes');
+                });
+                me.dataList(filtered);
+            }
+            else {
+                if (showAll) {
+                    me.dataList(me.data);
+                }
+                else {
+                    let filtered = _.filter(me.data, function (item:ICreditsReportItem) {
+                        return item.attended == 'Yes';
+                    });
+                    me.dataList(filtered);
+                }
+            }
+            me.getCreditsTotal();
+            return true;
+        };
+
+        lookupRegistration =  (item: ICreditsReportItem) => {
+            var me = this;
+            me.owner.handleEvent('registrationselected', item.registrationId);
+        };
 
         initialize = (data: any) => {
             var me = this;
+            me.filter.setOptions(data.creditTypes);
+            me.filter.subscribe();
             me.display(data);
+
         };
 
         display = (data:any)=> {
             var me = this;
-            me.dataList(data);
+            me.data = <ICreditsReportItem[]> _.sortBy(data.report,'registrationName');
+            me.applyFilter();
         };
 
         select = ()  => {

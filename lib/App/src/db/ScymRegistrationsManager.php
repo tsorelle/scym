@@ -150,6 +150,16 @@ class ScymRegistrationsManager extends TDbServiceManager
 
     }
 
+    public function getCreditTypesLookupList() {
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT c.creditTypeName AS 'Name',c.creditTypeId AS 'Value' FROM credittypes c WHERE active = 1";
+        $statement = $qm->executeStatement($sql);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $result;
+
+    }
+
     public function  getHousingTypesEditList() {
         $qm = TQueryManager::getInstance();
         $sql = 'SELECT * FROM housingTypesView ORDER BY housingTypeDescription';
@@ -986,7 +996,10 @@ class ScymRegistrationsManager extends TDbServiceManager
     }
 
     public function getCreditsReport() {
-        return $this->getReportView('creditsReportView');
+        $result = new \stdClass();
+        $result->report = $this->getReportView('creditsReportView');
+        $result->creditTypes = $this->getCreditTypesLookupList();
+        return $result;
     }
 
     public function getSubsidiesReport() {

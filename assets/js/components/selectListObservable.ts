@@ -22,6 +22,13 @@ module Tops {
             // me.subscription =  me.selected.subscribe(selectHandler);
         }
 
+        public setOptions( optionsList: INameValuePair[] = [],
+                           defaultValue: any = null) {
+            var me = this;
+            me.options(optionsList);
+            me.setValue(defaultValue);
+        }
+
         public setValue(value: any) {
             var me = this;
             var options = me.options();

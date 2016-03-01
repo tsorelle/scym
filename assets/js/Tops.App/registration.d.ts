@@ -509,4 +509,14 @@ declare module Tops {
         amountFormatted: string;
         attended: string;
     }
+
+    export interface ICreditsReportItem {
+        registrationId: any;
+        registrationName: string;
+        amount: number;
+        amountFormatted: string;
+        attended: string;
+        creditTypeId : any,
+        creditTypeName: any;
+    }
 }
