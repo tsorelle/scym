@@ -1,0 +1,28 @@
+<div id="registrars-report-section">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Registrar's Report</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th class="text-right">Registered</th>
+                        <th class="text-right">Attended</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach:dataList">
+                    <tr>
+                        <td data-bind="text:itemName"></td>
+                        <td class="text-right" data-bind="text:registered"></td>
+                        <td class="text-right" data-bind="text:attended"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>

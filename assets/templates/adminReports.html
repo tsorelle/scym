@@ -9,6 +9,7 @@
                     <li><a href="#" data-bind="click:showReptRegistrationsReceived">Registrations</a> </li>
                     <li><a href="#" data-bind="click:showReptRegisteredAttenders" >Attenders</a> </li>
                     <li><a href="#" data-bind="click:showReptAttendersByArrival">Arrivals</a> </li>
+                    <li><a href="#"  data-bind="click:showReptMiscCounts">Misc Counts</a></li>
                 </ul>
             </li>
             <li role="presentation" class="dropdown">
@@ -26,7 +27,6 @@
                 </a>
                 <ul class="dropdown-menu">
                     <li><a href="#"  data-bind="click:showReptPaymentsReceived">Payments</a></li>
-                    <li><a href="#"  data-bind="click:showReptMiscCounts">Misc Counts</a></li>
                     <li><a href="#"  data-bind="click:showReptFinancialAid">Financial Aid</a></li>
                     <li><a href="#"  data-bind="click:showReptLedger">Ledger</a></li>
                 </ul>
@@ -79,7 +79,11 @@
     </div>
 </div>
 
-<div class="row" data-bind="visible:selectedReport()=='miscCounts'"><div class="col-md-12">Work in progress, report:miscCounts    </div></div>
+<div class="row" data-bind="visible:selectedReport()=='miscCounts'">
+    <div class="col-md-12">
+        <div id="registrars-report-container"><registrars-report></registrars-report></div>
+    </div>
+</div>
 <div class="row" data-bind="visible:selectedReport()=='financialAid'"><div class="col-md-12">Work in progress, report:financialAid    </div></div>
 
 

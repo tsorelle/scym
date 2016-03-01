@@ -1,5 +1,4 @@
-DROP VIEW IF EXISTS attendersReportView;
-CREATE VIEW attendersReportView AS
+CREATE OR REPLACE VIEW attendersReportView AS
   SELECT
     r.year,
     r.registrationCode,
@@ -15,6 +14,8 @@ CREATE VIEW attendersReportView AS
     a.arrivalTime    AS arrivalTime,
     a.departureTime  AS departureTime,
     a.generationId     AS generationId,
+    a.housingTypeId AS housingPreference,
+    a.firstTimer,
     IF(ISNULL(a.affiliationCode),0,1) AS ScymMembership,
     CONCAT(a.lastName,', ',a.firstName,IF(ISNULL(a.middleName),'',CONCAT(' ',a.middleName))) AS AttenderName,
     IF(ISNULL(m.meetingName),IF(ISNULL(a.otherAffiliation),'(unknown)',a.otherAffiliation),m.meetingName) AS Affiliation,
@@ -34,3 +35,10 @@ CREATE VIEW attendersReportView AS
   GROUP BY a.attenderId;
 
 -- SELECT * FROM attendersReportView;
+CREATE OR REPLACE VIEW currentAttendersReportView AS
+  SELECT * FROM attendersReportView av
+  WHERE av.year IN
+        (
+          SELECT a.`year` FROM annualsessions a WHERE a.`start` >= CURRENT_DATE() AND a.`end` <= DATE_ADD(CURRENT_DATE(), INTERVAL 90 DAY)
+        );
+

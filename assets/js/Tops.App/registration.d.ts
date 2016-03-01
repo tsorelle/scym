@@ -495,4 +495,10 @@ declare module Tops {
         ledger: ILedgerReportItem[];
         balanceSheet: IBalanceSheetItem[];
     }
+
+    export interface IRegistrarsReportItem {
+        itemName: string;
+        registered: number;
+        attended: number;
+    }
 }

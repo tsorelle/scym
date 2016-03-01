@@ -12,6 +12,7 @@
 ///<reference path="arrivalsReportComponent.ts"/>
 ///<reference path="ledgerReportComponent.ts"/>
 ///<reference path="incomeReportComponent.ts"/>
+///<reference path="registrarsReportComponent.ts"/>
 
 /**
  * Created by Terry on 1/4/2016.
@@ -152,12 +153,28 @@ module Tops {
 
         showReptMiscCounts              = () => {
             var me=this;
-            me.loadReport('miscCounts','not-implemented',function(reportName: string) {return null;});
+            me.loadReport('miscCounts','registrars-report',
+                function(reportName: string) {
+                    return new registrarsReportComponent(me.application,me,reportName);
+                });
         };
+
         showReptFinancialAid            = () => {
             var me=this;
             me.loadReport('financialAid','not-implemented',function(reportName: string) {return null;});
         };
+
+        showReptCredits            = () => {
+            var me=this;
+            me.loadReport('credits','not-implemented',function(reportName: string) {return null;});
+        };
+
+        showReptSubsidies            = () => {
+            var me=this;
+            me.loadReport('subsidies','not-implemented',function(reportName: string) {return null;});
+        };
+
+
 
         refreshReports = () => {
             var me = this;

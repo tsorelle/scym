@@ -978,9 +978,9 @@ class ScymRegistrationsManager extends TDbServiceManager
     }
 
     public function getMiscCountsReport(){
-        /* todo: implement report views */ return
-            $this->getReportView('miscCountsReportView',false);
+        return $this->getReportView('registrarsReportView',false);
     }
+
     public function getFinancialAidReport(){
         /* todo: implement report views */
         return $this->getReportView('financialAidReportView',false);
