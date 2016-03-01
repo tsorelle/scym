@@ -10,11 +10,17 @@
     ?>
     <div class="form-group">
         <!-- input id="edit-name" type="text" placeholder="User name" name="name" class="form-control" -->
-        <?php print drupal_render($form['name']);?>
+        <?php
+            $form['name']['#required'] = false;
+            print drupal_render($form['name']);
+        ?>
     </div>
     <div class="form-group">
         <!-- input id="edit-pass" type="password" name="pass" placeholder="Password" class="form-control" -->
-        <?php print drupal_render($form['pass']);?>
+        <?php
+        $form['pass']['#required'] = false;
+        print drupal_render($form['pass']);
+        ?>
     </div>
 
     <div id="login-form-links">
