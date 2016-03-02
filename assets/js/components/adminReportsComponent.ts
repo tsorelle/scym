@@ -179,7 +179,7 @@ module Tops {
 
         showReptSubsidies            = () => {
             var me=this;
-            me.loadReport('subsidies','subsidies-repor',function(reportName: string){
+            me.loadReport('subsidies','subsidies-report',function(reportName: string){
                 return new subsidiesReportComponent(me.application,me,reportName);
             });
         };

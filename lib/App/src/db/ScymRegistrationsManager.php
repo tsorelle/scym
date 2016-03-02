@@ -1003,8 +1003,10 @@ class ScymRegistrationsManager extends TDbServiceManager
     }
 
     public function getSubsidiesReport() {
-        return $this->getReportView('subsidiesReportView');
+        $result = new \stdClass();
+        $result->report = $this->getReportView('subsidiesReportView');
+        $result->creditTypes = $this->getCreditTypesLookupList();
+        return $result;
     }
-
 
 }

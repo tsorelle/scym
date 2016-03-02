@@ -1,3 +1,4 @@
+///<reference path="selectListObservable.ts"/>
 /**
  * Created by Terry on 3/1/2016.
  */
@@ -16,7 +17,12 @@ module Tops {
         private owner : IReportOwner;
         private reportName;
 
+        data : ISubsidiesReportItem[];
         dataList = ko.observableArray();
+        filter: selectListObservable;
+        headerTitle = ko.observable('');
+        showAttendedOnly = ko.observable(false);
+
 
         public constructor(application:IPeanutClient, owner: IReportOwner, name: string) {
             var me = this;
@@ -24,16 +30,61 @@ module Tops {
             me.peanut = application.peanut;
             me.owner = owner;
             me.reportName = name;
+            me.filter = new selectListObservable(me.onFilterSelected);
+
         }
+
+
+        onFilterSelected = (selection: INameValuePair) => {
+            var me = this;
+            me.applyFilter();
+        };
+
+        applyFilter = () => {
+            var me = this;
+            me.headerTitle(me.filter.getName(''));
+            var selected = me.filter.getValue(0);
+            var showAll = !me.showAttendedOnly();
+            if (selected) {
+                let filtered = _.filter(me.data,function(item: ISubsidiesReportItem) {
+                    return item.creditTypeId == selected && (showAll || item.attended == 'Yes');
+                });
+                me.dataList(filtered);
+            }
+            else {
+                if (showAll) {
+                    me.dataList(me.data);
+                }
+                else {
+                    let filtered = _.filter(me.data, function (item:ISubsidiesReportItem) {
+                        return item.attended == 'Yes';
+                    });
+                    me.dataList(filtered);
+                }
+            }
+            return true;
+        };
 
         initialize = (data: any) => {
             var me = this;
+            me.filter.setOptions(
+                _.filter(data.creditTypes,function(item: INameValuePair) {
+                    return (item.Value != 999 && item.Value != 1)
+                })
+            );
+            me.filter.subscribe();
             me.display(data);
+        };
+
+        lookupRegistration =  (item: ISubsidiesReportItem) => {
+            var me = this;
+            me.owner.handleEvent('registrationselected', item.registrationId);
         };
 
         display = (data:any)=> {
             var me = this;
-            me.dataList(data);
+            me.data = <ISubsidiesReportItem[]> _.sortBy(data.report,'sortName');
+            me.applyFilter();
         };
 
         select = ()  => {

@@ -519,4 +519,14 @@ declare module Tops {
         creditTypeId : any,
         creditTypeName: any;
     }
+
+    export interface ISubsidiesReportItem {
+        registrationId: any;
+        registrationName: string;
+        attenderName: string;
+        sortName: string;
+        attended: string;
+        creditTypeId : any,
+        role: string;
+    }
 }
