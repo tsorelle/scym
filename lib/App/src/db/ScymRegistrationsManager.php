@@ -897,6 +897,27 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $result;
     }
 
+    public function getDownloadView($viewName, $attendedOnly = false, $currentYear = true) {
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM $viewName";
+        if ($attendedOnly) {
+            $sql .= " WHERE attended = 'Yes'";
+        }
+        if ($currentYear) {
+            $sql .= $attendedOnly ? ' AND ' : ' WHERE ';
+            $sql .= " year = ?";
+            $session = $this->getSession();
+            $statement = $qm->executeStatement($sql,$session->getYear());
+        }
+        else {
+            $statement = $qm->executeStatement($sql);
+        }
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
+
+
+
     public function getRegistrationItems($registrationId,$viewName) {
         $qm = TQueryManager::getInstance();
         $sql = "SELECT * FROM $viewName WHERE registrationId = ?";
@@ -1007,6 +1028,30 @@ class ScymRegistrationsManager extends TDbServiceManager
         $result->report = $this->getReportView('subsidiesReportView');
         $result->creditTypes = $this->getCreditTypesLookupList();
         return $result;
+    }
+
+    public function getTransactionsDownload($attendedOnly = true) {
+        return $this->getDownloadView('transactionsDownloadView',$attendedOnly);
+    }
+
+    public function getAttenderCountsDownload($attendedOnly = true) {
+        return $this->getDownloadView('attenderCountsView',$attendedOnly);
+    }
+
+    public function getRegistrationCountsDownload() {
+        return $this->getDownloadView('registrationCountsDownloadView',false);
+    }
+
+    public function getBalanceSheetDownload($attendedOnly = true) {
+        return $this->getDownloadView('ledgerDownloadView',$attendedOnly);
+    }
+
+    public function getFinanceSummaryDownload() {
+        return $this->getDownloadView('financeSummaryDownloadView',false,false);
+    }
+
+    public function getCampReportDownload() {
+        return $this->getDownloadView('campReportDownloadView',false,false);
     }
 
 }

@@ -115,7 +115,7 @@ group by ra.registrationId;
 
 drop view if exists LedgerDetail;
 create view LedgerDetail as
-select ch.RegistrationId, 'Charge' as EntryType, 'debit' as TransactionType, 1 as ItemGroup, ft.description as Type, ft.feeTypeID as ItemTypeId, Amount
+select ch.RegistrationId, 'ldCharge' as EntryType, 'debit' as TransactionType, 1 as ItemGroup, ft.description as Type, ft.feeTypeID as ItemTypeId, Amount
 from charges ch
 join feetypes ft on  ft.feeTypeID =  ch.feeTypeID
 union

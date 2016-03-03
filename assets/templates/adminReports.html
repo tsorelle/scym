@@ -1,3 +1,18 @@
+<style>
+    .download-form  {
+        border-bottom: 1px solid navy;
+        padding-bottom: 3px;
+        margin-bottom: 5px;
+    }
+
+    .download-form div.form-group {
+        margin-bottom: 0;
+
+    }
+    .download-form div.checkbox {
+        margin-top: 0;
+    }
+</style>
 <div class="row" id="reports-menu" class="hidden-print">
     <div class="col-md-12" style="margin-bottom: 10px; border-bottom: 1px solid firebrick" >
         <ul class="nav nav-pills">
@@ -31,6 +46,7 @@
                     <li><a href="#"  data-bind="click:showReptFinancialAid">Financial Aid</a></li>
                     <li><a href="#"  data-bind="click:showReptCredits">Credits</a></li>
                     <li><a href="#"  data-bind="click:showReptSubsidies">Subsidies</a></li>
+                    <li><a href="#"  data-bind="click:showDownloads">Downloads</a></li>
                 </ul>
             </li>
             <li role="presentation" >
@@ -103,5 +119,86 @@
     <div class="col-md-12">
         <div id="subsidies-report-container"><subsidies-report></subsidies-report></div>
     </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='downloads'">
+    <div  id="'downloads-list" class="col-md-12">
+        <div class="download-form">
+            <form action="/scym/download/transactions" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Transactions: </label>
+                    Download list of payments, charges, credits and donations.
+                </div>
+                <div class="checkbox">
+                    <label><input id="transactions-attended" name="attended" type="checkbox" checked value="Yes"> Attended only. </label>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+        <div class="download-form">
+            <form action="/scym/download/attendercounts" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Attender counts: </label>
+                    Download list of attenders with counts of days, nights, meals etc.
+                </div>
+                <div class="checkbox">
+                    <label><input id="attendercounts-attended" name="attended" type="checkbox" checked value="Yes"> Attended only. </label>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+        <div class="download-form">
+            <form action="/scym/download/registrationcounts" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Registration counts: </label>
+                    Download list of registrations with attender counts, accomodation counts, account figures, etc.
+                </div>
+                <div>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+        <div class="download-form">
+            <form action="/scym/download/balancesheet" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Balance sheet: </label>
+                    Download list of registrations with total fees, donations, credits, payments and balance.
+                </div>
+                <div>
+                    <label><input id="balancesheet-attended" name="attended" type="checkbox" checked value="Yes"> Attended only. </label>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+        <div class="download-form">
+            <form action="/scym/download/financesummary" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Finance summary: </label>
+                    Download summary information fees, donations, credits, payments balances and refunds.
+                </div>
+                <div>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+        <div class="download-form">
+            <form action="/scym/download/campreport" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Camp report: </label>
+                    Download summary counts needed to calculate camp costs.
+                </div>
+                <div>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+    </div>
+
 </div>
 

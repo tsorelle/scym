@@ -184,6 +184,10 @@ module Tops {
             });
         };
 
+        showDownloads = () => {
+            var me = this;
+            me.selectedReport('downloads');
+        };
 
 
         refreshReports = () => {

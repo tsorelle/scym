@@ -84,6 +84,24 @@ function scym_handle_download($downloadType = null) {
         case 'contacts' :
             $lines = $downloadManager->getContactsList();
             break;
+        case 'transactions' :
+            $lines = $downloadManager->getTransactionsList();
+            break;
+        case 'attendercounts' :
+            $lines = $downloadManager->getAttenderCounts();
+            break;
+        case 'registrationcounts' :
+            $lines = $downloadManager->getRegistrationCounts();
+            break;
+        case 'balancesheet' :
+            $lines = $downloadManager->getBalanceSheet();
+            break;
+        case 'financesummary' :
+            $lines = $downloadManager->getFinanceSummary();
+            break;
+        case 'campreport':
+            $lines = $downloadManager->getCampReport();
+            break;
     }
     ob_start();
     header("Content-type: application/excel");header("Content-Disposition: attachment; filename=scym-$downloadType-list.csv");
