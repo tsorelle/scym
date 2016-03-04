@@ -189,6 +189,10 @@ module Tops {
             me.selectedReport('downloads');
         };
 
+        showRegistrarDownloads = () => {
+            var me = this;
+            me.selectedReport('registrar-downloads');
+        };
 
         refreshReports = () => {
             var me = this;

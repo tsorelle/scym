@@ -25,6 +25,7 @@
                     <li><a href="#" data-bind="click:showReptRegisteredAttenders" >Attenders</a> </li>
                     <li><a href="#" data-bind="click:showReptAttendersByArrival">Arrivals</a> </li>
                     <li><a href="#"  data-bind="click:showReptMiscCounts">Misc Counts</a></li>
+                    <li><a href="#"  data-bind="click:showRegistrarDownloads">Name tags</a></li>
                 </ul>
             </li>
             <li role="presentation" class="dropdown">
@@ -201,4 +202,32 @@
     </div>
 
 </div>
+<div class="row" data-bind="visible:selectedReport()=='registrar-downloads'">
+    <div  id="registrar-downloads-list" class="col-md-6">
+        <h3>Download name tags</h3>
+        <form action="/scym/download/nametags" method="get" target="_blank" role="form">
+            <div class="form-group">
+                <label>Sort: </label>
+                <select class="form-control" id="nametag-sort-select" name="order">
+                    <option value="name">By name</option>
+                    <option value="meeting">By meeting or affiliation and name</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Filter: </label>
+                <select class="form-control" id="nametag-filter-select" name="filter">
+                    <option value="all">Include everyone</option>
+                    <option value="firsttimers">First-timers only</option>
+                    <option value="nofirsttimers">Everyone except first-timers</option>
+                </select>
+            </div>
+            <div>
+                <input class="btn btn-default" type="submit" value="Download">
+            </div>
+        </form>
+    </div>
+
+
+</div>
+
 

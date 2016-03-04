@@ -197,6 +197,25 @@ class ScymDownloadManager
         return $result;
     }
 
+    public function getNameTags($filter='',$order='') {
+        $request = Request::createFromGlobals();
+        $filter = $request->get('filter');
+        $order = $request->get('order');
+        $manager = new ScymRegistrationsManager();
+        $items = $manager->getNameTags($filter,$order);
+        $result = array();
+        $header = 'Name,Affiliation,First-Timer'."\n";
+
+        array_push($result,$header);
+        foreach($items as $item) {
+            $record =
+                $this->fieldValue($item->Name).','.
+                $this->fieldValue($item->Affiliation).','.
+                $this->fieldValue($item->firstTimer)."\n";
+            array_push($result,$record);
+        }
+        return $result;
+    }
 
     private function fieldValue($value,$type = 'string') {
         $result = $value === null ? '' : $value;

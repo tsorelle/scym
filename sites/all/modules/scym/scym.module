@@ -102,6 +102,9 @@ function scym_handle_download($downloadType = null) {
         case 'campreport':
             $lines = $downloadManager->getCampReport();
             break;
+        case 'nametags' :
+            $lines = $downloadManager->getNameTags();
+            break;
     }
     ob_start();
     header("Content-type: application/excel");header("Content-Disposition: attachment; filename=scym-$downloadType-list.csv");

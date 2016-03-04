@@ -1054,4 +1054,26 @@ class ScymRegistrationsManager extends TDbServiceManager
         return $this->getDownloadView('campReportDownloadView',false,false);
     }
 
+    public function getNameTags($filter='', $order = '') {
+        $qm = TQueryManager::getInstance();
+        $sql = "SELECT * FROM nameTagsDownloadView ";
+        switch ($filter) {
+            case 'firsttimers' :
+                $sql .= " WHERE firstTimer <> '' ";
+                break;
+            case 'nofirsttimers' :
+                $sql .= " WHERE firstTimer = '' ";
+                break;
+        }
+
+        switch($order) {
+            case 'meeting' :
+                $sql .= ' ORDER BY Affiliation ';
+        }
+
+        $statement = $qm->executeStatement($sql);
+        $result = $statement->fetchAll(PDO::FETCH_OBJ);
+        return $result;
+    }
+
 }
