@@ -1,11 +1,12 @@
-DROP VIEW IF EXISTS housingAssignmentsTextView;
-CREATE VIEW housingAssignmentsTextView AS
-  SELECT r.registrationId, a.attenderID, a.firstName, ScymNumberToWeekday(ha.day) AS DAY,
-          CASE ht.housingTypeCode
-            WHEN 'NONE' THEN 'Day visitor, no room assigned'
-            WHEN 'TENT' THEN 'Tenting, no room assigned'
-            ELSE CONCAT(hu.unitname,' - ',ht.housingTypeDescription)
-          END AS description
+CREATE OR REPLACE VIEW housingAssignmentsTextView AS
+  SELECT r.registrationId,
+                 a.attenderID AS attenderId,
+    a.firstName, ScymNumberToWeekday(ha.day) AS 'dayOfWeek', ha.day AS 'day',
+                 CASE ht.housingTypeCode
+                 WHEN 'NONE' THEN 'Day visitor, no room assigned'
+                 WHEN 'TENT' THEN 'Tenting, no room assigned'
+                 ELSE CONCAT(hu.unitname,' - ',ht.housingTypeDescription)
+                 END AS description
   FROM
     attenders a
     JOIN registrations r ON a.registrationId = r.registrationId
