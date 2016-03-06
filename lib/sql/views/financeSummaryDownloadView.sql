@@ -1,3 +1,4 @@
+-- depends on ledgerDownloadView,ledgerDetailView
 CREATE OR REPLACE VIEW currentLedgerView AS
 SELECT * FROM ledgerDownloadView r WHERE
     r.attended = 'Yes' AND

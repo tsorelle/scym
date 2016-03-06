@@ -7,6 +7,7 @@
 module Tops {
     export class TkoComponentLoader {
         static instance : TkoComponentLoader;
+        static versionNumber = '0.0';
         components = [];
 
         constructor(
@@ -46,7 +47,7 @@ module Tops {
         // load component template, register to component name and vm instance
         public loadComponentTemplate(componentName: string, htmlFileName: string, vmInstance: any, finalFunction : () => void ) {
             var me = this;
-            var htmlPath = me.applicationPath + me.htmlPath + '/' + htmlFileName + '.html';
+            var htmlPath = me.applicationPath + me.htmlPath + '/' + htmlFileName + '.html?tv=' + TkoComponentLoader.versionNumber;
             jQuery.get(htmlPath, function (htmlSource:string) {
                 ko.components.register(componentName, {
                     viewModel: vmInstance,
@@ -69,10 +70,12 @@ module Tops {
                 return;
             }
             var fileName = me.nameToFileName(componentName);
-            var htmlPath = me.applicationPath + me.htmlPath + '/' + fileName + '.html';
+            var htmlPath = me.applicationPath + me.htmlPath + '/' + fileName + '.html?tv=' +
+                    TkoComponentLoader.versionNumber;
 
             jQuery.get(htmlPath, function (htmlSource:string) {
-                var src = me.applicationPath + me.vmPath + '/' + fileName + 'Component.js';
+                var src = me.applicationPath + me.vmPath + '/' + fileName + 'Component.js?tv='
+                    + TkoComponentLoader.versionNumber;
                 head.load(src, function () {
                     var vm = me.getVM(componentName);
                     if (vm) {
@@ -96,7 +99,7 @@ module Tops {
 
             var me = this;
             var fileName = me.nameToFileName(componentName);
-            var htmlPath = me.applicationPath + me.htmlPath + '/' + fileName + '.html';
+            var htmlPath = me.applicationPath + me.htmlPath + '/' + fileName + '.html?tv=' + TkoComponentLoader.versionNumber;
             jQuery.get(htmlPath, function (htmlSource:string) {
                 // vmInstance can be a function returning the instance or the instance itself
                 if (vm) {
@@ -117,10 +120,10 @@ module Tops {
                             finalFunction : (vmInstance?:any) => void ) {
             var me = this;
             var fileName = me.nameToFileName(name);
-            var htmlPath = me.applicationPath + me.htmlPath + '/' + fileName + '.html';
+            var htmlPath = me.applicationPath + me.htmlPath + '/' + fileName + '.html?tv=' + TkoComponentLoader.versionNumber;
 
             jQuery.get(htmlPath, function (htmlSource:string) {
-                var src = me.applicationPath + me.vmPath + '/' + fileName + 'Component.js';
+                var src = me.applicationPath + me.vmPath + '/' + fileName + 'Component.js?tv=' + TkoComponentLoader.versionNumber;
                 head.load(src, function () {
                     // vmInstance can be a function returning the instance or the instance itself
                     var vm = (jQuery.isFunction(vmInstance)) ? vmInstance() :  vmInstance;

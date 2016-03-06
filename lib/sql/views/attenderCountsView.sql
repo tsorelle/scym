@@ -10,7 +10,6 @@ WHERE generationId < 3 AND attended = 1
 GROUP BY category, firstname, lastname,h.housingUnitId
 ORDER BY category,nights;
 
-
 CREATE OR REPLACE VIEW attenderCountsView AS
 SELECT r.year, a.attenderId, a.registrationId,
 IF(a.attended = 1 ,'Yes','No') AS attended,

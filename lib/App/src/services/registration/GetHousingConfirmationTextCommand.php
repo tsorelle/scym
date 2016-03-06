@@ -57,7 +57,7 @@ class GetHousingConfirmationTextCommand extends TServiceCommand
                 $assignmentsText .= "\n$assignment->firstName:\n";
                 $attenderId = $assignment->attenderId;
             }
-            $assignmentsText .= "    $assignment->day: $assignment->description\n";
+            $assignmentsText .= "    $assignment->dayOfWeek: $assignment->description\n";
         }
 
         // $session = $this->registrationsManager->getSession();

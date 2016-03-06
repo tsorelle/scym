@@ -1,4 +1,4 @@
-
+-- depends on currentRegistrationsView
 CREATE OR REPLACE VIEW transactionsDownloadView AS
 SELECT
 r.year,r.registrationId,r.registrationCode, r.name AS 'Name', r.attended,

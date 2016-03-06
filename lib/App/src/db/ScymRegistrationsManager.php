@@ -573,12 +573,7 @@ class ScymRegistrationsManager extends TDbServiceManager
 
     public function getRegistrationCount() {
         $qm = TQueryManager::getInstance();
-        $sql =
-            "SELECT COUNT(DISTINCT registrationId) AS registrations, COUNT(*) AS attenders FROM (".
-                "SELECT  r.registrationId,attenderID,r.year ".
-                "FROM registrations r ".
-                "JOIN attenders a ON r.registrationId = a.registrationId ".
-                "WHERE r.year = (SELECT MIN(d.year) FROM ymdates d WHERE d.end >=  DATE_ADD(CURRENT_DATE(),INTERVAL 30 DAY)) ) AS countview";
+        $sql = 'SELECT COUNT(DISTINCT registrationId) AS registrations, COUNT(*) AS attenders FROM currentAttenders';
 
         $counts = $qm->executeStatement($sql);
         $result = $counts->fetch(PDO::FETCH_OBJ);

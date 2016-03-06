@@ -1,3 +1,5 @@
+-- depends on currentAttenders
+
 CREATE OR REPLACE VIEW nameTagsDownloadView AS
   SELECT
     FormatName(a.firstName,a.middleName,a.lastName) AS 'Name',
@@ -7,4 +9,4 @@ CREATE OR REPLACE VIEW nameTagsDownloadView AS
     LEFT OUTER JOIN meetings m ON m.affiliationCode = a.affiliationCode
   ORDER BY lastName,firstName,middleName;
 
-SELECT * FROM nameTagsDownloadView;
+-- SELECT * FROM nameTagsDownloadView;

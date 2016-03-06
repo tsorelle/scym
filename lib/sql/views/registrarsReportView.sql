@@ -1,3 +1,4 @@
+-- depends on currentRegistrationsView, currentAttendersReportView
 CREATE OR REPLACE VIEW registrarsReportView AS
   SELECT 'Registrations' AS itemName,
          (SELECT COUNT(*) FROM currentRegistrationsView) AS 'registered',

@@ -165,6 +165,8 @@ module Tops {
 
     // Class
     export class Application implements Tops.IPeanutClient {
+        static versionNumber = "1.0";
+
         constructor(currentViewModel: any) {
             var me = this;
             me.viewModel = currentViewModel;
@@ -190,7 +192,9 @@ module Tops {
             var parts = name.split('-');
             var fileName = parts[0] + parts[1].charAt(0).toUpperCase() + parts[1].substring(1);
             var htmlSource =  this.applicationPath +
-                'assets/templates/' + fileName + '.html';
+                'assets/templates/' + fileName + '.html'
+                + '?' + Application.versionNumber
+                ;
             jQuery.get(htmlSource, successFunction);
         }
 
@@ -202,9 +206,13 @@ module Tops {
             if (fileExtension) {
                 switch (fileExtension.toLowerCase()) {
                     case 'css' :
-                        return this.applicationPath + 'assets/css/' + fileName;
+                        return this.applicationPath + 'assets/css/' + fileName
+                            + '?tv=' + Application.versionNumber
+                            ;
                     case 'js' :
-                        return this.applicationPath + 'assets/js/components/' + fileName;
+                        return this.applicationPath + 'assets/js/components/' + fileName
+                            + '?tv=' + Application.versionNumber
+                            ;
                 }
             }
             return fileName;
@@ -231,7 +239,9 @@ module Tops {
             if (_.isArray(names)) {
                 params = [];
                 for(var i = 0; i < names.length; i++) {
-                    params.push(this.applicationPath + 'assets/js/components/' + names[i]);
+                    params.push(this.applicationPath + 'assets/js/components/' + names[i]
+                        + "?tv=" + Application.versionNumber
+                    );
                 }
             }
             else {
@@ -242,7 +252,9 @@ module Tops {
 
 
         public loadCSS(name: string, successFunction?: () => void) {
-            head.load(this.applicationPath + 'assets/css/' + name, successFunction);
+            head.load(this.applicationPath + 'assets/css/' + name
+                + "?tv=" + Application.versionNumber
+                , successFunction);
         }
 
         public usingComponentLoader(afterLoad: () => void) {
@@ -252,8 +264,10 @@ module Tops {
             }
             else
             {
-                head.load(me.applicationPath + 'assets/js/components/TkoComponentLoader.js', function() {
+                head.load(me.applicationPath + 'assets/js/components/TkoComponentLoader.js?tv=' + Application.versionNumber
+                    , function() {
                         me.componentLoader = new TkoComponentLoader(me.applicationPath);
+                        TkoComponentLoader.versionNumber = Application.versionNumber;
                         afterLoad();
                     }
                 );

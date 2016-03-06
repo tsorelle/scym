@@ -30,6 +30,7 @@ module Tops {
         public updatedBy = '';
         public quarterlyMeetingId : any = null;
         public quarterlyMeetingName = '';
+        public test = '';
 
         public mailFormLink = '';
         public email = '';
@@ -148,7 +149,7 @@ module Tops {
         }
 
 
-        public validate = (meetings:scymMeeting[]):boolean => {
+        public validate = (meetings:IScymMeeting[]):boolean => {
             var me = this;
             me.clearErrors();
             var valid = true;
@@ -230,7 +231,7 @@ module Tops {
         private mapApiInitialized = false;
 
         // observables
-        meetings  : scymMeeting[] = [];
+        meetings  : IScymMeeting[] = [];
         meetingsColumn1 = ko.observableArray<scymMeeting>();
         meetingsColumn2 = ko.observableArray<scymMeeting>();
         quarterlies = ko.observableArray<IListItem>();
@@ -419,7 +420,7 @@ module Tops {
         }
 
 
-        private loadColumns(meetingsList : scymMeeting[]) {
+        private loadColumns(meetingsList : IScymMeeting[]) {
             var me = this;
             var count = meetingsList.length;
             var meetings = [];
