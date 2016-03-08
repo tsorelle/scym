@@ -17,6 +17,8 @@ module Tops {
         selectedType = ko.observable<ILookupItem>();
         owner: IHousingViewModel;
         dayName = ko.observable();
+        motelOccupancy : string = '';
+        occupancy = ko.observable();
         day : number;
         assignment : IHousingAssignment;
         attenderId = 0;
@@ -46,6 +48,11 @@ module Tops {
             }
             me.filterHousingUnitList(typeId);
             var type = me.owner.getHousingType(typeId);
+            me.motelOccupancy = attender.occupancy;
+
+            if ((<IHousingTypeLookupItem>type).category == 3) {
+                me.occupancy(me.motelOccupancy);
+            }
             me.selectedType(type);
             me.selectedUnit(unit);
             me.selectedType.subscribe(me.onTypeChange);
@@ -58,9 +65,14 @@ module Tops {
             var id = 0;
             if (selected) {
                 id = selected.Key;
+                if ((<IHousingTypeLookupItem>selected).category == 3) {
+                    me.occupancy(me.motelOccupancy);
+                }
+                else {
+                    me.occupancy('');
+                }
             }
             me.filterHousingUnitList(id);
-
         };
 
         onUnitChange = (selected: IHousingUnit) => {

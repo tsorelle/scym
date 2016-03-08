@@ -26,6 +26,7 @@ declare module Tops {
         viewModel: any;
         serviceUrl: string;
         applicationPath: string;
+
     }
 
     export interface IViewModel {
@@ -70,6 +71,10 @@ declare module Tops {
         Key: any;
         Text: string;
         Description: string;
+    }
+
+    export interface IHousingTypeLookupItem extends ILookupItem {
+        category: number;
     }
 
     export interface IListItem {

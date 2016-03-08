@@ -4,7 +4,7 @@
     </div>
     <div class="col-md-4 form-group">
         <label class="control-label">
-            Housing preference
+            Housing preference <span data-bind="visible:occupancy">(private room)</span>
         </label>
         <select class="form-control"  data-bind="options: housingTypes, optionsText: 'Text', value: selectedType, optionsCaption: '-- Show all --'"></select>
 

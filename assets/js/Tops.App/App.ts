@@ -165,7 +165,7 @@ module Tops {
 
     // Class
     export class Application implements Tops.IPeanutClient {
-        static versionNumber = "1.0";
+        static versionNumber = "1.19";
 
         constructor(currentViewModel: any) {
             var me = this;
@@ -187,13 +187,12 @@ module Tops {
         // Drupal 6 or PHP
         // serviceUrl: string = "topsService.php";
 
-
         public getHtmlTemplate(name: string, successFunction: (htmlSource: string) => void) {
             var parts = name.split('-');
             var fileName = parts[0] + parts[1].charAt(0).toUpperCase() + parts[1].substring(1);
             var htmlSource =  this.applicationPath +
                 'assets/templates/' + fileName + '.html'
-                + '?' + Application.versionNumber
+                + '?tv=' + Application.versionNumber
                 ;
             jQuery.get(htmlSource, successFunction);
         }

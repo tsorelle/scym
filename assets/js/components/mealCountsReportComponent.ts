@@ -89,7 +89,7 @@ module Tops {
                         }
                     }
                 }
-                reportRow.total = reportRow.regular + reportRow.both + reportRow.glutenFree + reportRow.both;
+                reportRow.total = reportRow.regular + reportRow.both + reportRow.glutenFree + reportRow.vegetarian;
             });
             return result;
         }

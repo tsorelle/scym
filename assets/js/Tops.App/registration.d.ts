@@ -314,6 +314,7 @@ declare module Tops {
         attenderId : number;
         attenderName: string;
         housingPreference: number;
+        occupancy; string;
     }
 
     export interface IAttenderHousingAssignment {
@@ -324,7 +325,7 @@ declare module Tops {
     export interface IHousingAssignmentUpdateRequest {
         registrationId: any,
         updates: IHousingAssignmentsUpdate[];
-        confirm: boolean;
+        // confirm: boolean;
     }
 
     export interface IHousingAssignmentsUpdate {

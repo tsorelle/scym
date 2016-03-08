@@ -14,7 +14,7 @@ module Tops {
 
         private application:IPeanutClient;
         private peanut:Peanut;
-        private owner : IEventSubscriber;
+        private owner:IEventSubscriber;
 
         private refreshNeeded = false;
 
@@ -22,14 +22,16 @@ module Tops {
         housingTypes = ko.observableArray<ILookupItem>();
         housingUnits = ko.observableArray<IHousingUnit>();
         housingUnitList:IHousingUnit[] = [];
-        housingUnitsDaily: IHousingUnit[][];
+        housingUnitsDaily:IHousingUnit[][];
         housingAssignments = ko.observableArray<IAttenderHousingAssignment>();
-        housingAvailatility : IHousingAvailabilityItem[];
+        housingAvailatility:IHousingAvailabilityItem[];
 
         defaultHousingUnit = ko.observable<IHousingUnit>();
         defaultHousingType = ko.observable<ILookupItem>();
-        defaultHousingTypeSubscription: any;
-        defaultHousingUnitSubscription: any;
+        defaultOccupancy = ko.observable('');
+        defaultMotelOccupancy = '';
+        defaultHousingTypeSubscription:any;
+        defaultHousingUnitSubscription:any;
         assignedByAttender = ko.observable(false);
         confirmationText = ko.observable();
         canClose = ko.observable(false);
@@ -45,7 +47,7 @@ module Tops {
         unassignedCount = 0;
         assingnmentCount = 0;
 
-        public constructor(application:IPeanutClient, owner: IEventSubscriber, confirmOnSave : boolean = false) {
+        public constructor(application:IPeanutClient, owner:IEventSubscriber, confirmOnSave:boolean = false) {
             var me = this;
             me.application = application;
             me.peanut = application.peanut;
@@ -57,24 +59,27 @@ module Tops {
             me.owner = owner;
         }
 
-        public initialize(finalFunction? : () => void) {
+        public initialize(finalFunction?:() => void) {
             var me = this;
             me.assignedByAttender.subscribe(me.onShowAttenders);
-            me.application.loadComponent('housing-selector',function() {
+
+            // alert("STILL Testing " + Application.versionNumber);
+
+            me.application.loadComponent('housing-selector', function () {
                 if (finalFunction) {
                     finalFunction();
                 }
             });
         }
 
-        private getAssignmentCounts(assignments: IAttenderHousingAssignment[]) {
+        private getAssignmentCounts(assignments:IAttenderHousingAssignment[]) {
             var me = this;
             var counts = {
                 assigned: 0,
                 unassigned: 0
             };
-            _.each(assignments, function(attender: IAttenderHousingAssignment) {
-                _.each(attender.assignments,function(assignment: IHousingAssignment) {
+            _.each(assignments, function (attender:IAttenderHousingAssignment) {
+                _.each(attender.assignments, function (assignment:IHousingAssignment) {
                     if (assignment.housingUnitId == 0) {
                         counts.unassigned += 1;
                     }
@@ -120,10 +125,10 @@ module Tops {
                 includeLookups: me.housingTypes().length == 0 || me.housingUnitList.length == 0
             };
 
-             me.peanut.executeService('registration.GetHousingAssignments',request, me.handleGetAssignmentsResponse)
-             .always(function() {
-                me.application.hideWaiter();
-             });
+            me.peanut.executeService('registration.GetHousingAssignments', request, me.handleGetAssignmentsResponse)
+                .always(function () {
+                    me.application.hideWaiter();
+                });
         }
 
         private handleGetAssignmentsResponse = (serviceResponse:IServiceResponse) => {
@@ -155,7 +160,7 @@ module Tops {
                     me.canClose(true);
                 }
 
-                if(response.housingTypes) {
+                if (response.housingTypes) {
                     me.housingTypes(response.housingTypes);
                 }
 
@@ -171,7 +176,7 @@ module Tops {
                 if (me.showFormTitle) {
                     me.formTitle("Housing assignments for " + response.registrationName);
                 }
-                me.owner.handleEvent('houingassignmentsloaded',response.registrationId);
+                me.owner.handleEvent('houingassignmentsloaded', response.registrationId);
             }
         };
 
@@ -182,7 +187,7 @@ module Tops {
             me.assignedByAttender(false);
         };
 
-        buildHousingUnitList = (day: number = 0, sourceList : IHousingUnit[] = null) => {
+        buildHousingUnitList = (day:number = 0, sourceList:IHousingUnit[] = null) => {
             var me = this;
             var result = [];
             var availablityList;
@@ -192,15 +197,14 @@ module Tops {
             if (day == 0) {
                 availablityList = me.housingAvailatility;
             }
-            else
-            {
-                availablityList = _.filter(me.housingAvailatility,function(item: IHousingAvailabilityItem){
-                   return item.day == day;
+            else {
+                availablityList = _.filter(me.housingAvailatility, function (item:IHousingAvailabilityItem) {
+                    return item.day == day;
                 });
             }
-            _.each(sourceList,function(unit: IHousingUnit){
+            _.each(sourceList, function (unit:IHousingUnit) {
 
-                var availability : IHousingAvailabilityItem;
+                var availability:IHousingAvailabilityItem;
                 var occupants = 0;
                 if (day == 0) {
                     var items = _.filter(availablityList, function (a:IHousingAvailabilityItem) {
@@ -212,24 +216,25 @@ module Tops {
                     }
                     else {
                         availability = _.max(items, function (i:IHousingAvailabilityItem) {
-                            return i.occupants;
+                            return Number(i.occupants);
                         });
                     }
                 }
                 else {
-                    availability = _.find(availablityList,function(a : IHousingAvailabilityItem) {
+                    availability = _.find(availablityList, function (a:IHousingAvailabilityItem) {
                         return (a.day == day && a.housingUnitId == unit.housingUnitId);
                     });
                 }
-                
+
                 if (availability != null) {
-                    occupants = availability.occupants;
+                    occupants = Number(availability.occupants);
                 }
                 var description = unit.unitname + ' (';
-                if (occupants == unit.capacity) {
+                let capacity = Number(unit.capacity);
+                if (occupants == capacity) {
                     description += 'Full';
                 }
-                else if (occupants > unit.capacity) {
+                else if (occupants > capacity) {
                     description += 'Overbooked';
                 }
                 else if (occupants == 0) {
@@ -252,7 +257,15 @@ module Tops {
             return result;
         };
 
-        getHousingUnit = (id:number, unitList : IHousingUnit[] = null) => {
+        getHousingAssignmentType = (assignment:IHousingAssignment) => {
+            var me = this;
+            var unit = _.find(me.housingUnitList, function (unit:IHousingUnit) {
+                return unit.housingUnitId == assignment.housingUnitId;
+            }, me);
+            return unit == null ? null : unit.housingTypeId;
+        };
+
+        getHousingUnit = (id:number, unitList:IHousingUnit[] = null) => {
             var me = this;
             var selected = null;
             if (unitList == null) {
@@ -277,7 +290,7 @@ module Tops {
             return selected;
         };
 
-        getHousingUnitList = (typeId:number = 0, day: number = 0) => {
+        getHousingUnitList = (typeId:number = 0, day:number = 0) => {
             var me = this;
             var unitList = me.housingUnitList;
             if (day > 0 && me.housingUnitsDaily.length > 0) {
@@ -299,6 +312,7 @@ module Tops {
         onTypeChange = (selected:ILookupItem) => {
             var me = this;
             var id = 0;
+            me.setOccupancy(selected);
             if (selected) {
                 id = selected.Key;
             }
@@ -314,7 +328,7 @@ module Tops {
             me.showConfirmed(false);
         }
 
-        onDefaultUnitChange = (selected: IHousingUnit) => {
+        onDefaultUnitChange = (selected:IHousingUnit) => {
             var me = this;
             var housingUnitId = 0;
             if (selected) {
@@ -355,41 +369,47 @@ module Tops {
 
         };
 
+        private setOccupancy(housingType: any) {
+            var me = this;
+            me.defaultOccupancy('');
+            if (housingType != null) {
+                var category = (<IHousingTypeLookupItem>housingType).category;
+                if (category == 3) {
+                    me.defaultOccupancy(me.defaultMotelOccupancy);
+                }
+            }
+        }
+
         showAssignments(attenderAssignments:IAttenderHousingAssignment[]) {
             var me = this;
 
             var defaultAssignment:IHousingAssignment = null;
             var defaultType:number = null;
+
             var defaultUnit:number = null;
             var showDetail = false;
 
+            me.defaultMotelOccupancy = '';
             me.disableDefaultSubscriptions();
-            // me.loadingAssignments(true);
-
 
             if (attenderAssignments.length) {
                 var first:IAttenderHousingAssignment = me.findFirst(attenderAssignments);
                 if (first) {
-                    defaultType = first.attender.housingPreference;
-
                     defaultAssignment = me.findFirst(first.assignments);
-                    if (defaultAssignment) {
-                        var nonMatchAttender = _.find(attenderAssignments,
-                            function (attenderAssignment:IAttenderHousingAssignment) {
-                                if (attenderAssignment.attender.housingPreference != defaultType) {
-                                    return true;
-                                }
-                                var nonMatch = _.find(attenderAssignment.assignments,
-                                        function (assignment:IHousingAssignment) {
-                                            return assignment.housingUnitId != defaultAssignment.housingUnitId;
-                                        }
-                                    );
-                                return nonMatch != null;
+                    showDetail = me.hasMixedAssignments(attenderAssignments,defaultAssignment.housingUnitId);
+                    if (!showDetail) {
+                        me.defaultMotelOccupancy = first.attender.occupancy;
+                        if (defaultAssignment.housingUnitId == 0) {
+                            defaultType = first.attender.housingPreference;
+                            var otherPrefs = _.find(attenderAssignments, function(item: IAttenderHousingAssignment) {
+                                return item.attender.housingPreference != defaultType;
                             });
-
-                        if (nonMatchAttender) {
-                            defaultAssignment = null;
-                            showDetail = true;
+                            if (otherPrefs) {
+                                showDetail = true;
+                            }
+                        }
+                        else {
+                            defaultType = me.getHousingAssignmentType(defaultAssignment);
                         }
                     }
                 }
@@ -397,9 +417,11 @@ module Tops {
 
             if (!showDetail) {
                 var housingType = me.getHousingType(defaultType);
+                me.setOccupancy(housingType);
                 var unitList = me.getHousingUnitList(housingType.Key);
                 me.housingUnits(unitList);
                 me.defaultHousingType(housingType);
+
 
                 var unit = null;
                 if (defaultAssignment) {
@@ -415,11 +437,11 @@ module Tops {
             // me.loadingAssignments(false);
         }
 
-        onShowAttenders = (visible: boolean) => {
+        onShowAttenders = (visible:boolean) => {
             var me = this;
             if (visible && me.housingUnitsDaily.length == 0) {
-                for(var day = 4; day < 7; day += 1) {
-                    me.housingUnitsDaily[day - 4] = me.buildHousingUnitList(day,me.housingUnitList);
+                for (var day = 4; day < 7; day += 1) {
+                    me.housingUnitsDaily[day - 4] = me.buildHousingUnitList(day, me.housingUnitList);
                 }
             }
         };
@@ -431,13 +453,23 @@ module Tops {
             return first;
         }
 
+        private hasMixedAssignments(items:IAttenderHousingAssignment[], id : any) {
+            var result = _.find(items, function(item: IAttenderHousingAssignment){
+                var misMatch = _.find(item.assignments, function(assignment : IHousingAssignment){
+                    return assignment.housingUnitId != id;
+                });
+                return (misMatch != null);
+            });
+            return result != null;
+        }
+
         showAssignmentDetail = () => {
             var me = this;
             me.updatedAssignments([]);
             me.assignedByAttender(true);
         };
 
-        updateAssignment = (attenderId:number, assignment: IHousingAssignment) => {
+        updateAssignment = (attenderId:number, assignment:IHousingAssignment) => {
             var me = this;
 
             if (!assignment.housingUnitId) {
@@ -450,7 +482,7 @@ module Tops {
             }
 
             var updates = me.updatedAssignments();
-            var update : IHousingAssignmentsUpdate = _.find(updates, function(item: IHousingAssignmentsUpdate) {
+            var update:IHousingAssignmentsUpdate = _.find(updates, function (item:IHousingAssignmentsUpdate) {
                 return item.attenderId == attenderId;
             });
 
@@ -462,7 +494,7 @@ module Tops {
                 updates.push(update);
             }
             else {
-                var existing = _.find(update.assignments,function(assignmentItem: IHousingAssignment){
+                var existing = _.find(update.assignments, function (assignmentItem:IHousingAssignment) {
                     return assignmentItem.day == assignment.day;
                 });
                 if (existing != null) {
@@ -479,10 +511,9 @@ module Tops {
 
         saveAssignments = () => {
             var me = this;
-            var request : IHousingAssignmentUpdateRequest = {
+            var request:IHousingAssignmentUpdateRequest = {
                 registrationId: me.registrationId(),
-                updates: [],
-                confirm: me.confirmOnSave ? true : null
+                updates: []
             };
 
             if (me.assignedByAttender()) {
@@ -492,9 +523,9 @@ module Tops {
                 var defaultUnitId = me.defaultHousingUnit().housingUnitId;
                 var assignments = me.housingAssignments();
                 me.housingAssignments([]);
-                _.each(assignments, function(attenderAssignment : IAttenderHousingAssignment) {
+                _.each(assignments, function (attenderAssignment:IAttenderHousingAssignment) {
                     // attenderAssignment.assignments = [];
-                    _.each(attenderAssignment.assignments, function($a : IHousingAssignment) {
+                    _.each(attenderAssignment.assignments, function ($a:IHousingAssignment) {
                         $a.housingUnitId = defaultUnitId;
                     });
                     request.updates.push(
@@ -517,7 +548,7 @@ module Tops {
             }
         };
 
-        private handleSaveAssingmentsResponse = (serviceResponse: IServiceResponse) => {
+        private handleSaveAssingmentsResponse = (serviceResponse:IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 me.updatedAssignments([]);
@@ -597,7 +628,7 @@ module Tops {
 
         };
 
-        private handleRefreshHousingUnits = (serviceResponse: IServiceResponse) => {
+        private handleRefreshHousingUnits = (serviceResponse:IServiceResponse) => {
             // not needed?
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
@@ -618,14 +649,14 @@ module Tops {
             me.application.hideServiceMessages();
             me.application.showWaiter('Message here...');
 
-             me.peanut.executeService('registration.GetHousingConfirmationText',request, me.handleGetConfirmationTextResponse)
-             .always(function() {
-                me.application.hideWaiter();
-             });
+            me.peanut.executeService('registration.GetHousingConfirmationText', request, me.handleGetConfirmationTextResponse)
+                .always(function () {
+                    me.application.hideWaiter();
+                });
 
         };
 
-        private handleGetConfirmationTextResponse = (serviceResponse: IServiceResponse) => {
+        private handleGetConfirmationTextResponse = (serviceResponse:IServiceResponse) => {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 me.confirmationText(serviceResponse.Value);
@@ -639,20 +670,20 @@ module Tops {
             jQuery("#confirmation-message-modal").modal('hide');
 
             var request = {
-                registrationId : me.registrationId(),
+                registrationId: me.registrationId(),
             };
 
             me.application.hideServiceMessages();
             me.application.showWaiter('Confirming registration ...');
 
-            me.peanut.executeService('registration.ConfirmRegistration',request, function(serviceResponse: IServiceResponse){
+            me.peanut.executeService('registration.ConfirmRegistration', request, function (serviceResponse:IServiceResponse) {
                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                         me.canConfirm(false);
                         me.owner.handleEvent('housingassignmentsupdated');
                     }
                 }
                 )
-                .always(function() {
+                .always(function () {
                     me.application.hideWaiter();
                 });
         };
@@ -662,22 +693,22 @@ module Tops {
             jQuery("#confirmation-message-modal").modal('hide');
 
             var request = {
-                registrationId : me.registrationId(),
+                registrationId: me.registrationId(),
                 text: me.confirmationText()
             };
 
             me.application.hideServiceMessages();
             me.application.showWaiter('Confirming registration ...');
 
-             me.peanut.executeService('registration.ConfirmRegistration',request, function(serviceResponse: IServiceResponse){
-                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                         me.closeForm();
-                     }
-                 }
-             )
-             .always(function() {
-                me.application.hideWaiter();
-             });
+            me.peanut.executeService('registration.ConfirmRegistration', request, function (serviceResponse:IServiceResponse) {
+                    if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                        me.closeForm();
+                    }
+                }
+                )
+                .always(function () {
+                    me.application.hideWaiter();
+                });
         };
 
     }

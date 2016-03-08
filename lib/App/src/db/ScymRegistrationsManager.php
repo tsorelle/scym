@@ -205,7 +205,7 @@ class ScymRegistrationsManager extends TDbServiceManager
         $sql =
             "SELECT housingTypeID AS 'Key', ".
             ($activeOnly ? 'housingTypeDescription ' : "CONCAT(housingTypeDescription, IF(active=1,'',' [inactive]')) ")." AS 'Text', ".
-            'housingTypeDescription AS Description '.
+            'housingTypeDescription AS Description, category '.
             'FROM housingtypes  '.
             ($activeOnly ? ' WHERE active=1 ': ' ').
             'ORDER BY housingTypeDescription';
@@ -269,6 +269,7 @@ class ScymRegistrationsManager extends TDbServiceManager
             $assignment->attender->attenderId = $attender->getAttenderId();
             $assignment->attender->attenderName = $attender->getFullName();
             $assignment->attender->housingPreference = $attender->getHousingTypeId();
+            $assignment->attender->occupancy = $attender->getSingleOccupant() ? 'single' : '';
 
             $assignment->assignments = array(); // IHousingAssignment[];
             $attenderHousingAssignments = $attender->getHousingAssignments()->toArray();

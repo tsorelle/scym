@@ -1,6 +1,5 @@
-DROP VIEW IF EXISTS housingAvailabilityView;
-CREATE VIEW housingAvailabilityView AS
-  SELECT u.housingUnitId, ha.day, u.capacity, COUNT(*) AS occupants
+CREATE OR REPLACE VIEW housingAvailabilityView AS
+  SELECT u.housingUnitId, ha.day, IFNULL(u.capacity,0) AS capacity, COUNT(*) AS occupants
   FROM housingunits u
     JOIN housingassignments ha ON ha.housingUnitId = u.housingUnitId
     JOIN attenders a ON ha.attenderId = a.attenderID

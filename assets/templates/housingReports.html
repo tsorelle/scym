@@ -50,14 +50,15 @@
                 <div id="request-counts">
                     <table class="table">
                         <thead>
-                        <tr><th>Housing</th><th  class="text-right">Requested</th><th class="text-right">Available</th><th class="text-right">Assigned</th></tr>
+                        <tr><th>Housing</th><th  class="text-right">Requested</th><th class="text-right">Available</th>
+                            <!-- th class="text-right">Assigned</th></tr -->
                         </thead>
                         <tbody  data-bind="foreach:requestCounts">
                         <tr>
                             <td data-bind="text:housingTypeDescription"></td>
                             <td class="text-right"  data-bind="text:requested"></td>
                             <td class="text-right" data-bind="text:available"></td>
-                            <td class="text-right" data-bind="text:assigned"></td>
+                            <!-- td class="text-right" data-bind="text:assigned"></td -->
                         </tr>
                         </tbody>
                     </table>

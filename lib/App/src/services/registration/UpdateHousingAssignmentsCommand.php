@@ -62,7 +62,11 @@ class UpdateHousingAssignmentsCommand extends TServiceCommand
             $this->addErrorMessage('ERROR: No registration found for id ' . $registrationId);
             return;
         }
-        if (!empty($request->confirm)) {
+
+        $session = $manager->getSession();
+        $today = new \DateTime();
+
+        if ($today >= $session->getStart()) {
             $registration->setConfirmed(true);
         }
 

@@ -840,7 +840,8 @@ module Tops {
             me.linens(attender.linens === 1);
             me.vegetarian(attender.vegetarian === 1);
             me.attended(attender.attended === 1);
-            me.singleOccupant(attender.singleOccupant === 1);
+            var privateOccupant = attender.singleOccupant ? true: false;
+            me.singleOccupant(privateOccupant);
             me.glutenFree(attender.glutenFree === 1);
             me.setAttenderMeals(attender);
 
