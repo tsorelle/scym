@@ -1,0 +1,542 @@
+<!-- ******************  START FORM ****************************************************************************  -->
+<div id="scym-directory" style="display:none" class="container view-model-container">
+    <div class="row" id="search-form"   data-bind="visible:userIsAuthorized">
+        <div class="col-md-12">
+            <form>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Search" data-bind="value: familiesList.searchValue">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-default" data-bind="click:findFamiliesByPersonName" >Persons <span class="glyphicon glyphicon-search"></span> </button>
+                        <button class="btn btn-default" data-bind="click:findFamiliesByAddressName">Addresses <span class="glyphicon glyphicon-search"></span></button>
+                        <div class="btn-group" data-bind="visible:userCanEdit">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                New <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" data-bind="click:newPerson">Person</a></li>
+                                <li><a href="#" data-bind="click:newAddress">Address</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="found-panel" class="found well" data-bind="visible:familiesList.selectionCount">
+        <div id="found-header" class="row">
+            <div class="col-md-2">
+                Found: <span data-bind="text: familiesList.selectionCount"></span> <span data-bind="text: searchType"></span>.
+            </div>
+            <div class="col-md-2" style="padding-right: 3px" data-bind="visible:familiesList.hasPrevious">
+                <a href="#"  data-bind="click:familiesList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+            </div>
+            <div class="col-md-2" style="padding-right: 3px" data-bind="visible:familiesList.hasMore">
+                <a href="#" data-bind="click:familiesList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+            </div>
+            <div class="col-md-6"></div>
+        </div> <!-- end found header -->
+
+        <div class="row" id="found-list">
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[1]">
+                <div class="link-list-item">
+                    <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[2]">
+                <div class="link-list-item">
+                    <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                </div>
+
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[3]">
+                <div class="link-list-item">
+                    <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[4]">
+                <div class="link-list-item">
+                    <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[5]">
+                <div class="link-list-item">
+                    <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[6]">
+                <div class="link-list-item">
+                    <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                </div>
+            </div>
+
+        </div> <!-- end found list -->
+    </div> <!-- end found panel -->
+
+    <div id="family-panel"  class="row" data-bind="visible:family.visible">
+            <!-- person panels -->
+            <div id="person-panel"  class="col-md-6">
+                <div id="person-view-panel" data-bind="visible:personForm.viewState() == 'view'">
+                    <form>
+                    <fieldset id="person-view-fields">
+                        <legend data-bind="text:personFormHeader"></legend>
+                        <div id="person-view-buttons" data-bind="visible:showPersonViewButtons">
+                            <button class="btn btn-default" data-bind="click:editPerson">Edit</button>
+                            <button class="btn btn-default" data-bind="click:movePerson">
+                                <span data-bind="visible:family.hasAddress">Move</span>
+                                <span data-bind="visible:!family.hasAddress()">Get Address</span>
+                            </button>
+                            <button class="btn btn-default" data-bind="click:deletePerson">Delete</button>
+                        </div>
+                        <div data-bind="visible:personForm.hasAffiliation">
+                            <strong>Meeting: </strong>
+                            <span data-bind="text:personForm.affiliation"></span>
+                        </div>
+                        <div data-bind="visible:personForm.hasMembership">
+                            <strong>Membership: </strong>
+                            <span data-bind="text:personForm.membership"></span>
+                        </div>
+                        <div data-bind="visible:personForm.otheraffiliation">
+                            <strong>Meeting:</strong><br>
+                            <span data-bind="text:personForm.otheraffiliation"></span>
+                        </div>
+                        <div data-bind="visible:personForm.organization">
+                            <strong>Organization:</strong><br>
+                            <span data-bind="text:personForm.organization"></span>
+                        </div>
+                        <div data-bind="visible:personForm.email">
+                            <strong>E-mail: </strong>
+                            <a data-bind="attr: { href : personForm.emailLink }">
+                                <span data-bind="text:personForm.email"></span>
+                            </a>
+                        </div>
+                        <div data-bind="visible:personForm.junior">
+                            <strong>Young Friend.</strong><br>
+                        </div>
+                        <div data-bind="visible:personForm.dateOfBirth">
+                            <strong>Date of birth: </strong>
+                            <span data-bind="text:personForm.dateOfBirth"></span>
+                        </div>
+                        <div data-bind="visible:personForm.phone">
+                            <strong>Phone: </strong>
+                            <span data-bind="text:personForm.phone"></span>
+                        </div>
+                        <div data-bind="visible:personForm.phone2">
+                            <strong>Phone&nbsp;2: </strong>
+                            <span data-bind="text:personForm.phone2"></span>
+                        </div>
+                        <div>
+                            <strong>Send&nbsp;newsletter (e-mail): </strong>
+                            <span data-bind="visible:personForm.newsletter">Yes</span><span data-bind="visible:!personForm.newsletter()">No</span>
+                        </div>
+                        <div data-bind="visible:personForm.notes">
+                            <strong>Notes:</strong><br>
+                            <span data-bind="text:personForm.notes">notes</span>
+                        </div>
+                        <div>
+                            <strong>Last&nbsp;update: </strong>
+                            <span data-bind="text:personForm.lastUpdate"></span>
+                        </div>
+                        <div data-bind="visible:userCanEdit">
+                            <strong>Person Id: </strong>
+                            <span data-bind="text:personForm.personId"></span>
+                        </div>
+
+                    </fieldset>
+                        </form>
+                </div>
+                <div id="person-edit-panel" data-bind="visible:personForm.viewState() == 'edit'">
+                    <fieldset id="person-form" >
+                        <div id="person-edit-buttons">
+                            <button class="btn btn-primary" data-bind="click:savePerson">Save</button>
+                            <button class="btn btn-default" data-bind="click:cancelPersonEdit">Cancel</button>
+                        </div>
+                        <legend data-bind="text:personFormHeader"></legend>
+                        <div class="alert alert-danger" role="alert" data-bind="visible:personForm.hasErrors">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            <span class="sr-only">Error:</span>
+                            Please correct errors before saving.
+                        </div>
+                        <div class="form-group" data-bind="css:{'has-error': personForm.firstNameError}" >
+                            <label for="firstName" class="control-label">First name<span data-bind="text:personForm.firstNameError"></span></label>
+                            <input class="form-control" id="firstName" data-bind="value:personForm.firstName"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="middleName" class="control-label">Middle name</label>
+                            <input class="form-control" id="middleName" data-bind="value:personForm.middleName"/>
+                        </div>
+                        <div class="form-group" data-bind="css:{'has-error': personForm.lastNameError}">
+                            <label for="lastName" class="control-label">Last name<span data-bind="text:personForm.lastNameError"></span></label>
+                            <input class="form-control" id="lastName" data-bind="value:personForm.lastName"/>
+                        </div>
+                        <div class="form-group" data-bind="css:{'has-error': personForm.emailError}">
+                            <label for="email-input" class="control-label">E-mail<span data-bind="text:personForm.emailError"></span></label>
+                            <input class="form-control" id="email-input" data-bind="value:personForm.email"/>
+                        </div>
+                        <div class="form-group" data-bind="visible:personForm.email">
+                            <input id="newsletter-input" type="checkbox" data-bind="checked:personForm.newsletter"/>
+                            <label for="newsletter-input"  class="control-label">  Send newsletter (e-mail) </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone-input" class="control-label">Phone</label>
+                            <input class="form-control" id="phone-input" data-bind="value:personForm.phone"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone2-input" class="control-label">Second phone</label>
+                            <input class="form-control" id="phone2-input" data-bind="value:personForm.phone2"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="dob-input" class="control-label">Date of birth (kids only)</label>
+                            <input class="form-control datepicker" type="text" id="dob-input" data-bind="value:personForm.dateOfBirth"/>
+                        </div>
+                        <div class="form-group" data-bind="visible:personForm.dateOfBirth() == ''">
+                            <input id="junior-input" type="checkbox" data-bind="checked:personForm.junior"/>
+                            <label for="junior-input" class="control-label">  Young Friend (18 or younger - if date of birth unknown)</label>
+                        </div>
+                        <div class="form-group"  data-bind="css:{'has-error': personForm.affiliationError}" >
+                            <label for="affiliation-input" class="control-label">Attending meeting or worship group<span data-bind="text:personForm.affiliationError"></span></label>
+                            <select class="form-control" id="affiliation-input"
+                                    data-bind="options: personForm.affiliations,optionsText:'Name',value: personForm.selectedAffiliation,optionsCaption:'Select meeting or worship group...'"></select>
+                        </div>
+                        <div class="form-group" data-bind="visible: personForm.selectedAffiliation">
+                            <input type="radio"  name="membershipType" value="attender" data-bind="checked: personForm.membershipType" /> <span style="margin-right: 1em">Attender</span>
+                            <input type="radio"  name="membershipType" value="member" data-bind="checked: personForm.membershipType" /> <span style="margin-right: 1em">Member</span>
+                            <input type="radio" name="membershipType"  value="other" data-bind="checked: personForm.membershipType" /> <span style="margin-right: 1em">Other: member of a different meeting</span>
+                        </div>
+                        <div data-bind="visible: debugMode">
+                            Attends: <span data-bind="text:personForm.affiliationcode"></span>  Member: <span data-bind="text:personForm.memberaffiliation"></span> Type: <span data-bind="text:personForm.membershipType"></span>
+                        </div>
+                        <div class="form-group" data-bind="visible: personForm.membershipType() == 'other'">
+                            <label for="membership-input" class="control-label">Membership in meeting</label>
+                            <select class="form-control" id="membership-input"
+                                    data-bind="options: personForm.affiliations,optionsText:'Name',value: personForm.selectedMembershipAffiliation,optionsCaption:'Select meeting...'"></select>
+                        </div>
+                        <div class="form-group" data-bind="visible: personForm.showOutsideMeeting">
+                            <label for="otheraffiliation-input"  class="control-label">Meeting (outside of SCYM)</label>
+                            <input class="form-control" id="otheraffiliation-input" data-bind="value:personForm.otheraffiliation"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="organization-input" class="control-label">Organization (representative)</label>
+                            <input class="form-control" id="organization-input" data-bind="value:personForm.organization"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="directory-listing-input" class="control-label">Directory listing:</label>
+                            <select class="form-control" id="directory-listing-input"
+                                    data-bind="options: personForm.directoryListingTypes,optionsText:'Name',value: personForm.selectedDirectoryListingType"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="username-input" class="control-label">Web site user name</label>
+                            <input class="form-control" id="username-input" data-bind="value:personForm.username"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="sortkey-input" class="control-label">Sort key</label>
+                            <input class="form-control" id="sortkey-input" data-bind="value:personForm.sortkey"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes-input" class="control-label">Notes</label>
+                            <textarea class="form-control" id="notes-input" data-bind="value:personForm.detailText"></textarea>
+                        </div>
+                    </fieldset>
+                </div>
+                <div id="person-search-panel"  data-bind="visible:personForm.viewState() == 'search'">
+                    <form>
+                    <fieldset id="person-search-fields">
+                        <legend>Find Person</legend>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Search" data-bind="value: personsList.searchValue">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-default" data-bind="click:findPersons" title="Search"><span class="glyphicon glyphicon-search"></span> </button>
+                                <button class="btn btn-default" data-bind="click:createPersonForAddress" title="Create new person for address."><span class="glyphicon glyphicon-plus"></span></button>
+                                <button class="btn btn-default" data-bind="click:cancelPersonSearch" title="Cancel"><span class="glyphicon glyphicon-remove"></span></button>
+                            </div>
+                        </div>
+                        <div id="findPersonResults"  class="row found well" data-bind="visible:personsList.selectionCount">
+                            <div id="persons-found-header" class="row">
+                                <div class="col-md-12">
+                                    Found: <span data-bind="text: personsList.selectionCount"></span> persons.
+                                </div>
+
+                            </div>
+                            <div id="persons-found-nav" class="row">
+                                <div class="col-md-6" style="padding-right: 3px" data-bind="visible:personsList.hasPrevious">
+                                    <a href="#"  data-bind="click:personsList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+                                </div>
+                                <div class="col-md-6" style="padding-right: 3px" data-bind="visible:personsList.hasMore">
+                                    <a href="#" data-bind="click:personsList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+                                </div>
+                            </div> <!-- end found header -->
+
+                            <div class="row" id="persons-found-list">
+                                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" data-bind="foreach: personsList.selectionList[1]">
+                                    <div class="link-list-item">
+                                        <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" data-bind="foreach: personsList.selectionList[2]">
+                                    <div class="link-list-item">
+                                        <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
+                                    </div>
+                                </div>
+                            </div> <!-- end found list -->
+
+                        </div>
+                    </fieldset>
+                    </form>
+                </div>
+                <div id="person-empty-panel"  data-bind="visible:personForm.viewState() == 'empty'">
+                    <p>No person</p>
+                </div>
+            </div> <!-- end person panel -->
+
+            <!-- address panels -->
+            <div id="address-panel"  class="col-md-6">
+                <div id="address-view-panel" data-bind="visible:addressForm.viewState() == 'view'">
+                    <form>
+                    <fieldset id="address-view-fields">
+                        <legend>Address</legend>
+                        <div id="address-view-buttons">
+                            <div id="address-persons-list" class="btn-group" data-bind="visible:family.personCount()>1">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Residents <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" data-bind="foreach:addressPersonsList">
+                                    <li><a href="#" data-bind="click:$parent.selectPerson"><span data-bind="text: Name"></span></a></li>
+                                </ul>
+                            </div>
+                            <button class="btn btn-default" data-bind="click:editAddress,visible:showEditButton">Edit</button>
+                            <button class="btn btn-default" data-bind="click:findPersonForAddress, visible:showAddPersonButton">Add person</button>
+                            <button class="btn btn-default" data-bind="click:deleteAddress, visible:userCanEdit">Delete</button>
+                        </div>
+                        <div id='streetaddress-view'>
+                            <div>
+                                <strong>Street Address: </strong>
+                            </div>
+                            <div>
+                                <span data-bind="text:addressForm.addressname"></span>
+                            </div>
+                            <div data-bind="visible:addressForm.address1">
+                                <span data-bind="text:addressForm.address1"></span>
+                            </div>
+                            <div data-bind="visible:addressForm.address2">
+                                <span data-bind="text:addressForm.address2"></span>
+                            </div>
+                            <div data-bind="visible:addressForm.cityLocation">
+                                <span data-bind="text:addressForm.cityLocation"></span>
+                            </div>
+                            <div data-bind="visible:addressForm.country">
+                                <span data-bind="text:addressForm.country"></span>
+                            </div>
+                        </div>
+                        <div data-bind="visible:addressForm.phone">
+                            <strong>Household phone: </strong>
+                            <span data-bind="text:addressForm.phone"></span>
+                        </div>
+                        <div>
+                            <strong>Send&nbsp;newsletter (postal): </strong>
+                            <span data-bind="visible:addressForm.newsletter">Yes</span><span data-bind="visible:!addressForm.newsletter()">No</span>
+                        </div>
+
+                        <div data-bind="visible:addressForm.notes">
+                            <strong>Notes:</strong><br>
+                            <span data-bind="text:addressForm.notes">notes</span>
+                        </div>
+                        <div>
+                            <strong>Last&nbsp;update: </strong>
+                            <span data-bind="text:addressForm.lastUpdate"></span>
+                        </div>
+                        <div data-bind="visible:userCanEdit">
+                            <strong>Address Id: </strong>
+                            <span data-bind="text:addressForm.addressId"></span>
+                        </div>
+
+                    </fieldset>
+                    </form>
+                </div>
+                <div id="address-edit-panel" data-bind="visible:addressForm.viewState() == 'edit'">
+                    <fieldset id="address-form" >
+                        <legend >Address</legend>
+                    </fieldset>
+
+                    <div id="address-edit-buttons">
+                        <button class="btn btn-primary" data-bind="click:saveAddress">Save</button>
+                        <button class="btn btn-default" data-bind="click:cancelAddressEdit">Cancel</button>
+                    </div>
+                    <div class="alert alert-danger" role="alert" data-bind="visible:addressForm.hasErrors">
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <span class="sr-only">Error:</span>
+                        Please correct errors before saving.
+                    </div>
+                    <div class="form-group" data-bind="css:{'has-error': addressForm.addressNameError}" >
+                        <label for="addressname-input" class="control-label">Name on address<span data-bind="text:addressForm.addressNameError"></span></label>
+                        <input class="form-control" id="addressname-input" data-bind="value:addressForm.addressname"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="address-type" class="control-label">Address type</label>
+                        <select class="form-control" id="address-type"
+                                data-bind="value:addressForm.addressTypeId">
+                            <option value="1">Residence</option>
+                            <option value="2">SCYM Meeting</option>
+                            <option value="3">Friends Organization</option>
+                            <option value="4">Other Yearly Meeting</option>
+                            <option value="5">Other Friends Meeting or Worship Group</option>
+                            <option value="6">Other Organization or Business</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="address-input" class="control-label">Address</label>
+                        <input class="form-control" id="address-input" data-bind="value:addressForm.address1"/><br>
+                        <input class="form-control" id="address2-input" data-bind="value:addressForm.address2"/>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="city-input" class="control-label">City</label>
+                                <input class="form-control" id="city-input" data-bind="value:addressForm.city"/>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="state-input" class="control-label">State</label>
+                                <input class="form-control" id="state-input" data-bind="value:addressForm.state"/>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="zip-input" class="control-label">Postal Code</label>
+                                <input class="form-control" id="zip-input" data-bind="value:addressForm.postalcode"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="country-input" class="control-label">Country</label>
+                        <input class="form-control" id="country-input" data-bind="value:addressForm.country"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="address-phone-input" class="control-label">Household Phone</label>
+                        <input class="form-control" id="address-phone-input" data-bind="value:addressForm.phone"/>
+                    </div>
+                    <div class="form-group">
+                        <input id="address-newsletter-input" type="checkbox" data-bind="checked:addressForm.newsletter"/>
+                        <label for="address-newsletter-input"  class="control-label">  Send newsletter (postal)</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="addr-directory-listing-input" class="control-label">Directory listing:</label>
+                        <select class="form-control" id="addr-directory-listing-input"
+                                data-bind="options: addressForm.directoryListingTypes,optionsText:'Name',value: addressForm.selectedDirectoryListingType"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address-sortkey-input" class="control-label">Sort key</label>
+                        <input class="form-control" id="address-sortkey-input" data-bind="value:addressForm.sortkey"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="address-notes-input" class="control-label">Notes</label>
+                        <textarea class="form-control" id="address-notes-input" data-bind="value:addressForm.notes"></textarea>
+                    </div>
+                </div>
+                <div id="address-search-panel"  data-bind="visible:addressForm.viewState() == 'search'">
+                    <form>
+                    <fieldset id="address-search-fields">
+                        <legend>Find Address</legend>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Search" data-bind="value: addressesList.searchValue">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-default" data-bind="click:findAddresses" title="Search"><span class="glyphicon glyphicon-search"></span> </button>
+                                <button class="btn btn-default" data-bind="click:createAddressForPerson" title="Create new address for person."><span class="glyphicon glyphicon-plus"></span></button>
+                                <button class="btn btn-default" data-bind="click:cancelAddressSearch" title="Cancel"><span class="glyphicon glyphicon-remove"></span></button>
+                            </div>
+                        </div>
+                        <div id="findAddressResults"  class="row found well" data-bind="visible:addressesList.selectionCount">
+                            <div id="address-found-header" class="row" data-bind="visible:addressesList.foundCount">
+                                <div class="col-md-12">
+                                    Found: <span data-bind="text: addressesList.foundCount"></span> addresses.
+                                </div>
+                            </div>
+                            <div id="address-found-nav" class="row">
+                                <div class="col-md-6" style="padding-right: 3px" data-bind="visible:addressesList.hasPrevious">
+                                    <a href="#"  data-bind="click:addressesList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+                                </div>
+                                <div class="col-md-6" style="padding-right: 3px" data-bind="visible:addressesList.hasMore">
+                                    <a href="#" data-bind="click:addressesList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+                                </div>
+                            </div> <!-- end found header -->
+
+                            <div class="row" id="addresses-found-list">
+                                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" data-bind="foreach: addressesList.selectionList[1]">
+                                    <div class="link-list-item">
+                                        <a href="#" data-bind="click:$parent.assignAddressToPerson"><span data-bind="text: Name"></span></a>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" data-bind="foreach: addressesList.selectionList[2]">
+                                    <div class="link-list-item">
+                                        <a href="#" data-bind="click:$parent.assignAddressToPerson"><span data-bind="text: Name"></span></a>
+                                    </div>
+
+                                </div>
+                            </div> <!-- end found list -->
+
+                        </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <div id="address-empty-panel"  data-bind="visible:addressForm.viewState() == 'empty'">
+                    <p>No address</p>
+                </div>
+            </div> <!-- end address panel -->
+    </div> <!-- end family panel -->
+
+    <div class="modal" id="confirm-delete-person-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Delete person</h4>
+                </div>
+                <div class="modal-body">
+                    <h3>Delete this person?</h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bind="click: executeDeletePerson">Delete</button>
+                    <button type="button" class="btn btn-default"  data-dismiss="modal">Cancel</button>
+                </div>
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal" id="confirm-delete-address-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Delete address</h4>
+                </div>
+                <div class="modal-body">
+                    <h3>Delete this address?</h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bind="click: executeDeleteAddress">Delete</button>
+                    <button type="button" class="btn btn-default"  data-dismiss="modal">Cancel</button>
+                </div>
+                    </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+</div> <!-- end form content div -->
+<!-- ******************  END FORM ****************************************************************************  -->

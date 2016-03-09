@@ -1,0 +1,233 @@
+<style>
+    .download-form  {
+        border-bottom: 1px solid navy;
+        padding-bottom: 3px;
+        margin-bottom: 5px;
+    }
+
+    .download-form div.form-group {
+        margin-bottom: 0;
+
+    }
+    .download-form div.checkbox {
+        margin-top: 0;
+    }
+</style>
+<div class="row" id="reports-menu" class="hidden-print">
+    <div class="col-md-12" style="margin-bottom: 10px; border-bottom: 1px solid firebrick" >
+        <ul class="nav nav-pills">
+            <li role="presentation" class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    Registrations <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#" data-bind="click:showReptRegistrationsReceived">Registrations</a> </li>
+                    <li><a href="#" data-bind="click:showReptRegisteredAttenders" >Attenders</a> </li>
+                    <li><a href="#" data-bind="click:showReptAttendersByArrival">Arrivals</a> </li>
+                    <li><a href="#"  data-bind="click:showReptMiscCounts">Misc Counts</a></li>
+                    <li><a href="#"  data-bind="click:showRegistrarDownloads">Name tags</a></li>
+                </ul>
+            </li>
+            <li role="presentation" class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    Meals <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#" data-bind="click:showReptMealCounts">Meal counts</a> </li>
+                    <li><a href="#" data-bind="click:showReptMealRoster">Meal roster</a> </li>
+                </ul>
+            </li>
+            <li role="presentation" class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    Finance <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#"  data-bind="click:showReptPaymentsReceived">Payments</a></li>
+                    <li><a href="#"  data-bind="click:showReptLedger">Ledger</a></li>
+                    <li><a href="#"  data-bind="click:showReptFinancialAid">Financial Aid</a></li>
+                    <li><a href="#"  data-bind="click:showReptCredits">Credits</a></li>
+                    <li><a href="#"  data-bind="click:showReptSubsidies">Subsidies</a></li>
+                    <li><a href="#"  data-bind="click:showDownloads">Downloads</a></li>
+                </ul>
+            </li>
+            <li role="presentation" >
+                <a href="#" data-bind="click:refreshReports"><span class="glyphicon glyphicon-refresh"></span> Refresh</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="row" data-bind="visible:selectedReport()=='landing'"><div class="col-md-12"> Select your report from the menu. </div></div>
+<div class="row" data-bind="visible:selectedReport()=='registrationsReceived'">
+    <div class="col-md-12">
+        <div id="registrations-report-container"> <registrations-report></registrations-report> </div>
+    </div>
+</div>
+<div class="row" data-bind="visible:selectedReport()=='mealCounts'">
+    <div class="col-md-12">
+        <div id="mealcounts-report-container"><mealcounts-report></mealcounts-report> </div>
+    </div>
+</div>
+
+
+<div class="row" data-bind="visible:selectedReport()=='mealRoster'">
+    <div class="col-md-12">
+        <div id="meals-report-container"> <meals-report></meals-report> </div>
+    </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='registeredAttenders'">
+    <div class="col-md-12">
+        <div id="attenders-report-container"><attenders-report></attenders-report></div>
+    </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='attendersByArrival'">
+    <div class="col-md-12">
+        <div id="arrivals-report-container"><arrivals-report></arrivals-report></div>
+    </div>
+</div>
+<div class="row" data-bind="visible:selectedReport()=='ledger'">
+    <div class="col-md-12">
+        <div id="ledger-report-container"><ledger-report></ledger-report></div>
+    </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='paymentsReceived'">
+    <div class="col-md-12">
+        <div id="income-report-container"><income-report></income-report></div>
+    </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='miscCounts'">
+    <div class="col-md-12">
+        <div id="registrars-report-container"><registrars-report></registrars-report></div>
+    </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='financialAid'">
+    <div class="col-md-12">
+        <div id="financialaid-report-container"><financialaid-report></financialaid-report></div>
+    </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='credits'">
+    <div class="col-md-12">
+        <div id="credits-report-container"><credits-report></credits-report></div>
+    </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='subsidies'">
+    <div class="col-md-12">
+        <div id="subsidies-report-container"><subsidies-report></subsidies-report></div>
+    </div>
+</div>
+
+<div class="row" data-bind="visible:selectedReport()=='downloads'">
+    <div  id="'downloads-list" class="col-md-12">
+        <div class="download-form">
+            <form action="/scym/download/transactions" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Transactions: </label>
+                    Download list of payments, charges, credits and donations.
+                </div>
+                <div class="checkbox">
+                    <label><input id="transactions-attended" name="attended" type="checkbox" checked value="Yes"> Attended only. </label>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+        <div class="download-form">
+            <form action="/scym/download/attendercounts" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Attender counts: </label>
+                    Download list of attenders with counts of days, nights, meals etc.
+                </div>
+                <div class="checkbox">
+                    <label><input id="attendercounts-attended" name="attended" type="checkbox" checked value="Yes"> Attended only. </label>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+        <div class="download-form">
+            <form action="/scym/download/registrationcounts" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Registration counts: </label>
+                    Download list of registrations with attender counts, accomodation counts, account figures, etc.
+                </div>
+                <div>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+        <div class="download-form">
+            <form action="/scym/download/balancesheet" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Balance sheet: </label>
+                    Download list of registrations with total fees, donations, credits, payments and balance.
+                </div>
+                <div>
+                    <label><input id="balancesheet-attended" name="attended" type="checkbox" checked value="Yes"> Attended only. </label>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+        <div class="download-form">
+            <form action="/scym/download/financesummary" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Finance summary: </label>
+                    Download summary information fees, donations, credits, payments balances and refunds.
+                </div>
+                <div>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+        <div class="download-form">
+            <form action="/scym/download/campreport" method="get" target="_blank">
+                <div class="form-group">
+                    <label>Camp report: </label>
+                    Download summary counts needed to calculate camp costs.
+                </div>
+                <div>
+                    <input class="btn btn-link" type="submit" value="Download">
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+<div class="row" data-bind="visible:selectedReport()=='registrar-downloads'">
+    <div  id="registrar-downloads-list" class="col-md-6">
+        <h3>Download name tags</h3>
+        <form action="/scym/download/nametags" method="get" target="_blank" role="form">
+            <div class="form-group">
+                <label>Sort: </label>
+                <select class="form-control" id="nametag-sort-select" name="order">
+                    <option value="name">By name</option>
+                    <option value="meeting">By meeting or affiliation and name</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Filter: </label>
+                <select class="form-control" id="nametag-filter-select" name="filter">
+                    <option value="all">Include everyone</option>
+                    <option value="firsttimers">First-timers only</option>
+                    <option value="nofirsttimers">Everyone except first-timers</option>
+                </select>
+            </div>
+            <div>
+                <input class="btn btn-default" type="submit" value="Download">
+            </div>
+        </form>
+    </div>
+
+
+</div>
+
+

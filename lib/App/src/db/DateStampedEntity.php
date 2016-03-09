@@ -7,7 +7,8 @@
  */
 
 namespace App\db;
-//abstract 
+//abstract
+use Tops\sys\TDateTime;
 
 /**
  * @MappedSuperclass
@@ -52,7 +53,7 @@ class DateStampedEntity {
             }
 
             if (empty($this->currentUserName)) {
-                $this->username = 'unknown';
+                $this->setUsername('unknown');
             }
         }
         return $this->currentUserName;
@@ -64,11 +65,11 @@ class DateStampedEntity {
         $now = new \DateTime();
         $username = $this->getCurrentUserName();
         if ($initial) {
-            $this->dateadded = $now;
-            $this->addedby = $username ;
+            $this->setDateAdded( $now);
+            $this->setAddedBy( $username );
         }
-        $this->dateupdated = $now;
-        $this->updatedby = $username;
+        $this->setDateUpdated($now);
+        $this->setUpdatedBy($username);
     }
 
     public function setUpdateStamp() {
@@ -195,4 +196,33 @@ class DateStampedEntity {
         $this->setUpdateStamp();
     }
 
+
+    protected function formatDtoDate($dateValue,$format='F j, Y')
+    {
+        return TDateTime::format($dateValue,$format);
+    }
+
+
+    protected function lastUpdateAsString($format='F j, Y')
+    {
+        return $this->formatDtoDate($this->dateupdated,$format);
+    }
+
+    protected function convertDate($dateString) {
+        try {
+            $dateValue = empty($dateString) ? null : new \DateTime($dateString);
+        }
+        catch(\Exception $ex) {
+            return false;
+        }
+        return $dateValue;
+    }
+
+    protected function convertDefaultDate($dateString) {
+        if (empty($dateString)) {
+            return new \DateTime();
+        }
+        $dateValue = $this->convertDate($dateString);
+        return $dateValue;
+    }
 }

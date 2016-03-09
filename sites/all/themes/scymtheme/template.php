@@ -20,10 +20,10 @@ use Tops\sys\TUser;
  * @return string|void
  */
 function scymtheme_status_messages($variables) {
-    $vmPath = TViewModel::getVmPath();
     $result = bootstrap_status_messages($variables);
-    if (!empty($vmPath)) {
-        $result = "$result\n<messages-component></messages-component>";
+    $vmPath = TViewModel::getVmPath();
+    if ($vmPath !== null && isset($vmPath->messagesComponent) &&  $vmPath->messagesComponent) {
+        $result = "$result\n<div id='service-messages-container'><service-messages></service-messages></div>";
     }
     return $result;
 }
@@ -159,7 +159,7 @@ function scymtheme_preprocess_node(&$variables) {
 function _scymtheme_typeToLi($type)
 {
     $first = substr($type->type,0,1);
-    $article = ($first == 'a' || $first == 'i' || $first == 'o' || $first == 'u') ? 'an ' : 'a ';
+    $article = ($first == 'a' || $first == 'e' || $first == 'i' || $first == 'o' || $first == 'u') ? 'an ' : 'a ';
 
     $href = '/node/add/'.str_replace('_','-',$type->type);
     $title = strip_tags($type->description);
@@ -214,17 +214,35 @@ function _scymtheme_buildAdminToolsMenu(\Tops\sys\IUser $currentUser) {
     $isRegistrar = $currentUser->isAuthorized('administer registrations');
     $manageTasks = $currentUser->isAuthorized('manage web site tasks');
     $registerDocuments = $currentUser->isAuthorized('register documents');
+    $manageDirectory = $currentUser->isAuthorized('administer directory');
+    $manageHousing = $currentUser->isAuthorized('administer housing');
+    $manageYouth = $currentUser->isAuthorized('administer youth');
+    $isAdmin = $currentUser->isAdmin();
     if ($manageTasks) {
-        $items .= _scymtheme_menuLi('\tasks','Manage Web Site','Task List');
+        $items .= _scymtheme_menuLi('/tasks','Manage Web Site','Task List');
     }
     if ($mailboxManager) {
-        $items .= _scymtheme_menuLi('\Mailboxes','Manage Mailboxes','Mailboxes');
+        $items .= _scymtheme_menuLi('/Mailboxes','Manage Mailboxes','Mailboxes');
     }
     if ($registerDocuments) {
-        $items .= _scymtheme_menuLi('\RegisterDocument','Register Uploaded Document','Register Document');
+        $items .= _scymtheme_menuLi('/RegisterDocument','Register Uploaded Document','Register Document');
     }
-    if ($isRegistrar) {
-        $items .= _scymtheme_menuLi('\RegistrationAdmin','Manage Yearly Meeting Registrations','Manage Registrations');
+    if ($manageDirectory || $isAdmin) {
+        $items .= _scymtheme_menuLi('/management/EMailings','Manage mailing lists','Manage mailing lists');
+        $items .= _scymtheme_menuLi('/members/download','Directory downloads','Download directory lists');
+    }
+    if ($isRegistrar || $isAdmin) {
+        $items .= _scymtheme_menuLi('/registration/admin','Manage Yearly Meeting Registrations','Manage Registrations');
+    }
+    if ($manageHousing  || $isAdmin) {
+        $items .= _scymtheme_menuLi('/registration/housing','Manage Yearly Meeting Housing','Manage Housing');
+
+    }
+    if ($manageYouth || $isAdmin) {
+        $items .= _scymtheme_menuLi('/registration/youth','Manage Youth Program','Manage Youth Program');
+    }
+    if ($isAdmin) {
+        $items .= _scymtheme_menuLi('/admin/dashboard','Administrator Dashboard','Administrator Dashboard');
     }
 
 
@@ -274,7 +292,12 @@ function scymtheme_preprocess_page(&$variables) {
     $variables['primary_nav'] = FALSE;
     if ($variables['main_menu']) {
         // Build links.
-        $variables['primary_nav'] = menu_tree(variable_get('menu_main_links_source', 'main-menu'));
+        if ($variables['logged_in']) {
+            $variables['primary_nav'] = menu_tree(variable_get('menu_main_links_source', 'main-menu'));
+        }
+        else {
+            $variables['primary_nav'] = menu_tree('menu-main-menu-anonymous');
+        }
         // Provide default theme wrapper function.
         $variables['primary_nav']['#theme_wrappers'] = array('menu_tree__primary');
     }
@@ -421,5 +444,31 @@ function scymtheme_bootstrap_search_form_wrapper($variables) {
     $output .= '</button>';
     $output .= '</span>';
     $output .= '</div>';
+    return $output;
+}
+
+/**
+ * Overrides theme_menu_local_tasks().
+ * Hide tabs if rendering an MVVM application.
+ */
+function scymtheme_menu_local_tasks(&$variables) {
+    $output = '';
+    $vm = TViewModel::getVmPath();
+    if ($vm == null) {
+        if (!empty($variables['primary'])) {
+            $variables['primary']['#prefix'] = '<h2 class="element-invisible">' . t('Primary tabs') . '</h2>';
+            $variables['primary']['#prefix'] .= '<ul class="tabs--primary nav nav-tabs">';
+            $variables['primary']['#suffix'] = '</ul>';
+            $output .= drupal_render($variables['primary']);
+        }
+
+        if (!empty($variables['secondary'])) {
+            $variables['secondary']['#prefix'] = '<h2 class="element-invisible">' . t('Secondary tabs') . '</h2>';
+            $variables['secondary']['#prefix'] .= '<ul class="tabs--secondary pagination pagination-sm">';
+            $variables['secondary']['#suffix'] = '</ul>';
+            $output .= drupal_render($variables['secondary']);
+        }
+    }
+
     return $output;
 }

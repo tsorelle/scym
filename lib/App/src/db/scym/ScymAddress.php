@@ -39,6 +39,9 @@ class ScymAddress extends DateStampedEntity
         $this->persons = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
     public function getPersons()  {
         return $this->persons;
     }
@@ -138,6 +141,14 @@ class ScymAddress extends DateStampedEntity
      * @Column(name="active", type="boolean", nullable=true)
      */
     protected $active = '1';
+
+    /**
+     * @var integer
+     *
+     * @Column(name="directoryListingTypeId", type="integer", nullable=false)
+     */
+    protected $directoryListingTypeId = '1';
+
 
     /**
      * @var string
@@ -433,6 +444,31 @@ class ScymAddress extends DateStampedEntity
     }
 
     /**
+     * Set directorylistingtypeid
+     *
+     * @param integer $directorylistingtypeid
+     * @return ScymAddress
+     */
+    public function setDirectoryListingTypeId($directorylistingtypeid)
+    {
+        $this->directoryListingTypeId = $directorylistingtypeid;
+
+        return $this;
+    }
+
+    /**
+     * Get directorylistingtypeid
+     *
+     * @return integer
+     */
+    public function getDirectoryListingTypeId()
+    {
+        return $this->directoryListingTypeId;
+    }
+
+
+
+    /**
      * Set sortkey
      *
      * @param string $sortkey
@@ -455,5 +491,50 @@ class ScymAddress extends DateStampedEntity
         return $this->sortkey;
     }
 
+    /**
+     * @return \stdClass
+     */
+    public function getDataTransferObject() {
+        $result = new \stdClass();
 
+        $result->addressId = $this->addressid;
+        $result->addressTypeId = $this->addresstype;
+        $result->addressname = $this->addressname;
+        $result->address1 = $this->address1;
+        $result->address2 = $this->address2;
+        $result->city = $this->city;
+        $result->state = $this->state;
+        $result->postalcode = $this->postalcode;
+        $result->country = $this->country;
+        $result->phone = $this->phone;
+        $result->notes = $this->notes;
+        $result->newsletter = $this->newsletter;
+        $result->active  = $this->active;
+        $result->sortkey = $this->sortkey;
+        $result->lastUpdate = $this->lastUpdateAsString();
+        $result->id = $this->addressid; // client side id
+        $result->directorylistingtypeid = $this->directoryListingTypeId;
+        $result->editState = 0; // unchanged
+
+        return $result;
+    }
+    
+    public function updateFromDataTransferObject(\stdClass $dto)
+    {
+        $this->addressid = $dto->addressId;
+        $this->addresstype = $dto->addressTypeId;
+        $this->addressname = $dto->addressname;
+        $this->address1 = $dto->address1;
+        $this->address2 = $dto->address2;
+        $this->city = $dto->city;
+        $this->state = $dto->state;
+        $this->postalcode = $dto->postalcode;
+        $this->country = $dto->country;
+        $this->phone = $dto->phone;
+        $this->notes = $dto->notes;
+        $this->newsletter = $dto->newsletter;
+        $this->active = $dto->active;
+        $this->directorylistingtypeid = $dto->directorylistingtypeid;
+        $this->sortkey = $dto->sortkey;
+    }
 }

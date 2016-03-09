@@ -1,0 +1,58 @@
+<div id="credits-report" class="row">
+    <div class="col-md-12">
+        <h2>Credits Report</h2>
+        <h3 data-bind="visible:headerTitle"><span data-bind="text:headerTitle"></span> </h3>
+        <h4>Total amount: <span data-bind="text:creditsTotal"></span></h4>
+
+        <div id="options-header" class="row hidden-print" style="margin-bottom: 10px">
+            <div class="col-md-4" style="padding-bottom:5px">
+                <label style="padding-right:8px;">Filter:</label>
+                <select data-bind="options: filter.options,
+                   optionsText: 'Name',
+                   value: filter.selected,
+                   optionsCaption: '-- All --'"></select>
+            </div>
+            <div class="col-md-4">
+                <label>
+                    <input type="checkbox" data-bind="checked:showAttendedOnly,click:applyFilter">  Show attended only
+                </label>
+            </div>
+        </div>
+        <div id="print-header"  data-bind="visible:showAttendedOnly" class="row visible-print-block" style="margin-bottom: 10px">
+            <div class="col-md-12" >
+                <h4>(Attended only)</h4>
+            </div>
+        </div>
+
+        <div id="no-records" data-bind="visible:dataList().length == 0">
+            No records.
+        </div>
+        <div id="report-name-table" class="row" data-bind="visible:dataList().length">
+            <div class="col-md-12">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Registration Name</th>
+                        <th class="text-center">Attended</th>
+                        <th>Credit type</th>
+                        <th class="text-right">Amount</th>
+                    </tr>
+                    </thead>
+                    <tbody data-bind="foreach:dataList">
+                    <tr>
+                        <td>
+                            <span style="padding-right: 10px" data-bind="text:registrationName"></span>
+                                <span style="white-space: nowrap">
+                                <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:$parent.lookupRegistration"><span class="glyphicon glyphicon-search"></span></a>
+                                </span>
+                        </td>
+                        <td class="text-center" data-bind="text:attended"></td>
+                        <td data-bind="text:creditTypeName"></td>
+                        <td class="text-right" nowrap data-bind="text:amountFormatted"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

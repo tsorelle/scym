@@ -12,6 +12,8 @@
     <!-- link href="themes/scym/assets/css/style.css" rel="stylesheet" -->
     <link href="sites/all/themes/scymtheme/assets/css/scym-theme.min.css" rel="stylesheet">
     <link href="sites/all/themes/scymtheme/assets/css/scym-more.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
@@ -33,7 +35,7 @@
     <script src="http://local.scym.org/assets/js/Tops.App/App.js?v=1.0"></script>
     <script src="http://local.scym.org/modules/toolbar/toolbar.js?nr9wnb"></script>
     <script src="http://local.scym.org/sites/all/themes/scymtheme/assets/js/bootstrap.min.js?nr9wnb"></script>
-
+    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 
 
 
@@ -50,12 +52,15 @@
             padding-left: 0px;
         }
         #found-header { padding-bottom: 10px;  }
+        .viewform-label {
+            font-weight: bold;
+        }
     </style>
 
-<!-- link type="text/css" href="assets/css/scym.css" rel="stylesheet" -->
-<style>
-    .element-invisible { display: none; }
-</style>
+    <!-- link type="text/css" href="assets/css/scym.css" rel="stylesheet" -->
+    <style>
+        .element-invisible { display: none; }
+    </style>
 </head>
 
 <body class="html not-front logged-in no-sidebars page-node page-node- page-node-4 node-type-page toolbar toolbar-drawer" >
@@ -145,294 +150,484 @@
             <h1 class="page-header">SCYM Directory</h1>
             <div class="region region-content">
 
-            <section id="block-system-main" class="block block-system clearfix">
-                <div id="node-4" class="node node-page clearfix" about="/Mailboxes" typeof="foaf:Document">
-                    <span property="dc:title" content="Mailboxes" class="rdf-meta element-hidden"></span>
-                    <span property="sioc:num_replies" content="0" datatype="xsd:integer" class="rdf-meta element-hidden"></span>
+                <section id="block-system-main" class="block block-system clearfix">
+                    <div id="node-4" class="node node-page clearfix" about="/Mailboxes" typeof="foaf:Document">
+                        <span property="dc:title" content="Mailboxes" class="rdf-meta element-hidden"></span>
+                        <span property="sioc:num_replies" content="0" datatype="xsd:integer" class="rdf-meta element-hidden"></span>
 
-                    <div class="content">
-                        <div class="field field-name-body field-type-text-with-summary field-label-hidden">
-                            <div class="field-items">
-                                <div class="field-item even" property="content:encoded">
+                        <div class="content">
+                            <div class="field field-name-body field-type-text-with-summary field-label-hidden">
+                                <div class="field-items">
+                                    <div class="field-item even" property="content:encoded">
 
-                                    <!-- ******************  START FORM ****************************************************************************  -->
-                                    <div id="scym-directory" class="container view-model-container">
-                                        <div class="row" id="search-form">
-                                            <div class="col-md-12">
-                                                <form>
-                                                    <div class="row">
-                                                        <div class="col-md-8">
-                                                            <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="Search" data-bind="value: familiesList.searchValue">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <button class="btn btn-default" data-bind="click:findFamiliesByPersonName" >Persons <span class="glyphicon glyphicon-search"></span> </button>
-                                                            <button class="btn btn-default" data-bind="click:findFamiliesByAddressName">Addresses <span class="glyphicon glyphicon-search"></span></button>
-                                                            <div class="btn-group" data-bind="visible:userCanEdit">
-                                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                    New <span class="caret"></span>
-                                                                </button>
-                                                                <ul class="dropdown-menu">
-                                                                    <li><a href="#" data-bind="click:newPerson">Person</a></li>
-                                                                    <li><a href="#" data-bind="click:newAddress">Address</a></li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-
-                                        <div id="found-panel" class="found well" data-bind="visible:familiesList.selectionCount">
-                                            <div id="found-header" class="row">
-                                                <div class="col-md-2">
-                                                    Found: <span data-bind="text: familiesList.selectionCount"></span> <span data-bind="text: searchType"></span>.
-                                                </div>
-                                                <div class="col-md-2" style="padding-right: 3px" data-bind="visible:familiesList.hasPrevious">
-                                                    <a href="#"  data-bind="click:familiesList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
-                                                </div>
-                                                <div class="col-md-2" style="padding-right: 3px" data-bind="visible:familiesList.hasMore">
-                                                    <a href="#" data-bind="click:familiesList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
-                                                </div>
-                                                <div class="col-md-6"></div>
-                                            </div> <!-- end found header -->
-
-                                            <div class="row" id="found-list">
-                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[1]">
-                                                    <div>
-                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
-                                                    </div>
-                                                </div>
-                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[2]">
-                                                    <div>
-                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
-                                                    </div>
-
-                                                </div>
-                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[3]">
-                                                    <div>
-                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
-                                                    </div>
-                                                </div>
-                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[4]">
-                                                    <div>
-                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
-                                                    </div>
-                                                </div>
-                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[5]">
-                                                    <div>
-                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
-                                                    </div>
-                                                </div>
-                                                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[6]">
-                                                    <div>
-                                                        <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
-                                                    </div>
-                                                </div>
-
-                                            </div> <!-- end found list -->
-                                        </div> <!-- end found panel -->
-
-                                        <div id="family-panel"  class="row" data-bind="visible:family.visible">
-                                            <form>
-                                                <!-- person panels -->
-                                                <div id="person-panel"  class="col-md-6">
-                                                    <div id="person-view-panel" data-bind="visible:personForm.viewState() == 'view'">
-                                                        <fieldset id="person-view-fields">
-                                                        <legend data-bind="text:personFormHeader"></legend>
-                                                            <div id="person-view-buttons" data-bind="visible:userCanEdit">
-                                                                <button class="btn btn-default" data-bind="click:editPerson">Edit</button>
-                                                                <button class="btn btn-default" data-bind="click:movePerson">
-                                                                    <span data-bind="visible:family.hasAddress">Move</span>
-                                                                    <span data-bind="visible:!family.hasAddress()">Get Address</span>
-                                                                </button>
-                                                            </div>
-                                                            <em>Name:</em> <span ></span><br>
-                                                        </fieldset>
-                                                    </div>
-                                                    <div id="person-edit-panel" data-bind="visible:personForm.viewState() == 'edit'">
-                                                        <fieldset id="person-form" >
-                                                            <div id="person-edit-buttons">
-                                                                <button class="btn btn-primary" data-bind="click:savePerson">Save</button>
-                                                                <button class="btn btn-default" data-bind="click:cancelPersonEdit">Cancel</button>
-                                                            </div>
-                                                            <legend data-bind="text:personFormHeader"></legend>
-                                                            <div class="form-group">
-                                                                <label for="firstName">First name</label>
-                                                                <input class="form-control" id="firstName" data-bind="value:personForm.firstName"/>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="middleName">Middle name</label>
-                                                                <input class="form-control" id="middleName" data-bind="value:personForm.middleName"/>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="lastName">Last name</label>
-                                                                <input class="form-control" id="lastName" data-bind="value:personForm.lastName"/>
-                                                            </div>
-                                                        </fieldset>
-
-                                                    </div>
-                                                    <div id="person-search-panel"  data-bind="visible:personForm.viewState() == 'search'">
-                                                        <fieldset id="person-search-fields">
-                                                            <legend>Find Person</legend>
-                                                            <div class="row">
-                                                                <div class="col-md-8">
-                                                                    <div class="form-group">
-                                                                        <input type="text" class="form-control" placeholder="Search" data-bind="value: personForm.searchValue">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <button class="btn btn-default" data-bind="click:findPersons" title="Search"><span class="glyphicon glyphicon-search"></span> </button>
-                                                                    <button class="btn btn-default" data-bind="click:createPersonForAddress" title="Create new person for address."><span class="glyphicon glyphicon-plus"></span></button>
-                                                                    <button class="btn btn-default" data-bind="click:cancelPersonSearch" title="Cancel"><span class="glyphicon glyphicon-remove"></span></button>
+                                        <!-- ******************  START FORM ****************************************************************************  -->
+                                        <div id="scym-directory" style="display:none" class="container view-model-container">
+                                            <div class="row" id="search-form">
+                                                <div class="col-md-12">
+                                                    <form>
+                                                        <div class="row">
+                                                            <div class="col-md-8">
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-control" placeholder="Search" data-bind="value: familiesList.searchValue">
                                                                 </div>
                                                             </div>
-                                                            <div id="findPersonResults"  class="row found well" data-bind="visible:personsList.selectionCount">
-                                                                <div id="persons-found-header" class="row">
-                                                                    <div class="col-md-12">
-                                                                        Found: <span data-bind="text: personsList.selectionCount"></span> persons.
-                                                                    </div>
-
-                                                                </div>
-                                                                <div id="persons-found-nav" class="row">
-                                                                    <div class="col-md-6" style="padding-right: 3px" data-bind="visible:personsList.hasPrevious">
-                                                                        <a href="#"  data-bind="click:personsList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
-                                                                    </div>
-                                                                    <div class="col-md-6" style="padding-right: 3px" data-bind="visible:personsList.hasMore">
-                                                                        <a href="#" data-bind="click:personsList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
-                                                                    </div>
-                                                                </div> <!-- end found header -->
-
-                                                                <div class="row" id="persons-found-list">
-                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[1]">
-                                                                        <div>
-                                                                            <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[2]">
-                                                                        <div>
-                                                                            <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
-                                                                        </div>
-
-                                                                    </div>
-                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[3]">
-                                                                        <div>
-                                                                            <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div> <!-- end found list -->
-
-                                                            </div>
-
-
-
-
-
-                                                        </fieldset>
-                                                    </div>
-                                                    <div id="person-empty-panel"  data-bind="visible:personForm.viewState() == 'empty'">
-                                                        <p>No person</p>
-                                                    </div>
-                                                </div> <!-- end person panel -->
-
-                                                <!-- address panels -->
-                                                <div id="address-panel"  class="col-md-6">
-                                                    <div id="address-view-panel" data-bind="visible:addressForm.viewState() == 'view'">
-                                                        <fieldset id="address-view-fields">
-                                                            <legend>Address</legend>
-                                                            <div id="address-view-buttons">
-                                                                <button class="btn btn-default" data-bind="click:editAddress,visible:userCanEdit">Edit</button>
-                                                                <button class="btn btn-default" data-bind="click:findPersonForAddress, visible:family.personCount()<2 && userCanEdit()">Add person</button>
-                                                                <div id="address-persons-list" class="btn-group" data-bind="visible:family.personCount()>1">
+                                                            <div class="col-md-4">
+                                                                <button class="btn btn-default" data-bind="click:findFamiliesByPersonName" >Persons <span class="glyphicon glyphicon-search"></span> </button>
+                                                                <button class="btn btn-default" data-bind="click:findFamiliesByAddressName">Addresses <span class="glyphicon glyphicon-search"></span></button>
+                                                                <div class="btn-group" data-bind="visible:userCanEdit">
                                                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                        Persons <span class="caret"></span>
+                                                                        New <span class="caret"></span>
                                                                     </button>
-                                                                    <ul class="dropdown-menu" data-bind="foreach:addressPersonsList">
-                                                                        <li><a href="#" data-bind="click:$parent.selectPerson"><span data-bind="text: Name"></span></a></li>
+                                                                    <ul class="dropdown-menu">
+                                                                        <li><a href="#" data-bind="click:newPerson">Person</a></li>
+                                                                        <li><a href="#" data-bind="click:newAddress">Address</a></li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
-                                                            <em>Name:</em> <span ></span><br>
-                                                        </fieldset>
-                                                    </div>
-                                                    <div id="address-edit-panel" data-bind="visible:addressForm.viewState() == 'edit'">
-                                                        <fieldset id="address-form" >
-                                                            <legend >Address</legend>
-                                                        </fieldset>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
 
-                                                        <div id="address-edit-buttons">
-                                                            <button class="btn btn-primary" data-bind="click:saveAddress">Save</button>
-                                                            <button class="btn btn-default" data-bind="click:cancelAddressEdit">Cancel</button>
+                                            <div id="found-panel" class="found well" data-bind="visible:familiesList.selectionCount">
+                                                <div id="found-header" class="row">
+                                                    <div class="col-md-2">
+                                                        Found: <span data-bind="text: familiesList.selectionCount"></span> <span data-bind="text: searchType"></span>.
+                                                    </div>
+                                                    <div class="col-md-2" style="padding-right: 3px" data-bind="visible:familiesList.hasPrevious">
+                                                        <a href="#"  data-bind="click:familiesList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+                                                    </div>
+                                                    <div class="col-md-2" style="padding-right: 3px" data-bind="visible:familiesList.hasMore">
+                                                        <a href="#" data-bind="click:familiesList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+                                                    </div>
+                                                    <div class="col-md-6"></div>
+                                                </div> <!-- end found header -->
+
+                                                <div class="row" id="found-list">
+                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[1]">
+                                                        <div>
+                                                            <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
                                                         </div>
                                                     </div>
-                                                    <div id="address-search-panel"  data-bind="visible:addressForm.viewState() == 'search'">
-                                                        <fieldset id="address-search-fields">
-                                                            <legend>Find Address</legend>
+                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[2]">
+                                                        <div>
+                                                            <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[3]">
+                                                        <div>
+                                                            <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" data-bind="foreach: familiesList.selectionList[4]">
+                                                        <div>
+                                                            <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[5]">
+                                                        <div>
+                                                            <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2"  data-bind="foreach: familiesList.selectionList[6]">
+                                                        <div>
+                                                            <a href="#" data-bind="click:$parent.displayFamily"><span data-bind="text: Name"></span></a>
+                                                        </div>
+                                                    </div>
+
+                                                </div> <!-- end found list -->
+                                            </div> <!-- end found panel -->
+
+                                            <div id="family-panel"  class="row" data-bind="visible:family.visible">
+                                                <form>
+                                                    <!-- person panels -->
+                                                    <div id="person-panel"  class="col-md-6">
+                                                        <div id="person-view-panel" data-bind="visible:personForm.viewState() == 'view'">
+                                                            <fieldset id="person-view-fields">
+                                                                <legend data-bind="text:personFormHeader"></legend>
+                                                                <div id="person-view-buttons" data-bind="visible:userCanEdit">
+                                                                    <button class="btn btn-default" data-bind="click:editPerson">Edit</button>
+                                                                    <button class="btn btn-default" data-bind="click:movePerson">
+                                                                        <span data-bind="visible:family.hasAddress">Move</span>
+                                                                        <span data-bind="visible:!family.hasAddress()">Get Address</span>
+                                                                    </button>
+                                                                </div>
+
+                                                                <div data-bind="visible:personForm.hasAffiliation">
+                                                                    <strong>Meeting: </strong>
+                                                                    <span data-bind="text:personForm.affiliation"></span>
+                                                                </div>
+                                                                <div data-bind="visible:personForm.otheraffiliation">
+                                                                    <strong>Meeting:</strong><br>
+                                                                    <span data-bind="text:personForm.otheraffiliation"></span>
+                                                                </div>
+                                                                <div data-bind="visible:personForm.organization">
+                                                                    <strong>Organization:</strong><br>
+                                                                    <span data-bind="text:personForm.organization"></span>
+                                                                </div>
+                                                                <div data-bind="visible:personForm.email">
+                                                                    <strong>E-mail: </strong>
+                                                                    <a data-bind="attr: { href : personForm.emailLink }">
+                                                                        <span data-bind="text:personForm.email"></span>
+                                                                    </a>
+                                                                </div>
+                                                                <div data-bind="visible:personForm.junior">
+                                                                    <strong>Young Friend.</strong><br>
+                                                                </div>
+                                                                <div data-bind="visible:personForm.dateOfBirth">
+                                                                    <strong>Date of birth: </strong>
+                                                                    <span data-bind="text:personForm.dateOfBirth"></span>
+                                                                </div>
+                                                                <div data-bind="visible:personForm.phone">
+                                                                    <strong>Phone: </strong>
+                                                                    <span data-bind="text:personForm.phone"></span>
+                                                                </div>
+                                                                <div data-bind="visible:personForm.phone2">
+                                                                    <strong>Phone&nbsp;2: </strong>
+                                                                    <span data-bind="text:personForm.phone2"></span>
+                                                                </div>
+                                                                <div>
+                                                                    <strong>Send&nbsp;newsletter: </strong>
+                                                                    <span data-bind="visible:personForm.newsletter">Yes</span><span data-bind="visible:!personForm.newsletter()">No</span>
+                                                                </div>
+                                                                <div data-bind="visible:personForm.notes">
+                                                                    <strong>Notes:</strong><br>
+                                                                    <span data-bind="text:personForm.notes">notes</span>
+                                                                </div>
+                                                                <div>
+                                                                    <strong>Last&nbsp;update: </strong>
+                                                                    <span data-bind="text:personForm.lastUpdate"></span>
+                                                                </div>
+                                                                <div>
+                                                                    <strong>Person Id: </strong>
+                                                                    <span data-bind="text:personForm.personId"></span>
+                                                                </div>
+
+                                                            </fieldset>
+                                                        </div>
+                                                        <div id="person-edit-panel" data-bind="visible:personForm.viewState() == 'edit'">
+                                                            <fieldset id="person-form" >
+                                                                <div id="person-edit-buttons" data-bind="visible:addressForm.viewState() == 'view'">
+                                                                    <button class="btn btn-primary" data-bind="click:savePerson">Save</button>
+                                                                    <button class="btn btn-default" data-bind="click:cancelPersonEdit">Cancel</button>
+                                                                </div>
+                                                                <legend data-bind="text:personFormHeader"></legend>
+                                                                <div class="form-group">
+                                                                    <label for="firstName">First name</label>
+                                                                    <input class="form-control" id="firstName" data-bind="value:personForm.firstName"/>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="middleName">Middle name</label>
+                                                                    <input class="form-control" id="middleName" data-bind="value:personForm.middleName"/>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="lastName">Last name</label>
+                                                                    <input class="form-control" id="lastName" data-bind="value:personForm.lastName"/>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="email-input">E-mail</label>
+                                                                    <input class="form-control" id="email-input" data-bind="value:personForm.email"/>
+                                                                </div>
+                                                                <div class="form-group" data-bind="visible:personForm.email">
+                                                                    <input id="newsletter-input" type="checkbox" data-bind="checked:personForm.newsletter"/>
+                                                                    <label for="newsletter-input">  Send newsletter</label>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="phone-input">Phone</label>
+                                                                    <input class="form-control" id="phone-input" data-bind="value:personForm.phone"/>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="phone2-input">Second phone</label>
+                                                                    <input class="form-control" id="phone2-input" data-bind="value:personForm.phone2"/>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <input id="junior-input" type="checkbox" data-bind="checked:personForm.junior"/>
+                                                                    <label for="junior-input">  Young Friend (18 or younger)</label>
+                                                                </div>
+                                                                <!-- todo: make drupal include jquery-ui and use a date popup. see http://jqueryui.com/datepicker/ and https://www.drupal.org/project/date -->
+                                                                <div class="form-group">
+                                                                    <label for="dob-input">Date of birth (kids only)</label>
+                                                                    <input class="form-control datepicker" type="text" id="dob-input" data-bind="value:personForm.dateOfBirth"/>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="affiliation-input">SCYM Meeting or Worship Group</label>
+                                                                    <select class="form-control" id="affiliation-input"
+                                                                            data-bind="options: personForm.affiliations,optionsText:'Name',value: personForm.selectedAffiliation"></select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="otheraffiliation-input">Meeting (outside of SCYM)</label>
+                                                                    <input class="form-control" id="otheraffiliation-input" data-bind="value:personForm.otheraffiliation"/>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="organization-input">Organization (representative)</label>
+                                                                    <input class="form-control" id="organization-input" data-bind="value:personForm.organization"/>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="directory-listing-input">Directory listing:</label>
+                                                                    <select class="form-control" id="directory-listing-input"
+                                                                            data-bind="options: personForm.directoryListingTypes,optionsText:'Name',value: personForm.selectedDirectoryListingType"></select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="username-input">Web site user name</label>
+                                                                    <input class="form-control" id="username-input" data-bind="value:personForm.username"/>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="sortkey-input">Sort key</label>
+                                                                    <input class="form-control" id="sortkey-input" data-bind="value:personForm.sortkey"/>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="notes-input">Notes</label>
+                                                                    <textarea class="form-control" id="notes-input" data-bind="value:personForm.notes"></textarea>
+                                                                </div>
+
+
+                                                            </fieldset>
+
+                                                        </div>
+                                                        <div id="person-search-panel"  data-bind="visible:personForm.viewState() == 'search'">
+                                                            <fieldset id="person-search-fields">
+                                                                <legend>Find Person</legend>
+                                                                <div class="row">
+                                                                    <div class="col-md-8">
+                                                                        <div class="form-group">
+                                                                            <input type="text" class="form-control" placeholder="Search" data-bind="value: personForm.searchValue">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        <button class="btn btn-default" data-bind="click:findPersons" title="Search"><span class="glyphicon glyphicon-search"></span> </button>
+                                                                        <button class="btn btn-default" data-bind="click:createPersonForAddress" title="Create new person for address."><span class="glyphicon glyphicon-plus"></span></button>
+                                                                        <button class="btn btn-default" data-bind="click:cancelPersonSearch" title="Cancel"><span class="glyphicon glyphicon-remove"></span></button>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="findPersonResults"  class="row found well" data-bind="visible:personsList.selectionCount">
+                                                                    <div id="persons-found-header" class="row">
+                                                                        <div class="col-md-12">
+                                                                            Found: <span data-bind="text: personsList.selectionCount"></span> persons.
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div id="persons-found-nav" class="row">
+                                                                        <div class="col-md-6" style="padding-right: 3px" data-bind="visible:personsList.hasPrevious">
+                                                                            <a href="#"  data-bind="click:personsList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+                                                                        </div>
+                                                                        <div class="col-md-6" style="padding-right: 3px" data-bind="visible:personsList.hasMore">
+                                                                            <a href="#" data-bind="click:personsList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+                                                                        </div>
+                                                                    </div> <!-- end found header -->
+
+                                                                    <div class="row" id="persons-found-list">
+                                                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[1]">
+                                                                            <div>
+                                                                                <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[2]">
+                                                                            <div>
+                                                                                <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: personsList.selectionList[3]">
+                                                                            <div>
+                                                                                <a href="#" data-bind="click:$parent.addPersonToAddress"><span data-bind="text: Name"></span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div> <!-- end found list -->
+
+                                                                </div>
+
+
+
+
+
+                                                            </fieldset>
+                                                        </div>
+                                                        <div id="person-empty-panel"  data-bind="visible:personForm.viewState() == 'empty'">
+                                                            <p>No person</p>
+                                                        </div>
+                                                    </div> <!-- end person panel -->
+
+                                                    <!-- address panels -->
+                                                    <div id="address-panel"  class="col-md-6">
+                                                        <div id="address-view-panel" data-bind="visible:addressForm.viewState() == 'view'">
+                                                            <fieldset id="address-view-fields">
+                                                                <legend>Address</legend>
+                                                                <div id="address-view-buttons">
+                                                                    <button class="btn btn-default" data-bind="click:editAddress,visible:userCanEdit">Edit</button>
+                                                                    <button class="btn btn-default" data-bind="click:findPersonForAddress, visible:family.personCount()<2 && userCanEdit()">Add person</button>
+                                                                    <div id="address-persons-list" class="btn-group" data-bind="visible:family.personCount()>1">
+                                                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                            Persons <span class="caret"></span>
+                                                                        </button>
+                                                                        <ul class="dropdown-menu" data-bind="foreach:addressPersonsList">
+                                                                            <li><a href="#" data-bind="click:$parent.selectPerson"><span data-bind="text: Name"></span></a></li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                                <div id='streetaddress-view'>
+                                                                    <div>
+                                                                        <strong>Street Address: </strong>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span data-bind="text:addressForm.addressname"></span>
+                                                                    </div>
+                                                                    <div data-bind="visible:addressForm.address1">
+                                                                        <span data-bind="text:addressForm.address1"></span>
+                                                                    </div>
+                                                                    <div data-bind="visible:addressForm.address2">
+                                                                        <span data-bind="text:addressForm.address2"></span>
+                                                                    </div>
+                                                                    <div data-bind="visible:addressForm.cityLocation">
+                                                                        <span data-bind="text:addressForm.cityLocation"></span>
+                                                                    </div>
+                                                                    <div data-bind="visible:addressForm.country">
+                                                                        <span data-bind="text:addressForm.country"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div data-bind="visible:addressForm.phone">
+                                                                    <strong>Household phone: </strong>
+                                                                    <span data-bind="text:addressForm.phone"></span>
+                                                                </div>
+                                                                <div data-bind="visible:addressForm.notes">
+                                                                    <strong>Notes:</strong><br>
+                                                                    <span data-bind="text:addressForm.notes">notes</span>
+                                                                </div>
+                                                                <div>
+                                                                    <strong>Last&nbsp;update: </strong>
+                                                                    <span data-bind="text:addressForm.lastUpdate"></span>
+                                                                </div>
+                                                                <div>
+                                                                    <strong>Address Id: </strong>
+                                                                    <span data-bind="text:addressForm.addressId"></span>
+                                                                </div>
+
+                                                            </fieldset>
+                                                        </div>
+                                                        <div id="address-edit-panel" data-bind="visible:addressForm.viewState() == 'edit'">
+                                                            <fieldset id="address-form" >
+                                                                <legend >Address</legend>
+                                                            </fieldset>
+
+                                                            <div id="address-edit-buttons">
+                                                                <button class="btn btn-primary" data-bind="click:saveAddress">Save</button>
+                                                                <button class="btn btn-default" data-bind="click:cancelAddressEdit">Cancel</button>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="addressname-input">Name on address</label>
+                                                                <input class="form-control" id="addressname-input" data-bind="value:addressForm.addressname"/>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="address-input">Address</label>
+                                                                <input class="form-control" id="address-input" data-bind="value:addressForm.address1"/><br>
+                                                                <input class="form-control" id="address2-input" data-bind="value:addressForm.address2"/>
+                                                            </div>
                                                             <div class="row">
-                                                                <div class="col-md-8">
+                                                                <div class="col-md-5">
                                                                     <div class="form-group">
-                                                                        <input type="text" class="form-control" placeholder="Search" data-bind="value: addressForm.searchValue">
+                                                                        <label for="city-input">City</label>
+                                                                        <input class="form-control" id="city-input" data-bind="value:addressForm.city"/>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-md-4">
-                                                                    <button class="btn btn-default" data-bind="click:findAddresses" title="Search"><span class="glyphicon glyphicon-search"></span> </button>
-                                                                    <button class="btn btn-default" data-bind="click:createAddressForPerson" title="Create new address for person."><span class="glyphicon glyphicon-plus"></span></button>
-                                                                    <button class="btn btn-default" data-bind="click:cancelAddressSearch" title="Cancel"><span class="glyphicon glyphicon-remove"></span></button>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label for="state-input">State</label>
+                                                                        <input class="form-control" id="state-input" data-bind="value:addressForm.state"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label for="zip-input">Postal Code</label>
+                                                                        <input class="form-control" id="zip-input" data-bind="value:addressForm.postalcode"/>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                            <div id="findAddressResults"  class="row found well" data-bind="visible:addressesList.selectionCount">
-                                                                <div id="address-found-header" class="row">
-                                                                    <div class="col-md-12">
-                                                                        Found: <span data-bind="text: addressesList.selectionCount"></span> addresses.
-                                                                    </div>
-                                                                </div>
-                                                                <div id="address-found-nav" class="row">
-                                                                    <div class="col-md-6" style="padding-right: 3px" data-bind="visible:addressesList.hasPrevious">
-                                                                        <a href="#"  data-bind="click:addressesList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
-                                                                    </div>
-                                                                    <div class="col-md-6" style="padding-right: 3px" data-bind="visible:addressesList.hasMore">
-                                                                        <a href="#" data-bind="click:addressesList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
-                                                                    </div>
-                                                                </div> <!-- end found header -->
-
-                                                                <div class="row" id="addresses-found-list">
-                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: addressesList.selectionList[1]">
-                                                                        <div>
-                                                                            <a href="#" data-bind="click:$parent.assignAddressToPerson"><span data-bind="text: Name"></span></a>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: addressesList.selectionList[2]">
-                                                                        <div>
-                                                                            <a href="#" data-bind="click:$parent.assignAddressToPerson"><span data-bind="text: Name"></span></a>
-                                                                        </div>
-
-                                                                    </div>
-                                                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: addressesList.selectionList[3]">
-                                                                        <div>
-                                                                            <a href="#" data-bind="click:$parent.assignAddressToPerson"><span data-bind="text: Name"></span></a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div> <!-- end found list -->
-
+                                                            <div class="form-group">
+                                                                <label for="country-input">Country</label>
+                                                                <input class="form-control" id="country-input" data-bind="value:addressForm.country"/>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="address-phone-input">Household Phone</label>
+                                                                <input class="form-control" id="address-phone-input" data-bind="value:addressForm.phone"/>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="address-sortkey-input">Sort key</label>
+                                                                <input class="form-control" id="address-sortkey-input" data-bind="value:addressForm.sortkey"/>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="address-notes-input">Notes</label>
+                                                                <textarea class="form-control" id="address-notes-input" data-bind="value:addressForm.notes"></textarea>
                                                             </div>
 
-                                                        </fieldset>
-                                                    </div>
-                                                    <div id="address-empty-panel"  data-bind="visible:addressForm.viewState() == 'empty'">
-                                                        <p>No address</p>
-                                                    </div>
-                                                </div> <!-- end address panel -->
-                                            </form>
-                                        </div> <!-- end family panel -->
-                                    </div> <!-- end form content div -->
-                                    <!-- ******************  END FORM ****************************************************************************  -->
+
+                                                        </div>
+                                                        <div id="address-search-panel"  data-bind="visible:addressForm.viewState() == 'search'">
+                                                            <fieldset id="address-search-fields">
+                                                                <legend>Find Address</legend>
+                                                                <div class="row">
+                                                                    <div class="col-md-8">
+                                                                        <div class="form-group">
+                                                                            <input type="text" class="form-control" placeholder="Search" data-bind="value: addressForm.searchValue">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        <button class="btn btn-default" data-bind="click:findAddresses" title="Search"><span class="glyphicon glyphicon-search"></span> </button>
+                                                                        <button class="btn btn-default" data-bind="click:createAddressForPerson" title="Create new address for person."><span class="glyphicon glyphicon-plus"></span></button>
+                                                                        <button class="btn btn-default" data-bind="click:cancelAddressSearch" title="Cancel"><span class="glyphicon glyphicon-remove"></span></button>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="findAddressResults"  class="row found well" data-bind="visible:addressesList.selectionCount">
+                                                                    <div id="address-found-header" class="row">
+                                                                        <div class="col-md-12">
+                                                                            Found: <span data-bind="text: addressesList.selectionCount"></span> addresses.
+                                                                        </div>
+                                                                    </div>
+                                                                    <div id="address-found-nav" class="row">
+                                                                        <div class="col-md-6" style="padding-right: 3px" data-bind="visible:addressesList.hasPrevious">
+                                                                            <a href="#"  data-bind="click:addressesList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+                                                                        </div>
+                                                                        <div class="col-md-6" style="padding-right: 3px" data-bind="visible:addressesList.hasMore">
+                                                                            <a href="#" data-bind="click:addressesList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+                                                                        </div>
+                                                                    </div> <!-- end found header -->
+
+                                                                    <div class="row" id="addresses-found-list">
+                                                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: addressesList.selectionList[1]">
+                                                                            <div>
+                                                                                <a href="#" data-bind="click:$parent.assignAddressToPerson"><span data-bind="text: Name"></span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: addressesList.selectionList[2]">
+                                                                            <div>
+                                                                                <a href="#" data-bind="click:$parent.assignAddressToPerson"><span data-bind="text: Name"></span></a>
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" data-bind="foreach: addressesList.selectionList[3]">
+                                                                            <div>
+                                                                                <a href="#" data-bind="click:$parent.assignAddressToPerson"><span data-bind="text: Name"></span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div> <!-- end found list -->
+
+                                                                </div>
+                                                            </fieldset>
+                                                        </div>
+                                                        <div id="address-empty-panel"  data-bind="visible:addressForm.viewState() == 'empty'">
+                                                            <p>No address</p>
+                                                        </div>
+                                                    </div> <!-- end address panel -->
+                                                </form>
+                                            </div> <!-- end family panel -->
+                                        </div> <!-- end form content div -->
+                                        <!-- ******************  END FORM ****************************************************************************  -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
             </div> <!-- content div -->
         </section>
     </div>
@@ -481,8 +676,9 @@
         </section> <!-- /.block -->
     </div>
 </footer>
-    <script src="assets/js/Tops.App/ScymDirectoryViewModel.js?nr9wnb"></script>
-    <script>ViewModel.init('design/', function() {  ko.applyBindings(ViewModel); });</script>
+<script src="assets/js/Tops.App/ScymDirectoryViewModel.js?nr9wnb"></script>
+
+<script>ViewModel.init('design/', function() {  ko.applyBindings(ViewModel); });</script>
 
 </body>
 </html>

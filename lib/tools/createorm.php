@@ -5,8 +5,10 @@
  * Date: 1/2/2015
  * Time: 7:03 AM
  */
-$dbType = 'application';
-$outputPath= realpath(__DIR__ . '/'. $dbType.'-'.'model');
+// $dbType = 'application';
+$dbType = 'model';
+// $outputPath= realpath(__DIR__ . '/'. $dbType.'-'.'model');
+$outputPath= realpath(__DIR__ . '/application-model');
 require_once(__DIR__.'/../Tops/start/autoload.php');
 include (__DIR__."/../Tops/start/init.php");
 
@@ -59,7 +61,7 @@ foreach ($classes as $class) {
 $generator = new EntityGenerator();
 $generator->setAnnotationPrefix('');   // edit: quick fix for No Metadata Classes to process
 $generator->setUpdateEntityIfExists(true);	// only update if class already exists
-//$generator->setRegenerateEntityIfExists(true);	// this will overwrite the existing classes
+$generator->setRegenerateEntityIfExists(true);	// this will overwrite the existing classes
 $generator->setGenerateStubMethods(true);
 $generator->setGenerateAnnotations(true);
 $generator->generate($metadata, $outputPath);

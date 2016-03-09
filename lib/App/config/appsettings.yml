@@ -5,7 +5,7 @@ databases:
     type:
       application: scym
       drupal: scym_drupal
-      model: fma_model
+      model: scym_model
       scym: scym_temp
       fma: fma_production
     models:

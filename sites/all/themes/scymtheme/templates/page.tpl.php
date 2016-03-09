@@ -113,6 +113,13 @@
           <?php endif; ?>
         </nav>
 
+          <ul class="nav navbar-nav navbar-left">
+              <li>
+                  <a href="/help" title="Help videos and articles" role="button" target="_blank">
+                      <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Help</a>
+              </li>
+          </ul>
+
           <?php if ($logged_in): ?>
               <ul class="nav navbar-nav navbar-right">
                   <?php if(!empty($userContentMenu)) : ?>
@@ -198,7 +205,14 @@
       <?php if (!empty($action_links)): ?>
         <ul class="action-links"><?php print render($action_links); ?></ul>
       <?php endif; ?>
-      <?php print render($page['content']); ?>
+        <?php if (empty($peanut_viewmodel)): ?>
+            <?php print render($page['content']); ?>
+        <?php else: ?>
+            <div id="tops-view-section" style="display: none;">
+                <?php print render($page['content']); ?>
+            </div>
+        <?php endif; ?>
+
     </section>
 
     <?php if (!empty($page['sidebar_second'])): ?>

@@ -1,0 +1,5 @@
+        $request = $this->getRequest();
+        if ($request == null) {
+            $this->addErrorMessage("ERROR: No request");
+            return;
+        }

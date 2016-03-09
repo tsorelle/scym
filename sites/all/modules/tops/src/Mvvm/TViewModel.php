@@ -14,7 +14,7 @@ use Tops\sys\TPostOffice;
 
 class TViewModel
 {
-    private static $vmPaths = array();
+    private static $vmPaths = null;
     private static $vmname = null;
 
     public static function isVmPage()
@@ -85,18 +85,29 @@ class TViewModel
 
             // get node alias
             if ($name == 'node') {
-                // $name = $name . '/' . $pathParts[2];
                 $aliasManager = self::getAliasManager();
                 if (!$aliasManager) {
                     return null;
                 }
-                $name = $aliasManager->getAliasByPath($path);
-                if (!strstr('/', $name)) {
+                $name = $aliasManager->getAliasByPath(null); // $path);
+                if (strstr('/node/', $name)) {
+                    // must have alias
+                    return null;
+                }
+                else {
                     return $name;
                 }
-                return null;
             }
-            return $name;
+            if ($count <= 2) {
+                return $name;
+            }
+            $path = $pathParts[1];
+            for ($i = 2; $i < $count; $i++) {
+                $path .= '/'.$pathParts[$i];
+            }
+            return $path;
+
+            //return  $count > 2 ? $pathParts[1].'/'.$pathParts[2] : $name;
         }
 
         return null;
@@ -126,35 +137,68 @@ class TViewModel
         return null;
     }
 
-    private static $viewModelFiles;
-    private static function getViewModelFiles() {
-        if (!isset(self::$viewModelFiles)) {
-            self::$viewModelFiles = array();
-            $vmDirectory = '/assets/js/Tops.App';
-            $vmRootPath = \Tops\sys\TPath::FromRoot($vmDirectory);
-            $files = scandir($vmRootPath);
-            foreach($files as $fileName) {
-                if (strstr($fileName,'ViewModel.js')) {
-                    $parts = explode('ViewModel.js',$fileName);
-                    if (sizeof($parts == 2) && empty($parts[1])) {
-                        $vmName = $parts[0];
-                        self::$viewModelFiles[strtolower($vmName)] = $vmDirectory.'/' . $fileName;
+    public static function mappingRequired($vmPath) {
+
+    }
+
+    public static function getVmDirectory() {
+        // maybe replace with configuration some day
+        return '/assets/js/Tops.App';
+    }
+
+    public static function getComponentsDirectory() {
+        // maybe replace with configuration some day
+        return '/assets/js/components';
+    }
+
+
+    private static function getVMPathList() {
+        if (self::$vmPaths === null) {
+            self::$vmPaths = array();
+            $configpath = TPath::ConfigPath('viewmodels.csv');
+            $configFile = @fopen($configpath,'r');
+            if ($configFile) {
+                $vmDirectory = self::getVmDirectory();
+                $componentsDirectory = self::getComponentsDirectory();
+                // $vmRootPath = \Tops\sys\TPath::FromRoot($vmDirectory);
+                while(!feof($configFile)) {
+                    $item = new \stdClass();
+                    $parts =  explode(',',fgets($configFile));
+                    $partsCount = sizeof($parts);
+                    $item->requires = array();
+                    if ($partsCount > 1) {
+                        $key = trim($parts[0]);
+                        $value = trim($parts[1]);
+                        $item->path = $vmDirectory . '/' . $value . '.js';
+                        $item->messagesComponent = true;
+                        if ($partsCount > 2) {
+                            for ($i = 2; $i < $partsCount; $i++) {
+                                $requirement =  trim($parts[$i]);
+                                if ($requirement == 'no-messages')  {
+                                    $item->messagesComponent = false;
+                                }
+                                else {
+                                    $item->requires[$i - 2] = trim($parts[$i]);
+                                }
+                            }
+                        }
+                        self::$vmPaths[$key] = $item;
+                        // self::$vmPaths[$key] = $vmDirectory.'/'.$value.'.js';
                     }
                 }
+                fclose($configFile);
             }
         }
-        return self::$viewModelFiles;
+        return self::$vmPaths;
     }
 
     public static function Initialize(Request $request) {
         $name = self::getNameFromRequest($request);
         if ($name)
         {
-            $vmFiles = self::getViewModelFiles();
             $key = strtolower($name);
-            if (array_key_exists($key,$vmFiles)) {
-                $vmPath = $vmFiles[$key];
-                self::$vmPaths[$key] = $vmPath;
+            $vmPaths = self::getVMPathList();
+            if (array_key_exists($key,$vmPaths)) {
                 self::$vmname = $key;
             }
         }
@@ -163,7 +207,7 @@ class TViewModel
 
     public static function RenderMessageElements() {
         if (self::getVmPath()) {
-            return '<messages-component></messages-component>';
+            return '<div id="service-messages-container"><service-messages></service-messages></div>';
         }
         return '';
     }
@@ -173,14 +217,8 @@ class TViewModel
         if ($vmPath)
         {
             return
-
-
-               //  '<script src="'.$vmPath.'"'."></script>\n".
-                // "<script>\n".
                 "   ViewModel.init('/');\n".
-                "   ko.applyBindings(ViewModel); // \n"
-                // ."</script>\n"
-                ;
+                "   ko.applyBindings(ViewModel); \n";
         }
         return '';
     }

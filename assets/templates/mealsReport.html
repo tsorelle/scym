@@ -1,0 +1,52 @@
+<div class="row" id="meals-report">
+    <div class="col-md-12">
+        <div id="meals-options-header" class="row hidden-print" style="margin-bottom: 10px">
+            <div class="col-md-5" style="padding-bottom:2px">
+                <label style="padding-right:8px;">Meal:</label>
+                <select data-bind="options: mealFilter.options,
+                       optionsText: 'Name',
+                       value: mealFilter.selected"></select>
+            </div>
+            <div class="col-md-5" style="padding-bottom:2px">
+                <label style="padding-right:8px;">Diet:</label>
+                <select data-bind="options: dietFilter.options,
+                       optionsText: 'Name',
+                       value: dietFilter.selected,
+                       optionsCaption: '-- Any --'"></select>
+            </div>
+            <div class="col-md-2">
+                <div class="checkbox" data-bind="visible:sessionStarted">
+                    <label>
+                        <input type="checkbox" data-bind="checked:attendersOnly,click:setAttenderFilter">  Show Attenders only  <span data-bind="text:test"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h3 data-bind="text:mealFilter.selected().Name"></h3>
+                <h4 data-bind="text:tableHeader"></h4>
+
+                <div id="attender-meals-table">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Vegetarian</th>
+                            <th>Gluten free</th>
+                        </tr>
+                        </thead>
+                        <tbody data-bind="foreach:attenderList">
+                        <tr>
+                            <td data-bind="text:name"></td>
+                            <td data-bind="text:vegetarian"></td>
+                            <td data-bind="text:glutenFree"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,161 @@
+<div id="registrations-report" class="row">
+    <div class="col-md-12">
+        <h2>Registrations report</h2>
+        <div id="no-records" data-bind="visible:registrationsList().length == 0">
+            No registrations received.
+        </div>
+        <div data-bind="visible:registrationsList().length">
+            <div class="row visible-print-block">
+                <div class="col-md-12">
+                    <p data-bind="text:printHeader"></p>
+                </div>
+            </div>
+
+            <div id="options-header" class="row hidden-print" style="margin-bottom: 10px">
+
+                <div class="col-md-4" style="padding-bottom:2px">
+                    <label style="width:50px">Sort:</label>
+                    <select data-bind="options: sortOrderList,
+                               optionsText: 'Name',
+                               value: selectedSortOrder">
+                    </select>
+                </div>
+                <div class="col-md-4" style="padding-bottom:5px">
+                    <label style="width:50px">Filter:</label>
+                    <select data-bind="options: filterList,
+                               optionsText: 'Name',
+                               value: selectedFilter"></select>
+                </div>
+                <div class="col-md-4">
+                </div>
+            </div>
+
+
+            <div id="registrations-table" class="row hidden-xs hidden-print">
+                <div class="col-md-12">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Attenders</th>
+                                <th>Confirmed</th>
+                                <th>Received</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach:registrationsList">
+                            <tr>
+                                <td>
+                                    <span style="padding-right: 10px" data-bind="text:name"></span>
+                                    <span style="white-space: nowrap">
+                                    <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:$parent.lookupRegistration"><span class="glyphicon glyphicon-search"></span></a>
+                                    <a class="btn btn-sm hidden-print" title="Edit registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode}"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    </span>
+                                </td>
+                                <td data-bind="text:attenders"></td>
+                                <td data-bind="text:confirmed"></td>
+                                <td data-bind="text:receivedDate" style="white-space: nowrap"></td>
+                                <td data-bind="text:email"></td>
+                                <td data-bind="text:phone"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="registrations-print" class="row visible-print-block">
+                <div class="col-md-12">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Attenders</th>
+                            <th>Confirmed</th>
+                            <th>Received</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                        </tr>
+                        </thead>
+                        <tbody data-bind="foreach:registrationsList">
+                        <tr>
+                            <td data-bind="text:name"></td>
+                            <td data-bind="text:attenders"></td>
+                            <td data-bind="text:confirmed"></td>
+                            <td data-bind="text:receivedDate" style="white-space: nowrap"></td>
+                            <td data-bind="text:email"></td>
+                            <td data-bind="text:phone"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div id="registrations-xs" class="hidden-md hidden-sm hidden-lg hidden-print">
+                <div class="row" data-bind="foreach:registrationsList">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <label>Name</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:name"></span>
+                                    <span style="white-space: nowrap">
+                                    <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:$parent.lookupRegistration"><span class="glyphicon glyphicon-search"></span></a>
+                                    <a class="btn btn-sm hidden-print" title="Edit registration" target="_blank" data-bind="attr: {href: '/register?code=' + registrationCode}"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    </span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <label>Attenders</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:attenders"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <label>Confirmed</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:confirmed"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <label>Received</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:receivedDate"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <label>Email</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:email"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <label>Phone</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:phone"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <label></label>
+                            </div>
+                            <div class="col-xs-8">
+                                <span data-bind="text:"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

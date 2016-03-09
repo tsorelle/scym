@@ -53,6 +53,39 @@ abstract class TServiceCommand {
         $this->context->SetReturnValue($value);
     }
 
+    /**
+     * Get return value for unit testing
+     * @return mixed|null
+     */
+    private function getReturnValue() {
+        $response = $this->context->GetResponse();
+        return ($response == null) ? null : $response->Value;
+    }
+
+    public function runTest($request)
+    {
+        $this->context = new TServiceContext();
+        $this->setRequest($request);
+        $this->run();
+        return $this->getReturnValue();
+    }
+
+    public function getTestResponse($request) {
+        $this->context = new TServiceContext();
+        $this->setRequest($request);
+        $this->run();
+        return $this->context->GetResponse();
+    }
+
+    /**
+     * Set request for unit testing.
+     * @param $value
+     */
+    public function setRequest($value) {
+        $this->request = $value;
+    }
+
+
     public function getRequest() {
 
         return $this->request;
@@ -86,7 +119,13 @@ abstract class TServiceCommand {
     public function isAuthorized() {
         if (empty($this->authorizations))
             return true;
+        /**
+         * @var IUser $user
+         */
         $user = $this->getUser();
+        if ($user->isAdmin()) {
+            return true;
+        }
         foreach($this->authorizations as $auth) {
             if ($user->isAuthorized($auth)) {
                 return true;

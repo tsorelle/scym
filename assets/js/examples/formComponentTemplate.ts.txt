@@ -1,0 +1,61 @@
+/// <reference path='../typings/knockout/knockout.d.ts' />
+/// <reference path='../typings/underscore/underscore.d.ts' />
+/// <reference path='../typings/bootstrap/bootstrap.d.ts' />
+/// <reference path="../Tops.App/App.ts" />
+/// <reference path="../Tops.Peanut/Peanut.ts" />
+/// <reference path='../Tops.Peanut/Peanut.d.ts' />
+/// <reference path='../Tops.App/Registration.d.ts' />
+
+module Tops {
+    export class nameHereFormComponent implements IDataEntryForm {
+
+        private owner : IEventSubscriber;
+
+        amount = ko.observable('');
+        errorMessage = ko.observable('');
+
+        public constructor(owner: IEventSubscriber = null) {
+            var me = this;
+            me.owner = owner;
+            // todo: implemntConstructor
+        }
+
+        public initialize(finalFunction? : () => void) {
+            var me = this;
+            if (finalFunction) {
+                finalFunction();
+            }
+            // todo: implement initialize
+        }
+
+        setValues = (values: any) => {
+            var me = this;
+            // todo: implement setValues
+        };
+
+        getValues = ()=> {
+            var me = this;
+            // todo: implement getValues
+            return {};
+        };
+
+        clear = ()=> {
+            var me = this;
+        };
+
+        getErrorMessage = () => {
+            return this.errorMessage();
+        };
+
+        validate = (requireAmount = false) => {
+            var me = this;
+            me.errorMessage('');
+            // todo: implement validate
+
+            return true;
+        };
+
+    }
+}
+
+

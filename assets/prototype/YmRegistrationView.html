@@ -1,0 +1,1124 @@
+<!-- ******************  START FORM ****************************************************************************  -->
+<div id="application-container" style="display:none" class="view-model-container" style="display: none">
+    <!-- app header -->
+    <div id="reg-header">
+        <h4>
+            <span data-bind="text:datesText"></span>
+            -
+            <span data-bind="text:locationText"></span>
+        </h4>
+
+        <div id="reg-form-header-row" class="clearfix">
+            <h3 data-bind="text:formTitle"></h3>
+        </div>
+    </div>
+    <!-- app body -->
+    <div id="app-body" class="row">
+        <!-- form navigation -->
+
+        <div id="nav-column" class="col-md-2" data-bind="visible:registrationForm.registrationCode">
+            <div class="reg-nav-tab" data-bind="visible: registerButton.isVisible">
+                <button type="button" data-bind="attr: {class: registerButton.css, title: registerButton.title}, click: showSummaryForm" >
+                    <span data-bind="text:registerButton.label"></span>
+					<span aria-hidden="true"
+                          data-bind="visible: registerButton.iconClasses, attr:{class: registerButton.iconClasses}"></span>
+                </button>
+            </div>
+
+            <div id="contact-button" class="reg-nav-tab" data-bind="visible: contactButton.isVisible">
+                <button type="button" data-bind="attr: {class: contactButton.css, title: contactButton.title}, click: showContactForm" >
+                    <span data-bind="text:contactButton.label"></span>
+					<span aria-hidden="true"
+                          data-bind="visible: contactButton.iconClasses, attr:{class: contactButton.iconClasses}"></span>
+                </button>
+            </div>
+
+            <div id="attenders-button" class="reg-nav-tab" data-bind="visible: attendersButton.isVisible">
+                <button type="button" data-bind="attr: {class: attendersButton.css, title: attendersButton.title}, click: showAttenderForm" >
+                    <span data-bind="text:attendersButton.label"></span>
+					<span aria-hidden="true"
+                          data-bind="visible: attendersButton.iconClasses, attr:{class: attendersButton.iconClasses}"></span>
+                </button>
+            </div>
+
+            <div id="account-button" class="reg-nav-tab" data-bind="visible: accountButton.isVisible">
+                <button type="button" data-bind="attr: {class: accountButton.css, title: accountButton.title}, click: showAccountsForm" >
+                    <span data-bind="text:accountButton.label"></span>
+					<span aria-hidden="true"
+                          data-bind="visible: accountButton.iconClasses, attr:{class: accountButton.iconClasses}"></span>
+                </button>
+            </div>
+            <div class="reg-nav-tab" data-bind="visible:saveButtonVisible">
+                <button type="button" class="btn  btn-lg btn-block  btn-danger" data-bind="click: saveChanges"  >
+                    Save changes
+                </button>
+            </div>
+            <div id="button-help">
+				<span class="whats-this">
+					<a tabindex="0" role="button" data-toggle="popover"
+                       data-trigger="focus" title="Navigation buttons"
+                       data-placement="bottom"
+                       data-content="Use the buttons to select sections of your registration. Green buttons with check mark indicate you are ready to go. Orange with arrow means more information is needed. The red button means to save your changes and blue is for information. ">
+                        What are these buttons?</a>
+				</span>
+            </div>
+
+            <div class="reg-nav-tab" style="margin-top: 10ex; font-size: 13px;">
+                <div data-bind="visible:showConfirmationCheckbox" class="checkbox">
+                    <label><input type="checkbox" data-bind="checked:sendConfirmation" />Send confirmation message</label>
+                </div>
+            </div>
+
+        </div>
+        <!-- forms -->
+        <div id="form-column" class="col-md-10">
+            <div id="form-header">
+                <h3 id="reg-title" style="margin-top: 3px" data-bind="text:registrationTitle,visible:(currentForm() != 'welcome' && currentForm() != 'lookup')"></h3>
+            </div>
+            <div id="service-messages-container"><service-messages></service-messages></div>
+
+            <div id="form-section">
+                <!-- welcome form -->
+                <div id="welcome-form" data-bind="visible:currentForm() == 'welcome'">
+                    <div id="welcome-authenticated"  data-bind="visible:user.authenticated">
+                        <p class="reg-instruction" style="margin-bottom: 0">
+                            Welcome <span data-bind="text:user.name"></span>
+                        </p>
+                        <p>
+                            Not <span data-bind="text:user.name"></span>?  Please sign out.
+                        </p>
+                        <div class="button-stack">
+                            <button type="button" class="btn btn-success btn-md"
+                                    data-bind="visible:user.registrationId, click:getRegistration">
+                                <span >Open your current registration </span>
+                                <span class="glyphicon glyphicon-forward"></span>
+                            </button>
+                            <button type="button" class="btn btn-success btn-md"
+                                    data-bind="click:startLookup">
+                                Find <span data-bind="visible:user.registrationId">another</span><span data-bind="visible:!user.registrationId()">your</span> registration
+                                <span class="glyphicon glyphicon-forward"></span>
+                            </button>
+                            <button type="button" class="btn btn-success btn-md"
+                                    data-bind="click:newRegistration">
+                                Start a new registration
+                                <span class="glyphicon glyphicon-forward"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="welcome-anonymous" data-bind="visible: !user.authenticated()">
+                        <p>
+                            <strong><em>Take note:</em></strong> If you have a web site account, you may sign in for a more convenient registration experience.<br>
+                            Or you can answer our security question and click one of the buttons below to get started.
+                        </p>
+                        <div data-bind="visible:startupForm.askSecurityQuestion">
+                            <div class="form-group" data-bind="css:{'has-error': startupForm.validationError}">
+                                <label for="securityQuestion" class="control-label">Security question
+                                    <span data-bind="text:startupForm.validationError"></span>
+                                </label>
+                                    <span class="whats-this">
+                                        <a tabindex="0" role="button" data-toggle="popover"
+                                           data-trigger="focus" title="Security question"
+                                           data-placement="bottom"
+                                           data-content="This question is to discourage spam and other attempts to hack the site.">
+                                            What's this?</a>
+                                    </span><br>
+                                <div>
+                                    What is the name of the founder of Quakerism?
+                                </div>
+                                <input class="form-control" id="securityQuestion" data-bind="value:startupForm.securityAnswer"/>
+                            </div>
+                        </div>
+                        <p>
+                            <button type="button" class="btn btn-success btn-md" data-bind="click:startRegistration">Start your registration
+                                <span class="glyphicon glyphicon-forward"></span></button>
+                        </p>
+                        <p>
+                            <button type="button" class="btn btn-success btn-md" data-bind="click:startLookup">Find your existing registration
+                                <span class="glyphicon glyphicon-forward"></span></button>
+                        </p>
+                    </div>
+                </div>
+                <!-- lookup existing registration form -->
+                <div id="lookup-form" data-bind="visible:currentForm() == 'lookup'">
+                    <p class="reg-instruction">Please enter your e-mail address, or your lookup code.
+                        <span class="whats-this">
+                            <a tabindex="0" role="button" data-toggle="popover"
+                               data-trigger="focus" title="Lookup code"
+                               data-placement="bottom"
+                               data-content="When you entered your registration previously you were asked for an e-mail address or a lookup code. A lookup code is like a password used to find your registration.">
+                                What's this?</a>
+                        </span>
+
+                    </p>
+                    <div class="form-group" data-bind="css:{'has-error': lookupForm.validationError}">
+                        <label for = "lookupCode" data-bind="visible:lookupForm.validationError"><span data-bind="text:lookupForm.validationError" class="error-label"></span></label>
+                        <input id="lookupCode" type="text" class="form-control" data-bind="value: lookupForm.lookupCode">
+                    </div>
+                    <p>
+                        <button type="button" class="btn btn-success btn-md" data-bind="click:findRegistration">Continue
+                            <span class="glyphicon glyphicon-forward"></span></button>
+                    </p>
+                    <p>
+                        <br>Can't find it? <br>
+                        <button type="button" class="btn btn-success btn-md" data-bind="click:newRegistration">Start a new registration
+                            <span class="glyphicon glyphicon-forward"></span></button>
+                    </p>
+                </div>
+                <!-- new registration startup form -->
+                <div id="startnew-form" data-bind="visible:currentForm() == 'startnew'">
+                    <p class="reg-instruction">Please enter your e-mail address.</p>
+                    <p>
+                        If you don't have an email address or if there is another registration using yours
+                        enter a word or phrase that you can use later to look up your registration.
+                    </p>
+                    <div class="form-group" data-bind="css:{'has-error': lookupForm.validationError}">
+                        <div data-bind="text:lookupForm.validationError" class="error-label"></div>
+                        <input id="newRegistrationCode" type="text" class="form-control" data-bind="value: lookupForm.lookupCode">
+                    </div>
+                    <div class="button-stack" style="padding-top: 6px;">
+                        <button type="button" class="btn btn-success btn-md" data-bind="click:startNewRegistration">Continue
+                            <span class="glyphicon glyphicon-forward"></span></button>
+                        <button type="button" class="btn btn-success btn-md" data-bind="click:showWelcomeForm">Cancel
+                            <span class="glyphicon glyphicon-backward"></span></button>
+                    </div>
+                </div>
+                <!-- registration summary form -->
+                <div id="registration-summary-form" data-bind="visible:currentForm() == 'registration'">
+                    <div id="reg-status-panel" data-bind="visible:registrationForm.registrationCode">
+                        <div style="padding-bottom: 6px"  data-bind="visible:registrationStatus() != 0">
+                            <p>Your registration lookup code is <strong><span data-bind="text:registrationForm.registrationCode"></span></strong></p>
+                        </div>
+                        <div id="reg-status-new" data-bind="visible:registrationStatus() == 1">
+                            <p class="reg-instruction">
+                                Your registration is almost ready to submit.  Your next steps are:
+                            </p>
+                            <ol>
+                                <li data-bind="visible:!contactButton.isComplete()">Complete the contact form</li>
+                                <li data-bind="visible:attenderList().length == 0">Add one or more attenders</li>
+                                <li data-bind="visible:!accountButton.isComplete()">View and save the account form</li>
+                                <li>Save your changes</li>
+                            </ol>
+                        </div>
+                        <div id="reg-status-canceled" data-bind="visible:registrationStatus() == 0">
+                            <p>This registration was cancelled. </p>
+                            <div>
+                                <a href="#" data-bind="click:reloadPage">Continue...</a>
+                            </div>
+                        </div>
+                        <div id="reg-status-info" data-bind="visible:registrationStatus() > 1">
+                            <div data-bind="visible:registrationStatus() == 2">
+                                <p>
+                                    You registration has been submitted.
+                                </p>
+                            </div>
+                            <div data-bind="visible:registrationStatus() > 2">
+                                <p>
+                                    Your registration is complete. We are looking forward to seeing you there.
+                                </p>
+                            </div>
+                            <div data-bind="visible:registrationForm.financeInfoForm.calculated">
+                                <div data-bind="visible:registrationForm.financeInfoForm.balanceDue() >= 1">
+                                    <p>
+                                        The balance due for your registration is:
+                                        <strong><span data-bind="text:registrationForm.financeInfoForm.balance"></span></strong>
+                                        <a href="#" data-bind="click:showAccountsForm" style="padding-left: 5px">See details here >></a>.
+                                    </p>
+                                    <p>
+                                        This amount may be paid at Yearly Meeting by check or in cash.
+                                        Sorry, we are not able to accept credit card payments.
+                                    </p>
+                                </div>
+                                <div data-bind="visible:registrationForm.financeInfoForm.balanceDue() < 1">
+                                    <p>
+                                        Your costs have been paid in full.
+                                    </p>
+                                </div>
+                            </div>
+                            <div data-bind="visible:balanceInvalid" class="warning-label">
+                                Changes were made. Please save your registration to recalculate costs.
+                            </div>
+
+                            <div>
+                                <h4>Housing</h4>
+
+                                <div data-bind="visible:registrationStatus() == 2">
+                                    <p>
+                                        Housing assignments will be made based on your preferences. After these assignments are made
+                                        you will receive an email message with more details.
+                                    </p>
+                                </div>
+
+                                <div id="housing-assignments" data-bind="visible:housingAssignmentList().length">
+                                    <p>Your housing assignments are as follows:</p>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <th>Who</th><th>Where</th><th>When</th>
+                                        </thead>
+                                        <tbody data-bind="foreach:housingAssignmentList">
+                                        <td data-bind="text:Text"></td>
+                                        <td data-bind="text:Value"></td>
+                                        <td data-bind="text:Description"></td>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div>
+                                <h4>Contact us</h4>
+                                <p>
+                                    Please send a message to the registrar if you have and questions, comments, concerns or notes to add to your registration.
+                                </p>
+                                <p>
+                                    <button class="btn btn-default" data-bind="click:showRegistrarContactForm">Contact the registrar</button>
+                                </p>
+                            </div>
+
+                            <h4>Cancellations</h4>
+                            <p>
+                                You may cancel your registraion at any time.<br>
+                                <button class="btn btn-default" data-bind="click:cancelRegistration">Cancel your registration.</button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- contact form -->
+                <div id="contact-form" data-bind="visible:currentForm() == 'contact'">
+                    <fieldset>
+                        <legend>Address and Other Details</legend>
+                        <div data-bind="visible:debugging">Viewstate: <span data-bind="text:registrationForm.contactInfoForm.viewState()"></span></div>
+                        <!-- edit panel -->
+                        <div id="contact-edit-panel" data-bind="visible:registrationForm.contactInfoForm.viewState() == 'edit'">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="whats-this" style="padding-bottom: 4px">
+                                        <a href="#" data-bind="click:showContactFormHelp"><span class="glyphicon glyphicon-question-sign"></span> Help: How do I fill this out?</a>
+                                    </div>
+                                    <div id="contact-errors" class="alert alert-danger" role="alert" data-bind="visible:registrationForm.contactInfoForm.hasErrors">
+                                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                        <span class="sr-only">Error:</span>
+                                        Please correct errors before saving.
+                                    </div>
+
+                                    <div class="form-group" data-bind="css:{'has-error': registrationForm.contactInfoForm.nameError}" >
+                                        <label for="addressname-input" class="control-label">Name <span data-bind="text:registrationForm.contactInfoForm.nameError"></span></label>
+                                        <div><em>Please enter a name to identify your registration, such as "John Smith", "John and Jane Smith" or  "The Smith Family" </em></div>
+                                        <input class="form-control" id="addressname-input" data-bind="value:registrationForm.contactInfoForm.name"/>
+                                    </div>
+
+                                    <div id="no-contactinfo-error" class="alert alert-danger" role="alert" data-bind="visible:registrationForm.contactInfoForm.contactError">
+                                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                        <span data-bind="text:registrationForm.contactInfoForm.contactError"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" data-bind="css:{'has-error': registrationForm.contactInfoForm.emailError}" >
+                                        <label for email-input class="control-label">
+                                            E-mail<span data-bind="text:registrationForm.contactInfoForm.emailError"></span>
+                                        </label>
+                                        <input class="form-control" id="email-input" data-bind="value:registrationForm.contactInfoForm.email"/>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for phone-input class="control-label">
+                                            Phone
+                                        </label>
+                                        <input class="form-control" id="phone-input" data-bind="value:registrationForm.contactInfoForm.phone"/>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for address-input class="control-label">
+                                            Street address
+                                        </label>
+                                        <input class="form-control" id="address-input" data-bind="value:registrationForm.contactInfoForm.address"/>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for city-input class="control-label">
+                                            City
+                                        </label>
+                                        <span> (enter City, State/Province, Postal code)</span>
+                                        <input class="form-control" id="city-input" data-bind="value:registrationForm.contactInfoForm.city"/>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="notes-input" class="control-label">Notes</label>
+                                        <span>(Please add any questions or comments for the reqistrar.)</span>
+                                        <textarea class="form-control" id="notes-input" data-bind="value:registrationForm.contactInfoForm.notes"></textarea>
+                                    </div>
+                                    <div data-bind="visible: attenderList().length == 0">
+                                       <strong>Attenders:</strong> <em>Please add attender information for <strong>yourself</strong> and any others who will come with you.</em>
+                                    </div>
+                                    <div id="registration-edit-buttons">
+                                        <button class="btn btn-primary" data-bind="visible:!registrationForm.id(), click:addAttenders">
+                                            Add <span data-bind="visible: attenderList().length > 0"> additional </span> attenders
+                                        </button>
+                                        <button class="btn btn-primary" data-bind="visible: attenderList().length > 0,click:saveContactInfo">
+                                            <span data-bind="visible:registrationForm.id()">
+                                                Save
+                                            </span>
+                                            <span data-bind="visible:!registrationForm.id()">
+                                                Done
+                                            </span>
+                                        </button>
+
+                                        <button class="btn btn-default" data-bind="visible:registrationForm.id,click:cancelContactChanges">
+                                            Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- view panel -->
+                        <div id="contact-view-panel" data-bind="visible:registrationForm.contactInfoForm.viewState() != 'edit'">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Name<span data-bind="visible:registrationForm.contactInfoForm.hasAddress"> and address</span></label>
+                                        <div data-bind="text:registrationForm.contactInfoForm.name"></div>
+                                        <div data-bind="text:registrationForm.contactInfoForm.address"></div>
+                                        <div data-bind="text:registrationForm.contactInfoForm.city"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group" data-bind="visible:registrationForm.contactInfoForm.email">
+                                        <label class="control-label">Email</label>
+                                        <div data-bind="text:registrationForm.contactInfoForm.email"></div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <div class="form-group" data-bind="visible:registrationForm.contactInfoForm.phone">
+                                        <label class="control-label">Phone</label>
+                                        <div data-bind="text:registrationForm.contactInfoForm.phone"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" data-bind="visible:registrationForm.contactInfoForm.notes">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label">Notes</label>
+                                        <div data-bind="text:registrationForm.contactInfoForm.notes"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="contact-view-buttons">
+                                <button class="btn btn-primary" data-bind="click:editContactForm">Edit</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <!-- attenders form -->
+                <div id="attenders-form" data-bind="visible:currentForm() == 'attenders'">
+                    <div id="attenders-list-panel" data-bind="visible:attenderForm.viewState() != 'edit'">
+                        <fieldset><legend>Attenders</legend>
+                            <table id="attender-list">
+                                <tbody data-bind="foreach: attenderList">
+                                <tr>
+                                    <td data-bind="visible:$parent.debugging"><span data-bind="text: Value"></span>: </td>
+                                    <td class="attender-listitem-name" data-bind="text: Text"></td>
+                                    <td><a href="#" data-bind="click: $parent.editSelectedAttender" style="padding-left: 5px">[Edit]</a></td>
+                                    <td><a href="#" data-bind="click: $parent.removeSelectedAttender"  style="padding-left: 5px">[Remove]</a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div style="padding-top: 20px; font-size: 16px">
+                                <a href="#"  data-bind="click:newAttender">Add new attender</a>
+                            </div>
+                            <div style="padding-top: 20px; font-size: 16px" data-bind="visible: !registrationForm.id()">
+                                <button class="btn btn-success" data-bind="visible: attenderList().length > 0,click:endAddAttenders">No more attenders to add. Finish. <span class="glyphicon glyphicon-forward"></span></button>
+                            </div>
+
+                        </fieldset>
+                    </div>
+                    <div id="attender-edit-panel" data-bind="visible:attenderForm.viewState() == 'edit'">
+                        <fieldset>
+                            <legend>Attender: <span data-bind="text:attenderForm.attenderFullName"></span> </legend>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="attender-errors" class="alert alert-danger" role="alert" data-bind="visible:attenderForm.hasErrors">
+                                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                        <span class="sr-only">Error:</span>
+                                        Please correct errors before saving.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group" data-bind="css:{'has-error': attenderForm.firstNameError}" >
+                                        <label for="firstName" class="control-label">First name <span data-bind="text:attenderForm.firstNameError"></span></label>
+                                        <input class="form-control" id="firstName" data-bind="value:attenderForm.firstName"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="middleName" class="control-label">Middle name</label>
+                                        <input class="form-control" id="middleName" data-bind="value:attenderForm.middleName"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group" data-bind="css:{'has-error': attenderForm.lastNameError}">
+                                        <label for="lastName" class="control-label">Last name<span data-bind="text:attenderForm.lastNameError"></span></label>
+                                        <input class="form-control" id="lastName" data-bind="value:attenderForm.lastName"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <Label>First time attender?&nbsp;</Label> <input type="checkbox" data-bind="checked: attenderForm.firstTimer" />
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group" >
+                                        <label for="creditType-input" class="control-label">I am attending as a . . .</label>
+                                        <span class="whats-this">
+                                            <a tabindex="0" role="button" data-toggle="popover"
+                                               data-trigger="focus" title="Fee Considerations"
+                                               data-placement="bottom"
+                                               data-content="Teachers, Staff members and guests such as speakers recieve a fee waiver or discount. Choose 'General attender' if this does not apply.">
+                                                What is this?</a>
+                                        </span>
+                                        <select class="form-control" id="creditType-input"
+                                                data-bind="options: attenderForm.creditTypes,optionsText:'Text',value: attenderForm.selectedCreditType"></select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group" >
+                                        <label for="generation-input" class="control-label">Generation</label>
+                                        <select class="form-control" id="generation-input"
+                                                data-bind="options: attenderForm.generationTypes,optionsText:'Text',value: attenderForm.selectedGenerationType">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="kids-row" class="row" data-bind="visible:attenderForm.isChild">
+                                <div class="col-md-4">
+                                    <div class="form-group" data-bind="css:{'has-error': attenderForm.dateOfBirthError}">
+                                        <label for="dob-input" class="control-label">Date of birth (kids only)<span data-bind="text:attenderForm.dateOfBirthError"></span></label>
+                                        <input class="form-control datepicker" type="text" id="dob-input" data-bind="value:attenderForm.dateOfBirth"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group" >
+                                        <label for="grade-input" class="control-label">Grade level</label>
+                                        <select class="form-control" id="grade-input"
+                                                data-bind="options: attenderForm.gradeLevels,optionsText:'Text',value: attenderForm.selectedGradeLevel,optionsCaption:'Select...'"></select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" >
+                                        <label for="affiliation-input" class="control-label">SCYM Meeting</label>
+                                        <select class="form-control" id="affiliation-input"
+                                                data-bind="options: attenderForm.affiliationCodes,optionsText:'Text',value: attenderForm.selectedAffiliationCode,optionsCaption:'Select...'"></select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="otherAffiliation-input" class="control-label">Other affiliation</label>
+                                        <span class="whats-this">
+                                            <a tabindex="0" role="button" data-toggle="popover"
+                                               data-trigger="focus" title="Other affiliation"
+                                               data-placement="bottom"
+                                               data-content="If you are from another yearly meeting, or represent a Friends organization, please enter the name here.">
+                                                What is this?</a>
+                                        </span>
+                                        <input class="form-control" id="otherAffiliation-input" data-bind="value:attenderForm.otherAffiliation"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group"  data-bind="css:{'has-error': attenderForm.arrivalTimeError}">
+                                        <label for="arrival-input" class="control-label">Arrival time<span data-bind="text:attenderForm.arrivalTimeError"></span></label>
+                                        <select class="form-control" id="arrival-input"
+                                                data-bind="options: attenderForm.timePeriods,optionsText:'Text',value: attenderForm.selectedArrivalTime"></select>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="form-group"  data-bind="css:{'has-error': attenderForm.arrivalTimeError}">
+                                        <label for="departure-input" class="control-label">Departure time</label>
+                                        <select class="form-control" id="departure-input"
+                                                data-bind="options: attenderForm.timePeriods,optionsText:'Text',value: attenderForm.selectedDepartureTime"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" data-bind="css:{'has-error': attenderForm.housingPreferenceError}">
+                                        <label for="housing-input" class="control-label">Housing preference <span data-bind="text:attenderForm.housingPreferenceError"></span></label>
+                                        <select class="form-control" id="housing-input"
+                                                data-bind="options: attenderForm.housingTypes,optionsText:'Text',value: attenderForm.selectedHousingType,optionsCaption:'Select...'"></select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Housing options and other needs</label>
+                                        <div style="margin-bottom: 5px">
+                                           Need linens? <input type="checkbox" data-bind="checked: attenderForm.linens" />&nbsp;
+                                            <span class="whats-this">
+                                                <a tabindex="0" role="button" data-toggle="popover"
+                                                   data-trigger="focus" title="Linens"
+                                                   data-placement="bottom"
+                                                   data-content="Attenders usually bring their own bedding and linens. If you are unable to bring your own, or if you forget, linens are available at a small additional charge.">
+                                                    What's this?</a>
+                                            </span>
+                                        </div>
+                                        <div data-bind="visible:attenderForm.singleOccupancyApplies" style="margin-bottom: 6px" >
+                                            Reserve private room for one? <input type="checkbox" data-bind="checked: attenderForm.singleOccupant" />
+                                            <span class="whats-this">
+                                                <a tabindex="0" role="button" data-toggle="popover"
+                                                   data-trigger="focus" title="Single occupancy"
+                                                   data-placement="bottom"
+                                                   data-content="Check this to reserve your motel or health house room as private for one person. An additional charge will be applied.">
+                                                    What's this?</a>
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 5px">
+                                            <a href="#" data-toggle="modal" data-target="#housing-info"><span class="glyphicon glyphicon-question-sign"></span> More housing information...</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Meals</label><span> (for <strong>THIS</strong> attender)</span>
+                                        <div>
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                <th>&nbsp;</th><th>Breakfast</th><th>Lunch</th><th>Dinner</th>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td>Thursday</td>
+                                                    <td>&nbsp;</td>
+                                                    <td>&nbsp;</td>
+                                                    <td>
+                                                        <input type="checkbox" data-bind="checked: attenderForm.mealThursDinner" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Friday</td>
+                                                    <td>
+                                                        <input type="checkbox" data-bind="checked: attenderForm.mealFriBreakfast" />
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" data-bind="checked: attenderForm.mealFriLunch" />
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" data-bind="checked: attenderForm.mealFriDinner" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Saturday</td>
+                                                    <td>
+                                                        <input type="checkbox" data-bind="checked: attenderForm.mealSatBreakfast" />
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" data-bind="checked: attenderForm.mealSatLunch" />
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" data-bind="checked: attenderForm.mealSatDinner" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Sunday</td>
+                                                    <td>
+                                                        <input type="checkbox" data-bind="checked: attenderForm.mealSunBreakfast" />
+                                                    </td>
+                                                    <td colspan="2">
+                                                        <input type="checkbox" data-bind="checked: attenderForm.simpleMeal" />&nbsp;*
+                                                        <span>
+                                                            <a tabindex="0" role="button" data-toggle="popover"
+                                                               data-trigger="focus" title="Simple Meal"
+                                                               data-placement="bottom"
+                                                               data-content="A simple picknic style meal is served on Sunday. Your donation for the meal goes to a social concern project or organizaton.">
+                                                                Simple meal</a>
+                                                        </span>
+                                                    </td>
+
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Dietary prefernces</label>
+                                        <div>
+                                            <p><span>Vegetarian&nbsp;</span> <input type="checkbox" data-bind="checked: attenderForm.vegetarian" /></p>
+                                            <p><span>Gluten free&nbsp;</span> <input type="checkbox" data-bind="checked: attenderForm.glutenFree" /></p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" >
+                                        <label for="specialNeeds-input" class="control-label">Special needs</label>
+                                        <select class="form-control" id="specialNeeds-input"
+                                                data-bind="options: attenderForm.specialNeedsTypes,optionsText:'Text',value: attenderForm.selectedSpecialNeedsType,optionsCaption:'Select...'"></select>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="attender-notes-input" class="control-label">Notes</label>
+                                        <textarea class="form-control" id="attender-notes-input" data-bind="value:attenderForm.notes"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div id="attender-buttons">
+                            <div id="attender-buttons-new-registration" data-bind="">
+                                <button class="btn btn-primary" data-bind="visible: !registrationForm.id(),click:saveAttenderAddNext">Add another attender</button>
+                                <button class="btn btn-primary" data-bind="visible: !registrationForm.id(),click:saveAttenderAndDone">Done</button>
+                                <button class="btn btn-primary" data-bind="visible: registrationForm.id(),click:saveAttenderAndDone">Save</button>
+                                <button class="btn btn-default" data-bind="click:cancelAttenderEdit">Cancel</button>
+                            </div>
+                            <div class="whats-this" style="padding-top: 5px">
+                                <a href="#" data-bind="click:showAttenderNavHelp"><span class="glyphicon glyphicon-question-sign"></span> Help: What do these buttons do?</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- accounts form -->
+                <div id="accounts-form" data-bind="visible:currentForm() == 'accounts'">
+                    <div id="finance-edit-panel" data-bind="visible:registrationForm.financeInfoForm.viewState() == 'edit'">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="account-errors"  class="alert alert-danger" role="alert" data-bind="visible:registrationForm.financeInfoForm.hasErrors">
+                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                    <span class="sr-only">Error:</span>
+                                    Please correct errors before saving.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <fieldset>
+                                    <legend>Balance due</legend>
+                                    <p>
+                                        The balance for your registration is
+                                        <strong><span data-bind="text:registrationForm.financeInfoForm.balance"></span></strong>
+                                        <a href="#" data-bind="click:showAccountDetails,visible:registrationForm.financeInfoForm.calculated" style="padding-left: 5px">See details here >></a>.
+                                    </p>
+                                    <div data-bind="visible:balanceInvalid" class="warning-label">
+                                        Warning, changes were made. Please save your registration to recalculate.
+                                    </div>
+                                </fieldset>
+
+                                <fieldset>
+                                    <legend>Financial Aid</legend>
+                                    <p>
+                                        Assistance for financial need is available up to <span data-bind="text:registrationForm.financeInfoForm.aidEligibility"></span>.
+                                    </p>
+                                    <div class="form-group" data-bind="css:{'has-error': registrationForm.financeInfoForm.aidAmountError}" >
+                                        <label for="aidamount-input" class="control-label">Financial aid amount requested<span data-bind="text:registrationForm.financeInfoForm.aidAmountError"></span></label>
+                                        <input class="form-control" id="aidamount-input" data-bind="value:registrationForm.financeInfoForm.aidAmount"/>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col-md-6">
+
+                                <fieldset>
+                                    <legend>Donations</legend>
+                                    <div data-bind="foreach:registrationForm.financeInfoForm.fundContributions">
+                                        <div class="form-group" data-bind="css:{'has-error': ErrorMessage}"  style="margin-bottom: 0">
+                                            <label class="control-label">
+                                                <span data-bind="text:Text"></span>
+                                                <span data-bind="text:ErrorMessage"></span>
+                                            </label>
+                                            <input class="form-control"
+                                                   data-bind="value:Value"/>
+                                        </div>
+                                        <p>
+                                            <span class="whats-this">
+                                                <a class="description-link"
+                                                   data-bind="attr: {'data-content' : Description}"
+                                                   tabindex="0" role="button" data-toggle="popover"
+                                                   data-trigger="focus"
+                                                   data-placement="bottom"
+                                                > What is the '<span data-bind="text:Text"></span>?' </a>
+                                            </span>
+                                        </p>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div id="finance-edit-buttons">
+                            <button class="btn btn-primary" data-bind="click:saveFinanceInfo">
+                                <span data-bind="visible:registrationStatus() > 1">Save and recalculate</span>
+                                <span data-bind="visible:registrationStatus() == 1">Save and submit your registration</span>
+                            </button>
+                            <button class="btn btn-default" data-bind="click:cancelFinanceChanges">Cancel</button>
+                        </div>
+                    </div>
+                    <div id="finance-view-panel" data-bind="visible:registrationForm.financeInfoForm.viewState() == 'view'">
+                        <div>
+                            <h3>Yearly Meeting Costs</h3>
+                            <div class="form-group">
+                                <label><span data-bind="text:registrationForm.financeInfoForm.balance"></span></label>
+                            </div>
+                            <div data-bind="visible:balanceInvalid" class="warning-label">
+                                Changes were made. Please save your registration to recalculate.
+                            </div>
+                        </div>
+                        <fieldset>
+                            <legend>Fees</legend>
+                            <table id="fees-list" class="table table-striped">
+                                <thead>
+                                <th>Purpose</th><th>Description</th><th>Amount</th>
+                                </thead>
+                                <tbody data-bind="foreach:  registrationForm.financeInfoForm.feesList">
+                                <tr>
+                                    <td data-bind="text: Text"></td>
+                                    <td data-bind="text: Description"></td>
+                                    <td class="currency-cell" data-bind="text: Value"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="table-footer form-group">
+                                <label>Fees total: </label>
+                                <span data-bind="text:registrationForm.financeInfoForm.feeTotal"></span>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Donations</legend>
+                            <table id="donations-list" class="table table-striped">
+                                <thead>
+                                <th>Donation</th><th>Amount</th>
+                                </thead>
+                                <tbody data-bind="foreach: registrationForm.financeInfoForm.donationsList">
+                                <td data-bind="text: Text"></td>
+                                <td class="currency-cell" data-bind="text: Value"></td>
+                                </tbody>
+                            </table>
+                            <div class="table-footer form-group">
+                                <label>Donations total: </label>
+                                <span data-bind="text:registrationForm.financeInfoForm.donationTotal"></span>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Credits</legend>
+                            <table id="credits-list" class="table table-striped">
+                                <thead>
+                                <th>Credit</th><th>Amount</th>
+                                </thead>
+                                <tbody data-bind="foreach: registrationForm.financeInfoForm.creditsList">
+                                <tr>
+                                    <td data-bind="text: Text"></td>
+                                    <td class="currency-cell" data-bind="text: Value"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="table-footer form-group">
+                                <label>Credits total: </label>
+                                <span data-bind="text:registrationForm.financeInfoForm.creditTotal"></span>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Financial aid and donations</legend>
+                            <a href="#" data-bind="click:showFeesAndDonationsPage">Request financial aid and make donations to the Yearly Meeting.</a>
+                        </fieldset>
+                        <fieldset  data-bind="visible:registrationStatus() == 1">
+                            <legend>New registration</legend>
+                            <div>
+                                <button class="btn btn-primary" data-bind="click:saveFinanceInfo">
+                                    Save and submit your registration
+                                </button>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modals -->
+    <div id="modals-section">
+        <div class="modal fade" id="housing-info" tabindex="-1" role="dialog" aria-labelledby="housingInfoLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Housing at Yearly Meeting</h4>
+                    </div>
+                    <div class="modal-body">
+                        <dl class="indented-list">
+                            <dt>Dorms</dt>
+                            <dd>Shared dormatory six or more people.</dd>
+
+                            <dt>Cabins</dt>
+                            <dd>Rustic cabin room that shares a bathroom with ajoining cabin.
+                                Couples cabins are for two people. Family cabins accomdate up to six.
+                            </dd>
+
+                            <dt>Motel rooms</dt>
+                            <dd>Room for one or two people with a bathoom.</dd>
+
+                            <dt>Health House</dt>
+                            <dd>Room for one or two with accomodation for mobility impaired.
+                                Charged at cablin rate for people with special needs.
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="address-search-modal" tabindex="-1" role="dialog" aria-labelledby="addressSearchLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Find your address in SCYM Directory</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="input-group">
+                                    <input data-bind="value:addressSearchValue" type="text" class="form-control" placeholder="Search...">
+                                      <span class="input-group-btn">
+                                            <button data-bind="click:findAddresses" class="btn btn-default" type="button">
+                                                <span class="glyphicon glyphicon-search"></span>
+                                            </button>
+                                      </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="address-search-results" class="row">
+                            <div class="col-md-12">
+                                <div id="found-panel" class="found" data-bind="visible:addressSearchResults.selectionCount">
+                                    <div id="found-header" class="row">
+                                        <div class="col-md-4">
+                                            Found: <span data-bind="text: addressSearchResults.selectionCount"></span> addresses</span>.
+                                        </div>
+                                        <div class="col-md-4" style="padding-right: 3px" data-bind="visible:addressSearchResults.hasPrevious">
+                                            <a href="#"  data-bind="click:addressSearchResults.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+                                        </div>
+                                        <div class="col-md-4" style="padding-right: 3px" data-bind="visible:addressSearchResults.hasMore">
+                                            <a href="#" data-bind="click:addressSearchResults.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+                                        </div>
+                                    </div> <!-- end found header -->
+
+                                    <div class="row" id="found-list" style="padding-left: 5px;padding-top: 5px">
+                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" data-bind="foreach: addressSearchResults.selectionList[1]">
+                                            <div class="link-list-item">
+                                                <a href="#" data-bind="click:$parent.selectAddress"><span data-bind="text: Name"></span></a>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" data-bind="foreach: addressSearchResults.selectionList[2]">
+                                            <div class="link-list-item">
+                                                <a href="#" data-bind="click:$parent.selectAddress"><span data-bind="text: Name"></span></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="not-found-panel" class="found" data-bind="text:addressSearchWarning"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button data-bind="click:findAddresses" class="btn btn-primary" type="button">
+                            Search <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="family-member-modal" tabindex="-1" role="dialog" aria-labelledby="familyMemberListLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Add a family member?</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="family-member-results" class="row">
+                            <div class="col-md-12">
+                                <div id="family-member-list-panel" class="found" data-bind="visible:familyMemberResults.selectionCount">
+                                    <div id="family-member-list-header" class="row">
+                                        <div class="col-md-4" style="padding-right: 3px" data-bind="visible:familyMemberResults.hasPrevious">
+                                            <a href="#"  data-bind="click:familyMemberResults.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+                                        </div>
+                                        <div class="col-md-4" style="padding-right: 3px" data-bind="visible:familyMemberResults.hasMore">
+                                            <a href="#" data-bind="click:familyMemberResults.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+                                        </div>
+                                    </div> <!-- end found header -->
+
+                                    <div class="row" id="family-member-list" style="padding-left: 5px;padding-top: 5px">
+                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" data-bind="foreach: familyMemberResults.selectionList[1]">
+                                            <div class="link-list-item">
+                                                <a href="#" data-bind="click:$parent.selectFamilyMember"><span data-bind="text: Name"></span></a>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" data-bind="foreach: familyMemberResults.selectionList[2]">
+                                            <div class="link-list-item">
+                                                <a href="#" data-bind="click:$parent.selectFamilyMember"><span data-bind="text: Name"></span></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <a href='#' data-bind="click:endFamilyMemberSelection">Add other attender...</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="registrar-contact-modal" tabindex="-1" role="dialog" aria-labelledby="addressSearchLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Message for the registrar</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="notes-input" class="control-label">You comments, questions or concerns.</label>
+                                    <textarea class="form-control" id="registrar-message-input"
+                                              data-bind="value:modalInput"></textarea>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button data-bind="click:sendRegistrarMessage" class="btn btn-primary" type="button">
+                            Send <span class="glyphicon glyphicon-send"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="attender-nav-help" tabindex="-1" role="dialog" aria-labelledby="housingInfoLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Help: Attender navigation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Moving on...</h4>
+                        <dl class="indented-list">
+                            <dt data-bind="visible: !registrationForm.id()">Add another attender</dt>
+                            <dd data-bind="visible: !registrationForm.id()">Save your changes and start another attender form.</dd>
+
+                            <dt data-bind="visible: !registrationForm.id()">Done</dt>
+                            <dd data-bind="visible: !registrationForm.id()">Save this attender and proceed to submit your registration.
+                            </dd>
+
+                            <dt data-bind="visible: registrationForm.id()">Save</dt>
+                            <dd data-bind="visible: registrationForm.id()">Save this attender and return to the attender list.</dd>
+
+                            <dt>Cancel</dt>
+                            <dd>Cancel changes for this attender and go to the attender list. </dd>
+                        </dl>
+                        <div data-bind="visible: !registrationForm.id()">
+                            <h4>Going back...</h4>
+                            <p>
+                                If you need to change previous information first click 'Done' or 'Cancel'. Then . . .
+                            </p>
+                            <dl class="indented-list">
+                                <dt>To change your contact information.</dt>
+                                <dd>
+                                    Click the 'Contact' button on your left.
+                                </dd>
+                                <dt>To change a previously added attender.</dt>
+                                <dd>
+                                    Click the 'Attenders' button on your left find the attender you want to change and click the '[Edit]' or '[Remove]' link.
+                                </dd>
+                            </dl>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="contact-form-help" tabindex="-1" role="dialog" aria-labelledby="housingInfoLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Help: The contact form</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Attender action buttons</h4>
+                        <dl class="indented-list">
+                            <dt>Name</dt>
+                            <dd>This is a name to identify the registrations. It can be your full name or something like "John and Mary Smith" or "The Smith Family."<br><br>
+                                <em><strong>Note:</strong> Although you may enter your own name you will still need to add attender information for yourself and any others who are coming.</em>
+                                <br>
+                            </dd>
+
+                            <dt>E-mail</dt>
+                            <dd>E-mail is optional if you give a phone or a street address and city.</dd>
+
+                            <dt>Phone</dt>
+                            <dd>A phone number is optional if you give an e-mail address or a street address and city.</dd>
+
+                            <dt>E-mail</dt>
+                            <dd>E-mail address is optional if you give a phone or an address.</dd>
+
+                            <dt data-bind="visible:attenderList().length > 0 && registrationForm.id()">'Save' button</dt>
+                            <dd data-bind="visible:attenderList().length > 0 && registrationForm.id()">Save your changes.</dd>
+
+                            <dt data-bind="visible: !registrationForm.id()">
+                                'Add <span data-bind="visible: attenderList().length > 0"> additional </span> attenders' button</dt>
+                            <dd data-bind="visible: !registrationForm.id()">
+                                Save changes and proceed to add attenders.  Remember to add yourself as an attender.
+                            </dd>
+
+                            <dt data-bind="visible:attenderList().length > 0 && !registrationForm.id()">'Done' button</dt>
+                            <dd data-bind="visible:attenderList().length > 0 && !registrationForm.id()">
+                                Save your changes and proceed to sumbit your registration.</dd>
+
+
+                            <dt data-bind="visible:registrationForm.id">'Cancel' button</dt>
+                            <dd data-bind="visible:registrationForm.id">
+                                Cancel your changes.
+                            </dd>
+
+
+                        </dl>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <modal-confirm params="id:'confirm-cancel-modal',headerText: 'Please confirm', bodyText: 'Do you really want to cancel this registration?', confirmClick: doCancelRegistration, buttonSet: 'yesno'"></modal-confirm>
+        <modal-confirm params="id:'confirm-attender-delete-modal',headerText: 'Please confirm', bodyText: deleteAttenderMessage, confirmClick: deleteSelectedAttender, buttonSet: 'yesno'"></modal-confirm>
+    </div>
+
+
+</div>
+<!-- ******************  END FORM ****************************************************************************  -->

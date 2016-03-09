@@ -1,0 +1,45 @@
+<!-- ******************  START FORM ****************************************************************************  -->
+<div>
+    <form method="post" action="/scym/download/newsletter">
+    <h2>Tasks</h2>
+
+    <ul>
+        <li><input type="submit" value="Download current list" class="btn btn-link" style="padding: 0;color:#871A1A;" /> </li>
+        <li><a href="https://vr2.verticalresponse.com/users/sign_in" target="_blank">Log into Vertical Response</a> </li>
+        <li>
+            Load Corrections:
+            <input type="file" id='fileselect' name="files[]"
+                   data-bind="event: {change: onFileSelected }"  />
+        </li>
+    </ul>
+    </form>
+</div>
+
+<p><strong><span data-bind="text:fileLoadMessage"></span></strong></p>
+
+<div id="corrections-count" data-bind="visible:correctionsCount">
+    <button class="btn btn-default" data-bind="click:uploadCorrections">Upload corrections</button>
+</div>
+
+<div id="bounces" data-bind="visible: bounceList().length > 0" >
+    <h3>Bounces</h3>
+    <p data-bind="text:bounceValidationErrors" style="color: red"></p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th><th>Email</th><th>Correction</th><th>&nbsp;</th><th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach:bounceList">
+            <tr>
+                <td data-bind="text:name"></td><td data-bind="text:email"></td>
+                <td><input data-bind="value:correction" /></td>
+                <td><input type="checkbox" data-bind="checked:remove"/> Remove </td>
+                <td data-bind="text:validation" style="color: red"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button class="btn btn-default" data-bind="click:uploadBounceCorrections" style="margin-right: 20px">Upload bounce corrections</button>
+</div>
+<!-- ******************  END FORM ****************************************************************************  -->

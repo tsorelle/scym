@@ -27,12 +27,13 @@ class TEntityManagers {
      * @return EntityManager
      * @throws \Exception
      */
-    public static function Get($key='application')
+    public static function Get($key='application',$isDevMode=null)
     {
         self::initialize();
+        $isDevMode=true; // remove to optimize later.
         if (array_key_exists($key,self::$managers))
             return self::$managers[$key];
-        return self::createManager($key);
+        return self::createManager($key,$isDevMode);
     }
 
     /**
@@ -60,14 +61,24 @@ class TEntityManagers {
         // $config = self::getConfiguration();
         $config = TDbConfiguration::GetConfiguration();
         $databaseId = $config->Value("type/$typeKey");
-        if ($isDevMode === null) {
+        // temporary workaround to force proxy generation on server
+        // $isDevMode = null;
 
+        if ($isDevMode === null) {
             $isDevMode = TDbConfiguration::GetEnvironment()  === 'development';
         }
+
         $entityPath = $config->Value("models/$databaseId");
         $metaConfigPath = TPath::FromLib($entityPath);
         $connectionParams = $config->Value("connections/$databaseId");
         $metaConfig = Setup::createAnnotationMetadataConfiguration(array($metaConfigPath), $isDevMode);
+
+        $cachePath =  realpath(__DIR__.'/../../cache/doctrine2');
+        $cachingBackend = new \Doctrine\Common\Cache\FilesystemCache($cachePath);
+        $metaConfig->setMetadataCacheImpl($cachingBackend);
+        $metaConfig->setQueryCacheImpl($cachingBackend);
+        $metaConfig->setResultCacheImpl($cachingBackend);
+
         $entityManager = EntityManager::create($connectionParams,$metaConfig);
         self::$managers[$typeKey] = $entityManager;
         return $entityManager;

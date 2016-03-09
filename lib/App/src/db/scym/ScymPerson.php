@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Index;
 use Doctrine\ORM\Mapping\Table;
+use Tops\sys\TDateTime;
 
 
 /**
@@ -67,7 +68,7 @@ class ScymPerson extends DateStampedEntity
 
     public function getAddressId()
     {
-        return $this->address->getAddressid();
+        return $this->address ? $this->address->getAddressid() : null;
     }
 
     /**
@@ -104,6 +105,13 @@ class ScymPerson extends DateStampedEntity
      * @Column(name="dateOfBirth", type="date", nullable=true)
      */
     private $dateOfBirth;
+
+    /**
+     * @var string
+     *
+     * @Column(name="organization", type="string", length=100, nullable=true)
+     */
+    private $organization;
 
 
     /**
@@ -145,6 +153,14 @@ class ScymPerson extends DateStampedEntity
     /**
      * @var string
      *
+     * @Column(name="memberAffiliation", type="string", length=30, nullable=true)
+     */
+    private $memberaffiliation;
+
+
+    /**
+     * @var string
+     *
      * @Column(name="otherAffiliation", type="string", length=100, nullable=true)
      */
     private $otheraffiliation;
@@ -154,7 +170,7 @@ class ScymPerson extends DateStampedEntity
      *
      * @Column(name="directoryListingTypeId", type="integer", nullable=false)
      */
-    private $directorylistingtypeid = '1';
+    private $directoryListingTypeId = '1';
 
 
 
@@ -312,12 +328,12 @@ class ScymPerson extends DateStampedEntity
     /**
      * Set directorylistingtypeid
      *
-     * @param integer $directorylistingtypeid
-     * @return Persons
+     * @param integer $directoryListingTypeId
+     * @return ScymPerson
      */
-    public function setDirectoryListingTypeId($directorylistingtypeid)
+    public function setDirectoryListingTypeId($directoryListingTypeId)
     {
-        $this->directorylistingtypeid = $directorylistingtypeid;
+        $this->directoryListingTypeId = $directoryListingTypeId;
 
         return $this;
     }
@@ -329,7 +345,7 @@ class ScymPerson extends DateStampedEntity
      */
     public function getDirectoryListingTypeId()
     {
-        return $this->directorylistingtypeid;
+        return $this->directoryListingTypeId;
     }
 
 
@@ -438,7 +454,12 @@ class ScymPerson extends DateStampedEntity
      */
     public function setDateOfBirth($dateOfBirth)
     {
-        $this->dateOfBirth = $dateOfBirth;
+        if (empty($dateOfBirth)) {
+            $this->dateOfBirth = null;
+        }
+        else {
+            $this->dateOfBirth = $dateOfBirth;
+        }
 
         return $this;
     }
@@ -452,6 +473,30 @@ class ScymPerson extends DateStampedEntity
     {
         return $this->dateOfBirth;
     }
+
+    /**
+     * Set organization
+     *
+     * @param string $organization
+     * @return ScymPerson
+     */
+    public function setOrganization($organization)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return string
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
 
     /**
      * Set notes
@@ -568,6 +613,28 @@ class ScymPerson extends DateStampedEntity
         return $this->affiliationcode;
     }
 
+    /**
+     * Set memberaffiliation
+     *
+     * @param string $memberaffiliation
+     * @return ScymPerson
+     */
+    public function setMemberaffiliation($memberaffiliation)
+    {
+        $this->memberaffiliation = $memberaffiliation;
+
+        return $this;
+    }
+
+    /**
+     * Get memberaffiliation
+     *
+     * @return string
+     */
+    public function getMemberaffiliation()
+    {
+        return $this->memberaffiliation;
+    }
 
     private function appendName($name, $next) {
         if (empty($name)) {
@@ -600,8 +667,110 @@ class ScymPerson extends DateStampedEntity
         return $name;
     }
 
+    /**
+     * 1  Adult
+     * 2  Youth (age 4 through 18)
+     * 3  Young Friend (age 13 through 18)
+     * 4  Child (age 4 through 12)
+     * 5  Infant (through age 3)
+     */
 
+    /**
+     * @return int
+     */
+    public function getGeneration() {
+        $age = 21;
+        $today = new \DateTime();
+        $dob = $this->getDateOfBirth();
+        if (TDateTime::isEmpty($dob)) {
+            if ($this->getJunior()) {
+                return 2;
+            }
+        }
+        else {
+            $i = date_diff($today,$dob);
+            if ($i !== false) {
+                $age = $i->y;
+            }
+        }
+        if ($age > 18) {
+            return 1;
+        }
+        if ($age >= 13) {
+            return 3;
+        }
+        if ($age >= 4) {
+            return 4;
+        }
+        return 5;
+    }
 
+    private function assignDob($dateString) {
+        try {
+            $dateValue = empty($dateString) ? null : new \DateTime($dateString);
+            $this->dateOfBirth = $dateValue;
+        }
+        catch(\Exception $ex) {
+            return false;
+        }
+        return true;
+    }
 
+    public function updateFromDataTransferObject($dto) {
+        $valid = $this->assignDob($dto->dateOfBirth);
+        if (!$valid) {
+            return false;
+        }
+        $this->firstname= $dto->firstName;
+        $this->middlename= $dto->middleName;
+        $this->lastname= $dto->lastName;
+        $this->username= $dto->username;
+        $this->phone= $dto->phone;
+        $this->phone2= $dto->phone2;
+        $this->email= $dto->email;
+        $this->newsletter= $dto->newsletter;
+        $this->notes= $dto->notes;
+        $this->junior= $dto->junior;
+        $this->active= $dto->active;
+        $this->sortkey= $dto->sortkey;
+        $this->affiliationcode= $dto->affiliationcode;
+        $this->otheraffiliation= $dto->otheraffiliation;
+        $this->directoryListingTypeId = $dto->directorylistingtypeid;
+        $this->organization= $dto->organization;
+        $this->sortkey= $dto->sortkey;
+        $this->memberaffiliation = $dto->memberaffiliation;
+        return true;
+    }
+
+    public function getDataTransferObject() {
+        $result = new \stdClass();
+
+        $result->personId = $this->personid;
+        $result->firstName= $this->firstname;
+        $result->middleName= $this->middlename;
+        $result->lastName= $this->lastname;
+        $result->username = $this->username;
+        $result->addressId = $this->getAddressId();
+        $result->phone = $this->phone;
+        $result->phone2= $this->phone2;
+        $result->email = $this->email;
+        $result->newsletter = $this->newsletter;
+        $result->dateOfBirth = $this->formatDtoDate($this->dateOfBirth);
+        $result->notes = $this->notes;
+        $result->junior = $this->junior;
+        $result->active = $this->active;
+        $result->sortkey = $this->sortkey;
+        $result->affiliationcode = $this->affiliationcode;
+        $result->memberaffiliation = $this->memberaffiliation;
+        $result->otheraffiliation = $this->otheraffiliation;
+        $result->directorylistingtypeid = $this->directoryListingTypeId;
+        $result->organization = $this->organization;
+        $result->sortkey = $this->sortkey;
+        $result->lastUpdate = $this->lastUpdateAsString();
+        $result->id = $this->personid; // client side id
+        $result->editState = 0; // unchanged
+
+        return $result;
+    }
 
 }

@@ -12,6 +12,16 @@ module Tops {
     }
 
     /**
+     * Constants for scym entities editState
+     */
+    export class editState {
+        public static unchanged : number = 0;
+        public static created : number = 1;
+        public static updated : number = 2;
+        public static deleted : number = 3;
+    }
+
+    /**
      * Use for testing. Normally IServiceResponse is returned from a service
      */
     export class fakeServiceResponse implements IServiceResponse {
@@ -25,6 +35,41 @@ module Tops {
         Result: number = 0;
         Value: any;
         Data: any;
+    }
+
+    export class HttpRequestVars {
+        private static instance : HttpRequestVars;
+        private requestVars = [];
+
+        constructor() {
+            var me = this;
+            // var href = window.location.href;
+            var queryString = window.location.search;
+            var params = queryString.slice(queryString.indexOf('?') + 1).split('&');
+            for (var i = 0; i < params.length;i++) {
+                var parts = params[i].split('=');
+                var key = parts[0];
+                me.requestVars.push(key);
+                me.requestVars[key] = parts[1];
+            }
+        }
+
+        public getValue(key: string) {
+            var me = this;
+            var value = me.requestVars[key];
+            if (value) {
+                return value;
+            }
+            return null;
+        }
+
+        public static Get(key : string, defaultValue : any = null) {
+            if (!HttpRequestVars.instance) {
+                HttpRequestVars.instance = new HttpRequestVars();
+            }
+            var result = HttpRequestVars.instance.getValue(key);
+            return (result === null) ? defaultValue : result;
+        }
     }
 
 
@@ -58,6 +103,8 @@ module Tops {
 
         securityToken: string = '';
 
+        errorInfo = '';
+
         readSecurityToken() {
             var cookie = document.cookie;
             if (cookie) {
@@ -76,8 +123,9 @@ module Tops {
             try {
                 // WCF returns a big whopping HTML page.  Could add code later to parse it but for now, just status info.
                 if (result.status) {
-                    if (result.status == '404')
+                    if (result.status == '404') {
                         return responseText + " The web service was not found.";
+                    }
                     else {
                         responseText = responseText + " Status: " + result.status;
                         if (result.statusText)
@@ -203,6 +251,8 @@ module Tops {
                        errorFunction?: (errorMessage: string) => void) : JQueryPromise<any> {
             var _peanut = this;
 
+            _peanut.errorInfo = '';
+
             // peanut controller requires parameter as a string.
             if (!parameters)
                 parameters = "";
@@ -232,8 +282,10 @@ module Tops {
                     .fail(
                     function(jqXHR, textStatus ) {
                         var errorMessage = _peanut.showExceptionMessage(jqXHR);
-                        if (errorFunction)
+                        _peanut.errorInfo = (jqXHR) ? jqXHR.responseText : '';
+                        if (errorFunction) {
                             errorFunction(errorMessage);
+                        }
                     });
 
 
@@ -264,14 +316,111 @@ module Tops {
         getRequestParam(name){
             if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
                 return decodeURIComponent(name[1]);
+            return null;
         }
 
-        validateEmail(email: string) {
+        public static ValidateEmail(email: string) {
             if (!email || email.trim() == '') {
                 return false;
             }
             return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email);
         }
+
+        public static validatePositiveWholeNumber(text: string,maxValue = null, emptyOk: boolean = true) {
+            return Peanut.validateWholeNumber(text,maxValue,0,emptyOk);
+        }
+
+        public static validateWholeNumber(numberText: string, maxValue = null, minValue = null, emptyOk: boolean = true) {
+            if (numberText == null) {
+                numberText = '';
+            }
+
+            numberText = numberText + ' '; // convert to string to ensure .trim() works.
+            var result = {
+                errorMessage: '',
+                text: numberText.trim(),
+                value: 0,
+            };
+
+            var parts = result.text.split('.');
+            if (parts.length > 1) {
+                var fraction = parseInt(parts[1].trim());
+                if (fraction != 0) {
+                    result.errorMessage = 'Must be a whole number.';
+                    return result;
+                }
+                else {
+                    result.text = parts[0].trim();
+                }
+            }
+
+            if (result.text == '') {
+                if (!emptyOk) {
+                    result.errorMessage = 'A number is required.'
+                }
+                return result;
+            }
+
+            result.value = parseInt(result.text);
+            if (isNaN(result.value)) {
+                result.errorMessage = 'Must be a valid whole number.';
+            }
+            else {
+                if (minValue != null && result.value < minValue) {
+                    if (minValue == 0) {
+                        result.errorMessage = 'Must be a positive number';
+                    }
+                    else {
+                        result.errorMessage =  'Must be greater than ' + minValue;
+                    }
+                }
+                if (maxValue != null && result.value > maxValue) {
+                    if (result.errorMessage) {
+                        result.errorMessage += ' and less than ' + maxValue;
+                    }
+                    else {
+                        result.errorMessage =  'Must be less than ' + maxValue;
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static validateCurrency(value:any): any {
+            if (!value) {
+                return false;
+            }
+            if (typeof value == 'string') {
+                value = value.replace(/\s+/g, '');
+                value = value.replace(',', '');
+                value = value.replace('$', '');
+            }
+            else {
+                value = value.toString();
+            }
+            if (!value) {
+                return false;
+            }
+            var parts = value.split('.');
+            if (parts.length > 2) {
+                return false;
+            }
+            if (!jQuery.isNumeric(parts[0])) {
+                return false;
+            }
+            if (parts.length == 1) {
+                return parts[0] + '.00';
+            }
+
+            if (!jQuery.isNumeric(parts[1])) {
+                return false;
+            }
+
+            var result = Number(parts[0] + '.' + parts[1].substring(0, 2));
+            if (isNaN(result)) {
+                return false;
+            }
+        };
 
     }
 }

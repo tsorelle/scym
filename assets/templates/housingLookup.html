@@ -1,0 +1,111 @@
+<div id="search-form-container" data-bind="visible:searchFormVisible">
+    <label class="control-label">
+        Find registrations
+    </label>
+
+    <div class="row" id="search-form">
+        <div class="col-md-12">
+            <form>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Search" data-bind="value: registrationsList.searchValue">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-default" data-bind="click:findRegistrationsByName" >Search by name <span class="glyphicon glyphicon-search"></span> </button>
+                        <button class="btn btn-default" data-bind="click:findAllRegistrations">Show all <span class="glyphicon glyphicon-search"></span></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="found-panel" class="found well" data-bind="visible:registrationsList.selectionCount">
+        <div id="found-header" class="row">
+            <div class="col-md-2">
+                Found: <span data-bind="text: registrationsList.selectionCount"></span>.
+            </div>
+            <div class="col-md-2" style="padding-right: 3px" data-bind="visible:registrationsList.hasPrevious">
+                <a href="#"  data-bind="click:registrationsList.previousPage"><span class="glyphicon glyphicon-backward"></span> Show&nbsp;Previous</a>
+            </div>
+            <div class="col-md-2" style="padding-right: 3px" data-bind="visible:registrationsList.hasMore">
+                <a href="#" data-bind="click:registrationsList.nextPage">Show&nbsp;More&nbsp;<span class="glyphicon glyphicon-forward"></span></a>
+            </div>
+            <div class="col-md-6"></div>
+        </div> <!-- end found header -->
+
+        <div class="row" id="found-list">
+            <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4" data-bind="foreach: registrationsList.selectionList[1]">
+                <div class="link-list-item">
+                    <a href="#" data-bind="click:$parent.getRegistration"><span data-bind="text: Name"></span></a>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4" data-bind="foreach: registrationsList.selectionList[2]">
+                <div class="link-list-item">
+                    <a href="#" data-bind="click:$parent.getRegistration"><span data-bind="text: Name"></span></a>
+                </div>
+
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4"  data-bind="foreach: registrationsList.selectionList[3]">
+                <div class="link-list-item">
+                    <a href="#" data-bind="click:$parent.getRegistration"><span data-bind="text: Name"></span></a>
+                </div>
+            </div>
+        </div> <!-- end found list -->
+    </div> <!-- end found panel -->
+    <div id="confirmation-buttons" data-bind="visible:showMessagesButton">
+        <button class="btn btn-primary" data-bind="click:sendConfirmations" >Send confirmation messages <span class="glyphicon glyphicon-forward" aria-hidden="true"></span></button>
+    </div>
+
+    <div class="modal" id="search-all-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4>Search for . . .</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="padding-left: 10px">
+                        <div><input type="radio" name="searchTypeGroup" value="incomplete" data-bind="checked: searchType" /> Assignments not completed</div>
+                        <div><input type="radio" name="searchTypeGroup" value="unconfirmed" data-bind="checked: searchType" /> Assignments completed but not confirmed</div>
+                        <div><input type="radio" name="searchTypeGroup" value="allregistrations" data-bind="checked: searchType" /> All registrations</div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bind="click: searchAll">Search</button>
+                    <button type="button" class="btn btn-default"  data-dismiss="modal">Cancel</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal" id="confirm-send-all-confirmations">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Confirmation messages</h4>
+                </div>
+                <div class="modal-body">
+                    <h3>Send confirmation messages?</h3>
+                    <p>
+                        This will send <span data-bind="text:registrationsList.foundCount"></span> messages.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button data-bind="click:doSendConfirmations" class="btn btn-primary" type="button">
+                        Send <span class="glyphicon glyphicon-send"></span>
+                    </button>
+                    <button type="button" class="btn btn-default"  data-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>

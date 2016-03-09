@@ -1,0 +1,272 @@
+<div id="youth-list-header" class="row hidden-print" style="margin-bottom: 10px">
+
+    <div class="col-md-4" style="padding-bottom:2px">
+        <label style="width:50px">Sort:</label>
+        <select data-bind="options: sortOrderList,
+                               optionsText: 'Name',
+                               value: selectedSortOrder">
+                               </select>
+    </div>
+    <div class="col-md-4" style="padding-bottom:5px">
+        <label style="width:50px">Filter:</label>
+        <select data-bind="options: filterList,
+                               optionsText: 'Name',
+                               value: selectedFilter,
+                               optionsCaption: '-- Show all --'"></select>
+    </div>
+    <div class="col-md-4">
+    </div>
+</div>
+<div class="row visible-print-block">
+    <div class="col-md-12">
+        <p data-bind="text:printHeader"></p>
+    </div>
+</div>
+<div id="youth-list-table" class="row hidden-xs hidden-print">
+    <div class="table-responsive col-md-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th data-bind="visible:selectedSortOrder().Value == 'meeting'">Meeting</th>
+                    <th>Age</th>
+                    <th>Age Group</th>
+                    <th>Arrival</th>
+                    <th>Diet</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach:youthList">
+                <tr>
+                    <td>
+                       <a href="#" data-bind="click:$parent.showDetailForm"><span data-bind="text:fullName"></span></a>
+                    </td>
+                    <td data-bind="visible:$parent.selectedSortOrder().Value == 'meeting',text:meeting"></td>
+                    <td data-bind="text:age"></td>
+                    <td data-bind="text:ageGroup"></td>
+                    <td data-bind="text:arrivalTimeText"></td>
+                    <td data-bind="text:dietPreference"></td>
+                    <td>
+                       <a href="#" data-bind="visible:hasNotes, click:$parent.showCombinedNotes">See notes...</a>
+                       &nbsp;
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="youth-list-print" class="row visible-print-block">
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th data-bind="visible:selectedSortOrder().Value == 'meeting'">Meeting</th>
+                <th>Age</th>
+                <th>Age Group</th>
+                <th>Arrival</th>
+                <th>Diet</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach:youthList">
+            <tr>
+                <td>
+                    <span data-bind="text:fullName"></span>
+                </td>
+                <td data-bind="visible:$parent.selectedSortOrder().Value == 'meeting',text:meeting"></td>
+                <td data-bind="text:age"></td>
+                <td data-bind="text:ageGroup"></td>
+                <td data-bind="text:arrivalTimeText"></td>
+                <td data-bind="text:dietPreference"></td>
+                <td>
+                    <span data-bind="visible:hasNotes">See notes...</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="youth-list-xs" class="row hidden-md hidden-sm hidden-lg hidden-print">
+    <div class="col-xs-12">
+    <div class="col-xs-12 row" data-bind="foreach:youthList">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>
+                    <a href="#" data-bind="click:$parent.showDetailForm"><span data-bind="text:fullName"></span></a>
+                </h4>
+            </div>
+        </div>
+
+        <div class="row" data-bind="visible:$parent.selectedSortOrder().Value == 'meeting'">
+            <div class="col-xs-3">
+                <label>Meeting</label>
+            </div>
+            <div class="col-xs-8">
+                <span data-bind="text:meeting"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-3">
+                <label>Age</label>
+            </div>
+            <div class="col-xs-8">
+                <span data-bind="text:age"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                <label>Group: </label>
+            </div>
+            <div class="col-xs-8">
+                <span data-bind="text:ageGroup"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                <label>Arrival: </label>
+            </div>
+            <div class="col-xs-8">
+                <span data-bind="text:arrivalTimeText"></span>
+            </div>
+        </div>
+        <div class="row" data-bind="visible:dietPreference">
+            <div class="col-xs-3">
+                <label>Diet: </label>
+            </div>
+            <div class="col-xs-8">
+                <span data-bind="text:dietPreference"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12" data-bind="visible:hasNotes">
+                <a href="#" data-bind="click:$parent.showCombinedNotes">See notes...</a>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<!-- Modals -->
+<div>
+    <div class="modal" id="youth-update-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+                    <h4 data-bind="text:youthDetailForm.fullName"></h4>
+                    <div>
+                        <button type="button" class="btn btn-primary btn-xs" data-bind="click: saveChanges">Save changes</button>
+                        <button type="button" class="btn btn-default btn-xs"  data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group"><label class="control-label">Registration: </label><div data-bind="text:youthDetailForm.registrationName"></div></div>
+                            <div class="form-group" >
+                                <label for="sponsor" class="control-label">Sponsor: </label>
+                                <input class="form-control" id="sponsor" data-bind="value:youthDetailForm.sponsor"/>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="youth-program-notes">Youth Program Notes</label>
+                                <textarea rows="2" class="form-control" id="youth-program-notes"
+                                     data-bind="value: youthDetailForm.youthNotes"></textarea>
+                            </div>
+
+                            <div class="form-group" data-bind="visible: youthDetailForm.attenderNotes">
+                                <label class="control-label" for="attender-notes">Attender Notes</label>
+                                <div id="attender-notes"
+                                     data-bind="text: youthDetailForm.attenderNotes">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 10px">
+                        <div class="col-md-6">
+                                <input id="forms-recd" type="checkbox" data-bind="checked:youthDetailForm.formsSubmitted"/>
+                                Permission and health form recieved.
+                        </div>
+                        <div class="col-md-6">
+                                <label>Age group:</label>
+                                <select data-bind="options:ageGroupList,
+                                optionsText: 'Text',
+                               value: selectedAgeGroup">
+                                </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group"  data-bind="visible: youthDetailForm.dietPreference">
+                                <label class="control-label" for="diet">Dietry preference: </label>
+                                <span id="diet" data-bind="text: youthDetailForm.dietPreference"></span>
+                            </div>
+                            <div class="form-group" data-bind="visible: youthDetailForm.specialNeeds">
+                                <label class="control-label" for="needs">Special needs: </label>
+                                <span id="needs" data-bind="text: youthDetailForm.specialNeeds"></span>
+                            </div>
+                            <div class="form-group" data-bind="visible: youthDetailForm.meeting">
+                                <label class="control-label">Meeting: </label>
+                                <div data-bind="text:youthDetailForm.meeting"></div>
+                            </div>
+                            <div class="form-group"><label class="control-label tops-horizontal-label">Age:</label><span data-bind="text:youthDetailForm.age"></span></div>
+                            <div class="form-group"><label class="control-label tops-horizontal-label">Arrive:</label><span data-bind="text:youthDetailForm.arrivalTimeText"></span></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group"><label class="control-label">Generation: </label> <div data-bind="text:youthDetailForm.generationName"></div></div>
+                            <div class="form-group" data-bind="visible: youthDetailForm.dietPreference"><label class="control-label tops-horizontal-label">Diet: </label> <span data-bind="text:youthDetailForm.dietPreference"></span></div>
+                            <div class="form-group"><label class="control-label tops-horizontal-label">Date of birth: </label> <span data-bind="text:youthDetailForm.dateOfBirth"></span></div>
+                            <div class="form-group"><label class="control-label tops-horizontal-label">Grade level:</label> <span data-bind="text:youthDetailForm.gradeLevel"></span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: saveChanges">Save changes</button>
+                    <button type="button" class="btn btn-default btn-xs"  data-dismiss="modal">Cancel</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <div class="modal" id="youth-notes-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 data-bind="text:youthDetailForm.fullName"></h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group"  data-bind="visible: youthDetailForm.dietPreference">
+                            <label class="control-label" for="diet-2">Dietry preference: </label>
+                            <div id="diet-2"
+                                 data-bind="text: youthDetailForm.dietPreference"></div>
+                        </div>
+                        <div class="form-group" data-bind="visible: youthDetailForm.specialNeeds">
+                            <label class="control-label" for="needs-2">Special needs: </label>
+                            <div id="needs-2"
+                                 data-bind="text: youthDetailForm.specialNeeds"></div>
+                        </div>
+                        <div class="form-group" data-bind="visible: youthDetailForm.attenderNotes">
+                            <label class="control-label" for="attender-notes-2">Attender Notes</label>
+                            <div id="attender-notes-2"
+                                      data-bind="text: youthDetailForm.attenderNotes">
+
+                            </div>
+                        </div>
+                        <div class="form-group" data-bind="visible: youthDetailForm.youthNotes">
+                            <label for="youth-program-notes">Youth Program Notes</label>
+                            <div id="youth-program-notes-2"
+                                      data-bind="text: youthDetailForm.youthNotes"></div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"  data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>

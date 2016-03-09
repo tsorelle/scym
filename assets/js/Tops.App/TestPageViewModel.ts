@@ -152,63 +152,6 @@ module Tops {
             Tops.waitMessage.hide();
 
         }
-/*
-        clearPerson() {
-            var me = this;
-            var initPerson =
-            {
-                id : 0,
-                Name: "",
-                Gender: "",
-                Status: "New",
-                Age: 0
-            };
-            me.person(initPerson);
-        }
-
-        onUpdatePerson() {
-            var me = this;
-
-            me.application.hideServiceMessages();
-            // me.application.showErrorMessage("Testing error messages: updatePerson");
-
-            me.peanut.executeService('UpdatePerson', me.person(),
-                function (serviceResponse: Tops.IServiceResponse) {
-                    if (serviceResponse.Result == Tops.Peanut.serviceResultSuccess) {
-
-                        me.person(serviceResponse.Value);
-
-                    }
-                    else {
-                        alert("Service failed");
-                        me.clearPerson();
-                    }
-                }
-            ).always(
-                function() {
-                    alert("Service complete.");
-                }
-            );
-        }
-
-        onGetPerson() {
-            var me = this;
-            me.application.hideServiceMessages();
-            // me.application.showInfoMessage("Testing info messages: getPerson");
-
-
-            me.peanut.getFromService('GetPerson', 1,
-                function (serviceResponse: Tops.IServiceResponse) {
-                    if (serviceResponse.Result == Tops.Peanut.serviceResultSuccess) {
-                        me.person(serviceResponse.Value);
-                    }
-                    else {
-                        alert("Service failed");
-                        me.clearPerson();
-                    }
-                });
-        }
-        */
     }
 }
 

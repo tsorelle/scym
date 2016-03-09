@@ -1,0 +1,154 @@
+<div class="row" id="income-report-view">
+    <div class="col-md-12">
+        <div id="income-options-header" class="row hidden-print" style="margin-bottom: 10px">
+            <div class="col-md-6" style="padding-bottom:2px">
+                <label style="width:50px">Sort: </label>
+                <div>
+                    <select data-bind="options: sort.options,
+                                   optionsText: 'Name',
+                                   value: sort.selected">
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6" style="padding-bottom:2px">
+                <label style="width:50px">Filter: </label>
+                <div>
+                    <select data-bind="options: filter.options,
+                                   optionsText: 'Name',
+                                   value: filter.selected">
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="income-report-header">
+            <div class="col-md-12">
+                <h3>Income Report</h3>
+
+                <div class="row">
+                    <div class="col-md-4">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="color: firebrick">Summary:</th>
+                                <th class="text-right">Amount</th>
+                                <th class="text-right">Number of payments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    Cash
+                                </td>
+                                <td class="text-right" nowrap data-bind="text:cashTotal"></td>
+                                <td class="text-right"  data-bind="text:cashCount"></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Checks
+                                </td>
+                                <td class="text-right" nowrap data-bind="text:checkTotal"></td>
+                                <td class="text-right" data-bind="text:checkCount"></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    All&nbsp;income
+                                </td>
+                                <td class="text-right"  nowrap data-bind="text:incomeTotal"></td>
+                                <td class="text-right" data-bind="text:incomeCount"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="income-list" data-bind="visible:incomeCount()">
+            <div class="col-md-12">
+                <h4 data-bind="visible:filter.selected().Value == 0">Income</h4>
+                <h4 data-bind="visible:filter.selected().Value == 1">Income: Cash</h4>
+                <h4 data-bind="visible:filter.selected().Value == 2">Income: Checks</h4>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>Payor</th>
+                        <th data-bind="visible:filter.selected().Value == 0">Type</th>
+                        <th data-bind="visible:filter.selected().Value != 1">Check number</th>
+                        <th>Date received</th>
+                        <th>Entered by</th>
+                        <th class="text-right">Amount</th>
+                        <th class="hidden-print">Notes</th>
+                    </tr>
+                    </thead>
+                    <tbody data-bind="foreach:paymentList">
+                    <tr>
+                        <td>
+                            <span style="white-space: nowrap">
+                                <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:$parent.lookupRegistration"><span class="glyphicon glyphicon-search"></span></a>
+                            </span>
+                        </td>
+                        <td data-bind="text:payor"></td>
+                        <td data-bind="visible:$parent.filter.selected().Value == 0,text:type"></td>
+                        <td data-bind="visible:$parent.filter.selected().Value != 1, text:checkNumber"></td>
+                        <td data-bind="text:dateAdded"></td>
+                        <td data-bind="text:addedBy"></td>
+                        <td  class="text-right" data-bind="text:amountFormatted"></td>
+                        <td class="hidden-print">
+                            <span data-bind="visible:notes">
+                                <a href="#" data-bind="click:$parent.showPaymentNotes"><span class="glyphicon glyphicon-info-sign"></span> Notes</a>
+                            </span>
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal" id="payment-notes-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="modal-title">
+                        From: <span  data-bind="text: selectedPayment().payor"></span>  on <span data-bind="text: selectedPayment().dateAdded"></span>
+                    </h3>
+                </div>
+                <div class="modal-body"  style="background-color: white">
+                    <form>
+                        <div class="form-group" >
+                            <label class="control-label" >Registration: </label>
+                            <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:lookupSelectedRegistration">
+                                <span data-bind="text: selectedPayment().registrationName "></span>
+                            </a>
+                        </div>
+
+                        <div class="form-group" >
+                            <label class="control-label" >Type: </label>
+                            <span data-bind="text: selectedPayment().type"></span>
+                        </div>
+
+                        <div class="form-group" data-bind="visible: selectedPayment().paymentType == 2">
+                            <label class="control-label" >Check Number:</label>
+                            <div data-bind="text: selectedPayment().checkNumber "></div>
+                        </div>
+                        <div class="form-group" >
+                            <label class="control-label" >Amount: </label>
+                            <span data-bind="text: selectedPayment().amountFormatted"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label">Notes: </label>
+                            <div data-bind="text: selectedPayment().notes"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"  data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div>

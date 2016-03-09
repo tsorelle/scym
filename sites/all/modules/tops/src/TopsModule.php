@@ -104,8 +104,15 @@ class TopsModule {
     }
     public static function checkContentAccess($node) {
 
+       // application_page
+
        if (self::userAnonymous() && $node !== null && isset($node->type)) {
-           $accessFieldName = 'field_' . $node->type . '_access';
+           if ($node->type = 'application_page') {
+               $accessFieldName = 'field_page_access';
+           }
+           else {
+               $accessFieldName = 'field_' . $node->type . '_access';
+           }
            if (property_exists($node,$accessFieldName)) {
                if (self::hasTaxonomyTerm($node, $accessFieldName, 'Private')) {
                    drupal_set_message(t('You must sign in to view this content.'), 'error');
@@ -138,18 +145,49 @@ class TopsModule {
         // TTracer::Trace('End TopsModule::Initialize');
     }
 
+    public static function PreprocessPage(&$variables) {
+        $variables['trace_messages'] = \Tops\sys\TTracer::RenderTraceMessages();
+        $vmPath = TViewModel::getVmPath();
+        $hasVm = ($vmPath !== null);
+        $variables['peanut_viewmodel'] = $hasVm;
+    }
+
     public static function PreprocessHtml(&$variables) {
         $vmPath = TViewModel::getVmPath();
-        $hasVm = (!empty($vmPath));
+        $hasVm = ($vmPath !== null);
         $variables['peanut_viewmodel'] = $hasVm;
-        $variables['peanut_viewmodel_src'] = $vmPath;
+        $variables['peanut_viewmodel_src'] = $vmPath ? $vmPath->path : '';
         // $variables['tops_js_debug'] =  \Tops\sys\TTracer::JsDebuggingOn();
-
         if ($hasVm) {
-            $initJs =  "ViewModel.init('//', function() {  ko.applyBindings(ViewModel); });";
+            $initJs =  "ViewModel.init('/', function() {  ViewModel.application.bindDefaultSection(); });";
+            foreach ($vmPath->requires as $requirement) {
+                if ($requirement == 'maps.api') {
+                    $mapKey = 'AIzaSyDPaIAgncWvvzfrsnw53PTxmLow3Tu4WEg';
+                    $variables['googleApiKey'] = $mapKey;
+                } else {
+                    $pos = strpos($requirement, 'url:');
+                    if ($pos === 0) {
+                        $src = substr($requirement, 4);
+                    }
+                    else {
+                        if (substr($requirement,0,10) == 'component:') {
+                            $requirement = substr($requirement,10);
+                            $src = TViewModel::getComponentsDirectory() . '/' . $requirement . '.js' ;
+                        }
+                        else {
+                            $src = TViewModel::getVmDirectory() . '/' . $requirement . '.js';
+                        }
+                    }
 
+                    drupal_add_js($src, array('group' => 'JS_THEME', 'scope' => 'footer'));
+                }
+            }
+
+
+
+            drupal_add_library('system', 'ui.datepicker');
             drupal_add_library('tops','peanut.app');
-            drupal_add_js($vmPath,array('group'=>'JS_THEME', 'scope'=>'footer'));
+            drupal_add_js($vmPath->path,array('group'=>'JS_THEME', 'scope'=>'footer'));
             drupal_add_js($initJs,array('group'=>'JS_THEME','type'=>'inline', 'scope'=>'footer'));
         }
     }
@@ -181,6 +219,16 @@ class TopsModule {
             ),
         );
 
+        $libraries['headjs'] = array(
+            'title' => 'Head JS Load',
+            'website' => 'http://cdnjs.cloudflare.com',
+            'version' => '1.0.3',
+            'js' => array(
+                'http://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.js' => array('type'=>'external', 'group' => JS_LIBRARY,  'weight' => '1')
+            )
+
+        );
+
         $libraries['peanut'] = array(
             'title' => 'Peanut Service Library',
             'version' => '1.0',
@@ -189,7 +237,7 @@ class TopsModule {
             ),
             'dependencies' => array(
                 array('system', 'jquery'),
-                array('tops','knockoutjs'),
+                array('tops','knockoutjs')
                 // we also need bootstrap but will rely on bootstrap module for that
             ),
         );
@@ -213,6 +261,7 @@ class TopsModule {
                 array('system', 'jquery'),
                 array('tops','knockoutjs'),
                 array('tops','underscorejs'),
+                array('tops','headjs'),
                 array('tops','peanut')
                 // we also need bootstrap but will rely on bootstrap module for that
             )

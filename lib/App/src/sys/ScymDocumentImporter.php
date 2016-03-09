@@ -61,7 +61,7 @@ class ScymDocumentImporter {
             $access ='private';
         }
         if ($this->access != $access) {
-            if ($access = 'private') {
+            if ($access == 'private') {
                 $basePath = variable_get('file_private_path');
             }
             else if ($access == 'public') {
@@ -77,6 +77,7 @@ class ScymDocumentImporter {
 
             $this->docPath = $basePath.'/documents/';
             $this->access = $access;
+            return $this->access.': '.$this->docPath;
         }
     }
 
@@ -259,12 +260,12 @@ class ScymDocumentImporter {
             return 0;
         }
 
-        $this->setAccess(empty($doc->access) ? 'private' : $doc->access);
+        $baseDocPath = $this->setAccess(empty($doc->access) ? 'private' : $doc->access);
 
         $fileInfo = $this->getFileInfo($doc->filename);
 
         if ($fileInfo === false) {
-            $this->messages->AddErrorMessage("File '$doc->filename' not found.");
+            $this->messages->AddErrorMessage("File '$baseDocPath$doc->filename' not found.");
             return 0;
         }
 

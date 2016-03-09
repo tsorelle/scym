@@ -75,11 +75,21 @@
   <?php print $scripts; ?>
 </head>
 <body class="<?php print $classes; ?>" <?php print $attributes;?>>
+<!--
+<div style="background-color: yellow;color: firebrick; padding: 5px; border: 1px solid black">
+   This site is for testing only. The real SCYM site is <a href="http://www.scym.org"><strong>http://www.scym.org</strong></a>
+</div>
+-->
   <div id="skip-link">
     <a href="#main-content" class="element-invisible element-focusable"><?php print t('Skip to main content'); ?></a>
   </div>
   <?php print $page_top; ?>
   <?php print $page; ?>
   <?php print $page_bottom; ?>
+  <?php if(!empty($googleApiKey)) : ?>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=<?php print $googleApiKey; ?>&callback=ViewModel.initMap">
+    </script>
+  <?php endif; ?>
 </body>
 </html>

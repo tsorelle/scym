@@ -110,7 +110,12 @@ class TPostOffice {
         return self::getInstance()->_send($message);
     }
     private function _send($message) {
-        return $this->mailer->send($message);
+        try {
+            return $this->mailer->send($message);
+        }
+        catch(\Exception $ex) {
+            return false;
+        }
     }
 
 

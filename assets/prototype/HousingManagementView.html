@@ -1,0 +1,35 @@
+<!-- ******************  START FORM ****************************************************************************  -->
+<div id="view-container" class="view-model-container">
+    <div class="row" id="tabs">
+        <div class="col-md-12">
+            <ul class="nav nav-tabs">
+                <li  data-bind="css: {active: currentForm() == 'assignments'}"><a href="#" data-bind="click:showAssignmentForm">Assignments</a></li>
+                <li  data-bind="css: {active: currentForm() == 'units'}"><a href="#" data-bind="click:showHousingUnitsForm">Housing units</a></li>
+                <li  data-bind="css: {active: currentForm() == 'types'}"><a href="#" data-bind="click:showHousingTypesForm">Housing types</a></li>
+                <li  data-bind="css: {active: currentForm() == 'reports'}"><a href="#" data-bind="click:showHousingReportsForm">Housing reports</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="main-row" class="row">
+        <div id="main-column" class="col-md-12">
+            <div id="assignments"  data-bind="visible:currentForm() == 'assignments'">
+                <div id="housing-lookup-container">
+                    <housing-lookup></housing-lookup>
+                </div>
+                <div id="housing-assignment-container">
+                    <housing-assignment></housing-assignment>
+                </div>
+            </div>
+            <div id="housing-units-form" data-bind="visible:currentForm() == 'units'">
+                <div id="housing-units-container"><housing-units></housing-units></div>
+            </div>
+            <div id="housing-types-form"  data-bind="visible:currentForm() == 'types'">
+                <div id="housing-types-container"><housing-types></housing-types></div>
+            </div>
+            <div id="housing-reports-form"  data-bind="visible:currentForm() == 'reports'">
+                <div id="housing-reports-container"><housing-reports></housing-reports></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ******************  END FORM ****************************************************************************  -->

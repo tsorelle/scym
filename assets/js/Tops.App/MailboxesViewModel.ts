@@ -181,7 +181,7 @@ module Tops {
             }
             */
 
-            var emailOk = me.peanut.validateEmail(box.email);
+            var emailOk = Tops.Peanut.ValidateEmail(box.email);
             me.mailboxEmailHasError(!emailOk);
             if (!emailOk) {
                 valid = false;

@@ -1,0 +1,15 @@
+Dear Friend,
+
+Thank you for registering for SCYM.  We look forward to seeing you there.
+When you arrive at camp, enter this code to open the gate: #7296 (or, on a phone keypad it's #SCYM)
+
+{{cost}}
+Your room assignments are as follows:
+{{room-assignments}}
+Check in at registration in the Dining Hall when you get to Greene Family Camp to be sure nothing has changed and to complete your registration before you go to your lodging.
+
+If you have any questions, please contact me at registrar@scym.org. Starting thursday morning of Yearly Meeting, you may reach me at (512) 913-5434 if you have questions or concerns.
+
+You can make any changes or cancel your registration at the web site: http://www.scym.org/register?code={{code}}
+
+Galia Harrington

@@ -1,0 +1,97 @@
+<div class="row" id="ledger-report-view">
+    <style>
+        .balanceWarning {
+            font-weight: bold;
+            background-color: yellow;
+            color: red;
+        }
+        .refundWarning {
+            background-color: lightgreen;
+            font-weight: bold;
+        }
+    </style>
+    <div class="col-md-12">
+        <div id="ledger-options-header" class="row hidden-print" style="margin-bottom: 10px">
+            <div class="col-md-6" style="padding-bottom:2px">
+                <label style="width:50px">Report&nbsp;view: </label>
+                <div>
+                    <select data-bind="options: reportView.options,
+                                   optionsText: 'Name',
+                                   value: reportView.selected">
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6" style="padding-bottom:2px">
+                <div class="checkbox">
+                    <label><input type="checkbox" data-bind="checked:showAttendedOnly,click:showReportView">Show attended only</label>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="ledger-report-header">
+            <div class="col-md-12">
+                <h3 data-bind="text:reportHeader"></h3>
+            </div>
+        </div>
+        <div class="row" id="ledger" data-bind="visible:!showBalanceSheet()">
+            <div class="col-md-12">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Attended</th>
+                        <th>Entry</th>
+                        <th>Type</th>
+                        <th class="text-right">Amount</th>
+                    </tr>
+                    </thead>
+                    <tbody data-bind="foreach:itemlist">
+                    <tr>
+                        <td>
+                            <span data-bind="text:name"></span>
+                            <span style="white-space: nowrap">
+                                <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:$parent.lookupRegistration"><span class="glyphicon glyphicon-search"></span></a>
+                            </span>
+                        </td>
+                        <td data-bind="text:attendedCount"></td>
+                        <td data-bind="text:EntryType"></td>
+                        <td data-bind="text:Type"></td>
+                        <td data-bind="text:Amount" class="text-right"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row" id="balance-sheet"  data-bind="visible:showBalanceSheet">
+            <div class="col-md-12">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th class="text-right">Fees</th>
+                            <th class="text-right">Donations</th>
+                            <th class="text-right">Credits</th>
+                            <th class="text-right">Payments</th>
+                            <th class="text-right">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach:balanceList">
+                    <tr>
+                        <td>
+                            <span data-bind="text:name"></span>
+                            <span style="white-space: nowrap">
+                                <a class="btn btn-sm hidden-print" title="Lookup registration" data-bind="click:$parent.lookupRegistration"><span class="glyphicon glyphicon-search"></span></a>
+                            </span>
+                        </td>
+                        <td data-bind="text:Fees" class="text-right"></td>
+                        <td data-bind="text:Donations" class="text-right"></td>
+                        <td data-bind="text:Credits" class="text-right"></td>
+                        <td data-bind="text:Payments" class="text-right"></td>
+                        <td  data-bind="css: { balanceWarning: balanceAmount > 0, refundWarning: balanceAmount < 0 }" class="text-right"><span data-bind="text:Balance"></span> </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

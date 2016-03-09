@@ -1,0 +1,230 @@
+<style>
+    .overbooked {
+       background-color: yellow;
+    }
+</style>
+<div id="housing-reports-section">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-group btn-group-justified hidden-print visible-lg-block visible-md-block visible-sm-block" role="group" aria-label="..." >
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" data-bind="click:showHousingRequestCounts">Requested counts</button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" data-bind="click:showHousingAssignmentCounts">Assigned counts</button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" data-bind="click:showHousingRoster">Where are they?</button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" data-bind="click:showWhoWhereReport">Who lives here?</button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" data-bind="click:refreshAll"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+                </div>
+            </div>
+
+            <div class="btn-group hidden-print visible-xs-block clearfix" role="group" aria-label="..." >
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" data-bind="click:showHousingRequestCounts">Requested counts</button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" data-bind="click:showHousingAssignmentCounts">Assigned counts</button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" data-bind="click:showHousingRoster">Where are they?</button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" data-bind="click:showWhoWhereReport">Who lives here?</button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" data-bind="click:refreshAll"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="request-counts-report" data-bind="visible:selectedReport()=='requestCounts'">
+                <h3>Requested Housing</h3>
+                <div id="request-counts">
+                    <table class="table">
+                        <thead>
+                        <tr><th>Housing</th><th  class="text-right">Requested</th><th class="text-right">Available</th>
+                            <!-- th class="text-right">Assigned</th></tr -->
+                        </thead>
+                        <tbody  data-bind="foreach:requestCounts">
+                        <tr>
+                            <td data-bind="text:housingTypeDescription"></td>
+                            <td class="text-right"  data-bind="text:requested"></td>
+                            <td class="text-right" data-bind="text:available"></td>
+                            <!-- td class="text-right" data-bind="text:assigned"></td -->
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="assigned-counts-report" data-bind="visible:selectedReport()=='assignedCounts'">
+                <h3>Assigned Housing</h3>
+                <table class="table">
+                    <thead>
+                    <tr><th>Unit</th><th>Type</th><th>Capacity</th><th>Thursday</th><th>Friday</th><th>Saturday</th></tr>
+                    </thead>
+                    <tbody data-bind="foreach:assignmentCounts">
+                    <tr data-bind="css:{overbooked: status == 'overbooked'}">
+                        <td >
+                            <span data-bind="text:unitname"></span>
+                            <span style="margin-left-left: 2px; color: red" data-bind="visible:status=='overbooked'">
+                                Overbooked!</span>
+                        </td>
+                        <td data-bind="text:housingTypeDescription"></td>
+                        <td data-bind="text:capacity"></td>
+                        <td data-bind="text:Thursday"></td>
+                        <td data-bind="text:Friday"></td>
+                        <td data-bind="text:Saturday"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="housing-details-report" data-bind="visible:selectedReport()=='housingRoster'">
+                <h3>Housing Roster</h3>
+                <div class="hidden-print">
+                    <label>Show:</label>
+                    <select data-bind="value:rosterFilter">
+                        <option>Thursday</option>
+                        <option>Friday</option>
+                        <option>Saturday</option>
+                        <option>Day visitors</option>
+                        <option>Unassigned</option>
+                        <option>All</option>
+                    </select>
+                </div>
+
+                <div id="roster-daily" data-bind="foreach:housingRoster.daily">
+                    <h4 data-bind="text:day"></h4>
+                    <div class="hidden-print" data-bind="visible:$parent.rosterFilter() != day && $parent.rosterFilter() != 'All'">
+                        <span data-bind="text:items().length"></span> records.
+                    </div>
+                    <table class="table" data-bind="visible:$parent.rosterFilter() == day || $parent.rosterFilter() == 'All'">
+                        <thead>
+                        <tr>
+                            <th class="hidden-print">&nbsp;</th>
+                            <th>Name</th>
+                            <th>Requested</th>
+                            <th>Unit</th>
+                            <th>Occupancy</th>
+                            <th>Confirmed</th>
+                            <th>Arrived</th>
+                            <th>Note</th>
+                        </tr>
+
+                        </thead>
+                        <tbody data-bind="foreach:items">
+                        <tr>
+                            <td class="hidden-print">
+                                <button data-bind="click:$parents[1].changeAssignment" title="Change assignment" class="btn btn-sm"><span class="glyphicon glyphicon-bed"></span></button>
+                            </td>
+                            <td data-bind='text:name'></td>
+                            <td data-bind='text:requested'></td>
+                            <td data-bind='text:unit'></td>
+                            <td data-bind='text:occupancy'></td>
+                            <td data-bind='text:confirmed'></td>
+                            <td data-bind='text:arrived'></td>
+                            <td data-bind='text:note'></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h4>Day visitors</h4>
+                    <div class="hidden-print" data-bind="visible:rosterFilter() != 'Day visitors' && rosterFilter() != 'All'">
+                        <span data-bind="text:housingRoster.visitors().length"></span> records.
+                    </div>
+                    <table class="table" data-bind="visible:rosterFilter() == 'Day visitors' || rosterFilter() == 'All'">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Confirmed</th>
+                            <th>Arrived</th>
+                            <th>Note</th>
+                        </tr>
+
+                        </thead>
+                        <tbody data-bind="foreach:housingRoster.visitors">
+                        <tr>
+                            <td data-bind='text:name'></td>
+                            <td data-bind='text:confirmed'></td>
+                            <td data-bind='text:arrived'></td>
+                            <td data-bind='text:note'></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h4>Unassigned</h4>
+                    <div class="hidden-print" data-bind="visible:rosterFilter() != 'Unassigned' && rosterFilter() != 'All'">
+                        <span data-bind="text:housingRoster.visitors().length"></span> records.
+                    </div>
+                    <table class="table" data-bind="visible:rosterFilter() == 'Unassigned' || rosterFilter() == 'All'">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Arrived</th>
+                            <th>Note</th>
+                        </tr>
+
+                        </thead>
+                        <tbody data-bind="foreach:housingRoster.unassigned">
+                        <tr>
+                            <td data-bind='text:name'></td>
+                            <td data-bind='text:arrived'></td>
+                            <td data-bind='text:note'></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="who-where-report" data-bind="visible:selectedReport()=='occupants'">
+                <h3>Occupants</h3>
+                <div class="hidden-print">
+                    <label>Show:</label>
+                    <select data-bind="value:occupantsFilter">
+                        <option>Thursday</option>
+                        <option>Friday</option>
+                        <option>Saturday</option>
+                        <option>All</option>
+                    </select>
+                </div>
+
+                <div id="occupants" data-bind="foreach:occupants">
+                    <h4 data-bind="text:day"></h4>
+                    <div class="hidden-print" data-bind="visible:$parent.occupantsFilter() != day && $parent.occupantsFilter() != 'All'">
+                        <span data-bind="text:items().length"></span> records.
+                    </div>
+                    <table class="table" data-bind="visible:$parent.occupantsFilter() == day || $parent.occupantsFilter() == 'All'">
+                        <thead>
+                        <tr><th>Unit</th>
+                            <th>Name</th><th>Arrived</th></tr>
+                        </thead>
+                        <tbody data-bind="foreach:items">
+                        <tr>
+                            <td data-bind="text:unitname"></td>
+                            <td>
+                                <button data-bind="click:$parents[1].changeAssignment" title="Change assignment" style="margin-right: 3px" class="btn btn-sm hidden-print"><span class="glyphicon glyphicon-bed"></span></button>
+                                <span data-bind="text:name"></span>
+                            </td>
+                            <td data-bind="text:arrived"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>

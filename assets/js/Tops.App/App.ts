@@ -4,6 +4,10 @@
 ///<reference path='../Tops.Peanut/Peanut.d.ts' />
 /// <reference path="../Tops.Peanut/Peanut.ts" />
 /// <reference path="../typings/bootstrap/bootstrap.d.ts" />
+/// <reference path="../typings/custom/head.load.d.ts" />
+/// <reference path="../components/TkoComponentLoader.ts" />
+/// <reference path='../typings/underscore/underscore.d.ts' />
+
 module Tops {
     export class mailBox {
         id:string;
@@ -18,6 +22,7 @@ module Tops {
         private static waitDialog : any = null;
         private static waiterType : string = 'spin-waiter';
         private static templates = Array<string>();
+        private static visible = false;
 
         public static addTemplate(templateName: string, content: string) {
             waitMessage.templates[templateName] = content;
@@ -31,10 +36,16 @@ module Tops {
         }
 
         public static show(message: string = 'Please wait ...', waiterType : string = 'spin-waiter') {
-            var div = waitMessage.setWaiterType(waiterType);
-            var span =  div.find('#wait-message');
-            span.text(message);
-            div.modal();
+            if (waitMessage.visible) {
+                waitMessage.setMessage(message);
+            }
+            else   {
+                var div = waitMessage.setWaiterType(waiterType);
+                var span = div.find('#wait-message');
+                span.text(message);
+                div.modal();
+                waitMessage.visible = true;
+            }
         }
 
         public static setMessage(message: string) {
@@ -56,8 +67,9 @@ module Tops {
         }
 
         public static hide() {
-            if (waitMessage.waitDialog) {
+            if (waitMessage.visible && waitMessage.waitDialog) {
                 waitMessage.waitDialog.modal('hide');
+                waitMessage.visible = false;
             }
         }
     }
@@ -153,6 +165,8 @@ module Tops {
 
     // Class
     export class Application implements Tops.IPeanutClient {
+        static versionNumber = "1.19";
+
         constructor(currentViewModel: any) {
             var me = this;
             me.viewModel = currentViewModel;
@@ -164,36 +178,226 @@ module Tops {
         applicationPath: string = "";
         peanut: Tops.Peanut;
         viewModel: any;
+        componentLoader: TkoComponentLoader = null;
 
-        // Drupal 8
+        // Drupal 7/8
         // See modules/tops/tops.routing.yml and modules/tops/src/controller/TopsController.php
         serviceUrl: string = "tops/service";
 
-        // Drupal 6/7 or PHP
+        // Drupal 6 or PHP
         // serviceUrl: string = "topsService.php";
-
 
         public getHtmlTemplate(name: string, successFunction: (htmlSource: string) => void) {
             var parts = name.split('-');
             var fileName = parts[0] + parts[1].charAt(0).toUpperCase() + parts[1].substring(1);
             var htmlSource =  this.applicationPath +
-                'assets/templates/' + fileName + '.html';
+                'assets/templates/' + fileName + '.html'
+                + '?tv=' + Application.versionNumber
+                ;
             jQuery.get(htmlSource, successFunction);
         }
 
-        private registerComponent(name: string, vm: any, successFunction?: () => void) {
-            var me = this;
-
-            me.getHtmlTemplate(name, function (htmlSource: string) {
-                ko.components.register(name, {
-                    viewModel: {instance: vm}, // testComponentVm,
-                    template: htmlSource
-                });
-                if (successFunction) {
-                    successFunction();
+        private expandFileName(fileName: string ) {
+            if (!fileName) {
+                return '';
+            }
+            var fileExtension = fileName.substr((fileName.lastIndexOf('.') + 1));
+            if (fileExtension) {
+                switch (fileExtension.toLowerCase()) {
+                    case 'css' :
+                        return this.applicationPath + 'assets/css/' + fileName
+                            + '?tv=' + Application.versionNumber
+                            ;
+                    case 'js' :
+                        return this.applicationPath + 'assets/js/components/' + fileName
+                            + '?tv=' + Application.versionNumber
+                            ;
                 }
+            }
+            return fileName;
+
+        }
+        public loadResources(names: any, successFunction?: () => void) {
+            var me = this;
+            var params : any = null;
+            if (_.isArray(names)) {
+                params = [];
+                for(var i = 0; i < names.length; i++) {
+                    var path = me.expandFileName(names[i]);
+                    params.push(path);
+                }
+            }
+            else {
+                params = me.expandFileName(names);
+            }
+            head.load(params, successFunction);
+        }
+
+        public loadJS(names: any, successFunction?: () => void) {
+            var params: any = null;
+            if (_.isArray(names)) {
+                params = [];
+                for(var i = 0; i < names.length; i++) {
+                    params.push(this.applicationPath + 'assets/js/components/' + names[i]
+                        + "?tv=" + Application.versionNumber
+                    );
+                }
+            }
+            else {
+                params = names;
+            }
+            head.load(params, successFunction);
+        }
+
+
+        public loadCSS(name: string, successFunction?: () => void) {
+            head.load(this.applicationPath + 'assets/css/' + name
+                + "?tv=" + Application.versionNumber
+                , successFunction);
+        }
+
+        public usingComponentLoader(afterLoad: () => void) {
+            var me = this;
+            if (me.componentLoader) {
+                afterLoad();
+            }
+            else
+            {
+                head.load(me.applicationPath + 'assets/js/components/TkoComponentLoader.js?tv=' + Application.versionNumber
+                    , function() {
+                        me.componentLoader = new TkoComponentLoader(me.applicationPath);
+                        TkoComponentLoader.versionNumber = Application.versionNumber;
+                        afterLoad();
+                    }
+                );
+            }
+
+        }
+
+        public componentIsLoaded(name : string) {
+            var me = this;
+            me.usingComponentLoader(function() {
+                return me.componentLoader
+            });
+
+        }
+
+        /**
+         * load component source and template and register.
+         * Use when multiple instances are reuqired.
+         *
+         * @param name
+         * @param successFunction
+         */
+        public loadComponent(name: string, successFunction?: () => void) {
+            var me = this;
+            me.usingComponentLoader(function() {
+                me.componentLoader.load(name, successFunction);
             });
         }
+
+        /**
+         * load component template, register to component name and vm instance
+         * overrides naming conventions.
+         *
+         * @param componentName
+         * @param htmlFileName
+         * @param vmInstance
+         * @param finalFunction
+         */
+        public loadComponentTemplate(componentName: string, htmlFileName: string, vmInstance: any, finalFunction: () => void  = null) {
+            var me = this;
+            me.usingComponentLoader(function() {
+                me.componentLoader.loadComponentTemplate(componentName, htmlFileName, vmInstance, finalFunction)
+            });
+        }
+
+
+        /**
+         * load template and register instance. Instance argumnent may be a function returning an instance or the instance itself.
+         *
+         * @param name
+         * @param vmInstance
+         * @param finalFunction
+         */
+        public loadComponentInstance(name: string,
+                                     vmInstance : any, // instance of VM or function returning the instance.
+                                     finalFunction?: () => void) {
+            var me = this;
+            me.usingComponentLoader(function() {
+                me.componentLoader.loadComponentInstance(name, vmInstance, finalFunction);
+            });
+        }
+
+        /**
+         * KnockoutJS databinding against single element
+         *
+         * @param containerName
+         * @param context
+         */
+        public bindNode(containerName: string, context : any) {
+            var me = this;
+            if (context == null) {
+                context = me.viewModel; // calling context
+            }
+            var container = document.getElementById(containerName); // messages-component-container
+            ko.applyBindingsToNode(container,null,context);
+        };
+
+
+        /**
+         * KnockoutJS databind against a DIV or other element, including descendants.
+         *
+         * @param containerName
+         * @param context
+         */
+        public bindSection(containerName: string, context : any) {
+            var me = this;
+            if (context == null) {
+                context = me.viewModel; // calling context
+            }
+            var container = document.getElementById(containerName); // messages-component-container
+            if (container==null) {
+                if (containerName) {
+                    alert("Error: Container element '" + containerName + "' for section binding not found.");
+                }
+                else {
+                    alert("Error: not container name for section binding.");
+                }
+                return;
+            }
+            ko.applyBindings(context,container);
+            jQuery("#"+containerName).show();
+        };
+
+        /**
+         * load template and register instance. Instance argumnent may be a function returning an instance or the instance itself.
+         * Bind assuming outer div with id of "[component name]-container"
+         *
+         * @param name
+         * @param vmInstance
+         * @param finalFunction
+         */
+        public bindComponent = (name: string,
+                                vmInstance : any, // instance of VM or function returning the instance.
+                                finalFunction?: () => void) => {
+            var me = this;
+            me.usingComponentLoader(function() {
+                if (me.componentLoader.alreadyLoaded(name)) {
+                    if (finalFunction) {
+                        finalFunction();
+                    }
+                }
+                else {
+                    me.componentLoader.loadComponentInstance(name, vmInstance, function(vm: any) {
+                        me.bindSection(name + '-container', vm);
+                        if (finalFunction) {
+                            finalFunction();
+                        }
+                    });
+                }
+            });
+        };
 
         public loadWaitMessageTemplate(templateName: string, successFunction: () => void) {
             this.getHtmlTemplate(templateName, function (htmlSource: string) {
@@ -202,14 +406,60 @@ module Tops {
             });
         }
 
+        static defaultSectionId : string = 'tops-view-section';
+
+        public showDefaultSection() {
+            var container = document.getElementById(Tops.Application.defaultSectionId); // messages-component-container
+            jQuery("#"+Tops.Application.defaultSectionId).show();
+        }
+        public bindDefaultSection() {
+            var me = this;
+            me.bindSection(Tops.Application.defaultSectionId,me.viewModel);
+        }
+
+        /**
+         * load template, create instance and register.  Assumes source already loaded.
+         *
+         * @param componentName
+         * @param vm
+         * @param finalFunction
+         */
+        public registerComponent(componentName: string, vm: any, finalFunction?: () => void) {
+            var me = this;
+            me.usingComponentLoader(function() {
+                me.componentLoader.registerComponent(componentName, vm,finalFunction);
+            });
+        }
+
+        /**
+         *
+         * @param componentName
+         * @param vm
+         * @param finalFunction
+         *
+         * Assumes vm source already loaded
+         * load template, create instance and register.  Assumes source already load.
+         * Bind assuming outer div with id of "[component name]-container"
+         */
+        public registerAndBindComponent(componentName: string, vm: any, finalFunction?: () => void) {
+            var me = this;
+            me.usingComponentLoader(function() {
+                me.componentLoader.registerComponent(componentName, vm,
+                    function () {
+                        me.bindSection(componentName+'-container', messageManager.instance);
+                        if (finalFunction) {
+                            finalFunction();
+                        }
+                    });
+            });
+        }
+
         public initialize(applicationPath: string, successFunction?: () => void) {
             var me = this;
             me.setApplicationPath(applicationPath);
-            me.serviceUrl = me.applicationPath +
-                me.serviceUrl;
-
+            me.serviceUrl = me.applicationPath +  me.serviceUrl;
             messageManager.instance = new messageManager();
-            me.registerComponent('messages-component', messageManager.instance, function () {
+            me.registerAndBindComponent('service-messages',messageManager.instance, function() {
                 me.loadWaitMessageTemplate('spin-waiter', function () {
                     me.loadWaitMessageTemplate('progress-waiter', function () {
                         if (successFunction) {
@@ -227,13 +477,22 @@ module Tops {
                 if (path.charAt(0) != "/")
                     me.applicationPath = "/";
                 me.applicationPath = me.applicationPath + path;
-                if (path.charAt(path.length - 1) != "/")
+                if (path.charAt(path.length - 1) != "/") {
                     me.applicationPath = me.applicationPath + "/";
+                }
             }
-            else
+            else {
                 me.applicationPath = "/";
+            }
 
-            me.applicationPath = location.protocol + '//' + location.hostname + me.applicationPath;
+            var port = location.port;
+            if ((!port) || port == '8080') {
+                port = '';
+            }
+            else {
+                port = ':' + port;
+            }
+            me.applicationPath = location.protocol + '//' + location.hostname + port + me.applicationPath;
         }
 
         showServiceMessages(messages: Tops.IServiceMessage[]): void {

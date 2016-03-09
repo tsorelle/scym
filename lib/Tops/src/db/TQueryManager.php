@@ -27,8 +27,18 @@ class TQueryManager {
     private $connection;
 
     public function __construct($type='application') {
-
         $this->connection = self::GetConnection($type);
+    }
+
+    private static $instances = array();
+    public static function getInstance($type='application')
+    {
+        if (array_key_exists($type, self::$instances)) {
+            return self::$instances[$type];
+        }
+        $instance = new TQueryManager($type);
+        self::$instances[$type] = $instance;
+        return $instance;
     }
 
     /**

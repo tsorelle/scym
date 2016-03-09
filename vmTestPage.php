@@ -63,13 +63,14 @@ $vmcontent = __DIR__."/lib/test/vmtest/$testpage.html";
         <section class="col-sm-12">
             <a id="main-content"></a>
             <h1 class="page-header">Test Page</h1>
-            <messages-component></messages-component>
+            <div id="service-messages-container"><service-messages></service-messages></div>
             <div class="region region-content">
                 <section id="block-system-main" class="block block-system clearfix">
                     <div id="node-4" class="node node-page clearfix" about="/TestPage" typeof="foaf:Document">
                         <span property="dc:title" content="Page Title" class="rdf-meta element-hidden"></span>
                         <span property="sioc:num_replies" content="0" datatype="xsd:integer" class="rdf-meta element-hidden"></span>
-                        <div class="content">
+                        <div id="tops-view-section" style="display: none;">
+                            <div class="content">
 
                             <div class="field field-name-body field-type-text-with-summary field-label-hidden">
                                 <div class="field-items">
@@ -85,6 +86,7 @@ $vmcontent = __DIR__."/lib/test/vmtest/$testpage.html";
                                 </div>
                             </div>
                         </div><!-- end content div -->
+                        </div>
                     </div> <!-- node-4 -->
                 </section> <!-- block-system-main -->
             </div> <!-- end region-conten div -->
@@ -99,7 +101,7 @@ $vmcontent = __DIR__."/lib/test/vmtest/$testpage.html";
 <!-- initialize and bind viewmodel -->
 <script src="/assets/js/Tops.App/<?php print $testpage?>ViewModel.js"></script>
 <script>ViewModel.init('//', function() {
-        ko.applyBindings(ViewModel);
+        ViewModel.application.bindDefaultSection();
     });</script>
 
 
