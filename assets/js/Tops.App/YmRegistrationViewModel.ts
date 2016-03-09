@@ -419,6 +419,8 @@ module Tops {
             me.address(registration.address);
             me.city(registration.city);
             me.email(registration.email);
+            me.phone(registration.phone);
+            me.notes(registration.notes);
         };
 
         public updateRegistration = (registration:IRegistrationInfo) => {
@@ -427,6 +429,9 @@ module Tops {
             registration.address = me.address();
             registration.city = me.city();
             registration.email = me.email();
+            registration.phone = me.phone();
+            registration.notes = me.notes();
+            // test
         };
 
         public validate = ():boolean => {

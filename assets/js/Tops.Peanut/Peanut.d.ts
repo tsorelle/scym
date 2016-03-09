@@ -26,7 +26,6 @@ declare module Tops {
         viewModel: any;
         serviceUrl: string;
         applicationPath: string;
-
     }
 
     export interface IViewModel {
