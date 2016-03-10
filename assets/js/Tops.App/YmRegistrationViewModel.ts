@@ -838,16 +838,16 @@ module Tops {
             me.notes(attender.notes);
 
             //boolean
-            me.firstTimer(attender.firstTimer === 1);
-            me.teacher(attender.teacher === 1);
-            // me.financialAidRequested(attender.financialAidRequested === 1);
-            me.guest(attender.guest === 1);
-            me.linens(attender.linens === 1);
-            me.vegetarian(attender.vegetarian === 1);
-            me.attended(attender.attended === 1);
+            me.firstTimer(attender.firstTimer ? true : false);
+            me.teacher(attender.teacher ? true : false);
+            // me.financialAidRequested(attender.financialAidRequested ? true : false);
+            me.guest(attender.guest ? true : false);
+            me.linens(attender.linens ? true : false);
+            me.vegetarian(attender.vegetarian ? true : false);
+            me.attended(attender.attended ? true : false);
             var privateOccupant = attender.singleOccupant ? true: false;
             me.singleOccupant(privateOccupant);
-            me.glutenFree(attender.glutenFree === 1);
+            me.glutenFree(attender.glutenFree ? true : false);
             me.setAttenderMeals(attender);
 
             me.setLookupValue(me.specialNeedsTypes(), me.selectedSpecialNeedsType, attender.specialNeedsTypeId);
@@ -1234,7 +1234,7 @@ module Tops {
 
             window.onbeforeunload = function () {
                 if (me.hasUnsavedChanges()) {
-                    if (me.registrationStatus() === 1 && me.attendersButton.isComplete()) {
+                    if (me.registrationStatus() ? true : false && me.attendersButton.isComplete()) {
                         me.accountReviewed(true); // show save button even if we are in 'new registration' wizard mode.
                     }
                     return "**** WARNING: If you reload or leave this page your changes will be lost. ****";
