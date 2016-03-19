@@ -1072,6 +1072,7 @@ module Tops {
         sessionInfo = new AnnualSessionInfo();
         user = new userObservable();
         registrationStatus = ko.observable(-1);
+        registrationReceivedDate : any = null;
 
         // simple forms
         lookupCode = ko.observable('');
@@ -1537,6 +1538,7 @@ module Tops {
 
         private loadRegistration(response:IRegistrationResponse) {
             var me = this;
+            me.registrationReceivedDate = response.registration.receivedDate;
             me.registrationStatus(response.registration.statusId);
             me.currentRegistration = response.registration;
             me.currentDonationsTotal = response.accountSummary.donationTotal;
@@ -1581,6 +1583,7 @@ module Tops {
 
         public newRegistration() {
             var me = this;
+            me.registrationReceivedDate = null;
             me.registrationForm.clear();
             me.lookupForm.clear();
             me.formTitle('Begin your registration');
@@ -1605,6 +1608,7 @@ module Tops {
 
         startNewRegistration() {
             var me = this;
+            me.registrationReceivedDate = null;
             me.registrationForm.clear();
             me.attenderList([]);
             var code = me.lookupForm.getLookupCode();
@@ -1838,6 +1842,7 @@ module Tops {
         updateCosts = () => {
             var me = this;
             var request:ICostUpdateRequest = {
+                registrationReceivedDate : me.registrationReceivedDate,
                 aidAmount: me.registrationForm.financeInfoForm.aidAmount(),
                 donations: me.registrationForm.financeInfoForm.getDonations(),
                 attenders: me.updatedAttenders,

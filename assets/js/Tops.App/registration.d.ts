@@ -59,6 +59,7 @@ declare module Tops {
     }
 
     export interface ICostUpdateRequest {
+        registrationReceivedDate : any;
         aidAmount  : any;
         attenders : IAttender[];
         deletedAttenders : any[];

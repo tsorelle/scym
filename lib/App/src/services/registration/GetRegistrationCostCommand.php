@@ -83,8 +83,9 @@ class GetRegistrationCostCommand  extends TServiceCommand
         }
         $attenders = AttenderDto::CreateList($request->attenders);
         $registrationsManager = new ScymRegistrationsManager();
+        $receivedDate =  empty($request->receivedDate) ? null : new \DateTime($request->receivedDate);
         $accountManager = new ScymAccountManager($registrationsManager);
-        $costs = $accountManager->createAccount($attenders);
+        $costs = $accountManager->createAccount($receivedDate, $attenders);
         $accountService = new AccountService($registrationsManager);
         $summary = $accountService->formatAccountSummary($costs);
         $summary->funds = ($request->getFundList) ? $registrationsManager->getFundList() : [];
