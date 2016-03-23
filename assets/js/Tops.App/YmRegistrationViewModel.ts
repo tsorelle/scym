@@ -2216,10 +2216,29 @@ module Tops {
 
         sendRegistrarMessage = () => {
             var me = this;
-            if (me.modalInput()) {
+            var messageText = me.modalInput().trim();
+            if (messageText) {
                 // todo: implement send registrar message
-                alert('Send message not implemented yet.');
+                // alert('Send message not implemented yet.');
                 me.modalInput('');
+                var message  = {
+                    toName: 'Registrar',
+                    mailboxCode: 'registrar',
+                    fromName: me.currentRegistration.name,
+                    fromAddress: me.currentRegistration.email,
+                    subject: 'Registration inquiry',
+                    body: messageText,
+                    registrationCode: me.currentRegistration.registrationCode
+                };
+
+                me.application.showWaiter('Sending message. Please wait...');
+                me.peanut.executeService('mailboxes.SendMessage', message, function (serviceResponse:Tops.IServiceResponse) {
+                    if (serviceResponse.Result == Tops.Peanut.serviceResultSuccess) {
+                        // alert('Thanks for your message.')
+                    }
+                }).always(function () {
+                    me.application.hideWaiter();
+                });
                 jQuery("#registrar-contact-modal").modal('hide');
             }
         };
