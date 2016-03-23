@@ -85,6 +85,7 @@ class GetRegistrationDashboardCommand extends TServiceCommand
         $responseDto->notes =  $registration->getNotes();
         $responseDto->status =  $registration->getStatusId();
         $responseDto->confirmed = $registration->getConfirmed();
+        $responseDto->registrarNotes = $registration->getScymNotes();
         switch($responseDto->status) {
             case 0 : $responseDto->statusText = 'Cancelled' ; break;
             case 1 : $responseDto->statusText = 'Incomplete'; break;

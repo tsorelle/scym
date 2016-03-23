@@ -2218,8 +2218,6 @@ module Tops {
             var me = this;
             var messageText = me.modalInput().trim();
             if (messageText) {
-                // todo: implement send registrar message
-                // alert('Send message not implemented yet.');
                 me.modalInput('');
                 var message  = {
                     toName: 'Registrar',
@@ -2233,16 +2231,33 @@ module Tops {
 
                 me.application.showWaiter('Sending message. Please wait...');
                 me.peanut.executeService('mailboxes.SendMessage', message, function (serviceResponse:Tops.IServiceResponse) {
+                    me.application.hideWaiter();
                     if (serviceResponse.Result == Tops.Peanut.serviceResultSuccess) {
-                        // alert('Thanks for your message.')
+                        me.updateRegistrationNotes(messageText);
                     }
-                }).always(function () {
+                }).fail(function () {
                     me.application.hideWaiter();
                 });
                 jQuery("#registrar-contact-modal").modal('hide');
             }
         };
 
+        private updateRegistrationNotes(noteText: string) {
+            var me = this;
+            me.application.showWaiter('Updating notes...');
+            var request = {
+                registrationId: me.registrationForm.id(),
+                notes: noteText,
+                action: 'appendNote'
+            };
+            me.peanut.executeService('registration.UpdateRegistrationNotes',request,
+                function (serviceResponse:IServiceResponse) {
+                    // nothing to do
+                }).always(function() {
+                me.application.hideWaiter();
+            });
+
+        }
 
         showRegistrarContactForm() {
             var me = this;

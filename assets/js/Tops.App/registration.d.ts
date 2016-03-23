@@ -262,6 +262,7 @@ declare module Tops {
         balanceDue: any,
         attenders: IAttenderCheckListItem[];
         housingAssignment: string;
+        registrarNotes: string;
     }
 
     export interface IRegistrationResponse {
