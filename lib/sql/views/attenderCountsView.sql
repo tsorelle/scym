@@ -13,7 +13,7 @@ ORDER BY category,nights;
 CREATE OR REPLACE VIEW attenderCountsView AS
 SELECT r.year, a.attenderId, a.registrationId,
 IF(a.attended = 1 ,'Yes','No') AS attended,
-FormatName(a.firstName, a.middleName, a.lastName) AS NAME,
+FormatName(a.firstName, a.middleName, a.lastName) AS 'Name',
 ScymTime(arrivalTime) AS Arrival,
 ScymTime(departureTime) AS Departure,
 (CASE a.generationId

@@ -2,25 +2,24 @@
     <div class="col-md-12">
         <h2>Financial Aid Report</h2>
         <h4>Total: <span data-bind="text:totalAid"></span> </h4>
+        <div id="options-header" class="row hidden-print" style="margin-bottom: 10px">
+            <div class="checkbox col-md-12">
+                <label>
+                    <input type="checkbox" data-bind="checked:showAttendedOnly,click:filter">  Show attended only
+                </label>
+            </div>
+        </div>
+        <div id="print-header" class="row visible-print-block" style="margin-bottom: 10px">
+            <div class="col-md-12">
+                <h4 data-bind="visible:!showAttendedOnly()">All registrations</h4>
+                <h4 data-bind="visible:showAttendedOnly">Attended only</h4>
+            </div>
+        </div>
+
         <div id="no-records" data-bind="visible:dataList().length == 0">
             No records.
         </div>
         <div data-bind="visible:dataList().length">
-
-            <div id="options-header" class="row hidden-print" style="margin-bottom: 10px">
-                <div class="checkbox col-md-12">
-                    <label>
-                        <input type="checkbox" data-bind="checked:showAttendedOnly,click:filter">  Show attended only
-                    </label>
-                </div>
-            </div>
-            <div id="print-header" class="row visible-print-block" style="margin-bottom: 10px">
-                <div class="col-md-12">
-                    <h4 data-bind="visible:!showAttendedOnly()">All registrations</h4>
-                    <h4 data-bind="visible:showAttendedOnly">Attended only</h4>
-                </div>
-            </div>
-
             <div id="report-name-table" class="row">
                 <div class="col-md-6">
                     <table class="table table-striped">
