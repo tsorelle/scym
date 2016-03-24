@@ -59,6 +59,7 @@ declare module Tops {
     }
 
     export interface ICostUpdateRequest {
+        registrationReceivedDate : any;
         aidAmount  : any;
         attenders : IAttender[];
         deletedAttenders : any[];
@@ -261,6 +262,7 @@ declare module Tops {
         balanceDue: any,
         attenders: IAttenderCheckListItem[];
         housingAssignment: string;
+        registrarNotes: string;
     }
 
     export interface IRegistrationResponse {

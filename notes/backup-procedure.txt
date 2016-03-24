@@ -1,0 +1,28 @@
+Backup procedure
+1) create sub-directory by date in:
+	D:\Projects\websites\scym.org\next\data\backups\
+2) Backup to sets:
+	Set 1:
+		tables structure & data:
+			addresses
+			quarterlymeetings
+			registrations
+
+	Set 2:
+		tables structure & data:
+			attenders
+			persons
+
+	Set 3:
+		all tables structure & data except
+			addresses
+			attenders
+			persons
+			quarterlymeetings
+			registrations
+	set 4:
+		structure, no tables, Ignore DEFINER
+
+Restore procedure
+1) Empty or create new database
+2) Execute backup sets in order.

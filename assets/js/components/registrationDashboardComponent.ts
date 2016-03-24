@@ -18,7 +18,7 @@ module Tops {
 
     export class registrationDashboardComponent implements IRegistrationComponent, IEventSubscriber {
         // todo: set this false for production
-        private testing = true;
+        private testing = false;
 
         private application:IPeanutClient;
         private peanut:Peanut;
@@ -40,7 +40,8 @@ module Tops {
             balanceDue: ko.observable(0.00),
             balance: ko.observable(''),
             housingAssignment: ko.observable(''),
-            confirmed: ko.observable(false)
+            confirmed: ko.observable(false),
+            registrarNotes: ko.observable('')
         };
 
         attenderForm = {
@@ -65,6 +66,7 @@ module Tops {
 
         checkinEnabled = ko.observable(false);
         printInvoiceOnCheckin = ko.observable(true);
+        showNotes = ko.observable(false);
 
         paymentForm : IDataEntryForm;
 
@@ -193,13 +195,15 @@ module Tops {
                     me.registration.city(response.city);
                     me.registration.phone(response.phone);
                     me.registration.email(response.email);
-                    me.registration.notes(response.notes);
                     me.registration.registrationCode(response.registrationCode);
                     me.registration.status(response.status);
                     me.registration.statusText(response.statusText);
                     me.registration.housingAssignment(response.housingAssignment);
                     me.registration.confirmed(response.confirmed);
-
+                    me.registration.registrarNotes(response.registrarNotes);
+                    var hasNotes = response.notes ? true: false;
+                    me.showNotes(hasNotes);
+                    me.registration.notes(response.notes);
                     me.setBalance(response.balanceDue);
 
                     me.unCheckedCount = response.attenders.length;
@@ -207,6 +211,9 @@ module Tops {
                         attender.arrived = (attender.arrived == 'Yes' || attender.arrived == true);
                         if (attender.arrived) {
                             me.unCheckedCount = -1;
+                        }
+                        if (attender.note) {
+                            me.showNotes(true);
                         }
                     });
 
@@ -219,6 +226,27 @@ module Tops {
                 }
             );
         }
+
+        updateRegNotes = () => {
+            var me = this;
+            jQuery("#dashboard-registration-notes-modal").modal('hide');
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Updating notes...');
+            var request = {
+                registrationId: me.registrationId(),
+                notes: me.registration.registrarNotes()
+            };
+            me.peanut.executeService('registration.UpdateRegistrationNotes',request,
+                function (serviceResponse:IServiceResponse) {
+                    // nothing to do
+                }).always(function() {
+                me.application.hideWaiter();
+            });
+        };
+
+        showRegNotesModal = () => {
+            jQuery("#dashboard-registration-notes-modal").modal('show');
+        };
 
         showAttenderDetails = (attender : IAttenderCheckListItem) => {
             var me = this;

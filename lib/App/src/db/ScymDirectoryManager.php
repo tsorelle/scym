@@ -318,7 +318,7 @@ class ScymDirectoryManager extends TDbServiceManager
         $householdPhone = '';
         if ($address) {
             $phone   = $address->getPhone();
-            if (!empty($householdPhone)) {
+            if (!empty($phone)) {
                 $householdPhone = $phone;
             }
         };

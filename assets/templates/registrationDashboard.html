@@ -97,12 +97,24 @@
          </div>
         </div>
         <div class="col-md-4">
-            <div data-bind="visible:registration.notes">
+            <div data-bind="visible:showNotes">
                 <h3>Notes:</h3>
                 <div class="form-group">
                     <div data-bind="text:registration.notes"></div>
                 </div>
+                <div class="form-group" data-bind="foreach:attenders">
+                    <div data-bind="visible:note">
+                        <span data-bind="text:name"></span>: <span data-bind="text:note"></span>
+                    </div>
+                </div>
             </div>
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 10px">
+        <div class="col-md-12">
+            <h3>Registrar Notes</h3>
+            <div data-bind="text:registration.registrarNotes"></div>
+            </p> <a href="#" data-bind="click:showRegNotesModal">Update notes</a> </p>
         </div>
     </div>
     <div class="row" style="padding: 10px;" id="buttons-section" >
@@ -174,6 +186,33 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+<div class="modal" id="dashboard-registration-notes-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title">Notes: <span data-bind="text:registration.name"></span></h3>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12" >
+                        <form>
+                            <div class="form-group">
+                                <label class="control-label">Note: </label>
+                                <textarea rows="4" class="form-control" id="dashboard-registrar-notes-input"
+                                          data-bind="value:registration.registrarNotes"></textarea>
 
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"  data-bind="click:updateRegNotes" style="margin-right: 10px">Save</button>
+                <button type="button" class="btn btn-default"  data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 

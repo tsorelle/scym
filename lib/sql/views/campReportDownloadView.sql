@@ -15,19 +15,19 @@ GROUP BY a.`attenderID`, ht.`category`,a.`generationId`;
 
 
 CREATE OR REPLACE VIEW campReportDownloadView AS
-SELECT (4 - Nights) AS LineOrder, CONCAT(CampCategory,' ',Nights,' night ') AS Item, COUNT(*) AS COUNT
+SELECT (4 - Nights) AS LineOrder, CONCAT(CampCategory,' ',Nights,' night ') AS Item, COUNT(*) AS 'Count'
 FROM campReportHousingDetailView
 GROUP BY Nights, CampCategory
 UNION
 SELECT 4 AS LineOrder, 'Day visitors - Adult' AS Item,
 
-IFNULL((SELECT SUM(Days) FROM attenderCountsView WHERE Generation = 'Adult' AND DayVisitor = 'Yes'),0) AS COUNT
+IFNULL((SELECT SUM(Days) FROM attenderCountsView WHERE Generation = 'Adult' AND DayVisitor = 'Yes'),0) AS 'Count'
 UNION
 SELECT 5 AS LineOrder, 'Day visitors - Youth' AS Item,
-IFNULL((SELECT SUM(Days) FROM attenderCountsView WHERE Generation = 'Youth' AND DayVisitor = 'Yes'),0) AS COUNT
+IFNULL((SELECT SUM(Days) FROM attenderCountsView WHERE Generation = 'Youth' AND DayVisitor = 'Yes'),0) AS 'Count'
 UNION
 SELECT 6 AS LineOrder,  'Extra Meals' AS Item,
-(SELECT COUNT(*) FROM meals m JOIN currentAttenders a ON m.attenderId = a.attenderId WHERE a.housingTypeId = 1 AND a.attended = 1) AS COUNT
+(SELECT COUNT(*) FROM meals m JOIN currentAttenders a ON m.attenderId = a.attenderId WHERE a.housingTypeId = 1 AND a.attended = 1) AS 'Count'
 
 UNION
 SELECT 7 AS LineOrder, 'Linen Bags' AS Item,

@@ -838,16 +838,16 @@ module Tops {
             me.notes(attender.notes);
 
             //boolean
-            me.firstTimer(attender.firstTimer === 1);
-            me.teacher(attender.teacher === 1);
-            // me.financialAidRequested(attender.financialAidRequested === 1);
-            me.guest(attender.guest === 1);
-            me.linens(attender.linens === 1);
-            me.vegetarian(attender.vegetarian === 1);
-            me.attended(attender.attended === 1);
+            me.firstTimer(attender.firstTimer ? true : false);
+            me.teacher(attender.teacher ? true : false);
+            // me.financialAidRequested(attender.financialAidRequested ? true : false);
+            me.guest(attender.guest ? true : false);
+            me.linens(attender.linens ? true : false);
+            me.vegetarian(attender.vegetarian ? true : false);
+            me.attended(attender.attended ? true : false);
             var privateOccupant = attender.singleOccupant ? true: false;
             me.singleOccupant(privateOccupant);
-            me.glutenFree(attender.glutenFree === 1);
+            me.glutenFree(attender.glutenFree ? true : false);
             me.setAttenderMeals(attender);
 
             me.setLookupValue(me.specialNeedsTypes(), me.selectedSpecialNeedsType, attender.specialNeedsTypeId);
@@ -1072,6 +1072,7 @@ module Tops {
         sessionInfo = new AnnualSessionInfo();
         user = new userObservable();
         registrationStatus = ko.observable(-1);
+        registrationReceivedDate : any = null;
 
         // simple forms
         lookupCode = ko.observable('');
@@ -1234,7 +1235,7 @@ module Tops {
 
             window.onbeforeunload = function () {
                 if (me.hasUnsavedChanges()) {
-                    if (me.registrationStatus() === 1 && me.attendersButton.isComplete()) {
+                    if (me.registrationStatus() ? true : false && me.attendersButton.isComplete()) {
                         me.accountReviewed(true); // show save button even if we are in 'new registration' wizard mode.
                     }
                     return "**** WARNING: If you reload or leave this page your changes will be lost. ****";
@@ -1537,6 +1538,7 @@ module Tops {
 
         private loadRegistration(response:IRegistrationResponse) {
             var me = this;
+            me.registrationReceivedDate = response.registration.receivedDate;
             me.registrationStatus(response.registration.statusId);
             me.currentRegistration = response.registration;
             me.currentDonationsTotal = response.accountSummary.donationTotal;
@@ -1581,6 +1583,7 @@ module Tops {
 
         public newRegistration() {
             var me = this;
+            me.registrationReceivedDate = null;
             me.registrationForm.clear();
             me.lookupForm.clear();
             me.formTitle('Begin your registration');
@@ -1605,6 +1608,7 @@ module Tops {
 
         startNewRegistration() {
             var me = this;
+            me.registrationReceivedDate = null;
             me.registrationForm.clear();
             me.attenderList([]);
             var code = me.lookupForm.getLookupCode();
@@ -1838,6 +1842,7 @@ module Tops {
         updateCosts = () => {
             var me = this;
             var request:ICostUpdateRequest = {
+                registrationReceivedDate : me.registrationReceivedDate,
                 aidAmount: me.registrationForm.financeInfoForm.aidAmount(),
                 donations: me.registrationForm.financeInfoForm.getDonations(),
                 attenders: me.updatedAttenders,
@@ -2211,14 +2216,48 @@ module Tops {
 
         sendRegistrarMessage = () => {
             var me = this;
-            if (me.modalInput()) {
-                // todo: implement send registrar message
-                alert('Send message not implemented yet.');
+            var messageText = me.modalInput().trim();
+            if (messageText) {
                 me.modalInput('');
+                var message  = {
+                    toName: 'Registrar',
+                    mailboxCode: 'registrar',
+                    fromName: me.currentRegistration.name,
+                    fromAddress: me.currentRegistration.email,
+                    subject: 'Registration inquiry',
+                    body: messageText,
+                    registrationCode: me.currentRegistration.registrationCode
+                };
+
+                me.application.showWaiter('Sending message. Please wait...');
+                me.peanut.executeService('mailboxes.SendMessage', message, function (serviceResponse:Tops.IServiceResponse) {
+                    me.application.hideWaiter();
+                    if (serviceResponse.Result == Tops.Peanut.serviceResultSuccess) {
+                        me.updateRegistrationNotes(messageText);
+                    }
+                }).fail(function () {
+                    me.application.hideWaiter();
+                });
                 jQuery("#registrar-contact-modal").modal('hide');
             }
         };
 
+        private updateRegistrationNotes(noteText: string) {
+            var me = this;
+            me.application.showWaiter('Updating notes...');
+            var request = {
+                registrationId: me.registrationForm.id(),
+                notes: noteText,
+                action: 'appendNote'
+            };
+            me.peanut.executeService('registration.UpdateRegistrationNotes',request,
+                function (serviceResponse:IServiceResponse) {
+                    // nothing to do
+                }).always(function() {
+                me.application.hideWaiter();
+            });
+
+        }
 
         showRegistrarContactForm() {
             var me = this;

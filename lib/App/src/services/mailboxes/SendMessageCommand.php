@@ -56,8 +56,11 @@ class SendMessageCommand extends TServiceCommand {
             $this->addErrorMessage('Your e-mail address is required');
         }
         else {
+            $message->setFromAddress('webclerk@scym.org','SCYM Messages');
             $fromName =  empty($fromName) ? null : trim($fromName);
-            $message->setFromAddress($fromAddress,$fromName);
+            // $message->setFromAddress($fromAddress,$fromName);
+            $senderAddress = empty($fromName) ? $fromAddress : "$fromName ($fromAddress)";
+            $body = "This message sent from the SCYM website on behalf of $senderAddress'. Do not reply directly.\n\n$body";
         }
 
         if (empty($subject)) {
@@ -81,6 +84,9 @@ class SendMessageCommand extends TServiceCommand {
                 $this->addErrorMessage('Links or urls are not permitted in these messages.');
             }
             else {
+                if (isset($dto->registrationCode)) {
+                    $body .= "\n\nView registration: http://www.scym.org/register?code=$dto->registrationCode";
+                }
                 $message->setMessageBody($body);
             }
         }
@@ -94,6 +100,7 @@ class SendMessageCommand extends TServiceCommand {
                 $this->addErrorMessage("The address '$email' is invalid: $error");
             }
         }
+
         return $message;
     }
     

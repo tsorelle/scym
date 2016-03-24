@@ -1009,7 +1009,7 @@ class ScymRegistrationsManager extends TDbServiceManager
     }
 
     public function getFinancialAidReport(){
-        return $this->getReportView('financialAidReportView',false);
+        return $this->getReportView('financialAidReportView');
     }
 
     public function getCreditsReport() {

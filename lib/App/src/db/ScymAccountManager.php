@@ -267,20 +267,23 @@ class ScymAccountManager
      * @param float $aidAmount
      * @return RegistrationAccount
      */
-    public function createAccount(array $attenders, array $donations = array(), $aidAmount = 0.0)
+    public function createAccount($recievedDate, array $attenders, array $donations = array(), $aidAmount = 0.0)
     {
         $this->payments = array();
+        if ($recievedDate == null) {
+            $recievedDate = new \DateTime();
+        }
         $this->registrationId = 0;
-        $today = new \DateTime();
-        $result = $this->buildAccount(null,$today,$attenders,$donations,$aidAmount);
+        $result = $this->buildAccount(null,$recievedDate,$attenders,$donations,$aidAmount);
         return $result;
     }
 
     public function createAccountFromRegistration(ScymRegistration $registration) {
         $account = $this->createAccount(
+            $registration->getReceivedDate(),
             $registration->getAttenders()->toArray(),
             $registration->getDonations()->toArray(),
-            $registration->getFinancialAidAmount() );
+            $registration->getFinancialAidAmount());
         $registration->addAccountItems($account);
         return $account;
     }
