@@ -37,8 +37,4 @@ CREATE OR REPLACE VIEW attendersReportView AS
 -- SELECT * FROM attendersReportView;
 CREATE OR REPLACE VIEW currentAttendersReportView AS
   SELECT * FROM attendersReportView av
-  WHERE av.year IN
-        (
-          SELECT a.`year` FROM annualsessions a WHERE a.`start` >= CURRENT_DATE() AND a.`end` <= DATE_ADD(CURRENT_DATE(), INTERVAL 90 DAY)
-        );
-
+  WHERE av.year =  currentYmYear();

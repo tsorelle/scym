@@ -2,19 +2,12 @@
 CREATE OR REPLACE VIEW currentLedgerView AS
 SELECT * FROM ledgerDownloadView r WHERE
     r.attended = 'Yes' AND
-    r.year IN
-      (SELECT a.year FROM annualsessions a
-      WHERE a.start >= CURRENT_DATE() AND a.end <= DATE_ADD(CURRENT_DATE(), INTERVAL 90 DAY) );
-
-SELECT * FROM currentLedgerView;
+    r.year =  currentYmYear();
 
 CREATE OR REPLACE VIEW currentLedgerDetailView AS
 SELECT * FROM ledgerDetailView r WHERE
         r.attendedCount > 0 AND
-        r.year IN
-          (SELECT a.year FROM annualsessions a
-          WHERE a.start >= CURRENT_DATE() AND a.end <= DATE_ADD(CURRENT_DATE(), INTERVAL 90 DAY) );
-
+        r.year =  currentYmYear();
 SELECT * FROM currentLedgerDetailView;
 
 
