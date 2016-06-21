@@ -165,7 +165,7 @@ module Tops {
 
     // Class
     export class Application implements Tops.IPeanutClient {
-        static versionNumber = "1.19";
+        static versionNumber = "1.2";
 
         constructor(currentViewModel: any) {
             var me = this;

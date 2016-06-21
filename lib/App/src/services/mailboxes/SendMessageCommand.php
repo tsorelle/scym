@@ -57,6 +57,7 @@ class SendMessageCommand extends TServiceCommand {
         }
         else {
             $message->setFromAddress('webclerk@scym.org','SCYM Messages');
+            // $message->setFromAddress('messageform@scym.org','SCYM Messages');
             $fromName =  empty($fromName) ? null : trim($fromName);
             // $message->setFromAddress($fromAddress,$fromName);
             $senderAddress = empty($fromName) ? $fromAddress : "$fromName ($fromAddress)";

@@ -64,7 +64,7 @@ class ScymRegistrationsManager extends TDbServiceManager
             // if we are 60 days past the yearly meeting end date for the curren year, go to next year.
             $endDate = clone $result->getEnd(); // must clone because $endDate->add would change $result->end
             $today = new \DateTime();
-            if ($today > $endDate->add(new \DateInterval('P60D'))) {
+            if ($today > $endDate->add(new \DateInterval('P120D'))) {
                 $year++;
                 $result = null; // try again
             }

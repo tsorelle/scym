@@ -56,6 +56,10 @@ class ScymDocumentImporter {
         }
     }
 
+    public function getDocPath() {
+        return $this->docPath;
+    }
+    
     private function setAccess($access) {
         if (empty($access)) {
             $access ='private';
@@ -108,10 +112,14 @@ class ScymDocumentImporter {
             $result = new \stdClass();
             $result->name = $fileName;
             $result->location = $filePath;
-            $result->uri = $this->access.'://documents/'.$fileName;
+            $result->uri =  $this->access.'://documents/'.$fileName;
             $result->size = $fileStat['size'];
             $result->time =  $fileStat['mtime'];
             return $result;
+        }
+        else {
+            $this->messages->AddErrorMessage("File not found: $filePath");
+
         }
         return false;
     }
@@ -184,7 +192,7 @@ class ScymDocumentImporter {
         return $this->toFieldSpec($term->tid,'tid');
     }
 
-    private function createNode($fileInfo) {
+    private function createNode($fileInfo,$access='public') {
         $node = new \stdClass();
         $node->fid = $fileInfo->fid;
         $node->type = 'documents';
@@ -222,7 +230,12 @@ class ScymDocumentImporter {
         $node->tnid = 0;
         $node->translate = 0;
         $node->field_document_status = $this->toFieldSpec($fileInfo->docStatus,'value');
-        $node->field_file_private_document_file = $this->toFieldSpec($fileSpec);
+        if ($access == 'private') {
+            $node->field_file_private_document_file = $this->toFieldSpec($fileSpec);
+        }
+        else {
+            $node->field_document_file = $this->toFieldSpec($fileSpec);
+        }
         $node->field_document_type = $this->toFieldSpec($fileInfo->docType,'value');
         $node->field_document_publication_date = $this->dateToArray($fileInfo->published);
         $field = $this->taxonomyField('Annual session years',$fileInfo->ymYear);
@@ -244,6 +257,9 @@ class ScymDocumentImporter {
 
     public function addDocument(\stdClass $doc)
     {
+
+        $access = isset($doc->access) ? $doc->access : 'private';
+
         if (!$doc->filename) {
             $this->messages->AddErrorMessage("Document file name is required.");
             return 0;
@@ -251,8 +267,10 @@ class ScymDocumentImporter {
         if (!$this->isPdf($doc->filename)) {
             $this->messages->AddErrorMessage("Document must be in PDF format.");
             return 0;
-
         }
+
+
+
 
         $previouslyAdded = $this->drupalqm->executeScaler('count(*)', 'file_managed', 'filename=?', $doc->filename);
         if ($previouslyAdded) {
@@ -260,16 +278,14 @@ class ScymDocumentImporter {
             return 0;
         }
 
-        $baseDocPath = $this->setAccess(empty($doc->access) ? 'private' : $doc->access);
+
+        $this->setAccess($access);
 
         $fileInfo = $this->getFileInfo($doc->filename);
-
         if ($fileInfo === false) {
-            $this->messages->AddErrorMessage("File '$baseDocPath$doc->filename' not found.");
             return 0;
         }
-
-
+        
         $fileInfo->fid = $this->insertIntoFileTable($fileInfo);
 
         // $fileInfo->fid = 99;
@@ -303,10 +319,9 @@ class ScymDocumentImporter {
         }
 
         // create node
-        $nid = $this->createNode($fileInfo);
+        $nid = $this->createNode($fileInfo,$access);
 
         $this->messages->AddInfoMessage("Successfully registered '$doc->filename'");
         return $nid;
     }
-
 }
