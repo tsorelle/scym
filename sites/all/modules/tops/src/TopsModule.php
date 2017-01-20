@@ -107,7 +107,7 @@ class TopsModule {
        // application_page
 
        if (self::userAnonymous() && $node !== null && isset($node->type)) {
-           if ($node->type = 'application_page') {
+           if ($node->type == 'application_page') {
                $accessFieldName = 'field_page_access';
            }
            else {
