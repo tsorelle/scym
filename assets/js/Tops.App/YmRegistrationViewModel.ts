@@ -503,6 +503,7 @@ module Tops {
 
     export class attenderObservable extends editPanel {
         public id = ko.observable(0);
+        showCreditTypeDropdown = ko.observable(true);
         changed = ko.observable(false);
         firstName = ko.observable('');
         lastName = ko.observable('');
@@ -659,7 +660,7 @@ module Tops {
             me.hasErrors(false);
         }
 
-        public assignLookupLists(lists:IAttenderLookups) {
+        public assignLookupLists(lists:IAttenderLookups, showAllCreditTypes: boolean = false) {
             var me = this;
             me.lookupsAssigned = true;
             me.housingTypes(lists.housingTypes);
@@ -702,14 +703,27 @@ module Tops {
                     {Text: 'Twelth', Value: '12', Description: ''}
                 ]
             );
-            me.creditTypes(
-                [
-                    {Text: 'General attender', Value: '0', Description: ''},
-                    {Text: 'Teacher', Value: '2', Description: ''},
-                    {Text: 'Guest', Value: '3', Description: ''},
-                    {Text: 'SCYM Staff', Value: '4', Description: ''}
-                ]
-            );
+            if (showAllCreditTypes) {
+                me.creditTypes(
+                    [
+                        {Text: 'General attender', Value: '0', Description: ''},
+                        {Text: 'Teacher', Value: '2', Description: ''},
+                        {Text: 'Guest', Value: '3', Description: ''},
+                        {Text: 'SCYM Staff', Value: '4', Description: ''}
+                    ]
+                );
+                me.showCreditTypeDropdown(true);
+            }
+            else {
+                me.creditTypes(
+                    [
+                        {Text: 'General attender', Value: '0', Description: ''}
+                        // ,{Text: 'SCYM Staff', Value: '4', Description: ''}
+                    ]
+                );
+                me.showCreditTypeDropdown(false);
+
+            }
         }
 
         private buildTimeLookup():IListItem[] {
@@ -2116,9 +2130,12 @@ module Tops {
             var me = this;
             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                 var response = <IGetAttenderResponse>serviceResponse.Value;
+                showAllCreditTypes = true;
                 if (response) {
                     if (response.lookups) {
-                        me.attenderForm.assignLookupLists(response.lookups);
+                        var showAllCreditTypes =  (me.user.isRegistrar() ||
+                            (response.attender && response.attender.creditTypeId && response.attender.creditTypeId > 2));
+                        me.attenderForm.assignLookupLists(response.lookups, showAllCreditTypes);
                     }
                 }
                 me.editAttender(response.attender);

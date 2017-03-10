@@ -480,7 +480,7 @@
                                     <Label>First time attender?&nbsp;</Label> <input type="checkbox" data-bind="checked: attenderForm.firstTimer" />
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="form-group" >
+                                    <div class="form-group" data-bind="visible:attenderForm.showCreditTypeDropdown" >
                                         <label for="creditType-input" class="control-label">I am attending as a . . .</label>
                                         <span class="whats-this">
                                             <a tabindex="0" role="button" data-toggle="popover"
