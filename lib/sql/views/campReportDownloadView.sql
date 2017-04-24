@@ -33,6 +33,7 @@ UNION
 SELECT 7 AS LineOrder, 'Linen Bags' AS Item,
 (SELECT IFNULL(SUM(amount) DIV ft.unitAmount,0)
 FROM charges c
+JOIN registrations r ON (c.registrationId = r.registrationId AND r.year = currentYmYear())
 JOIN feetypes ft ON ft.feeTypeID = c.feeTypeID
 WHERE feeCode = 'LINEN') AS 'Count'
 ORDER BY LineOrder;

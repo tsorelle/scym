@@ -5,4 +5,3 @@ sites/*/settings*.php
 sites/*/files
 sites/*/private
 
-assets/js/typings

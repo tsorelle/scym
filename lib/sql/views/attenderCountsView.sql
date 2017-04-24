@@ -34,7 +34,6 @@ IFNULL((SELECT SUM(nights) FROM housingCountsDetailView WHERE attenderid = a.att
 IFNULL((SELECT SUM(nights) FROM housingCountsDetailView WHERE attenderid = a.attenderid AND category > 1), 0) AS CabinNights,
 (SELECT COUNT(*) FROM meals WHERE attenderid = a.attenderid) AS Meals,
 IF(a.housingTypeId = 1,'Yes','No') AS DayVisitor
-FROM attenders a
-JOIN registrations r ON a.registrationId = r.registrationId;
+FROM currentAttenders a
+JOIN registrations r ON a.registrationId = r.registrationId
 
--- SELECT * FROM attenderCountsView;
